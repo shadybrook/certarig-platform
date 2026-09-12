@@ -45,6 +45,14 @@ CATALOG: dict[str, dict[str, str]] = {
         "title": "That tool is not on this rig",
         "next": "The capability manifest does not expose it. Ask an engineer to change the manifest.",
     },
+    "gpio_backend": {
+        "title": "This Pi cannot open GPIO",
+        "next": "Set GPIOZERO_PIN_FACTORY=lgpio and recreate the venv with --system-site-packages so system lgpio is visible. Isolated Python 3.13 venvs fail this import.",
+    },
+    "interview_incomplete": {
+        "title": "The commissioning interview is not finished",
+        "next": "Learn the required facts (modules, signals, observe-only), then propose. A human still has to apply it.",
+    },
 }
 
 

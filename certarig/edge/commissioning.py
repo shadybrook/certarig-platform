@@ -3,7 +3,7 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 
-from .models import RigConfig, RigSnapshot
+from .models import RigConfig, RigSnapshot, in_valid_range
 
 
 @dataclass(frozen=True)
@@ -206,9 +206,11 @@ class ProcessGuardrail:
                     state = "invalid"
                     if not math.isfinite(value):
                         value = None
-                elif value < channel.valid_min or value > channel.valid_max:
+                elif not in_valid_range(channel, value):
                     state = "invalid"
-                elif value < channel.safe_min:
+                elif value < channel.safe_min and not (
+                    channel.safe_min == 0.0 and in_valid_range(channel, value)
+                ):
                     state = "low"
                 elif value > safe_max:
                     state = "high"

@@ -1,10 +1,31 @@
 from __future__ import annotations
 
+import os
 from datetime import UTC, datetime
 from time import sleep
 
-from ..models import ChannelConfig, RigConfig, RigSnapshot, Sample
+from ..models import ChannelConfig, RigConfig, RigSnapshot, Sample, in_valid_range
 from .base import HardwareAdapter, HardwareError
+
+GPIO_BACKEND_HELP = (
+    "Raspberry Pi GPIO needs the system lgpio backend. "
+    "Set GPIOZERO_PIN_FACTORY=lgpio and recreate the venv with --system-site-packages "
+    "so the OS lgpio package is visible. Isolated Python 3.13 venvs fail this import."
+)
+
+
+def require_pi_gpio_backend() -> None:
+    """Fail in English before gpiozero opens pins. Isolated venvs cannot see system lgpio."""
+    factory = os.environ.get("GPIOZERO_PIN_FACTORY", "")
+    if factory and factory != "lgpio":
+        raise HardwareError(
+            f"GPIOZERO_PIN_FACTORY={factory} will not drive this bench. Set it to lgpio. {GPIO_BACKEND_HELP}"
+        )
+    try:
+        import lgpio  # noqa: F401
+    except ImportError as exc:
+        raise HardwareError(GPIO_BACKEND_HELP) from exc
+    os.environ.setdefault("GPIOZERO_PIN_FACTORY", "lgpio")
 
 
 def utc_now() -> str:
@@ -51,10 +72,13 @@ class RaspberryPiHardware(HardwareAdapter):
     """GPIO and ADS1115 adapter. Output initializes and closes in the safe state."""
 
     def __init__(self, config: RigConfig) -> None:
+        require_pi_gpio_backend()
         try:
             from gpiozero import DigitalInputDevice, OutputDevice
         except ImportError as exc:
-            raise HardwareError("gpiozero is required for Raspberry Pi GPIO access") from exc
+            raise HardwareError(
+                "gpiozero is required for Raspberry Pi GPIO access. " + GPIO_BACKEND_HELP
+            ) from exc
 
         self.config = config
         hardware = config.hardware
@@ -110,7 +134,7 @@ class RaspberryPiHardware(HardwareAdapter):
                 continue
             voltage = self.adc.read_voltage(channel.adc_channel)
             value = self._scale(channel, voltage)
-            quality = "good" if channel.valid_min <= value <= channel.valid_max else "out_of_range"
+            quality = "good" if in_valid_range(channel, value) else "out_of_range"
             samples.append(
                 Sample(
                     channel_id=channel.channel_id,

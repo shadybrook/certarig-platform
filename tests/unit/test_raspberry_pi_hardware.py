@@ -66,8 +66,10 @@ class RaspberryPiHardwareTests(unittest.TestCase):
             DigitalInputDevice=FakeInput,
             OutputDevice=FakeOutput,
         )
+        fake_lgpio = types.ModuleType("lgpio")
         with (
-            patch.dict(sys.modules, {"gpiozero": fake_gpiozero}),
+            patch.dict(sys.modules, {"gpiozero": fake_gpiozero, "lgpio": fake_lgpio}),
+            patch.dict("os.environ", {"GPIOZERO_PIN_FACTORY": "lgpio"}),
             patch("certarig.edge.hardware.raspberry_pi.ADS1115Reader", FakeADC),
         ):
             return RaspberryPiHardware(config(active_high))
@@ -103,6 +105,25 @@ class RaspberryPiHardwareTests(unittest.TestCase):
         self.assertTrue(hardware.emergency_stop_is_active())
         hardware.emergency_stop.pin.state = True
         self.assertFalse(hardware.emergency_stop_is_active())
+
+    def test_missing_lgpio_is_english(self) -> None:
+        from certarig.edge.hardware.base import HardwareError
+        from certarig.edge.hardware.raspberry_pi import require_pi_gpio_backend
+
+        with (
+            patch.dict("os.environ", {"GPIOZERO_PIN_FACTORY": "lgpio"}),
+            patch.dict(sys.modules, {"lgpio": None}),
+        ):
+            with self.assertRaisesRegex(HardwareError, "system-site-packages"):
+                require_pi_gpio_backend()
+
+    def test_wrong_pin_factory_is_refused(self) -> None:
+        from certarig.edge.hardware.base import HardwareError
+        from certarig.edge.hardware.raspberry_pi import require_pi_gpio_backend
+
+        with patch.dict("os.environ", {"GPIOZERO_PIN_FACTORY": "mock"}):
+            with self.assertRaisesRegex(HardwareError, "GPIOZERO_PIN_FACTORY=mock"):
+                require_pi_gpio_backend()
 
 
 if __name__ == "__main__":

@@ -1,8 +1,15 @@
 from __future__ import annotations
 
+import math
 from dataclasses import asdict, dataclass, field
 from enum import StrEnum
 from typing import Any
+
+# Single-ended ADS1115 reads can dip a few millivolts below 0 at rest.
+# Treat a small undershoot of a 0-based valid_min as in-range so noise
+# at the stop does not fail adc_validation (lab: first sweep, 12 Sep 2026).
+VALID_UNDERSHOOT_FRACTION = 0.01
+VALID_UNDERSHOOT_MIN = 0.05
 
 
 class PlanState(StrEnum):
@@ -45,6 +52,18 @@ class ChannelConfig:
     stuck_samples: int | None = None
     stuck_epsilon: float | None = None
     source: dict[str, Any] | None = None
+
+
+def in_valid_range(channel: ChannelConfig, value: float) -> bool:
+    """True when ``value`` is inside the channel's valid span, with a documented floor epsilon."""
+    if not math.isfinite(value):
+        return False
+    low = channel.valid_min
+    high = channel.valid_max
+    if low == 0.0:
+        span = max(0.0, high - low)
+        low -= max(VALID_UNDERSHOOT_MIN, span * VALID_UNDERSHOOT_FRACTION)
+    return low <= value <= high
 
 
 CONCEPT_BY_UNIT = {

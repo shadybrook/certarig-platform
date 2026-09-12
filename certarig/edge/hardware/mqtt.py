@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from typing import Any
 
-from ..models import RigConfig, RigSnapshot, Sample
+from ..models import RigConfig, RigSnapshot, Sample, in_valid_range
 from .base import HardwareAdapter, HardwareError
 from .bus import TagBus
 
@@ -27,7 +27,7 @@ class MqttHardware(HardwareAdapter):
         samples = []
         for channel in self.config.channels:
             value = self.bus.get(_address(channel))
-            quality = "good" if channel.valid_min <= value <= channel.valid_max else "out_of_range"
+            quality = "good" if in_valid_range(channel, value) else "out_of_range"
             samples.append(
                 Sample(channel.channel_id, value, channel.unit, None, quality, captured)
             )
