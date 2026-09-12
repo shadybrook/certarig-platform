@@ -1,0 +1,18 @@
+name: estop wire break reads as stop
+description: A broken NC1 loop must be indistinguishable from a press. The button is never released so the release trigger fails.
+seed: 22
+procedure: estop_anti_restart
+duration_s: 30
+events:
+  - at_step: press_estop
+    action: fault
+    kind: estop_wire_break
+  - at_step: release_estop
+    action: abort
+    reason: wire break confirmed, stopping test
+    delay_s: 0.5
+expect:
+  outcome: aborted
+  kernel_events_include: [estop_open_forced_safe]
+  final_output_high: false
+  invariants: [output_off_when_estop, no_restart_without_reset, ends_safe]

@@ -1,0 +1,13 @@
+name: slow drift crosses the trip limit
+description: A drifting pressure sensor eventually crosses the trip while permitted; the output must drop exactly once and stay off.
+seed: 62
+duration_s: 10
+events:
+  - { at_s: 0.3, action: command, command: reset }
+  - { at_s: 0.5, action: command, command: permit }
+  - { at_s: 1.0, action: fault, kind: drift, channel: pressure, params: { rate: 0.6 } }
+  - { at_s: 8.0, action: command, command: permit }
+expect:
+  kernel_events_include: [permit_accepted, pressure_high_forced_safe, permit_rejected_reset_required]
+  final_output_high: false
+  invariants: [output_off_when_process_unsafe, no_restart_without_reset, ends_safe, csv_rows_contiguous]

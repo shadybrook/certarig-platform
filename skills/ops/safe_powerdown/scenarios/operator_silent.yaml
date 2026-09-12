@@ -1,0 +1,12 @@
+name: safe powerdown operator never confirms
+seed: 52
+procedure: safe_powerdown
+duration_s: 30
+events:
+  - when_awaiting: confirm_bench
+    action: abort
+    reason: no operator present
+    delay_s: 0.5
+expect:
+  outcome: aborted
+  final_output_high: false

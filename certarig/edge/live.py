@@ -285,11 +285,10 @@ class LiveBenchRuntime:
                 "event": state["guardrail"].get("event", ""),
             }
             self._history.append(point)
-            state["history"] = list(self._history)
             self._latest = state
             self._write_record(state)
             self._sample_index += 1
-            return json.loads(json.dumps(state))
+            return {**state, "history": list(self._history)}
 
     def state(self) -> dict[str, Any]:
         with self._lock:

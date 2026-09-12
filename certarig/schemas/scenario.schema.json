@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://certarig.dev/schemas/scenario.schema.json",
+  "title": "CertaRig simulation scenario",
+  "description": "Drives the simulated rig (operator moves, faults, E-stop) while a procedure runs, then checks expectations over the run record and the CSV.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name", "events", "expect"],
+  "properties": {
+    "name": { "type": "string", "minLength": 3, "maxLength": 120 },
+    "description": { "type": "string", "maxLength": 1000 },
+    "seed": { "type": "integer", "minimum": 0 },
+    "rig": { "type": "string", "description": "Rig config filename relative to config/ (default rig.sim.json)." },
+    "capabilities": { "type": "string" },
+    "procedure": { "type": "string", "description": "Procedure id to run; omit for kernel-only scenarios." },
+    "label": { "type": "string", "maxLength": 40 },
+    "duration_s": { "type": "number", "exclusiveMinimum": 0, "maximum": 600, "description": "Simulated seconds to run when there is no procedure, or the cap for a procedure run." },
+    "auto_ack": { "type": "boolean", "default": false, "description": "Acknowledge every await_operator step as soon as it appears." },
+    "events": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["action"],
+        "properties": {
+          "at_s": { "type": "number", "minimum": 0 },
+          "at_step": { "type": "string" },
+          "when_awaiting": { "type": "string" },
+          "delay_s": { "type": "number", "minimum": 0 },
+          "action": {
+            "type": "string",
+            "enum": ["set_target", "ramp", "estop", "fault", "clear", "ack", "command", "abort", "note"]
+          },
+          "channel": { "type": "string" },
+          "value": { "type": "number" },
+          "to": { "type": "number" },
+          "over_s": { "type": "number", "minimum": 0 },
+          "pressed": { "type": "boolean" },
+          "kind": { "type": "string" },
+          "params": { "type": "object" },
+          "step": { "type": "string" },
+          "command": { "type": "string", "enum": ["safe", "reset", "permit"] },
+          "reason": { "type": "string" },
+          "text": { "type": "string" }
+        }
+      }
+    },
+    "expect": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "outcome": { "type": "string", "enum": ["passed", "failed", "aborted"] },
+        "outcome_reason_contains": { "type": "string" },
+        "kernel_events_include": { "type": "array", "items": { "type": "string" } },
+        "kernel_events_exclude": { "type": "array", "items": { "type": "string" } },
+        "steps_passed": { "type": "array", "items": { "type": "string" } },
+        "steps_failed": { "type": "array", "items": { "type": "string" } },
+        "final_output_high": { "type": "boolean" },
+        "invariants": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "output_off_when_estop",
+              "output_off_when_process_unsafe",
+              "no_restart_without_reset",
+              "csv_rows_contiguous",
+              "ends_safe"
+            ]
+          }
+        },
+        "min_csv_rows": { "type": "integer", "minimum": 0 }
+      }
+    }
+  }
+}

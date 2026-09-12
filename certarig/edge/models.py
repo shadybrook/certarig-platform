@@ -69,6 +69,7 @@ class HardwareConfig:
     emergency_stop_active_high: bool = True
     relay_feedback_gpio: int | None = 25
     output_active_high: bool = True
+    simulator: dict[str, Any] | None = None
 
 
 @dataclass(frozen=True)

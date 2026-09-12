@@ -97,4 +97,10 @@ def build_node(settings: NodeSettings, hardware: HardwareAdapter | None = None) 
     from .ops import install_ops
 
     install_ops(node)
+    from certarig.sim.plant import SimulatedRig
+
+    if isinstance(adapter, SimulatedRig):
+        from certarig.sim.api import install_sim_api
+
+        install_sim_api(node, adapter)
     return node

@@ -1,0 +1,40 @@
+name: adc validation sweep happy path
+seed: 41
+procedure: adc_validation
+duration_s: 120
+events:
+  - at_step: pressure_low
+    action: ramp
+    channel: pressure
+    to: 0.1
+    over_s: 0.5
+  - at_step: pressure_high
+    action: ramp
+    channel: pressure
+    to: 9.0
+    over_s: 0.8
+  - at_step: pressure_mid
+    action: ramp
+    channel: pressure
+    to: 2.5
+    over_s: 0.8
+  - at_step: flow_low
+    action: ramp
+    channel: flow
+    to: 0.2
+    over_s: 0.5
+  - at_step: flow_high
+    action: ramp
+    channel: flow
+    to: 18.5
+    over_s: 0.8
+  - at_step: flow_mid
+    action: ramp
+    channel: flow
+    to: 8.0
+    over_s: 0.8
+expect:
+  outcome: passed
+  kernel_events_exclude: [permit_accepted]
+  final_output_high: false
+  invariants: [output_off_when_estop, output_off_when_process_unsafe, csv_rows_contiguous, ends_safe]

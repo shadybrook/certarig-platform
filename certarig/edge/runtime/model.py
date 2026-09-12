@@ -37,6 +37,10 @@ class Step:
     def allow_estop(self) -> bool:
         return bool(self.raw.get("allow_estop", False))
 
+    @property
+    def allow_invalid_sensor(self) -> bool:
+        return bool(self.raw.get("allow_invalid_sensor", False))
+
 
 @dataclass(frozen=True)
 class Procedure:

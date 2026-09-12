@@ -1,0 +1,33 @@
+name: adc channel stuck
+description: The flow pot wiper is broken; the channel never reaches the low trigger.
+seed: 42
+procedure: adc_validation
+duration_s: 40
+events:
+  - at_step: pressure_low
+    action: ramp
+    channel: pressure
+    to: 0.1
+    over_s: 0.5
+  - at_step: pressure_high
+    action: ramp
+    channel: pressure
+    to: 9.0
+    over_s: 0.8
+  - at_step: pressure_mid
+    action: ramp
+    channel: pressure
+    to: 2.5
+    over_s: 0.8
+  - at_step: flow_low
+    action: fault
+    kind: stuck
+    channel: flow
+  - at_step: flow_low
+    action: abort
+    reason: flow channel stuck, aborting sweep
+    delay_s: 1.0
+expect:
+  outcome: aborted
+  final_output_high: false
+  invariants: [output_off_when_estop, ends_safe]

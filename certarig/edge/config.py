@@ -127,6 +127,7 @@ def load_config_dict(raw: Any) -> RigConfig:
             hardware_raw.get("output_active_high", True),
             "hardware.output_active_high",
         ),
+        simulator=dict(hardware_raw["simulator"]) if hardware_raw.get("simulator") is not None else None,
     )
     sample_interval_ms = int(raw.get("sample_interval_ms", 100))
     if sample_interval_ms < 20:

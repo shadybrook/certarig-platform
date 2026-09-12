@@ -1,0 +1,14 @@
+name: flow runs high during a permitted cycle
+seed: 33
+procedure: relay_truth_table
+duration_s: 60
+events:
+  - at_step: cycle1_hold
+    action: set_target
+    channel: flow
+    value: 18.0
+expect:
+  outcome: failed
+  kernel_events_include: [flow_high_forced_safe]
+  final_output_high: false
+  invariants: [output_off_when_estop, output_off_when_process_unsafe, no_restart_without_reset, ends_safe]

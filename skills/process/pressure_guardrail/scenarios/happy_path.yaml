@@ -1,0 +1,24 @@
+name: pressure guardrail happy path
+description: Operator raises P1 through the trip limit, output drops, lowers it, no auto restart.
+seed: 11
+procedure: pressure_guardrail
+label: sim-guardrail
+duration_s: 120
+events:
+  - at_step: raise_pressure
+    action: ramp
+    channel: pressure
+    to: 5.2
+    over_s: 1.5
+  - at_step: lower_pressure
+    action: ramp
+    channel: pressure
+    to: 2.0
+    over_s: 1.0
+expect:
+  outcome: passed
+  kernel_events_include: [permit_accepted, pressure_high_forced_safe, permit_rejected_reset_required]
+  kernel_events_exclude: [estop_open_forced_safe, sensor_invalid_forced_safe]
+  final_output_high: false
+  invariants: [output_off_when_estop, output_off_when_process_unsafe, no_restart_without_reset, csv_rows_contiguous, ends_safe]
+  min_csv_rows: 50

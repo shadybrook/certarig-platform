@@ -1,0 +1,11 @@
+name: safe powerdown with operator confirmation
+seed: 51
+procedure: safe_powerdown
+duration_s: 30
+auto_ack: true
+events: []
+expect:
+  outcome: passed
+  kernel_events_exclude: [permit_accepted]
+  final_output_high: false
+  invariants: [ends_safe]

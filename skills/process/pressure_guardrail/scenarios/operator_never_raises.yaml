@@ -1,0 +1,18 @@
+name: operator never raises pressure
+description: The trigger step times out because nobody moves the pot. Output must be removed at the end.
+seed: 13
+procedure: pressure_guardrail
+duration_s: 40
+events:
+  - at_step: raise_pressure
+    action: note
+    text: operator distracted
+  - at_s: 6.0
+    action: abort
+    reason: operator walked away
+expect:
+  outcome: aborted
+  outcome_reason_contains: operator walked away
+  kernel_events_include: [permit_accepted, operator_safe]
+  final_output_high: false
+  invariants: [output_off_when_estop, output_off_when_process_unsafe, no_restart_without_reset, ends_safe]

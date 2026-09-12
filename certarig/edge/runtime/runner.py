@@ -209,6 +209,13 @@ class ProcedureRunner:
             raise _Abort(f"runtime error: {facts.states.get('last_event')}")
         if step is not None and facts.states.get("estop_active") and not step.allow_estop:
             raise _Abort("emergency stop became active during a step that does not allow it")
+        if step is not None and not step.allow_invalid_sensor:
+            invalid = sorted(name for name, state in facts.signal_states.items() if state == "invalid")
+            if invalid:
+                raise _Fail(
+                    f"sensor invalid during step: {', '.join(invalid)}",
+                    {"invalid_signals": invalid, "qualities": dict(facts.qualities)},
+                )
 
     def _wait_for(
         self,

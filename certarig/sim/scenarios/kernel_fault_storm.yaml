@@ -1,0 +1,39 @@
+name: kernel fault storm without a procedure
+description: Operator reset/permit cycles while faults, E-stop and overpressure hit the plant. Only invariants matter.
+seed: 61
+duration_s: 12
+events:
+  - { at_s: 0.5, action: command, command: reset }
+  - { at_s: 0.7, action: command, command: permit }
+  - { at_s: 1.5, action: ramp, channel: pressure, to: 6.0, over_s: 0.5 }
+  - { at_s: 2.5, action: ramp, channel: pressure, to: 2.0, over_s: 0.5 }
+  - { at_s: 3.2, action: command, command: permit }
+  - { at_s: 3.4, action: command, command: reset }
+  - { at_s: 3.6, action: command, command: permit }
+  - { at_s: 4.5, action: estop, pressed: true }
+  - { at_s: 5.0, action: estop, pressed: false }
+  - { at_s: 5.5, action: command, command: permit }
+  - { at_s: 5.7, action: command, command: reset }
+  - { at_s: 5.9, action: command, command: permit }
+  - { at_s: 6.5, action: fault, kind: bad_quality, channel: flow }
+  - { at_s: 7.0, action: clear, kind: bad_quality, channel: flow }
+  - { at_s: 7.5, action: command, command: reset }
+  - { at_s: 7.7, action: command, command: permit }
+  - { at_s: 8.5, action: fault, kind: saturate, channel: pressure }
+  - { at_s: 9.0, action: clear, kind: saturate, channel: pressure }
+  - { at_s: 9.5, action: fault, kind: snapshot_failure, params: { count: 3 } }
+  - { at_s: 10.0, action: command, command: reset }
+  - { at_s: 10.2, action: command, command: permit }
+  - { at_s: 11.0, action: command, command: safe }
+expect:
+  kernel_events_include:
+    - permit_accepted
+    - pressure_high_forced_safe
+    - estop_open_forced_safe
+    - estop_closed_reset_required
+    - permit_rejected_reset_required
+    - sensor_invalid_forced_safe
+    - sensor_runtime_error_forced_safe
+  final_output_high: false
+  invariants: [output_off_when_estop, output_off_when_process_unsafe, no_restart_without_reset, ends_safe]
+  min_csv_rows: 400
