@@ -51,3 +51,5 @@ CERTARIG_DEMO_URL=http://127.0.0.1:8082 node scripts/record_operator_walkthrough
 
 Voiceover for the long cut: [`operator-walkthrough.md`](operator-walkthrough.md). Pi metal shot: only after [`../platform-lab/2026-09-sidecar-repeat.md`](../platform-lab/2026-09-sidecar-repeat.md).
 
+A cloud recording of both cuts (sim Studio, no metal) is what this agent can produce. Re-record on the Mac with your voice for the 4-minute cut.
+

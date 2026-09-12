@@ -4,10 +4,10 @@ import { mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
+  BENCH_DUMP,
   clock,
   injectOverlays,
   launchBrowser,
-  login,
   showCaption,
   waitForEvidenceHash,
 } from "./lib/studio-demo.mjs";
@@ -41,12 +41,14 @@ await page.screenshot({ path: join(OUT, "live.png") });
 await until(page, 50_000);
 
 await page.locator('#nav a[data-view="onboard"]').click();
+await page.getByTestId("interview-start").waitFor();
+await page.waitForTimeout(400);
 await showCaption(page, "Onboard. Start. One bench dump. Record facts.");
 await page.getByTestId("interview-start").click();
-await page.getByTestId("interview-text").fill(
-  "ADC pots, E-stop, relay. pressure 4.05 bar, flow 14.5 L/min. observe-only: none. sim-stranger.md"
-);
+await page.getByTestId("interview-needs").filter({ hasText: "modules" }).waitFor();
+await page.getByTestId("interview-text").fill(BENCH_DUMP);
 await page.waitForTimeout(1_500);
+await page.getByTestId("interview-text").fill(BENCH_DUMP);
 await page.getByTestId("interview-record").click();
 await page.getByTestId("interview-prompt").filter({ hasText: "Required facts are in" }).waitFor();
 await until(page, 90_000);
@@ -73,6 +75,8 @@ await until(page, 190_000);
 
 await showCaption(page, "Evidence. Export the bundle. Open the SHA-256. interview.json is inside.");
 await waitForEvidenceHash(page);
+await page.getByText(".zip").first().waitFor({ timeout: 15_000 });
+await page.waitForTimeout(800);
 await page.screenshot({ path: join(OUT, "evidence.png") });
 await until(page, 230_000);
 

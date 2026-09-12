@@ -5,6 +5,8 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   clock,
+  BENCH_DUMP,
+  completeInterview,
   hideCard,
   injectOverlays,
   launchBrowser,
@@ -50,16 +52,8 @@ await page.waitForTimeout(800);
 await page.screenshot({ path: join(OUT, "live_pots.png") });
 await until(page, 38_000);
 
-await page.locator('#nav a[data-view="onboard"]').click();
 await showCaption(page, "A human applies the map.");
-await page.getByTestId("interview-start").click();
-await page.getByTestId("interview-text").fill(
-  "ADC pots, E-stop, relay. pressure 4.05 bar, flow 14.5 L/min. observe-only: none. sim-stranger.md"
-);
-await page.getByTestId("interview-record").click();
-await page.getByTestId("interview-prompt").filter({ hasText: "Required facts are in" }).waitFor();
-await page.getByTestId("interview-propose").click();
-await page.getByTestId("interview-diff").filter({ hasText: "next" }).waitFor({ timeout: 20_000 });
+await completeInterview(page, BENCH_DUMP);
 await page.screenshot({ path: join(OUT, "interview_propose.png") });
 await page.getByTestId("interview-apply").click();
 await page.waitForTimeout(600);
@@ -76,6 +70,8 @@ await until(page, 78_000);
 
 await showCaption(page, "Checksummed evidence.");
 await waitForEvidenceHash(page);
+await page.getByText(".zip").first().waitFor({ timeout: 15_000 });
+await showCaption(page, "");
 await page.screenshot({ path: join(OUT, "evidence_hash.png") });
 await until(page, 86_000);
 

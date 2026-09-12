@@ -92,6 +92,24 @@ export function clock() {
   };
 }
 
+export async function completeInterview(page, dump) {
+  await page.locator('#nav a[data-view="onboard"]').click();
+  await page.getByTestId("interview-start").waitFor();
+  await page.waitForTimeout(400);
+  await page.getByTestId("interview-start").click();
+  await page.getByTestId("interview-needs").filter({ hasText: "modules" }).waitFor();
+  await page.getByTestId("interview-text").fill(dump);
+  await page.waitForTimeout(200);
+  await page.getByTestId("interview-text").fill(dump);
+  await page.getByTestId("interview-record").click();
+  await page.getByTestId("interview-prompt").filter({ hasText: "Required facts are in" }).waitFor();
+  await page.getByTestId("interview-propose").click();
+  await page.getByTestId("interview-diff").filter({ hasText: "next" }).waitFor({ timeout: 20_000 });
+}
+
+export const BENCH_DUMP =
+  "ADC pots, E-stop, relay. pressure 4.05 bar, flow 14.5 L/min. observe-only: none. sim-stranger.md";
+
 export async function waitForEvidenceHash(page) {
   await page.locator('#nav a[data-view="evidence"]').click();
   await page.locator("#export-all").waitFor({ state: "visible", timeout: 15_000 });
