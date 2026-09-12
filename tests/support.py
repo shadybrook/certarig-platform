@@ -147,6 +147,54 @@ def edge_server(
             node.close()
 
 
+@dataclass
+class RunningSim:
+    node: EdgeNode
+    url: str
+    evidence_dir: Path
+
+    @property
+    def rig(self):  # type: ignore[no-untyped-def]
+        return self.node.extensions["simulator"]
+
+    def operator(self, name: str = "tester") -> EdgeClient:
+        return EdgeClient(self.url, operator_key=OPERATOR_KEY, principal_name=name)
+
+    def agent(self, name: str = "agent-under-test") -> EdgeClient:
+        return EdgeClient(self.url, agent_key=AGENT_KEY, principal_name=name)
+
+
+@contextlib.contextmanager
+def sim_server(
+    config_name: str = "rig.sim.json",
+    capabilities_name: str = "capabilities.wave1.json",
+    *,
+    static: bool = False,
+) -> Iterator[RunningSim]:
+    """A full Edge node over the digital twin, sampling loop running."""
+    with tempfile.TemporaryDirectory() as temp:
+        settings = _NodeSettings(
+            config_path=CONFIG_DIR / config_name,
+            capabilities_path=CONFIG_DIR / capabilities_name,
+            evidence_dir=Path(temp) / "evidence",
+            static_root=STUDIO_DIR if static else None,
+            operator_key=OPERATOR_KEY,
+            agent_key=AGENT_KEY,
+            allow_output=True,
+            skills_root=SKILLS_DIR,
+        )
+        node = build_node(settings)
+        server = make_edge_server(node, "127.0.0.1", 0)
+        threading.Thread(target=server.serve_forever, daemon=True).start()
+        node.start()
+        try:
+            yield RunningSim(node, f"http://127.0.0.1:{server.server_port}", Path(temp) / "evidence")
+        finally:
+            server.shutdown()
+            server.server_close()
+            node.close()
+
+
 def fast_config(name: str = "rig.wave1.json", **overrides: object) -> RigConfig:
     """Wave-1 config with a 20 ms sample interval for quick in-process runtime tests."""
     import json

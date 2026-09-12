@@ -464,29 +464,33 @@ class ProcedureRunner:
                 self._event(run, "recording_stopped", **(run.recording or {}))
         except Exception as exc:  # pragma: no cover - defensive
             self._event(run, "recording_stop_failed", error=str(exc))
+        # Persist before publishing the terminal status so an observer that sees ``terminal``
+        # always finds run.json and procedure.json on disk.
+        run.outcome_reason = reason
+        run.ended_at = utc_now()
+        run.current_step = None
+        self._event(run, "finished", status=status.value, reason=reason)
+        self._persist(run, status)
         with self._lock:
             run.status = status
-            run.outcome_reason = reason
-            run.ended_at = utc_now()
-            run.current_step = None
             self._active = None
-        self._event(run, "finished", status=status.value, reason=reason)
-        self._persist(run)
         if self.on_finish is not None:
             try:
                 self.on_finish(run)
             except Exception:  # pragma: no cover - hooks must not break the runner
                 pass
 
-    def _persist(self, run: ProcedureRun) -> None:
+    def _persist(self, run: ProcedureRun, status: RunStatus | None = None) -> None:
         target = self.evidence_dir / "procedure_runs" / run.run_id
         target.mkdir(parents=True, exist_ok=True)
         run.evidence_dir = str(target)
-        (target / "run.json").write_text(
-            json.dumps(run.to_dict(), indent=2, sort_keys=True), encoding="utf-8"
-        )
         procedure = self._procedures.get(run.run_id)
-        if procedure is not None:
+        if procedure is not None and not (target / "procedure.json").is_file():
             (target / "procedure.json").write_text(
                 json.dumps(procedure.raw, indent=2, sort_keys=True), encoding="utf-8"
             )
+        document = run.to_dict()
+        if status is not None:
+            document["status"] = status.value
+            document["terminal"] = status.terminal
+        (target / "run.json").write_text(json.dumps(document, indent=2, sort_keys=True), encoding="utf-8")

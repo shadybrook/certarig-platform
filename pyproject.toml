@@ -55,7 +55,8 @@ branch = true
 source = ["certarig"]
 omit = [
   "certarig/edge/hardware/raspberry_pi.py",
-  "certarig/edge/mcp_server.py",
+  "certarig/__main__.py",
+  "certarig/cli.py",
   "certarig/agent/providers/anthropic_provider.py",
   "certarig/agent/providers/openai_provider.py",
 ]

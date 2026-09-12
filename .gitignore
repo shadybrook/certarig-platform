@@ -22,3 +22,4 @@ studio/playwright-report/
 .env
 .netlify
 evidence/runs/
+.coverage
