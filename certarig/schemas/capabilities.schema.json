@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://certarig.dev/schemas/capabilities.schema.json",
+  "title": "CertaRig capability manifest",
+  "description": "What the agent principal may do on this rig. Every Edge tool is listed with a policy. Tools not listed are treated as 'never'. The manifest is hashed together with the rig config into the contract_hash that every mutating call must present.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["manifest_id", "revision", "tools"],
+  "properties": {
+    "manifest_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{2,63}$" },
+    "revision": { "type": "string", "minLength": 1, "maxLength": 80 },
+    "description": { "type": "string", "maxLength": 500 },
+    "approval_ttl_s": {
+      "type": "integer",
+      "minimum": 10,
+      "maximum": 3600,
+      "default": 300,
+      "description": "How long a granted human approval stays valid before it expires unused."
+    },
+    "tools": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": { "pattern": "^[a-z][a-z0-9_]{1,47}$" },
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["policy"],
+        "properties": {
+          "policy": {
+            "type": "string",
+            "enum": ["allowed", "human_approval", "controller_approval", "never"],
+            "description": "allowed: the agent may call it directly. human_approval: a human must grant a single-use approval first. controller_approval: the deterministic kernel decides at call time (the policy only labels it). never: not exposed to the agent at all, refused even with a valid key."
+          },
+          "note": { "type": "string", "maxLength": 300 }
+        }
+      }
+    }
+  }
+}

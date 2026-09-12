@@ -5,15 +5,12 @@ import hashlib
 import json
 import math
 import re
-import secrets
 import threading
 import time
 from collections import deque
 from datetime import UTC, datetime
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any
-from urllib.parse import urlparse
 
 from .commissioning import ProcessGuardrail, ProcessInterlockResult
 from .hardware.base import HardwareAdapter
@@ -390,129 +387,3 @@ class LiveBenchRuntime:
                 self._record_handle = None
                 self._record_writer = None
             self.hardware.close()
-
-
-def make_live_handler(
-    runtime: LiveBenchRuntime,
-    operator_key: str,
-    static_root: str | Path,
-) -> type[BaseHTTPRequestHandler]:
-    root = Path(static_root).resolve()
-    static_files = {
-        "/": (root / "index.html", "text/html; charset=utf-8"),
-        "/index.html": (root / "index.html", "text/html; charset=utf-8"),
-        "/styles.css": (root / "styles.css", "text/css; charset=utf-8"),
-        "/src/app.mjs": (root / "src/app.mjs", "text/javascript; charset=utf-8"),
-        "/src/engine.mjs": (root / "src/engine.mjs", "text/javascript; charset=utf-8"),
-        "/src/live.mjs": (root / "src/live.mjs", "text/javascript; charset=utf-8"),
-    }
-
-    class Handler(BaseHTTPRequestHandler):
-        server_version = "CertaRigLive/0.1"
-
-        def log_message(self, format: str, *args: Any) -> None:
-            return
-
-        def _send_json(self, status: int, payload: dict[str, Any]) -> None:
-            self._send_bytes(status, json.dumps(payload, sort_keys=True).encode("utf-8"), "application/json")
-
-        def _send_bytes(self, status: int, body: bytes, content_type: str) -> None:
-            self.send_response(status)
-            self.send_header("Content-Type", content_type)
-            self.send_header("Content-Length", str(len(body)))
-            self.send_header("Cache-Control", "no-store")
-            self.send_header("X-Content-Type-Options", "nosniff")
-            self.end_headers()
-            self.wfile.write(body)
-
-        def _read_json(self) -> dict[str, Any]:
-            length = int(self.headers.get("Content-Length", "0"))
-            if length > 64_000:
-                raise ValueError("request body is too large")
-            if length == 0:
-                return {}
-            payload = json.loads(self.rfile.read(length).decode("utf-8"))
-            if not isinstance(payload, dict):
-                raise ValueError("request body must be a JSON object")
-            return payload
-
-        def _authorized(self) -> bool:
-            candidate = self.headers.get("X-CertaRig-Operator-Key")
-            return candidate is not None and secrets.compare_digest(candidate, operator_key)
-
-        def _require_operator(self) -> bool:
-            if self._authorized():
-                return True
-            self._send_json(401, {"error": "operator authentication required"})
-            return False
-
-        def do_GET(self) -> None:
-            path = urlparse(self.path).path
-            if path in static_files:
-                source, content_type = static_files[path]
-                if not source.is_file():
-                    self._send_json(404, {"error": "static asset not found"})
-                    return
-                self._send_bytes(200, source.read_bytes(), content_type)
-                return
-            if path == "/health":
-                self._send_json(
-                    200,
-                    {
-                        "status": "ok",
-                        "rig_id": runtime.config.rig_id,
-                        "hardware_mode": runtime.config.hardware.mode,
-                        "actuation_enabled": runtime.allow_output,
-                        "config_hash": runtime.config.config_hash,
-                    },
-                )
-                return
-            if path == "/v1/live/state":
-                self._send_json(200, runtime.state())
-                return
-            if path == "/v1/live/recordings/latest.csv":
-                if not self._require_operator():
-                    return
-                recording = runtime.latest_recording()
-                if recording is None:
-                    self._send_json(404, {"error": "no CSV recording is available"})
-                    return
-                self._send_bytes(200, recording.read_bytes(), "text/csv; charset=utf-8")
-                return
-            self._send_json(404, {"error": "route not found"})
-
-        def do_POST(self) -> None:
-            path = urlparse(self.path).path
-            if not self._require_operator():
-                return
-            try:
-                payload = self._read_json()
-                if path.startswith("/v1/live/commands/"):
-                    command = path.removeprefix("/v1/live/commands/")
-                    if command not in {"safe", "reset", "permit"}:
-                        raise ValueError("unsupported command")
-                    self._send_json(200, runtime.command(command))
-                    return
-                if path == "/v1/live/recordings/start":
-                    self._send_json(201, runtime.start_recording(str(payload.get("label", "bench-run"))))
-                    return
-                if path == "/v1/live/recordings/stop":
-                    self._send_json(200, runtime.stop_recording())
-                    return
-                self._send_json(404, {"error": "route not found"})
-            except (json.JSONDecodeError, TypeError, ValueError) as exc:
-                self._send_json(400, {"error": str(exc)})
-            except RuntimeError as exc:
-                self._send_json(409, {"error": str(exc)})
-
-    return Handler
-
-
-def make_live_server(
-    runtime: LiveBenchRuntime,
-    operator_key: str,
-    static_root: str | Path,
-    host: str,
-    port: int,
-) -> ThreadingHTTPServer:
-    return ThreadingHTTPServer((host, port), make_live_handler(runtime, operator_key, static_root))

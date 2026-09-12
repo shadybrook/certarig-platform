@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://certarig.dev/schemas/rig.schema.json",
+  "title": "CertaRig rig configuration",
+  "description": "Describes one rig: identity, sampling, hardware interface, channels (customer signals mapped to CertaRig concepts) and limits. The SHA-256 of the canonical JSON is the config_hash that every command must present.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["rig_id", "revision", "pressure_abort_bar", "channels"],
+  "properties": {
+    "rig_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{2,63}$" },
+    "revision": { "type": "string", "minLength": 1, "maxLength": 80 },
+    "description": { "type": "string", "maxLength": 500 },
+    "sample_interval_ms": { "type": "integer", "minimum": 20, "maximum": 10000, "default": 100 },
+    "pressure_abort_bar": { "type": "number", "exclusiveMinimum": 0 },
+    "hardware": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "mode": { "type": "string", "enum": ["mock", "simulator", "raspberry_pi"] },
+        "i2c_bus": { "type": "integer", "minimum": 0 },
+        "ads1115_address": { "type": "integer", "minimum": 0, "maximum": 127 },
+        "valve_output_gpio": { "type": "integer", "minimum": 0, "maximum": 27 },
+        "emergency_stop_gpio": { "type": "integer", "minimum": 0, "maximum": 27 },
+        "emergency_stop_active_high": { "type": "boolean" },
+        "relay_feedback_gpio": { "type": ["integer", "null"], "minimum": 0, "maximum": 27 },
+        "output_active_high": { "type": "boolean" },
+        "simulator": {
+          "type": "object",
+          "description": "Simulator-only tuning. Ignored by other modes.",
+          "additionalProperties": false,
+          "properties": {
+            "seed": { "type": "integer", "minimum": 0 },
+            "time_scale": { "type": "number", "exclusiveMinimum": 0 },
+            "noise_bar": { "type": "number", "minimum": 0 },
+            "noise_l_min": { "type": "number", "minimum": 0 },
+            "lag_s": { "type": "number", "minimum": 0 }
+          }
+        }
+      }
+    },
+    "channels": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 32,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["channel_id", "unit", "valid_min", "valid_max", "safe_min", "safe_max"],
+        "properties": {
+          "channel_id": { "type": "string", "pattern": "^[a-z][a-z0-9_]{1,47}$" },
+          "kind": { "type": "string", "enum": ["analog", "digital", "virtual"], "default": "analog" },
+          "concept": {
+            "type": "string",
+            "description": "CertaRig concept this customer signal maps to (pressure, flow, temperature, ...). Derived from unit when omitted.",
+            "pattern": "^[a-z][a-z0-9_]{1,31}$"
+          },
+          "adc_channel": { "type": ["integer", "null"], "minimum": 0, "maximum": 3 },
+          "unit": { "type": "string", "minLength": 1, "maxLength": 12 },
+          "raw_min_v": { "type": ["number", "null"] },
+          "raw_max_v": { "type": ["number", "null"] },
+          "engineering_min": { "type": ["number", "null"] },
+          "engineering_max": { "type": ["number", "null"] },
+          "valid_min": { "type": "number" },
+          "valid_max": { "type": "number" },
+          "warning_min": { "type": ["number", "null"] },
+          "warning_max": { "type": ["number", "null"] },
+          "safe_min": { "type": "number" },
+          "safe_max": { "type": "number" },
+          "calibration_id": { "type": ["string", "null"] },
+          "required": { "type": "boolean", "default": true }
+        }
+      }
+    }
+  }
+}

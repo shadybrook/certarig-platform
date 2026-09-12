@@ -39,6 +39,24 @@ class ChannelConfig:
     raw_max_v: float | None = None
     engineering_min: float | None = None
     engineering_max: float | None = None
+    concept: str = "signal"
+    warning_min: float | None = None
+    warning_max: float | None = None
+
+
+CONCEPT_BY_UNIT = {
+    "bar": "pressure",
+    "psi": "pressure",
+    "kpa": "pressure",
+    "l/min": "flow",
+    "lpm": "flow",
+    "kg/s": "mass_flow",
+    "c": "temperature",
+    "degc": "temperature",
+    "k": "temperature",
+    "v": "voltage",
+    "a": "current",
+}
 
 
 @dataclass(frozen=True)
@@ -67,6 +85,65 @@ class RigConfig:
         value = asdict(self)
         value["channels"] = [asdict(channel) for channel in self.channels]
         return value
+
+    def channel(self, channel_id: str) -> ChannelConfig | None:
+        for channel in self.channels:
+            if channel.channel_id == channel_id:
+                return channel
+        return None
+
+    def signals(self) -> list[dict[str, Any]]:
+        """Customer signal to CertaRig concept mapping, as shown in Studio onboarding."""
+        rows: list[dict[str, Any]] = []
+        for channel in self.channels:
+            source = f"ADS1115:A{channel.adc_channel}" if channel.adc_channel is not None else "virtual"
+            rows.append(
+                {
+                    "channel_id": channel.channel_id,
+                    "source_id": source,
+                    "concept": channel.concept,
+                    "unit": channel.unit,
+                    "required": channel.required,
+                    "limits": {
+                        "valid": [channel.valid_min, channel.valid_max],
+                        "warning": [channel.warning_min, channel.warning_max],
+                        "trip": [
+                            channel.safe_min,
+                            min(channel.safe_max, self.pressure_abort_bar)
+                            if channel.concept == "pressure"
+                            else channel.safe_max,
+                        ],
+                    },
+                    "calibration_id": channel.calibration_id,
+                }
+            )
+        rows.append(
+            {
+                "channel_id": "emergency_stop",
+                "source_id": f"GPIO{self.hardware.emergency_stop_gpio}",
+                "concept": "emergency_stop",
+                "unit": "bool",
+                "required": True,
+                "limits": None,
+                "calibration_id": None,
+            }
+        )
+        return rows
+
+    def actuators(self) -> list[dict[str, Any]]:
+        return [
+            {
+                "actuator_id": "main_output",
+                "concept": "permit_relay",
+                "source_id": f"GPIO{self.hardware.valve_output_gpio}",
+                "feedback_source_id": (
+                    f"GPIO{self.hardware.relay_feedback_gpio}"
+                    if self.hardware.relay_feedback_gpio is not None
+                    else None
+                ),
+                "active_high": self.hardware.output_active_high,
+            }
+        ]
 
 
 @dataclass(frozen=True)

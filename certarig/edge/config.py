@@ -5,7 +5,8 @@ import json
 from pathlib import Path
 from typing import Any
 
-from .models import ChannelConfig, HardwareConfig, RigConfig
+from .models import CONCEPT_BY_UNIT, ChannelConfig, HardwareConfig, RigConfig
+from .schemas import validate_against_schema
 
 
 class ConfigurationError(ValueError):
@@ -32,8 +33,13 @@ def _require_bool(value: Any, field: str) -> bool:
 def load_config(path: str | Path) -> RigConfig:
     source = Path(path)
     raw = json.loads(source.read_text(encoding="utf-8"))
+    return load_config_dict(raw)
+
+
+def load_config_dict(raw: Any) -> RigConfig:
     if not isinstance(raw, dict):
         raise ConfigurationError("configuration root must be an object")
+    validate_against_schema(raw, "rig.schema.json", ConfigurationError)
 
     channels_raw = raw.get("channels")
     if not isinstance(channels_raw, list) or not channels_raw:
@@ -54,6 +60,22 @@ def load_config(path: str | Path) -> RigConfig:
         safe_max = _require_number(item.get("safe_max"), f"{channel_id}.safe_max")
         if not valid_min <= safe_min <= safe_max <= valid_max:
             raise ConfigurationError(f"{channel_id} safe range must be inside valid range")
+        warning_min = (
+            _require_number(item["warning_min"], f"{channel_id}.warning_min")
+            if item.get("warning_min") is not None
+            else None
+        )
+        warning_max = (
+            _require_number(item["warning_max"], f"{channel_id}.warning_max")
+            if item.get("warning_max") is not None
+            else None
+        )
+        if warning_max is not None and not safe_min <= warning_max <= safe_max:
+            raise ConfigurationError(f"{channel_id} warning_max must be inside the safe range")
+        if warning_min is not None and not safe_min <= warning_min <= safe_max:
+            raise ConfigurationError(f"{channel_id} warning_min must be inside the safe range")
+        unit = str(item.get("unit", ""))
+        concept = str(item.get("concept") or CONCEPT_BY_UNIT.get(unit.lower(), "signal"))
         required = bool(item.get("required", True))
         calibration_id = item.get("calibration_id")
         if required and not str(calibration_id or "").strip():
@@ -63,7 +85,10 @@ def load_config(path: str | Path) -> RigConfig:
             ChannelConfig(
                 channel_id=channel_id,
                 kind=str(item.get("kind", "analog")),
-                unit=str(item.get("unit", "")),
+                unit=unit,
+                concept=concept,
+                warning_min=warning_min,
+                warning_max=warning_max,
                 valid_min=valid_min,
                 valid_max=valid_max,
                 safe_min=safe_min,

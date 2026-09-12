@@ -1,0 +1,29 @@
+{
+  "manifest_id": "certarig-wave1-agent-policy",
+  "revision": "2026-09-12",
+  "description": "Agent permissions for the Phase 3 low-voltage dry bench. The agent may observe, record, run approved procedures and force safe on its own. Clearing a trip and powering down need a human. Energising the permit output is decided by the deterministic kernel. Bypassing interlocks or limits is never possible.",
+  "approval_ttl_s": 300,
+  "tools": {
+    "read_rig": { "policy": "allowed" },
+    "read_capabilities": { "policy": "allowed" },
+    "read_signals": { "policy": "allowed" },
+    "read_state": { "policy": "allowed" },
+    "read_procedures": { "policy": "allowed" },
+    "read_procedure_run": { "policy": "allowed" },
+    "read_evidence": { "policy": "allowed" },
+    "force_safe": { "policy": "allowed", "note": "Always available: moving to safe can never make things worse." },
+    "reset_trip": { "policy": "human_approval", "note": "A human confirms the cause of the trip is understood." },
+    "request_permit": { "policy": "controller_approval", "note": "ProcessGuardrail decides; reset must precede permit." },
+    "start_recording": { "policy": "allowed" },
+    "stop_recording": { "policy": "allowed" },
+    "run_procedure": { "policy": "allowed", "note": "Only approved procedures; the runtime may still refuse on preconditions." },
+    "ack_operator_step": { "policy": "never", "note": "Only a human can confirm a physical action was performed." },
+    "abort_procedure": { "policy": "allowed" },
+    "draft_procedure": { "policy": "allowed", "note": "Drafts are inert until an engineer approves them." },
+    "export_evidence": { "policy": "allowed" },
+    "stop_recorder": { "policy": "allowed" },
+    "shutdown": { "policy": "human_approval" },
+    "bypass_interlock": { "policy": "never" },
+    "override_limits": { "policy": "never" }
+  }
+}
