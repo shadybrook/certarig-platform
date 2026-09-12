@@ -95,7 +95,7 @@ class RuleBasedPolicy:
             if run_id:
                 return call(tool_call("wait_for_run", {"run_id": run_id, "timeout_s": 60}))
         matches = self.skills.match(request)
-        if matches and matches[0][1] >= 0.5:
+        if matches and matches[0][1] > 0.5:
             skill = matches[0][0]
             return call(tool_call("read_skill", {"name": skill.name}))
         if words & _STATUS_WORDS:

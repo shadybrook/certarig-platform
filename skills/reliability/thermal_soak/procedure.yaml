@@ -1,0 +1,43 @@
+id: thermal_soak
+version: 1
+title: Jacket thermal soak
+domain: reliability
+tags: [temperature, soak, reliability]
+summary: >
+  Holds a temperature concept in band for a shortened simulated soak and fails if the
+  abort limit or stuck-good quality trips.
+applies_to:
+  concepts: [temperature]
+requires_output: false
+record: true
+timeout_s: 60
+preconditions:
+  - { signal: temperature, op: "<", value: 80.0 }
+  - { quality: temperature, eq: good }
+steps:
+  - id: in_band
+    type: expect
+    predicate: { signal: temperature, op: "<", value: 80.0 }
+    within_ms: 10000
+  - id: soak
+    type: wait
+    duration_ms: 1500
+  - id: still_in_band
+    type: expect
+    predicate:
+      all:
+        - { signal: temperature, op: "<", value: 80.0 }
+        - { state: process_healthy, eq: true }
+    within_ms: 2000
+  - id: end_safe
+    type: command
+    command: safe
+    expect: { state: output_high, eq: false }
+evaluate:
+  - { step_passed: still_in_band }
+  - { signal: temperature, peak_below: 85.0 }
+evidence:
+  report_template: soak_report
+recovery: >
+  If the soak aborted, force safe, inspect the temperature tag, then acknowledge any unclean boot
+  before retrying.

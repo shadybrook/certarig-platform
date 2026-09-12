@@ -93,8 +93,9 @@ def export_bundle(
     suffix = run_id or label or "all"
     name = f"{_utc_stamp()}_{''.join(ch if ch.isalnum() or ch in '-_' else '_' for ch in suffix)}.zip"
     target = out_dir / name
+    tmp = out_dir / f".{name}.tmp"
     rows: list[dict[str, Any]] = []
-    with zipfile.ZipFile(target, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+    with zipfile.ZipFile(tmp, "w", compression=zipfile.ZIP_DEFLATED) as archive:
         for path in files:
             row = _file_row(path, evidence_dir)
             rows.append(row)
@@ -110,6 +111,7 @@ def export_bundle(
             **context,
         }
         archive.writestr(EXPORT_MANIFEST, json.dumps(manifest, indent=2, sort_keys=True))
+    tmp.replace(target)
     return {
         "filename": name,
         "path": f"/v1/evidence/exports/{name}",
@@ -147,6 +149,16 @@ class OpsService:
             "manifest_hash": self.node.manifest.manifest_hash,
             "contract_hash": self.node.contract_hash,
         }
+
+    def get_briefing(self, ctx: RequestContext) -> tuple[int, dict[str, Any]]:
+        from .briefing import read_briefing
+
+        return 200, read_briefing(self.evidence_dir)
+
+    def put_briefing(self, ctx: RequestContext) -> tuple[int, dict[str, Any]]:
+        from .briefing import write_briefing
+
+        return 200, write_briefing(self.evidence_dir, ctx.body)
 
     # ------------------------------------------------------------ evidence
     def _runs(self) -> list[dict[str, Any]]:
@@ -354,6 +366,8 @@ def install_ops(
     add("GET", "/v1/evidence/runs/{run_id}/files/{name}", service.run_file, "read_evidence")
     add("GET", "/v1/evidence/recordings/{name}", service.recording_file, "read_evidence")
     add("GET", "/v1/evidence/exports/{name}", service.export_file, "read_evidence")
+    add("GET", "/v1/ops/briefing", service.get_briefing)
+    add("POST", "/v1/ops/briefing", service.put_briefing)
     add("POST", "/v1/ops/recorder/stop", service.stop_recorder, "stop_recorder")
     add("POST", "/v1/ops/evidence/export", service.export_evidence, "export_evidence")
     add("POST", "/v1/ops/shutdown", service.shutdown, "shutdown")

@@ -22,6 +22,7 @@ def test_simulator_routes_are_operator_only_and_drive_the_plant() -> None:
                 static_root=None,
                 operator_key=OPERATOR_KEY,
                 agent_key=AGENT_KEY,
+                auditor_key=None,
                 allow_output=True,
                 skills_root=SKILLS_DIR,
             )

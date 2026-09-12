@@ -127,6 +127,8 @@ class ProcessGuardrail:
         self.reason = "startup_safe"
         self.channels: tuple[dict[str, object], ...] = ()
         self._condition = "startup"
+        self._last_values: dict[str, float] = {}
+        self._stuck_counts: dict[str, int] = {}
 
     @property
     def drive_high(self) -> bool:
@@ -151,7 +153,9 @@ class ProcessGuardrail:
         )
 
     @staticmethod
-    def _event_prefix(channel_id: str, unit: str) -> str:
+    def _event_prefix(channel_id: str, concept: str, unit: str) -> str:
+        if concept and concept != "signal":
+            return concept
         lowered = unit.lower()
         if lowered == "bar":
             return "pressure"
@@ -170,11 +174,8 @@ class ProcessGuardrail:
         for channel in self.config.channels:
             if not channel.required:
                 continue
-            safe_max = (
-                min(channel.safe_max, self.config.pressure_abort_bar)
-                if channel.unit.lower() == "bar"
-                else channel.safe_max
-            )
+            abort = self.config.abort_limits.get(channel.concept)
+            safe_max = min(channel.safe_max, abort) if abort is not None else channel.safe_max
             sample = samples.get(channel.channel_id)
             state = "safe"
             value: float | None = None
@@ -184,7 +185,24 @@ class ProcessGuardrail:
             else:
                 value = float(sample.value)
                 quality = sample.quality
-                if not math.isfinite(value) or quality != "good":
+                if (
+                    quality == "good"
+                    and value is not None
+                    and math.isfinite(value)
+                    and channel.stuck_samples
+                ):
+                    previous = self._last_values.get(channel.channel_id)
+                    epsilon = channel.stuck_epsilon if channel.stuck_epsilon is not None else 1e-6
+                    if previous is not None and abs(value - previous) < epsilon:
+                        self._stuck_counts[channel.channel_id] = (
+                            self._stuck_counts.get(channel.channel_id, 0) + 1
+                        )
+                    else:
+                        self._stuck_counts[channel.channel_id] = 0
+                    self._last_values[channel.channel_id] = value
+                    if self._stuck_counts.get(channel.channel_id, 0) >= channel.stuck_samples:
+                        quality = "stuck"
+                if not math.isfinite(value) or quality not in {"good"}:
                     state = "invalid"
                     if not math.isfinite(value):
                         value = None
@@ -197,6 +215,7 @@ class ProcessGuardrail:
             statuses.append(
                 {
                     "channel_id": channel.channel_id,
+                    "concept": channel.concept,
                     "value": value,
                     "unit": channel.unit,
                     "quality": quality,
@@ -206,7 +225,7 @@ class ProcessGuardrail:
                 }
             )
             if first_problem is None and state != "safe":
-                prefix = self._event_prefix(channel.channel_id, channel.unit)
+                prefix = self._event_prefix(channel.channel_id, channel.concept, channel.unit)
                 first_problem = (state, prefix)
 
         self.channels = tuple(statuses)

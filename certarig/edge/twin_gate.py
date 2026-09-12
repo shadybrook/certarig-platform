@@ -25,7 +25,9 @@ def record_sim_pass(evidence_dir: Path, procedure_id: str, procedure_hash: str, 
         "passed_at": datetime.now(UTC).isoformat(),
         "passed_at_unix": time.time(),
     }
-    target.write_text(json.dumps(document, indent=2, sort_keys=True), encoding="utf-8")
+    from .atomic import write_json_atomic
+
+    write_json_atomic(target, document)
     return target
 
 

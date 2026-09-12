@@ -7,10 +7,12 @@ import json
 import os
 import sys
 from pathlib import Path
+from typing import Any
 
 from certarig.edge.bootstrap import DEFAULT_SKILLS_ROOT, DEFAULT_STUDIO_ROOT
 
 from .scenario import CONFIG_DIR, ROOT, SKILLS_DIR, ScenarioResult, discover_scenarios, run_scenario_file
+from .stamp_gate import stamp_lab_twin_gate
 
 SIM_SCENARIOS = Path(__file__).resolve().parent / "scenarios"
 
@@ -19,6 +21,7 @@ def sim_serve(args: argparse.Namespace) -> None:
     """Serve the Edge node on the simulator with Studio. Sets demo keys if none are configured."""
     os.environ.setdefault("CERTARIG_OPERATOR_KEY", "sim-operator-key-000001")
     os.environ.setdefault("CERTARIG_AGENT_KEY", "sim-agent-key-0000000001")
+    os.environ.setdefault("CERTARIG_AUDITOR_KEY", "sim-auditor-key-000001")
     from certarig.edge.cli import serve
 
     serve(
@@ -80,7 +83,14 @@ def sim_run_library(args: argparse.Namespace) -> None:
         sys.exit(1)
 
 
-def add_sim_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
+def sim_stamp_gate(args: argparse.Namespace) -> None:
+    result = stamp_lab_twin_gate(args.out)
+    print(json.dumps(result, indent=2))
+    if not result["passed"] or result["stamp_count"] < 6:
+        sys.exit(1)
+
+
+def add_sim_parser(subparsers: Any) -> None:
     sim = subparsers.add_parser("sim", help="digital twin: serve, run scenarios, run the procedure library")
     sim_sub = sim.add_subparsers(dest="sim_command", required=True)
 
@@ -102,3 +112,10 @@ def add_sim_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentParse
     library.add_argument("--out", default="evidence/sim-library")
     library.add_argument("--filter", default=None, help="substring filter on scenario paths")
     library.set_defaults(func=sim_run_library)
+
+    stamp = sim_sub.add_parser(
+        "stamp-gate",
+        help="run lab happy-path scenarios and write twin-gate stamps for a later raspberry_pi node",
+    )
+    stamp.add_argument("--out", default="evidence/sim-library")
+    stamp.set_defaults(func=sim_stamp_gate)

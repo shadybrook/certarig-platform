@@ -1,0 +1,16 @@
+name: unexpected e-stop during flow test
+description: Someone presses the E-stop during the hold step. The run aborts and the output is off.
+seed: 24
+procedure: flow_guardrail
+duration_s: 60
+events:
+  - at_step: stable_permit
+    action: estop
+    pressed: true
+    delay_s: 0.3
+expect:
+  outcome: aborted
+  outcome_reason_contains: emergency stop
+  kernel_events_include: [estop_open_forced_safe]
+  final_output_high: false
+  invariants: [output_off_when_estop, output_off_when_process_unsafe, no_restart_without_reset, ends_safe]

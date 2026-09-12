@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import contextlib
+import shutil
 import tempfile
 import threading
 from collections.abc import Iterator
@@ -24,6 +25,7 @@ STUDIO_DIR = ROOT / "studio"
 SKILLS_DIR = ROOT / "skills"
 OPERATOR_KEY = "test-operator-key-0001"
 AGENT_KEY = "test-agent-key-000001"
+AUDITOR_KEY = "test-auditor-key-00001"
 
 
 class ControllableRig(HardwareAdapter):
@@ -103,6 +105,9 @@ class RunningEdge:
     def agent(self, name: str = "agent-under-test") -> EdgeClient:
         return EdgeClient(self.url, agent_key=AGENT_KEY, principal_name=name)
 
+    def auditor(self, name: str = "auditor") -> EdgeClient:
+        return EdgeClient(self.url, auditor_key=AUDITOR_KEY, principal_name=name)
+
     def anonymous(self) -> EdgeClient:
         return EdgeClient(self.url)
 
@@ -114,20 +119,27 @@ def edge_server(
     *,
     static: bool = True,
     agent_key: str | None = AGENT_KEY,
+    auditor_key: str | None = AUDITOR_KEY,
     start_loop: bool = False,
     skills_dir: Path | None = SKILLS_DIR,
 ) -> Iterator[RunningEdge]:
     with tempfile.TemporaryDirectory() as temp:
-        config_path = CONFIG_DIR / config_name
+        config_path = Path(temp) / config_name
+        shutil.copy2(CONFIG_DIR / config_name, config_path)
+        capabilities_path = None
+        if capabilities_name:
+            capabilities_path = Path(temp) / capabilities_name
+            shutil.copy2(CONFIG_DIR / capabilities_name, capabilities_path)
         config = load_config(config_path)
         rig = ControllableRig(config)
         settings = _NodeSettings(
             config_path=config_path,
-            capabilities_path=CONFIG_DIR / capabilities_name if capabilities_name else None,
+            capabilities_path=capabilities_path,
             evidence_dir=Path(temp) / "evidence",
             static_root=STUDIO_DIR if static else None,
             operator_key=OPERATOR_KEY,
             agent_key=agent_key,
+            auditor_key=auditor_key,
             allow_output=True,
             skills_root=skills_dir if skills_dir is not None and skills_dir.is_dir() else None,
         )
@@ -173,13 +185,18 @@ def sim_server(
 ) -> Iterator[RunningSim]:
     """A full Edge node over the digital twin, sampling loop running."""
     with tempfile.TemporaryDirectory() as temp:
+        config_path = Path(temp) / config_name
+        capabilities_path = Path(temp) / capabilities_name
+        shutil.copy2(CONFIG_DIR / config_name, config_path)
+        shutil.copy2(CONFIG_DIR / capabilities_name, capabilities_path)
         settings = _NodeSettings(
-            config_path=CONFIG_DIR / config_name,
-            capabilities_path=CONFIG_DIR / capabilities_name,
+            config_path=config_path,
+            capabilities_path=capabilities_path,
             evidence_dir=Path(temp) / "evidence",
             static_root=STUDIO_DIR if static else None,
             operator_key=OPERATOR_KEY,
             agent_key=AGENT_KEY,
+            auditor_key=None,
             allow_output=True,
             skills_root=SKILLS_DIR,
         )

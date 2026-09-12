@@ -1,0 +1,29 @@
+{
+  "manifest_id": "certarig-observe-first",
+  "revision": "2026-09-12",
+  "description": "Sit-beside-LabVIEW default: read and record, never command the output until an engineer flips the policies.",
+  "approval_ttl_s": 300,
+  "tools": {
+    "read_rig": { "policy": "allowed" },
+    "read_capabilities": { "policy": "allowed" },
+    "read_signals": { "policy": "allowed" },
+    "read_state": { "policy": "allowed" },
+    "read_procedures": { "policy": "allowed" },
+    "read_procedure_run": { "policy": "allowed" },
+    "read_evidence": { "policy": "allowed" },
+    "force_safe": { "policy": "allowed" },
+    "reset_trip": { "policy": "never" },
+    "request_permit": { "policy": "never" },
+    "start_recording": { "policy": "allowed" },
+    "stop_recording": { "policy": "allowed" },
+    "run_procedure": { "policy": "allowed" },
+    "ack_operator_step": { "policy": "never" },
+    "abort_procedure": { "policy": "allowed" },
+    "draft_procedure": { "policy": "allowed" },
+    "export_evidence": { "policy": "allowed" },
+    "stop_recorder": { "policy": "allowed" },
+    "shutdown": { "policy": "human_approval" },
+    "bypass_interlock": { "policy": "never" },
+    "override_limits": { "policy": "never" }
+  }
+}

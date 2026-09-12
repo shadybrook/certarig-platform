@@ -1,0 +1,16 @@
+# One-command stranger path. Simulator only — no privileged GPIO.
+services:
+  certarig:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      CERTARIG_OPERATOR_KEY: sim-operator-key-000001
+      CERTARIG_AGENT_KEY: sim-agent-key-0000000001
+      CERTARIG_AUDITOR_KEY: sim-auditor-key-000001
+    volumes:
+      - certarig-evidence:/app/evidence
+volumes:
+  certarig-evidence:

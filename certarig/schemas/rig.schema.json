@@ -5,18 +5,34 @@
   "description": "Describes one rig: identity, sampling, hardware interface, channels (customer signals mapped to CertaRig concepts) and limits. The SHA-256 of the canonical JSON is the config_hash that every command must present.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["rig_id", "revision", "pressure_abort_bar", "channels"],
+  "required": ["rig_id", "revision", "channels"],
   "properties": {
     "rig_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{2,63}$" },
     "revision": { "type": "string", "minLength": 1, "maxLength": 80 },
     "description": { "type": "string", "maxLength": 500 },
     "sample_interval_ms": { "type": "integer", "minimum": 20, "maximum": 10000, "default": 100 },
-    "pressure_abort_bar": { "type": "number", "exclusiveMinimum": 0 },
+    "pressure_abort_bar": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "description": "Deprecated alias for abort_limits.pressure. Still accepted so wave-1 documents keep loading."
+    },
+    "abort_limits": {
+      "type": "object",
+      "description": "Per-concept abort thresholds. Caps channel.safe_max for that concept. pressure_abort_bar maps here.",
+      "additionalProperties": { "type": "number", "exclusiveMinimum": 0 }
+    },
     "hardware": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "mode": { "type": "string", "enum": ["mock", "simulator", "raspberry_pi"] },
+        "mode": { "type": "string", "enum": ["mock", "simulator", "raspberry_pi", "mqtt", "modbus_tcp"] },
+        "observe_only": {
+          "type": "boolean",
+          "default": false,
+          "description": "When true the adapter may read tags but must refuse actuation."
+        },
+        "mqtt": { "type": "object", "additionalProperties": true },
+        "modbus": { "type": "object", "additionalProperties": true },
         "i2c_bus": { "type": "integer", "minimum": 0 },
         "ads1115_address": { "type": "integer", "minimum": 0, "maximum": 127 },
         "valve_output_gpio": { "type": "integer", "minimum": 0, "maximum": 27 },
@@ -33,6 +49,11 @@
             "time_scale": { "type": "number", "exclusiveMinimum": 0 },
             "noise_bar": { "type": "number", "minimum": 0 },
             "noise_l_min": { "type": "number", "minimum": 0 },
+            "noise": {
+              "type": "object",
+              "additionalProperties": { "type": "number", "minimum": 0 },
+              "description": "Concept-keyed noise, e.g. {\"temperature\": 0.05}."
+            },
             "lag_s": { "type": "number", "minimum": 0 }
           }
         }
@@ -67,7 +88,25 @@
           "safe_min": { "type": "number" },
           "safe_max": { "type": "number" },
           "calibration_id": { "type": ["string", "null"] },
-          "required": { "type": "boolean", "default": true }
+          "required": { "type": "boolean", "default": true },
+          "stuck_samples": {
+            "type": ["integer", "null"],
+            "minimum": 2,
+            "description": "If set, an in-band value that does not move for this many samples is quality=stuck. Off by default: static pots are allowed to sit still."
+          },
+          "stuck_epsilon": { "type": ["number", "null"], "minimum": 0 },
+          "source": {
+            "type": "object",
+            "description": "Where this signal is read (ADC, MQTT topic, Modbus register).",
+            "additionalProperties": true,
+            "properties": {
+              "kind": { "type": "string" },
+              "address": { "type": "string" },
+              "topic": { "type": "string" },
+              "register": { "type": "integer" },
+              "coil": { "type": "integer" }
+            }
+          }
         }
       }
     }

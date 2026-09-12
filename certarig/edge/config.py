@@ -104,6 +104,9 @@ def load_config_dict(raw: Any) -> RigConfig:
                 engineering_max=float(item["engineering_max"])
                 if item.get("engineering_max") is not None
                 else None,
+                stuck_samples=int(item["stuck_samples"]) if item.get("stuck_samples") is not None else None,
+                stuck_epsilon=float(item["stuck_epsilon"]) if item.get("stuck_epsilon") is not None else None,
+                source=dict(item["source"]) if isinstance(item.get("source"), dict) else None,
             )
         )
 
@@ -128,22 +131,38 @@ def load_config_dict(raw: Any) -> RigConfig:
             "hardware.output_active_high",
         ),
         simulator=dict(hardware_raw["simulator"]) if hardware_raw.get("simulator") is not None else None,
+        observe_only=bool(hardware_raw.get("observe_only", False)),
+        mqtt=dict(hardware_raw["mqtt"]) if isinstance(hardware_raw.get("mqtt"), dict) else None,
+        modbus=dict(hardware_raw["modbus"]) if isinstance(hardware_raw.get("modbus"), dict) else None,
     )
     sample_interval_ms = int(raw.get("sample_interval_ms", 100))
     if sample_interval_ms < 20:
         raise ConfigurationError("sample_interval_ms must be at least 20")
-    pressure_abort_bar = _require_number(raw.get("pressure_abort_bar"), "pressure_abort_bar")
-    pressure_channels = [channel for channel in channels if channel.unit.lower() == "bar"]
-    if not pressure_channels:
-        raise ConfigurationError("at least one pressure channel with unit bar is required")
-    if pressure_abort_bar > min(channel.safe_max for channel in pressure_channels):
-        raise ConfigurationError("pressure_abort_bar may not exceed the configured pressure safe_max")
+
+    abort_limits: dict[str, float] = {}
+    raw_limits = raw.get("abort_limits")
+    if isinstance(raw_limits, dict):
+        for concept, value in raw_limits.items():
+            abort_limits[str(concept)] = _require_number(value, f"abort_limits.{concept}")
+    if raw.get("pressure_abort_bar") is not None:
+        abort_limits.setdefault(
+            "pressure", _require_number(raw.get("pressure_abort_bar"), "pressure_abort_bar")
+        )
+
+    for concept, limit in abort_limits.items():
+        matching = [channel for channel in channels if channel.concept == concept]
+        if matching and limit > min(channel.safe_max for channel in matching):
+            field = "pressure_abort_bar" if concept == "pressure" and raw.get("pressure_abort_bar") is not None else f"abort_limits.{concept}"
+            raise ConfigurationError(f"{field} may not exceed the configured {concept} safe_max")
+
+    pressure_abort_bar = abort_limits.get("pressure", 0.0)
 
     return RigConfig(
         rig_id=str(raw.get("rig_id", "")).strip(),
         revision=str(raw.get("revision", "")).strip(),
         sample_interval_ms=sample_interval_ms,
         pressure_abort_bar=pressure_abort_bar,
+        abort_limits=abort_limits,
         hardware=hardware,
         channels=tuple(channels),
         config_hash=canonical_hash(raw),

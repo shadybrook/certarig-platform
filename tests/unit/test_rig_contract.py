@@ -26,7 +26,14 @@ CAPS = json.loads((CONFIG_DIR / "capabilities.wave1.json").read_text())
 
 # ----------------------------------------------------------------------------- rig schema
 def test_shipped_configs_validate_and_hash_is_stable() -> None:
-    for name in ("rig.example.json", "rig.wave1.json"):
+    for name in (
+        "rig.example.json",
+        "rig.wave1.json",
+        "rig.sim.json",
+        "rig.thermal.sim.json",
+        "rig.mqtt.json",
+        "rig.modbus.json",
+    ):
         raw = json.loads((CONFIG_DIR / name).read_text())
         assert schema_errors(raw, "rig.schema.json") == []
         first = load_config(CONFIG_DIR / name)

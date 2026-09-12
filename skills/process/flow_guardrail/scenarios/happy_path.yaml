@@ -1,0 +1,24 @@
+name: flow guardrail happy path
+description: Operator raises P2 through the trip limit, output drops, lowers it, no auto restart.
+seed: 21
+procedure: flow_guardrail
+label: sim-flow-guardrail
+duration_s: 120
+events:
+  - at_step: raise_flow
+    action: ramp
+    channel: flow
+    to: 16.5
+    over_s: 1.5
+  - at_step: lower_flow
+    action: ramp
+    channel: flow
+    to: 8.0
+    over_s: 1.0
+expect:
+  outcome: passed
+  kernel_events_include: [permit_accepted, flow_high_forced_safe, permit_rejected_reset_required]
+  kernel_events_exclude: [estop_open_forced_safe, sensor_invalid_forced_safe, pressure_high_forced_safe]
+  final_output_high: false
+  invariants: [output_off_when_estop, output_off_when_process_unsafe, no_restart_without_reset, csv_rows_contiguous, ends_safe]
+  min_csv_rows: 50

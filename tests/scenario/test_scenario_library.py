@@ -13,9 +13,19 @@ SCENARIOS = discover_scenarios(SKILLS_DIR, SIM_SCENARIOS)
 
 
 def test_scenarios_were_discovered() -> None:
-    assert len(SCENARIOS) >= 13
+    assert len(SCENARIOS) >= 20
+    names = {path.parent.parent.name for path in SCENARIOS if path.parent.name == "scenarios"}
+    assert {"flow_guardrail", "dual_pot_guardrail", "pressure_guardrail"} <= names
     for path in SCENARIOS:
         load_scenario(path)  # schema-valid
+
+
+def test_happy_path_copies_twin_gate_stamps(tmp_path: Path) -> None:
+    path = SKILLS_DIR / "process" / "flow_guardrail" / "scenarios" / "happy_path.yaml"
+    result = run_scenario_file(path, tmp_path)
+    assert result.passed, result.failures
+    stamps = list((tmp_path / "twin_gate").glob("*.json"))
+    assert stamps, "simulator pass must write a twin-gate stamp into the evidence root"
 
 
 @pytest.mark.parametrize("path", SCENARIOS, ids=[str(p.relative_to(ROOT)) for p in SCENARIOS])

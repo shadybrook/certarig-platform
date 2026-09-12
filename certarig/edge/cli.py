@@ -26,6 +26,9 @@ def serve(args: argparse.Namespace) -> None:
     node = build_node(settings)
     server = make_edge_server(node, args.bind, args.port)
     node.start()
+    from .watchdog import start_watchdog
+
+    start_watchdog()
     print(
         json.dumps(
             {

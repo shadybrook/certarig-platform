@@ -197,7 +197,9 @@ class ToolRegistry:
             return client.get("/v1/evidence")
         if name in {"force_safe", "reset_trip", "request_permit"}:
             command = {"force_safe": "safe", "reset_trip": "reset", "request_permit": "permit"}[name]
-            return client.command(command, approval_id=approval)
+            state = client.command(command, approval_id=approval)
+            state.pop("history", None)
+            return state
         if name == "start_recording":
             return client.start_recording(str(args.get("label", "agent-run")))
         if name == "stop_recording":
@@ -229,7 +231,14 @@ class ToolRegistry:
             if skill is None:
                 matches = self.skills.match(str(args["name"]))
                 return {"error": "skill not found", "suggestions": [m[0].name for m in matches]}
-            return {**skill.summary(), "guidance": skill.body}
+            payload = {**skill.summary(), "guidance": skill.body}
+            procedure_id = skill.procedure_id or skill.name
+            try:
+                ledger = self.client.get(f"/v1/ledger?procedure_id={procedure_id}")
+                payload["recent_outcomes"] = (ledger.get("outcomes") or [])[-5:]
+            except Exception:
+                payload["recent_outcomes"] = []
+            return payload
         if name == "wait_for_run":
             deadline = time.monotonic() + float(args.get("timeout_s", 120))
             while True:

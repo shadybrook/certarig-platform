@@ -188,3 +188,29 @@ def test_shutdown_without_poweroff_command_only_closes_runtime() -> None:
         assert result["record"]["poweroff"].startswith("not configured")
         assert wait_until(lambda: edge.rig.closed, 5)
         assert edge.rig.output is False
+
+
+def test_briefing_round_trip_is_copied_into_a_run_bundle() -> None:
+    with sim_server() as sim:
+        operator = sim.operator()
+        empty = operator.get("/v1/ops/briefing")
+        assert empty["present"] is False
+        saved = operator.post(
+            "/v1/ops/briefing",
+            {
+                "p1_role": "Pressure emulator P1",
+                "p2_role": "Flow emulator P2",
+                "estop": "GPIO24",
+                "relay": "GPIO23",
+                "diagram_notes": "wave-1 dry bench",
+            },
+        )
+        assert saved["present"] is True
+        assert saved["briefing"]["p1_role"] == "Pressure emulator P1"
+        run_id = _run_relay(operator)
+        report = (sim.evidence_dir / "procedure_runs" / run_id / "report.md").read_text()
+        assert "Pressure emulator P1" in report
+        briefing = json.loads(
+            (sim.evidence_dir / "procedure_runs" / run_id / "briefing.json").read_text()
+        )
+        assert briefing["p2_role"] == "Flow emulator P2"

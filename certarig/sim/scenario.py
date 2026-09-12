@@ -98,12 +98,26 @@ class ScenarioRunner:
     def _build(self, temp: Path) -> tuple[EdgeNode, SimulatedRig]:
         config_path = CONFIG_DIR / self.scenario.get("rig", "rig.sim.json")
         config = load_config(config_path)
-        if config.hardware.mode != "simulator":
-            raise ScenarioError("scenario rig must use hardware.mode simulator")
+        mode = config.hardware.mode
+        if mode not in {"simulator", "mqtt", "modbus_tcp"}:
+            raise ScenarioError(f"scenario rig must use simulator, mqtt or modbus_tcp, not {mode}")
         settings = SimSettings.from_config(config, config.hardware.simulator)
         if "seed" in self.scenario:
             settings.seed = int(self.scenario["seed"])
-        rig = SimulatedRig(config, settings)
+        plant = SimulatedRig(config, settings)
+        hardware: SimulatedRig | Any = plant
+        if mode == "mqtt":
+            from certarig.edge.hardware.mqtt import MqttHardware
+
+            from .bus_twin import PlantOnBus
+
+            hardware = PlantOnBus(plant, MqttHardware(config))
+        elif mode == "modbus_tcp":
+            from certarig.edge.hardware.modbus import ModbusHardware
+
+            from .bus_twin import PlantOnBus
+
+            hardware = PlantOnBus(plant, ModbusHardware(config))
         node = build_node(
             NodeSettings(
                 config_path=config_path,
@@ -112,12 +126,13 @@ class ScenarioRunner:
                 static_root=None,
                 operator_key=SCENARIO_KEY,
                 agent_key=SCENARIO_AGENT_KEY,
+                auditor_key=None,
                 allow_output=True,
                 skills_root=SKILLS_DIR,
             ),
-            hardware=rig,
+            hardware=hardware,
         )
-        return node, rig
+        return node, hardware
 
     def _apply(
         self, event: dict[str, Any], node: EdgeNode, rig: SimulatedRig, run_id: str | None, notes: list[str]
@@ -281,7 +296,15 @@ class ScenarioRunner:
                     shutil.copy2(csv_path, target / csv_path.name)
                 if final_run is not None and final_run.evidence_dir:
                     for item in Path(final_run.evidence_dir).iterdir():
-                        shutil.copy2(item, target / item.name)
+                        if item.is_file():
+                            shutil.copy2(item, target / item.name)
+                twin_src = Path(temp) / "evidence" / "twin_gate"
+                if twin_src.is_dir():
+                    dest = self.evidence_root / "twin_gate"
+                    dest.mkdir(parents=True, exist_ok=True)
+                    for item in twin_src.iterdir():
+                        if item.is_file():
+                            shutil.copy2(item, dest / item.name)
                 evidence_dir = str(target)
             result = ScenarioResult(
                 name=self.scenario["name"],

@@ -16,28 +16,42 @@ from .commissioning import ProcessGuardrail, ProcessInterlockResult
 from .hardware.base import HardwareAdapter
 from .models import RigConfig, RigSnapshot
 
-CSV_FIELDS = (
+IDENTITY_FIELDS = (
     "sample_index",
     "timestamp_utc",
     "elapsed_s",
     "event",
     "reason",
-    "pressure_voltage_v",
-    "pressure_bar",
-    "pressure_state",
-    "flow_voltage_v",
-    "flow_l_min",
-    "flow_state",
+)
+KERNEL_FIELDS = (
     "estop_active",
     "process_healthy",
     "trip_latched",
     "permit_requested",
+    "output_high",
     "gpio23_command_high",
     "relay_energized_expected",
     "red_indicator_expected",
     "green_indicator_expected",
     "record_kind",
+    "sample_gap",
 )
+
+
+def csv_fields_for(config: RigConfig) -> tuple[str, ...]:
+    """Identity + per-channel columns + kernel. Wave-1 aliases kept when those concepts exist."""
+    per_channel: list[str] = []
+    concepts: dict[str, str] = {}
+    for channel in config.channels:
+        cid = channel.channel_id
+        per_channel.extend((f"{cid}_raw", f"{cid}_value", f"{cid}_state", f"{cid}_quality"))
+        concepts.setdefault(channel.concept, cid)
+    legacy: list[str] = []
+    if "pressure" in concepts:
+        legacy.extend(("pressure_voltage_v", "pressure_bar", "pressure_state"))
+    if "flow" in concepts:
+        legacy.extend(("flow_voltage_v", "flow_l_min", "flow_state"))
+    return IDENTITY_FIELDS + tuple(per_channel) + KERNEL_FIELDS + tuple(legacy)
 
 
 def utc_now() -> str:
@@ -74,6 +88,8 @@ class LiveBenchRuntime:
         self._record_path: Path | None = None
         self._last_record_path: Path | None = None
         self._record_samples = 0
+        self._last_elapsed_s: float | None = None
+        self._csv_fields = csv_fields_for(config)
         self.hardware.force_safe_state()
 
     def _empty_state(self) -> dict[str, Any]:
@@ -130,13 +146,6 @@ class LiveBenchRuntime:
             self.sample_once()
             next_sample += interval
             self._stop.wait(max(0.0, next_sample - time.monotonic()))
-
-    @staticmethod
-    def _channel(statuses: tuple[dict[str, object], ...], unit: str) -> dict[str, object]:
-        for status in statuses:
-            if str(status.get("unit", "")).lower() == unit.lower():
-                return status
-        return {}
 
     @staticmethod
     def _finite(value: object) -> float | None:
@@ -205,42 +214,51 @@ class LiveBenchRuntime:
             "warning": "Relay and panel-light states are expected from the command/contact model; no feedback sensor is fitted.",
         }
 
-    def _csv_row(self, state: dict[str, Any], record_kind: str) -> dict[str, object]:
+    def _csv_row(self, state: dict[str, Any], record_kind: str, sample_gap: int = 0) -> dict[str, object]:
         guardrail = state["guardrail"]
-        channels = tuple(guardrail["channels"])
-        pressure = self._channel(channels, "bar")
-        flow = self._channel(channels, "L/min")
-        raw_samples = {sample["channel_id"]: sample for sample in state["samples"]}
-        pressure_raw = raw_samples.get(pressure.get("channel_id"), {})
-        flow_raw = raw_samples.get(flow.get("channel_id"), {})
+        statuses = {str(item.get("channel_id")): item for item in guardrail.get("channels", [])}
+        raw_samples = {sample["channel_id"]: sample for sample in state.get("samples", [])}
         outputs = state["outputs"]
-        return {
+        output_high = str(outputs["gpio23_command_high"]).lower()
+        row: dict[str, object] = {
             "sample_index": state["sample_index"],
             "timestamp_utc": state["captured_at"],
             "elapsed_s": f"{float(state['elapsed_s']):.6f}",
             "event": guardrail.get("event", ""),
-            "reason": guardrail["reason"],
-            "pressure_voltage_v": pressure_raw.get("raw_value", ""),
-            "pressure_bar": pressure.get("value", ""),
-            "pressure_state": pressure.get("state", "missing"),
-            "flow_voltage_v": flow_raw.get("raw_value", ""),
-            "flow_l_min": flow.get("value", ""),
-            "flow_state": flow.get("state", "missing"),
-            "estop_active": str(guardrail["estop_active"]).lower(),
-            "process_healthy": str(guardrail["process_healthy"]).lower(),
-            "trip_latched": str(guardrail["trip_latched"]).lower(),
-            "permit_requested": str(guardrail["permit_requested"]).lower(),
-            "gpio23_command_high": str(outputs["gpio23_command_high"]).lower(),
-            "relay_energized_expected": str(outputs["relay_energized_expected"]).lower(),
-            "red_indicator_expected": str(outputs["red_indicator_expected"]).lower(),
-            "green_indicator_expected": str(outputs["green_indicator_expected"]).lower(),
+            "reason": guardrail.get("reason", ""),
+            "estop_active": str(guardrail.get("estop_active")).lower(),
+            "process_healthy": str(guardrail.get("process_healthy")).lower(),
+            "trip_latched": str(guardrail.get("trip_latched")).lower(),
+            "permit_requested": str(guardrail.get("permit_requested")).lower(),
+            "output_high": output_high,
+            "gpio23_command_high": output_high,
+            "relay_energized_expected": str(outputs.get("relay_energized_expected")).lower(),
+            "red_indicator_expected": str(outputs.get("red_indicator_expected")).lower(),
+            "green_indicator_expected": str(outputs.get("green_indicator_expected")).lower(),
             "record_kind": record_kind,
+            "sample_gap": sample_gap,
         }
+        for channel in self.config.channels:
+            status = statuses.get(channel.channel_id, {})
+            raw = raw_samples.get(channel.channel_id, {})
+            row[f"{channel.channel_id}_raw"] = raw.get("raw_value", "")
+            row[f"{channel.channel_id}_value"] = status.get("value", raw.get("value", ""))
+            row[f"{channel.channel_id}_state"] = status.get("state", "missing")
+            row[f"{channel.channel_id}_quality"] = status.get("quality", raw.get("quality", ""))
+            if channel.concept == "pressure":
+                row["pressure_voltage_v"] = raw.get("raw_value", "")
+                row["pressure_bar"] = status.get("value", "")
+                row["pressure_state"] = status.get("state", "missing")
+            if channel.concept == "flow":
+                row["flow_voltage_v"] = raw.get("raw_value", "")
+                row["flow_l_min"] = status.get("value", "")
+                row["flow_state"] = status.get("state", "missing")
+        return row
 
-    def _write_record(self, state: dict[str, Any], record_kind: str = "sample") -> None:
+    def _write_record(self, state: dict[str, Any], record_kind: str = "sample", sample_gap: int = 0) -> None:
         if self._record_writer is None or self._record_handle is None:
             return
-        self._record_writer.writerow(self._csv_row(state, record_kind))
+        self._record_writer.writerow(self._csv_row(state, record_kind, sample_gap=sample_gap))
         self._record_handle.flush()
         self._record_samples += 1
 
@@ -277,16 +295,30 @@ class LiveBenchRuntime:
                 }
                 self._last_event = result.event
                 self._last_event_at = state["last_event_at"]
-            point = {
+            elapsed = float(state["elapsed_s"])
+            interval = self.config.sample_interval_ms / 1000.0
+            sample_gap = 0
+            if self._last_elapsed_s is not None and elapsed - self._last_elapsed_s > 1.5 * interval:
+                sample_gap = 1
+            self._last_elapsed_s = elapsed
+            row = self._csv_row(state, "sample", sample_gap=sample_gap)
+            point: dict[str, Any] = {
                 "elapsed_s": state["elapsed_s"],
-                "pressure_bar": self._csv_row(state, "sample")["pressure_bar"],
-                "flow_l_min": self._csv_row(state, "sample")["flow_l_min"],
                 "gpio23_command_high": state["outputs"]["gpio23_command_high"],
                 "event": state["guardrail"].get("event", ""),
+                "sample_gap": sample_gap,
             }
+            for channel in self.config.channels:
+                if channel.required:
+                    point[f"{channel.channel_id}_value"] = row.get(f"{channel.channel_id}_value")
+                    point[channel.concept] = row.get(f"{channel.channel_id}_value")
+            if "pressure_bar" in row:
+                point["pressure_bar"] = row["pressure_bar"]
+            if "flow_l_min" in row:
+                point["flow_l_min"] = row["flow_l_min"]
             self._history.append(point)
             self._latest = state
-            self._write_record(state)
+            self._write_record(state, sample_gap=sample_gap)
             event = str(state["guardrail"].get("event") or "")
             if event.endswith("_forced_safe") or event in {"sensor_runtime_error_forced_safe"}:
                 self.dump_flight(event)
@@ -362,7 +394,9 @@ class LiveBenchRuntime:
             stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%S%fZ")
             self._record_path = self.evidence_dir / f"{stamp}_{self._safe_label(label)}.csv"
             self._record_handle = self._record_path.open("x", newline="", encoding="utf-8")
-            self._record_writer = csv.DictWriter(self._record_handle, fieldnames=CSV_FIELDS)
+            self._record_writer = csv.DictWriter(
+                self._record_handle, fieldnames=self._csv_fields, extrasaction="ignore"
+            )
             self._record_writer.writeheader()
             self._record_handle.flush()
             self._record_samples = 0

@@ -1,4 +1,6 @@
-# CertaRig Edge node. Install with deploy/install_pi.sh.
+# CertaRig Edge node for a *new* user install. Do not overlay this unit on the
+# Phase 3 submission Pi (that host keeps `python3 -m certarig_edge.cli live-dashboard`).
+# WatchdogSec is a supervisor heartbeat, not a SIL safety loop.
 # Secrets and rig configuration live in /etc/certarig/, never in the repository.
 [Unit]
 Description=CertaRig Edge node (deterministic kernel, procedure runtime, Studio)
@@ -6,7 +8,7 @@ After=network-online.target
 Wants=network-online.target
 
 [Service]
-Type=simple
+Type=notify
 User=certarig
 Group=gpio
 SupplementaryGroups=i2c
@@ -22,6 +24,8 @@ KillSignal=SIGINT
 TimeoutStopSec=15
 Restart=on-failure
 RestartSec=3
+WatchdogSec=30
+WatchdogSignal=SIGABRT
 # Hardening. GPIO and I2C need /dev access, everything else is locked down.
 NoNewPrivileges=false
 ProtectSystem=strict

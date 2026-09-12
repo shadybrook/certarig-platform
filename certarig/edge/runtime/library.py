@@ -111,6 +111,7 @@ class ProcedureLibrary:
         self._approved: dict[str, Procedure] = {}
         self._drafts: dict[str, Procedure] = {}
         self.skipped: list[dict[str, str]] = []
+        self._reload_drafts()
 
     def load_directory(self, root: str | Path) -> list[Procedure]:
         loaded: list[Procedure] = []
@@ -129,6 +130,19 @@ class ProcedureLibrary:
             existing = self._approved.get(procedure.id)
             if existing is None or existing.version <= procedure.version:
                 self._approved[procedure.id] = procedure
+
+    def _reload_drafts(self) -> None:
+        if self.drafts_dir is None or not self.drafts_dir.is_dir():
+            return
+        for path in sorted(self.drafts_dir.glob("*.y*ml")):
+            raw = yaml.safe_load(path.read_text(encoding="utf-8"))
+            if not isinstance(raw, dict):
+                continue
+            try:
+                draft = Procedure.from_dict(raw, source=f"disk:{path.name}", approved=False)
+            except Exception:
+                continue
+            self._drafts.setdefault(draft.procedure_hash, draft)
 
     def get(self, procedure_id: str) -> Procedure | None:
         with self._lock:

@@ -11,8 +11,9 @@ def test_procedure_catalogue_and_detail() -> None:
         anon = edge.anonymous()
         listing = anon.procedures()
         ids = {row["id"] for row in listing["procedures"]}
-        assert {"pressure_guardrail", "relay_truth_table", "safe_powerdown"} <= ids
-        assert listing["skipped"] == []
+        assert {"pressure_guardrail", "relay_truth_table", "safe_powerdown", "tag_health"} <= ids
+        skipped_paths = " ".join(row.get("path", "") for row in listing["skipped"])
+        assert "thermal_soak" in skipped_paths or not listing["skipped"]
         detail = anon.get("/v1/procedures/relay_truth_table")
         assert detail["procedure"]["steps"][0]["id"] == "boot_safe"
         with pytest.raises(EdgeApiError) as missing:

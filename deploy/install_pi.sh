@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+# UNSAFE on the Phase 3 submission host. This script rsyncs --delete into /opt/certarig
+# and binds port 8080. Running it on certarig-pi.local before 21 Sep 2026 would overwrite
+# the frozen course demo (`certarig_edge` live-dashboard). Use it only on a *new* Pi or
+# after the submission window, and never against the Phase 3 working copy.
+#
 # Install or upgrade the CertaRig Edge node on a Raspberry Pi (Debian/Raspberry Pi OS).
 #
 #   sudo deploy/install_pi.sh [--source DIR] [--operator-key KEY] [--agent-key KEY] [--no-start]
@@ -30,6 +35,12 @@ done
 if [[ $EUID -ne 0 ]]; then
   echo "run as root: sudo $0 $*" >&2
   exit 1
+fi
+
+if [[ -f /opt/certarig/certarig_edge/cli.py ]]; then
+  echo "refusing to install: this looks like the Phase 3 submission host." >&2
+  echo "Do not run deploy/install_pi.sh here before 21 Sep 2026." >&2
+  exit 3
 fi
 
 PREFIX=/opt/certarig

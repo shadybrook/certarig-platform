@@ -1,0 +1,114 @@
+id: dual_pot_guardrail
+version: 1
+title: Dual potentiometer guardrail
+domain: process
+tags: [interlock, pressure, flow, trip, anti-restart]
+summary: >
+  Permits once, proves P1 (pressure) forces safe, resets and permits again, then proves P2
+  (flow) forces safe independently. Shows the two emulators are not one aliased channel.
+applies_to:
+  concepts: [pressure, flow, emergency_stop]
+  actuators: [permit_relay]
+requires_output: true
+record: true
+timeout_s: 900
+preconditions:
+  - { signal: pressure, op: "<", value: 4.0 }
+  - { signal: flow, op: "<", value: 14.0 }
+  - { signal_state: pressure, eq: safe }
+  - { signal_state: flow, eq: safe }
+  - { quality: pressure, eq: good }
+  - { quality: flow, eq: good }
+  - { state: estop_active, eq: false }
+steps:
+  - id: safe_start
+    type: command
+    command: safe
+    expect: { state: output_high, eq: false }
+  - id: reset
+    type: command
+    command: reset
+    expect: { state: trip_latched, eq: false }
+  - id: permit
+    type: command
+    command: permit
+    expect: { all: [{ state: drive_high, eq: true }, { state: output_high, eq: true }] }
+    within_ms: 500
+  - id: stable_permit
+    type: expect
+    predicate: { state: output_high, eq: true }
+    within_ms: 500
+    hold_ms: 1000
+  - id: raise_pressure
+    type: trigger
+    title: Operator raises pressure above the trip limit
+    instruction: >
+      Turn P1 up slowly until the dashboard shows more than 4.2 bar. Leave P2 in the safe band.
+      Do not touch the E-stop.
+    predicate: { signal: pressure, op: ">", value: 4.2 }
+    timeout_s: 300
+  - id: pressure_output_removed
+    type: expect
+    predicate: { all: [{ state: output_high, eq: false }, { state: trip_latched, eq: true }] }
+    within_ms: 500
+  - id: lower_pressure
+    type: trigger
+    title: Operator returns pressure to the safe band
+    instruction: Turn P1 back down below 3.5 bar. Leave P2 untouched.
+    predicate: { signal: pressure, op: "<", value: 3.5 }
+    timeout_s: 300
+  - id: reset_after_pressure
+    type: command
+    command: reset
+    expect: { state: trip_latched, eq: false }
+  - id: permit_after_pressure
+    type: command
+    command: permit
+    expect: { all: [{ state: drive_high, eq: true }, { state: output_high, eq: true }] }
+    within_ms: 500
+  - id: raise_flow
+    type: trigger
+    title: Operator raises flow above the trip limit
+    instruction: >
+      Turn P2 up slowly until the dashboard shows more than 15.0 L/min. Leave P1 in the safe band.
+    predicate: { signal: flow, op: ">", value: 15.0 }
+    timeout_s: 300
+  - id: flow_output_removed
+    type: expect
+    predicate: { all: [{ state: output_high, eq: false }, { state: trip_latched, eq: true }] }
+    within_ms: 500
+  - id: lower_flow
+    type: trigger
+    title: Operator returns flow to the safe band
+    instruction: Turn P2 back down below 10 L/min.
+    predicate: { signal: flow, op: "<", value: 10.0 }
+    timeout_s: 300
+  - id: no_auto_restart
+    type: expect
+    predicate: { all: [{ state: output_high, eq: false }, { state: reason, eq: reset_required }] }
+    within_ms: 1000
+    hold_ms: 1500
+  - id: permit_rejected
+    type: command
+    command: permit
+    expect: { all: [{ state: output_high, eq: false }, { state: last_event, eq: permit_rejected_reset_required }] }
+  - id: end_safe
+    type: command
+    command: safe
+    expect: { state: output_high, eq: false }
+evaluate:
+  - { event_observed: permit_accepted }
+  - { event_observed: pressure_high_forced_safe }
+  - { event_observed: flow_high_forced_safe }
+  - { event_observed: permit_rejected_reset_required }
+  - { step: pressure_output_removed, max_elapsed_ms: 500 }
+  - { step: flow_output_removed, max_elapsed_ms: 500 }
+  - { step_passed: no_auto_restart }
+  - { signal: pressure, peak_below: 9.5 }
+  - { signal: flow, peak_below: 19.5 }
+evidence:
+  report_template: qualification_report
+  flight_recorder_s: 30
+recovery: >
+  If either pot fails to drop the output, stop: force safe, remove the external 5 V supply and
+  inspect GPIO23 and the ADS1115 wiring for that channel before retrying.

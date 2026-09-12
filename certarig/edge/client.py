@@ -33,10 +33,14 @@ class EdgeClient:
         agent_key: str | None = None,
         principal_name: str | None = None,
         timeout: float = 10.0,
+        auditor_key: str | None = None,
+        session_token: str | None = None,
     ) -> None:
         self.base_url = base_url.rstrip("/")
         self.operator_key = operator_key
         self.agent_key = agent_key
+        self.auditor_key = auditor_key
+        self.session_token = session_token
         self.principal_name = principal_name
         self.timeout = timeout
         self._contract_hash: str | None = None
@@ -44,6 +48,8 @@ class EdgeClient:
     # ------------------------------------------------------------ plumbing
     def _headers(self, contract: bool) -> dict[str, str]:
         headers: dict[str, str] = {"Accept": "application/json"}
+        if self.session_token:
+            headers["X-CertaRig-Session"] = self.session_token
         if self.operator_key:
             headers["X-CertaRig-Operator-Key"] = self.operator_key
             if self.principal_name:
@@ -52,6 +58,10 @@ class EdgeClient:
             headers["X-CertaRig-Agent-Key"] = self.agent_key
             if self.principal_name:
                 headers["X-CertaRig-Agent"] = self.principal_name
+        elif self.auditor_key:
+            headers["X-CertaRig-Auditor-Key"] = self.auditor_key
+            if self.principal_name:
+                headers["X-CertaRig-Auditor"] = self.principal_name
         if contract and self._contract_hash:
             headers["X-CertaRig-Contract"] = self._contract_hash
         return headers

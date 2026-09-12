@@ -27,8 +27,13 @@ class ProcedureService:
             bundle_context=lambda: {
                 "manifest_hash": node.manifest.manifest_hash,
                 "manifest_id": node.manifest.manifest_id,
+                "evidence_root": str(node.runtime.evidence_dir),
+                "hardware_identity": (
+                    f"{type(node.runtime.hardware).__name__}@{__import__('socket').gethostname()}"
+                    f" config={node.config.config_hash[:12]}"
+                ),
             },
-            on_finish=self._record_twin_pass,
+            on_finish=self._on_run_finish,
         )
 
     def load_library(self, root: str | Path) -> list[str]:
@@ -98,10 +103,25 @@ class ProcedureService:
             raise HttpError(404, "draft not found") from exc
         return 200, {"status": "rejected"}
 
-    def _record_twin_pass(self, run: Any) -> None:
+    def _on_run_finish(self, run: Any) -> None:
+        from .ledger import append_outcome
         from .runtime.model import RunStatus
         from .twin_gate import record_sim_pass
 
+        failed = next((step.step_id for step in run.steps if step.status not in {"passed", "skipped", "pending"}), None)
+        append_outcome(
+            self.node.runtime.evidence_dir,
+            {
+                "procedure_id": run.procedure_id,
+                "procedure_hash": run.procedure_hash,
+                "run_id": run.run_id,
+                "status": run.status.value,
+                "outcome_reason": run.outcome_reason,
+                "first_failing_step": failed,
+                "config_hash": self.node.config.config_hash,
+                "contract_hash": self.node.contract_hash,
+            },
+        )
         if run.status is not RunStatus.PASSED:
             return
         if self.node.config.hardware.mode != "simulator":

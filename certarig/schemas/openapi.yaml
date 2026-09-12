@@ -1,0 +1,316 @@
+openapi: 3.0.3
+info:
+  title: CertaRig Edge API
+  version: 0.4.0
+  description: Deterministic kernel, procedures, approvals, evidence. Generated from
+    the live route table.
+paths:
+  /health:
+    get:
+      summary: GET /health
+      responses:
+        '200':
+          description: Success
+  /v1/errors:
+    get:
+      summary: GET /v1/errors
+      responses:
+        '200':
+          description: Success
+  /v1/auth/session:
+    post:
+      summary: POST /v1/auth/session
+      responses:
+        '200':
+          description: Success
+  /v1/rig:
+    get:
+      summary: GET /v1/rig
+      responses:
+        '200':
+          description: Success
+  /v1/rig/propose:
+    post:
+      summary: POST /v1/rig/propose
+      responses:
+        '200':
+          description: Success
+  /v1/rig/apply:
+    post:
+      summary: POST /v1/rig/apply
+      responses:
+        '200':
+          description: Success
+  /v1/capabilities/propose:
+    post:
+      summary: POST /v1/capabilities/propose
+      responses:
+        '200':
+          description: Success
+  /v1/capabilities/apply:
+    post:
+      summary: POST /v1/capabilities/apply
+      responses:
+        '200':
+          description: Success
+  /v1/ledger:
+    get:
+      summary: GET /v1/ledger
+      responses:
+        '200':
+          description: Success
+  /v1/authoring/templates:
+    get:
+      summary: GET /v1/authoring/templates
+      responses:
+        '200':
+          description: Success
+  /v1/authoring/build:
+    post:
+      summary: POST /v1/authoring/build
+      responses:
+        '200':
+          description: Success
+  /v1/ops/acknowledge_unclean:
+    post:
+      summary: POST /v1/ops/acknowledge_unclean
+      responses:
+        '200':
+          description: Success
+  /v1/signals:
+    get:
+      summary: GET /v1/signals
+      responses:
+        '200':
+          description: Success
+  /v1/capabilities:
+    get:
+      summary: GET /v1/capabilities
+      responses:
+        '200':
+          description: Success
+  /v1/live/state:
+    get:
+      summary: GET /v1/live/state
+      responses:
+        '200':
+          description: Success
+  /v1/live/recordings/latest.csv:
+    get:
+      summary: GET /v1/live/recordings/latest.csv
+      responses:
+        '200':
+          description: Success
+  /v1/audit:
+    get:
+      summary: GET /v1/audit
+      responses:
+        '200':
+          description: Success
+  /v1/live/commands/safe:
+    post:
+      summary: POST /v1/live/commands/safe
+      responses:
+        '200':
+          description: Success
+  /v1/live/commands/reset:
+    post:
+      summary: POST /v1/live/commands/reset
+      responses:
+        '200':
+          description: Success
+  /v1/live/commands/permit:
+    post:
+      summary: POST /v1/live/commands/permit
+      responses:
+        '200':
+          description: Success
+  /v1/live/recordings/start:
+    post:
+      summary: POST /v1/live/recordings/start
+      responses:
+        '200':
+          description: Success
+  /v1/live/recordings/stop:
+    post:
+      summary: POST /v1/live/recordings/stop
+      responses:
+        '200':
+          description: Success
+  /v1/approvals:
+    get:
+      summary: GET /v1/approvals
+      responses:
+        '200':
+          description: Success
+  /v1/approvals/{approval_id}:
+    get:
+      summary: GET /v1/approvals/{approval_id}
+      responses:
+        '200':
+          description: Success
+  /v1/approvals/request:
+    post:
+      summary: POST /v1/approvals/request
+      responses:
+        '200':
+          description: Success
+  /v1/approvals/{approval_id}/grant:
+    post:
+      summary: POST /v1/approvals/{approval_id}/grant
+      responses:
+        '200':
+          description: Success
+  /v1/approvals/{approval_id}/deny:
+    post:
+      summary: POST /v1/approvals/{approval_id}/deny
+      responses:
+        '200':
+          description: Success
+  /v1/procedures:
+    get:
+      summary: GET /v1/procedures
+      responses:
+        '200':
+          description: Success
+  /v1/procedures/drafts:
+    get:
+      summary: GET /v1/procedures/drafts
+      responses:
+        '200':
+          description: Success
+    post:
+      summary: POST /v1/procedures/drafts
+      responses:
+        '200':
+          description: Success
+  /v1/procedures/drafts/{procedure_hash}:
+    get:
+      summary: GET /v1/procedures/drafts/{procedure_hash}
+      responses:
+        '200':
+          description: Success
+  /v1/procedures/{procedure_id}:
+    get:
+      summary: GET /v1/procedures/{procedure_id}
+      responses:
+        '200':
+          description: Success
+  /v1/procedures/validate:
+    post:
+      summary: POST /v1/procedures/validate
+      responses:
+        '200':
+          description: Success
+  /v1/procedures/drafts/{procedure_hash}/approve:
+    post:
+      summary: POST /v1/procedures/drafts/{procedure_hash}/approve
+      responses:
+        '200':
+          description: Success
+  /v1/procedures/drafts/{procedure_hash}/reject:
+    post:
+      summary: POST /v1/procedures/drafts/{procedure_hash}/reject
+      responses:
+        '200':
+          description: Success
+  /v1/procedure_runs:
+    get:
+      summary: GET /v1/procedure_runs
+      responses:
+        '200':
+          description: Success
+    post:
+      summary: POST /v1/procedure_runs
+      responses:
+        '200':
+          description: Success
+  /v1/procedure_runs/{run_id}:
+    get:
+      summary: GET /v1/procedure_runs/{run_id}
+      responses:
+        '200':
+          description: Success
+  /v1/procedure_runs/{run_id}/ack:
+    post:
+      summary: POST /v1/procedure_runs/{run_id}/ack
+      responses:
+        '200':
+          description: Success
+  /v1/procedure_runs/{run_id}/abort:
+    post:
+      summary: POST /v1/procedure_runs/{run_id}/abort
+      responses:
+        '200':
+          description: Success
+  /v1/evidence:
+    get:
+      summary: GET /v1/evidence
+      responses:
+        '200':
+          description: Success
+  /v1/evidence/runs/{run_id}:
+    get:
+      summary: GET /v1/evidence/runs/{run_id}
+      responses:
+        '200':
+          description: Success
+  /v1/evidence/runs/{run_id}/files/{name}:
+    get:
+      summary: GET /v1/evidence/runs/{run_id}/files/{name}
+      responses:
+        '200':
+          description: Success
+  /v1/evidence/recordings/{name}:
+    get:
+      summary: GET /v1/evidence/recordings/{name}
+      responses:
+        '200':
+          description: Success
+  /v1/evidence/exports/{name}:
+    get:
+      summary: GET /v1/evidence/exports/{name}
+      responses:
+        '200':
+          description: Success
+  /v1/ops/briefing:
+    get:
+      summary: GET /v1/ops/briefing
+      responses:
+        '200':
+          description: Success
+    post:
+      summary: POST /v1/ops/briefing
+      responses:
+        '200':
+          description: Success
+  /v1/ops/recorder/stop:
+    post:
+      summary: POST /v1/ops/recorder/stop
+      responses:
+        '200':
+          description: Success
+  /v1/ops/evidence/export:
+    post:
+      summary: POST /v1/ops/evidence/export
+      responses:
+        '200':
+          description: Success
+  /v1/ops/shutdown:
+    post:
+      summary: POST /v1/ops/shutdown
+      responses:
+        '200':
+          description: Success
+  /v1/agent/chat:
+    post:
+      summary: POST /v1/agent/chat
+      responses:
+        '200':
+          description: Success
+  /v1/agent/sessions/{session_id}:
+    get:
+      summary: GET /v1/agent/sessions/{session_id}
+      responses:
+        '200':
+          description: Success

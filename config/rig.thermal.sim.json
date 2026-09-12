@@ -1,0 +1,41 @@
+{
+  "rig_id": "certarig-thermal-sim",
+  "revision": "thermal-soak-twin",
+  "sample_interval_ms": 20,
+  "abort_limits": {
+    "temperature": 85.0
+  },
+  "hardware": {
+    "mode": "simulator",
+    "observe_only": false,
+    "emergency_stop_active_high": true,
+    "output_active_high": true,
+    "valve_output_gpio": 23,
+    "emergency_stop_gpio": 24,
+    "relay_feedback_gpio": null,
+    "simulator": {
+      "seed": 11,
+      "time_scale": 1.0,
+      "noise": { "temperature": 0.05 },
+      "lag_s": 0.2
+    }
+  },
+  "channels": [
+    {
+      "channel_id": "jacket_c",
+      "kind": "analog",
+      "concept": "temperature",
+      "unit": "degC",
+      "valid_min": 0.0,
+      "valid_max": 120.0,
+      "safe_min": 10.0,
+      "safe_max": 85.0,
+      "warning_max": 75.0,
+      "calibration_id": "TH-JKT-20260912",
+      "required": true,
+      "stuck_samples": 50,
+      "stuck_epsilon": 0.01
+    }
+  ],
+  "description": "Digital twin for a jacket-temperature soak. Proves abort_limits and stuck-good without a pressure channel."
+}

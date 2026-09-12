@@ -42,6 +42,9 @@ class ChannelConfig:
     concept: str = "signal"
     warning_min: float | None = None
     warning_max: float | None = None
+    stuck_samples: int | None = None
+    stuck_epsilon: float | None = None
+    source: dict[str, Any] | None = None
 
 
 CONCEPT_BY_UNIT = {
@@ -69,7 +72,10 @@ class HardwareConfig:
     emergency_stop_active_high: bool = True
     relay_feedback_gpio: int | None = 25
     output_active_high: bool = True
+    observe_only: bool = False
     simulator: dict[str, Any] | None = None
+    mqtt: dict[str, Any] | None = None
+    modbus: dict[str, Any] | None = None
 
 
 @dataclass(frozen=True)
@@ -78,9 +84,13 @@ class RigConfig:
     revision: str
     sample_interval_ms: int
     pressure_abort_bar: float
+    abort_limits: dict[str, float]
     hardware: HardwareConfig
     channels: tuple[ChannelConfig, ...]
     config_hash: str
+
+    def abort_for(self, concept: str) -> float | None:
+        return self.abort_limits.get(concept)
 
     def public_dict(self) -> dict[str, Any]:
         value = asdict(self)
@@ -97,23 +107,28 @@ class RigConfig:
         """Customer signal to CertaRig concept mapping, as shown in Studio onboarding."""
         rows: list[dict[str, Any]] = []
         for channel in self.channels:
-            source = f"ADS1115:A{channel.adc_channel}" if channel.adc_channel is not None else "virtual"
+            if channel.source and channel.source.get("address"):
+                source_id = str(channel.source["address"])
+            elif channel.source and channel.source.get("topic"):
+                source_id = str(channel.source["topic"])
+            elif channel.adc_channel is not None:
+                source_id = f"ADS1115:A{channel.adc_channel}"
+            else:
+                source_id = "virtual"
+            abort = self.abort_limits.get(channel.concept)
+            trip_max = min(channel.safe_max, abort) if abort is not None else channel.safe_max
             rows.append(
                 {
                     "channel_id": channel.channel_id,
-                    "source_id": source,
+                    "source_id": source_id,
+                    "source": channel.source,
                     "concept": channel.concept,
                     "unit": channel.unit,
                     "required": channel.required,
                     "limits": {
                         "valid": [channel.valid_min, channel.valid_max],
                         "warning": [channel.warning_min, channel.warning_max],
-                        "trip": [
-                            channel.safe_min,
-                            min(channel.safe_max, self.pressure_abort_bar)
-                            if channel.concept == "pressure"
-                            else channel.safe_max,
-                        ],
+                        "trip": [channel.safe_min, trip_max],
                     },
                     "calibration_id": channel.calibration_id,
                 }

@@ -50,6 +50,7 @@ def config(active_high: bool = True) -> RigConfig:
         revision="test",
         sample_interval_ms=100,
         pressure_abort_bar=4.2,
+        abort_limits={"pressure": 4.2},
         hardware=HardwareConfig(
             emergency_stop_active_high=active_high,
             relay_feedback_gpio=None,

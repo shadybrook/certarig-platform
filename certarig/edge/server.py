@@ -34,14 +34,19 @@ from certarig import __version__
 
 from .approvals import ApprovalError, ApprovalRegistry
 from .capabilities import CapabilityError, CapabilityManifest, Policy, Principal
+from .errors import catalog, enrich
 from .live import LiveBenchRuntime
+from .sessions import SessionRegistry
 
 
 class HttpError(Exception):
     def __init__(self, status: int, payload: dict[str, Any] | str) -> None:
         super().__init__(payload if isinstance(payload, str) else payload.get("error", "error"))
         self.status = status
-        self.payload = {"error": payload} if isinstance(payload, str) else payload
+        if isinstance(payload, str):
+            self.payload = {"error": payload}
+        else:
+            self.payload = enrich(payload)
 
 
 @dataclass
@@ -64,6 +69,7 @@ Handler = Callable[[RequestContext], tuple[int, dict[str, Any]] | tuple[int, byt
 @dataclass(frozen=True)
 class Route:
     method: str
+    path: str
     pattern: re.Pattern[str]
     handler: Handler
     tool: str | None
@@ -76,7 +82,9 @@ class Router:
 
     def add(self, method: str, path: str, handler: Handler, tool: str | None = None) -> None:
         regex = "^" + re.sub(r"\{(\w+)\}", r"(?P<\1>[^/]+)", path) + "$"
-        self.routes.append(Route(method.upper(), re.compile(regex), handler, tool, method.upper() != "GET"))
+        self.routes.append(
+            Route(method.upper(), path, re.compile(regex), handler, tool, method.upper() != "GET")
+        )
 
     def match(self, method: str, path: str) -> tuple[Route | None, dict[str, str], bool]:
         path_matched = False
@@ -102,8 +110,11 @@ class EdgeNode:
         manifest: CapabilityManifest,
         operator_key: str,
         agent_key: str | None = None,
+        auditor_key: str | None = None,
         static_root: str | Path | None = None,
         audit_size: int = 2000,
+        config_path: str | Path | None = None,
+        capabilities_path: str | Path | None = None,
     ) -> None:
         if len(operator_key) < 12:
             raise ValueError("operator key must be at least 12 characters")
@@ -116,6 +127,10 @@ class EdgeNode:
         self.manifest = manifest
         self.operator_key = operator_key
         self.agent_key = agent_key
+        self.auditor_key = auditor_key
+        self.config_path = Path(config_path) if config_path else None
+        self.capabilities_path = Path(capabilities_path) if capabilities_path else None
+        self.sessions = SessionRegistry()
         self.static_root = Path(static_root).resolve() if static_root else None
         self.approvals = ApprovalRegistry(ttl_s=manifest.approval_ttl_s)
         self.router = Router()
@@ -132,6 +147,20 @@ class EdgeNode:
         return self.manifest.contract_hash(self.config.config_hash)
 
     def health(self) -> dict[str, Any]:
+        import os
+
+        observe_only = bool(self.config.hardware.observe_only)
+        unclean = bool(self.flags.get("unclean_shutdown"))
+        twin = self.flags.get("twin_gate_ready")
+        ready = {
+            "actuation_enabled": self.runtime.allow_output,
+            "observe_only": observe_only,
+            "unclean_shutdown": unclean,
+            "contract_hash": self.contract_hash,
+            "calibration_ids": [c.calibration_id for c in self.config.channels if c.calibration_id],
+            "twin_gate": twin,
+            "agent_provider": os.environ.get("CERTARIG_AGENT_PROVIDER", "fake"),
+        }
         return {
             "status": "ok",
             "rig_id": self.config.rig_id,
@@ -143,10 +172,16 @@ class EdgeNode:
             "started_at": self.started_at,
             "extensions": sorted(self.extensions),
             "version": __version__,
+            "observe_only": observe_only,
+            "ready_to_arm": ready,
+            "agent_provider": ready["agent_provider"],
             **self.flags,
         }
 
     def rig_document(self) -> dict[str, Any]:
+        document = None
+        if self.config_path is not None and self.config_path.is_file():
+            document = json.loads(self.config_path.read_text(encoding="utf-8"))
         return {
             "rig": self.config.public_dict(),
             "signals": self.config.signals(),
@@ -155,6 +190,7 @@ class EdgeNode:
             "manifest_id": self.manifest.manifest_id,
             "manifest_hash": self.manifest.manifest_hash,
             "contract_hash": self.contract_hash,
+            "document": document,
         }
 
     # -------------------------------------------------------------------- audit
@@ -182,25 +218,38 @@ class EdgeNode:
 
     # ----------------------------------------------------------------- principal
     def resolve_principal(self, headers: Any) -> tuple[Principal, str]:
+        token = headers.get("X-CertaRig-Session")
+        if token:
+            session = self.sessions.resolve(token)
+            if session is not None:
+                return session.role, session.name
         operator = headers.get("X-CertaRig-Operator-Key")
         if operator is not None and secrets.compare_digest(operator, self.operator_key):
             return Principal.OPERATOR, str(headers.get("X-CertaRig-Operator", "operator"))
         agent = headers.get("X-CertaRig-Agent-Key")
         if agent is not None and self.agent_key is not None and secrets.compare_digest(agent, self.agent_key):
             return Principal.AGENT, str(headers.get("X-CertaRig-Agent", "agent"))
+        auditor = headers.get("X-CertaRig-Auditor-Key")
+        if auditor is not None and self.auditor_key is not None and secrets.compare_digest(auditor, self.auditor_key):
+            return Principal.AUDITOR, str(headers.get("X-CertaRig-Auditor", "auditor"))
         return Principal.ANONYMOUS, "anonymous"
 
     # --------------------------------------------------------------- enforcement
     def enforce(self, ctx: RequestContext, route: Route, headers: Any) -> None:
         if route.tool is None:
-            if route.mutating and ctx.principal is Principal.ANONYMOUS:
+            if route.mutating and ctx.principal is Principal.ANONYMOUS and route.path != "/v1/auth/session":
                 raise HttpError(401, "authentication required")
+            if route.mutating and ctx.principal is Principal.AUDITOR:
+                raise HttpError(403, {"error": "auditor is read-only", "code": "observe_only"})
             return
         try:
             policy = self.manifest.authorize(route.tool, ctx.principal)
         except CapabilityError as exc:
             status = 401 if ctx.principal is Principal.ANONYMOUS else 403
-            raise HttpError(status, exc.to_dict()) from exc
+            payload = exc.to_dict()
+            if ctx.principal is Principal.AUDITOR:
+                payload["code"] = "observe_only"
+            raise HttpError(status, payload) from exc
         ctx.policy = policy
         if not route.mutating:
             return
@@ -242,7 +291,17 @@ class EdgeNode:
     def _register_core_routes(self) -> None:
         add = self.add_route
         add("GET", "/health", lambda ctx: (200, self.health()))
+        add("GET", "/v1/errors", lambda ctx: (200, catalog()))
+        add("POST", "/v1/auth/session", self._mint_session)
         add("GET", "/v1/rig", lambda ctx: (200, self.rig_document()), "read_rig")
+        add("POST", "/v1/rig/propose", self._propose_rig)
+        add("POST", "/v1/rig/apply", self._apply_rig)
+        add("POST", "/v1/capabilities/propose", self._propose_capabilities)
+        add("POST", "/v1/capabilities/apply", self._apply_capabilities)
+        add("GET", "/v1/ledger", self._ledger)
+        add("GET", "/v1/authoring/templates", self._authoring_templates)
+        add("POST", "/v1/authoring/build", self._authoring_build)
+        add("POST", "/v1/ops/acknowledge_unclean", self._ack_unclean)
         add("GET", "/v1/signals", lambda ctx: (200, {"signals": self.config.signals()}), "read_signals")
         add(
             "GET",
@@ -286,6 +345,132 @@ class EdgeNode:
         add("POST", "/v1/approvals/request", self._request_approval)
         add("POST", "/v1/approvals/{approval_id}/grant", self._grant_approval)
         add("POST", "/v1/approvals/{approval_id}/deny", self._deny_approval)
+
+    def _require_operator(self, ctx: RequestContext) -> None:
+        if ctx.principal is Principal.ANONYMOUS:
+            raise HttpError(401, "authentication required")
+        if ctx.principal is not Principal.OPERATOR:
+            raise HttpError(403, {"error": "operator authentication required", "code": "observe_only"})
+
+    def _mint_session(self, ctx: RequestContext) -> tuple[int, dict[str, Any]]:
+        principal, name = self.resolve_principal(
+            {
+                "X-CertaRig-Operator-Key": ctx.body.get("operator_key"),
+                "X-CertaRig-Agent-Key": ctx.body.get("agent_key"),
+                "X-CertaRig-Auditor-Key": ctx.body.get("auditor_key"),
+                "X-CertaRig-Operator": ctx.body.get("name"),
+            }
+        )
+        if principal is Principal.ANONYMOUS:
+            raise HttpError(401, "authentication required")
+        session = self.sessions.mint(principal, str(ctx.body.get("name") or name))
+        return 200, session.public()
+
+    def _current_rig_raw(self) -> dict[str, Any]:
+        if self.config_path is None or not self.config_path.is_file():
+            raise HttpError(409, {"error": "this node has no writable rig file", "code": "restart_required"})
+        return json.loads(self.config_path.read_text(encoding="utf-8"))
+
+    def _propose_rig(self, ctx: RequestContext) -> tuple[int, dict[str, Any]]:
+        self._require_operator(ctx)
+        from .configurator import propose_rig
+
+        return 200, propose_rig(self._current_rig_raw(), ctx.body.get("document") or ctx.body)
+
+    def _apply_rig(self, ctx: RequestContext) -> tuple[int, dict[str, Any]]:
+        self._require_operator(ctx)
+        from .commissioning import ProcessGuardrail
+        from .config import load_config
+        from .configurator import apply_rig
+
+        expected = str(ctx.body.get("expected_current_hash") or "")
+        incoming = ctx.body.get("document") or {}
+        if not isinstance(incoming, dict):
+            raise HttpError(400, "document must be an object")
+        try:
+            preview = apply_rig(self.config_path, self._current_rig_raw(), incoming, expected)  # type: ignore[arg-type]
+        except ValueError as exc:
+            raise HttpError(409, {"error": str(exc), "code": "stale_contract"}) from exc
+        if preview["restart_required"]:
+            raise HttpError(
+                409,
+                {
+                    "error": "hardware identity changed; restart the Edge process",
+                    "code": "restart_required",
+                    **preview,
+                },
+            )
+        self.runtime.command("safe")
+        if self.config_path is None:
+            raise HttpError(409, {"error": "this node has no writable rig file", "code": "restart_required"})
+        self.config = load_config(self.config_path)
+        self.runtime.config = self.config
+        self.runtime.guardrail = ProcessGuardrail(self.config, allow_output=self.runtime.allow_output)
+        self.runtime._csv_fields = __import__("certarig.edge.live", fromlist=["csv_fields_for"]).csv_fields_for(
+            self.config
+        )
+        return 200, {**preview, "contract_hash": self.contract_hash}
+
+    def _propose_capabilities(self, ctx: RequestContext) -> tuple[int, dict[str, Any]]:
+        self._require_operator(ctx)
+        from .configurator import propose_capabilities
+
+        if self.capabilities_path is None:
+            raise HttpError(409, {"error": "no capabilities file", "code": "restart_required"})
+        raw = json.loads(self.capabilities_path.read_text(encoding="utf-8"))
+        return 200, propose_capabilities(raw, ctx.body.get("document") or ctx.body)
+
+    def _apply_capabilities(self, ctx: RequestContext) -> tuple[int, dict[str, Any]]:
+        self._require_operator(ctx)
+        from .capabilities import CapabilityManifest
+        from .configurator import apply_capabilities
+
+        if self.capabilities_path is None:
+            raise HttpError(409, {"error": "no capabilities file", "code": "restart_required"})
+        raw = json.loads(self.capabilities_path.read_text(encoding="utf-8"))
+        try:
+            preview = apply_capabilities(
+                self.capabilities_path, raw, ctx.body.get("document") or {}, str(ctx.body.get("expected_current_hash") or "")
+            )
+        except ValueError as exc:
+            raise HttpError(409, {"error": str(exc), "code": "stale_contract"}) from exc
+        self.manifest = CapabilityManifest.load(self.capabilities_path)
+        return 200, {**preview, "contract_hash": self.contract_hash}
+
+    def _ledger(self, ctx: RequestContext) -> tuple[int, dict[str, Any]]:
+        from .ledger import read_outcomes
+
+        procedure_id = (ctx.query.get("procedure_id") or [""])[0] or None
+        return 200, {"outcomes": read_outcomes(self.runtime.evidence_dir, procedure_id)}
+
+    def _authoring_templates(self, ctx: RequestContext) -> tuple[int, dict[str, Any]]:
+        from .authoring_templates import templates
+
+        return 200, {"templates": templates()}
+
+    def _authoring_build(self, ctx: RequestContext) -> tuple[int, dict[str, Any]]:
+        from .authoring_templates import build_procedure
+
+        procedure = build_procedure(
+            str(ctx.body.get("template_id") or "blank"),
+            signal=str(ctx.body.get("signal") or "pressure"),
+            concept=str(ctx.body["concept"]) if ctx.body.get("concept") else None,
+            trip=float(ctx.body.get("trip") or 4.2),
+            hold_s=float(ctx.body.get("hold_s") or 2.0),
+            title=ctx.body.get("title"),
+        )
+        return 200, {"procedure": procedure}
+
+    def _ack_unclean(self, ctx: RequestContext) -> tuple[int, dict[str, Any]]:
+        self._require_operator(ctx)
+        from .atomic import write_json_atomic
+        from .live import utc_now
+
+        path = self.runtime.evidence_dir / "boot" / "unclean_acknowledged.json"
+        write_json_atomic(path, {"at": utc_now(), "by": ctx.principal_name})
+        self.flags["unclean_shutdown"] = False
+        self.flags["unclean_acknowledged"] = True
+        return 200, {"status": "acknowledged"}
 
     def _latest_csv(self, ctx: RequestContext) -> tuple[int, bytes, str]:
         recording = self.runtime.latest_recording()
@@ -424,6 +609,9 @@ class EdgeNode:
             if callable(close):
                 close()
         self.runtime.close()
+        from .bootflag import mark_clean
+
+        mark_clean(self.runtime.evidence_dir)
 
 
 def make_edge_handler(node: EdgeNode) -> type[BaseHTTPRequestHandler]:

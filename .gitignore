@@ -22,4 +22,8 @@ studio/playwright-report/
 .env
 .netlify
 evidence/runs/
+evidence/sim/
+evidence/sim-library/
+evidence/agent_transcripts/
+evidence/lab-pulled/
 .coverage

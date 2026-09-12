@@ -34,6 +34,14 @@ def build_hardware(config: RigConfig) -> HardwareAdapter:
         from .hardware.raspberry_pi import RaspberryPiHardware
 
         return RaspberryPiHardware(config)
+    if mode == "mqtt":
+        from .hardware.mqtt import MqttHardware
+
+        return MqttHardware(config)
+    if mode == "modbus_tcp":
+        from .hardware.modbus import ModbusHardware
+
+        return ModbusHardware(config)
     raise ValueError(f"unsupported hardware mode: {mode}")
 
 
@@ -45,6 +53,7 @@ class NodeSettings:
     static_root: Path | None
     operator_key: str
     agent_key: str | None
+    auditor_key: str | None
     allow_output: bool
     skills_root: Path | None = None
     poweroff_command: str | None = None
@@ -62,6 +71,7 @@ class NodeSettings:
         if len(operator_key) < 12:
             raise SystemExit("CERTARIG_OPERATOR_KEY must be set to at least 12 characters")
         agent_key = os.environ.get("CERTARIG_AGENT_KEY") or None
+        auditor_key = os.environ.get("CERTARIG_AUDITOR_KEY") or None
         return cls(
             config_path=Path(config_path),
             capabilities_path=Path(capabilities_path) if capabilities_path else None,
@@ -69,6 +79,7 @@ class NodeSettings:
             static_root=Path(static_root) if static_root else None,
             operator_key=operator_key,
             agent_key=agent_key,
+            auditor_key=auditor_key,
             allow_output=os.environ.get("CERTARIG_ENABLE_ACTUATION") == "1",
             skills_root=Path(skills_root) if skills_root else None,
             poweroff_command=os.environ.get("CERTARIG_POWEROFF_CMD") or None,
@@ -83,16 +94,25 @@ def build_node(settings: NodeSettings, hardware: HardwareAdapter | None = None) 
         else CapabilityManifest.read_only()
     )
     adapter = hardware or build_hardware(config)
+    from .bootflag import mark_running
+
+    unclean = mark_running(settings.evidence_dir)
     # Mock and simulator hardware can never energise anything real, so output is always allowed there.
     allow_output = settings.allow_output or config.hardware.mode in {"mock", "simulator"}
+    if unclean and config.hardware.mode == "raspberry_pi":
+        allow_output = False
     runtime = LiveBenchRuntime(config, adapter, settings.evidence_dir, allow_output=allow_output)
     node = EdgeNode(
         runtime=runtime,
         manifest=manifest,
         operator_key=settings.operator_key,
         agent_key=settings.agent_key,
+        auditor_key=settings.auditor_key,
         static_root=settings.static_root,
+        config_path=settings.config_path,
+        capabilities_path=settings.capabilities_path,
     )
+    node.flags["unclean_shutdown"] = unclean
     from .procedures import install_procedures
 
     install_procedures(node, settings.skills_root)

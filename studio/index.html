@@ -20,6 +20,7 @@
         <a href="#agent" data-view="agent">Agent</a>
         <a href="#evidence" data-view="evidence">Evidence</a>
         <a href="#capabilities" data-view="capabilities">Capabilities</a>
+        <a href="#author" data-view="author">Author</a>
         <a href="#onboard" data-view="onboard">Onboard</a>
       </nav>
       <div class="session">
@@ -35,6 +36,12 @@
         <p>Keys stay in this browser tab only. They are never written to the repository or GBrain.</p>
         <label>Operator key <input id="operator-key" data-testid="operator-key" type="password" autocomplete="off" required minlength="12" /></label>
         <label>Your name <input id="operator-name" type="text" value="studio-operator" /></label>
+        <label>Mint a 1-hour session
+          <input id="mint-session" type="checkbox" />
+        </label>
+        <label>Auditor key (read-only, optional)
+          <input id="auditor-key" type="password" autocomplete="off" />
+        </label>
         <button class="primary" type="submit">Open Studio</button>
         <p id="login-error" class="error" hidden></p>
       </form>
@@ -47,6 +54,7 @@
       <section id="view-agent" class="view hidden" data-view="agent"></section>
       <section id="view-evidence" class="view hidden" data-view="evidence"></section>
       <section id="view-capabilities" class="view hidden" data-view="capabilities"></section>
+      <section id="view-author" class="view hidden" data-view="author"></section>
       <section id="view-onboard" class="view hidden" data-view="onboard"></section>
     </main>
 

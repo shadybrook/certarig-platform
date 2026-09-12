@@ -31,16 +31,22 @@ def output_off_when_estop(rows: Iterable[dict[str, str]]) -> list[str]:
     ]
 
 
+def _channel_state_keys(row: dict[str, str]) -> list[str]:
+    return [key for key in row if key.endswith("_state")]
+
+
 def output_off_when_process_unsafe(rows: Iterable[dict[str, str]]) -> list[str]:
     problems: list[str] = []
     for row in rows:
-        if not _truthy(row.get("gpio23_command_high")):
+        if not _truthy(row.get("gpio23_command_high") or row.get("output_high")):
             continue
-        if row.get("pressure_state", "safe") != "safe" or row.get("flow_state", "safe") != "safe":
-            problems.append(
-                f"row {row['sample_index']}: output high with pressure_state={row.get('pressure_state')} "
-                f"flow_state={row.get('flow_state')}"
-            )
+        bad_states = [
+            f"{key}={row[key]}"
+            for key in _channel_state_keys(row)
+            if row.get(key, "safe") not in {"safe", "", "None"}
+        ]
+        if bad_states:
+            problems.append(f"row {row['sample_index']}: output high with {', '.join(bad_states)}")
         if not _truthy(row.get("process_healthy")):
             problems.append(f"row {row['sample_index']}: output high while process unhealthy")
     return problems

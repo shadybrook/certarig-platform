@@ -1,0 +1,59 @@
+{
+  "rig_id": "certarig-modbus-observe",
+  "revision": "modbus-observe-twin",
+  "sample_interval_ms": 20,
+  "abort_limits": {
+    "pressure": 4.2
+  },
+  "hardware": {
+    "mode": "modbus_tcp",
+    "observe_only": true,
+    "emergency_stop_active_high": true,
+    "output_active_high": true,
+    "valve_output_gpio": 23,
+    "emergency_stop_gpio": 24,
+    "relay_feedback_gpio": null,
+    "modbus": {
+      "host": "in-process"
+    },
+    "simulator": {
+      "seed": 13,
+      "time_scale": 1.0,
+      "noise": { "pressure": 0.0, "flow": 0.0 },
+      "lag_s": 0.05
+    }
+  },
+  "channels": [
+    {
+      "channel_id": "pressure_emulator",
+      "kind": "analog",
+      "concept": "pressure",
+      "unit": "bar",
+      "valid_min": 0.0,
+      "valid_max": 10.0,
+      "safe_min": 0.0,
+      "safe_max": 4.2,
+      "warning_max": 3.8,
+      "calibration_id": "MB-P1-20260912",
+      "required": true,
+      "stuck_samples": 8,
+      "stuck_epsilon": 0.0001,
+      "source": { "kind": "modbus", "register": 40001 }
+    },
+    {
+      "channel_id": "flow_emulator",
+      "kind": "analog",
+      "concept": "flow",
+      "unit": "L/min",
+      "valid_min": 0.0,
+      "valid_max": 20.0,
+      "safe_min": 0.0,
+      "safe_max": 15.0,
+      "warning_max": 13.0,
+      "calibration_id": "MB-P2-20260912",
+      "required": true,
+      "source": { "kind": "modbus", "register": 40002 }
+    }
+  ],
+  "description": "Observe-only Modbus TCP twin. Registers are an in-process map, not a live PLC."
+}

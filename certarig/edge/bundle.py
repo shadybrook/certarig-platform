@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from certarig import __version__
+from certarig.edge.atomic import write_json_atomic, write_text_atomic
 from certarig.edge.ops import sha256_file, write_sums
 from certarig.edge.schemas import validate_against_schema
 
@@ -22,6 +23,7 @@ REPORT_TEMPLATE = """# {title}
 - Run `{run_id}` · **{status}** · {outcome_reason}
 - Rig `{rig_id}` ({hardware_mode}) config `{config_hash}`
 - Contract `{contract_hash}`
+- Hardware `{hardware_identity}`
 - CertaRig {certarig_version}
 
 ## Deterministic results
@@ -41,6 +43,10 @@ REPORT_TEMPLATE = """# {title}
 ## Recording
 
 {recording}
+
+## Bench briefing
+
+{briefing}
 
 ## Agent narrative
 
@@ -71,7 +77,58 @@ def _check_rows(run: dict[str, Any]) -> str:
     return "\n".join(f"- {'PASS' if c.get('passed') else 'FAIL'}: {c.get('check')}" for c in checks)
 
 
-def render_report(run: dict[str, Any], context: dict[str, Any], narrative: str = "") -> str:
+def _skill_extra(run: dict[str, Any], context: dict[str, Any]) -> str:
+    procedure_id = str(run.get("procedure_id") or "")
+    root = Path(context["skills_root"]) if context.get("skills_root") else Path(__file__).resolve().parents[2] / "skills"
+    if not procedure_id or not root.is_dir():
+        return ""
+    for path in root.rglob("report.md"):
+        if path.parent.name == procedure_id:
+            text = path.read_text(encoding="utf-8")
+            try:
+                return "\n" + text.format_map(_SafeMap(context))
+            except Exception:
+                return "\n" + text
+    return ""
+
+
+class _SafeMap(dict[str, Any]):
+    def __missing__(self, key: str) -> str:
+        return ""
+
+
+def _briefing_block(target: Path, context: dict[str, Any]) -> str:
+    source = context.get("briefing")
+    if not isinstance(source, dict):
+        candidates = []
+        root = context.get("evidence_root")
+        if root:
+            candidates.append(Path(root) / "briefing.json")
+        candidates.append(target.parent.parent / "briefing.json")
+        for path in candidates:
+            if path.is_file():
+                source = json.loads(path.read_text(encoding="utf-8"))
+                break
+        else:
+            source = None
+    if not source:
+        return "_No bench briefing was saved._"
+    write_json_atomic(target / "briefing.json", source)
+    lines = []
+    for key in ("p1_role", "p2_role", "estop", "relay", "diagram_notes"):
+        value = str(source.get(key) or "").strip() or "_empty_"
+        lines.append(f"- **{key}**: {value.replace('|', '/')}")
+    if source.get("updated_at"):
+        lines.append(f"- updated_at: `{source['updated_at']}`")
+    return "\n".join(lines)
+
+
+def render_report(
+    run: dict[str, Any],
+    context: dict[str, Any],
+    narrative: str = "",
+    briefing: str = "",
+) -> str:
     recording = run.get("recording") or {}
     rec = (
         f"`{recording.get('filename')}` · {recording.get('samples')} samples · sha256 `{recording.get('sha256')}`"
@@ -96,9 +153,11 @@ def render_report(run: dict[str, Any], context: dict[str, Any], narrative: str =
         check_rows=_check_rows(run),
         kernel_rows=kernel,
         recording=rec,
+        briefing=briefing or "_No bench briefing was saved._",
         narrative=narrative or "_No agent narrative was attached._",
         recovery=(run.get("recovery") or "_None._").strip(),
-    )
+        hardware_identity=context.get("hardware_identity") or context.get("hardware_mode") or "unknown",
+    ) + _skill_extra(run, context)
 
 
 def write_run_bundle(
@@ -109,10 +168,9 @@ def write_run_bundle(
 ) -> dict[str, Any]:
     target.mkdir(parents=True, exist_ok=True)
     events = run.get("events") or run.get("kernel_events") or []
-    (target / EVENTS_NAME).write_text(
-        "".join(json.dumps(e, sort_keys=True) + "\n" for e in events), encoding="utf-8"
-    )
-    (target / REPORT_NAME).write_text(render_report(run, context, narrative), encoding="utf-8")
+    write_text_atomic(target / EVENTS_NAME, "".join(json.dumps(e, sort_keys=True) + "\n" for e in events))
+    briefing = _briefing_block(target, context)
+    write_text_atomic(target / REPORT_NAME, render_report(run, context, narrative, briefing=briefing))
     listed = [
         path
         for path in sorted(target.iterdir())
@@ -135,12 +193,11 @@ def write_run_bundle(
         "config_hash": context.get("config_hash") or "unspecified",
         "manifest_hash": context.get("manifest_hash") or "unspecified",
         "contract_hash": context.get("contract_hash") or "unspecified",
+        "hardware_identity": context.get("hardware_identity") or context.get("hardware_mode"),
     }
     validate_against_schema(manifest, "evidence_manifest.schema.json", ValueError)
-    (target / MANIFEST_NAME).write_text(json.dumps(manifest, indent=2, sort_keys=True), encoding="utf-8")
-    (target / SUMS_NAME).write_text(
-        write_sums([(str(f["path"]), str(f["sha256"])) for f in files]), encoding="utf-8"
-    )
+    write_json_atomic(target / MANIFEST_NAME, manifest)
+    write_text_atomic(target / SUMS_NAME, write_sums([(str(f["path"]), str(f["sha256"])) for f in files]))
     return manifest
 
 

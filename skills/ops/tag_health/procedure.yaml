@@ -1,0 +1,30 @@
+id: tag_health
+version: 1
+title: Tag health watch
+domain: ops
+tags: [observe, mqtt, modbus]
+summary: Stay process-healthy for a short window. Used to prove tag dropout and stuck registers.
+applies_to:
+  concepts: [pressure]
+requires_output: false
+record: true
+timeout_s: 30
+steps:
+  - id: start_healthy
+    type: expect
+    predicate: { state: process_healthy, eq: true }
+    within_ms: 5000
+  - id: hold
+    type: wait
+    duration_ms: 1200
+  - id: still_healthy
+    type: expect
+    predicate: { state: process_healthy, eq: true }
+    within_ms: 1000
+  - id: end_safe
+    type: command
+    command: safe
+    expect: { state: output_high, eq: false }
+evaluate:
+  - { step_passed: still_healthy }
+recovery: Inspect the tag source. Observe-mode adapters will not open the valve.

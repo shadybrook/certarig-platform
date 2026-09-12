@@ -1,0 +1,18 @@
+name: modbus stuck register
+description: Holding register freezes; stuck-good trips process-unhealthy.
+seed: 32
+rig: rig.modbus.json
+capabilities: capabilities.observe.json
+procedure: tag_health
+label: mb-stuck
+duration_s: 20
+events:
+  - at_s: 0.2
+    action: fault
+    kind: stuck
+    channel: pressure
+expect:
+  outcome: failed
+  kernel_events_include: [sensor_invalid_forced_safe]
+  final_output_high: false
+  invariants: [ends_safe]

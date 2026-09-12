@@ -1,0 +1,84 @@
+id: flow_guardrail
+version: 1
+title: Flow guardrail verification
+domain: process
+tags: [interlock, flow, trip, anti-restart]
+summary: >
+  Proves that the deterministic kernel removes the permit output when flow exceeds the
+  trip limit, that it does so within the allowed response time, and that the output cannot be
+  restored without an explicit reset. The operator raises the flow emulator (P2) by hand.
+applies_to:
+  concepts: [flow, emergency_stop]
+  actuators: [permit_relay]
+requires_output: true
+record: true
+timeout_s: 900
+preconditions:
+  - { signal: flow, op: "<", value: 14.0 }
+  - { signal_state: flow, eq: safe }
+  - { quality: flow, eq: good }
+  - { signal_state: pressure, eq: safe }
+  - { state: estop_active, eq: false }
+steps:
+  - id: safe_start
+    type: command
+    command: safe
+    expect: { state: output_high, eq: false }
+  - id: reset
+    type: command
+    command: reset
+    expect: { state: trip_latched, eq: false }
+  - id: permit
+    type: command
+    command: permit
+    expect: { all: [{ state: drive_high, eq: true }, { state: output_high, eq: true }] }
+    within_ms: 500
+  - id: stable_permit
+    type: expect
+    predicate: { state: output_high, eq: true }
+    within_ms: 500
+    hold_ms: 1000
+  - id: raise_flow
+    type: trigger
+    title: Operator raises flow above the trip limit
+    instruction: >
+      Turn the P2 flow emulator up slowly until the dashboard shows more than 15.0 L/min.
+      Leave P1 in the safe band. Do not touch the E-stop.
+    predicate: { signal: flow, op: ">", value: 15.0 }
+    timeout_s: 300
+  - id: output_removed
+    type: expect
+    predicate: { all: [{ state: output_high, eq: false }, { state: trip_latched, eq: true }] }
+    within_ms: 500
+  - id: lower_flow
+    type: trigger
+    title: Operator returns flow to the safe band
+    instruction: Turn P2 back down below 10 L/min.
+    predicate: { signal: flow, op: "<", value: 10.0 }
+    timeout_s: 300
+  - id: no_auto_restart
+    type: expect
+    predicate: { all: [{ state: output_high, eq: false }, { state: reason, eq: reset_required }] }
+    within_ms: 1000
+    hold_ms: 1500
+  - id: permit_rejected
+    type: command
+    command: permit
+    expect: { all: [{ state: output_high, eq: false }, { state: last_event, eq: permit_rejected_reset_required }] }
+  - id: end_safe
+    type: command
+    command: safe
+    expect: { state: output_high, eq: false }
+evaluate:
+  - { event_observed: permit_accepted }
+  - { event_observed: flow_high_forced_safe }
+  - { event_observed: permit_rejected_reset_required }
+  - { step: output_removed, max_elapsed_ms: 500 }
+  - { step_passed: no_auto_restart }
+  - { signal: flow, peak_below: 19.5 }
+evidence:
+  report_template: qualification_report
+  flight_recorder_s: 30
+recovery: >
+  If the output did not drop within the response time, stop: force safe from Studio, remove the
+  external 5 V supply and inspect the GPIO23 transistor stage and relay wiring before retrying.

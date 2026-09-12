@@ -1,0 +1,18 @@
+name: thermal soak overtemp abort
+description: Jacket ramps through the abort limit; soak fails and output stays safe.
+seed: 22
+rig: rig.thermal.sim.json
+procedure: thermal_soak
+label: sim-soak-hot
+duration_s: 20
+events:
+  - at_s: 0.2
+    action: ramp
+    channel: temperature
+    to: 90.0
+    over_s: 0.4
+expect:
+  outcome: failed
+  kernel_events_include: [temperature_high_forced_safe]
+  final_output_high: false
+  invariants: [ends_safe]

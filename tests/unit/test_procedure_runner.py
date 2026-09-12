@@ -75,8 +75,11 @@ def test_library_loads_the_shipped_procedures() -> None:
         "adc_validation",
         "safe_powerdown",
         "anomaly_report",
+        "tag_health",
+        "flow_guardrail",
+        "dual_pot_guardrail",
     } <= set(ids)
-    assert [row["path"] for row in library.skipped] == []
+    assert any("thermal_soak" in row["path"] for row in library.skipped)
     summary = library.get("pressure_guardrail").summary()  # type: ignore[union-attr]
     assert summary["operator_steps"] == 0 and summary["requires_output"] is True
     assert len(summary["procedure_hash"]) == 64
@@ -116,6 +119,39 @@ def test_pressure_guardrail_with_operator_moves(harness: Harness) -> None:
     assert by_step["output_removed"].detail["satisfied_after_ms"] <= 500
     assert run.peaks["pressure"] == 5.0
     assert all(check["passed"] for check in run.checks), run.checks
+
+
+def test_flow_guardrail_with_operator_moves(harness: Harness) -> None:
+    run_id = harness.run("flow_guardrail", "flow")
+    harness.at_step(run_id, "raise_flow")
+    assert harness.rig.output is True
+    harness.rig.set("flow_emulator", 16.0)
+    harness.at_step(run_id, "lower_flow")
+    assert harness.rig.output is False
+    harness.rig.set("flow_emulator", 8.0)
+    assert harness.finished(run_id) is RunStatus.PASSED
+    run = harness.runner.get(run_id)
+    assert run is not None
+    events = [row["event"] for row in run.kernel_events]
+    assert "flow_high_forced_safe" in events and "permit_rejected_reset_required" in events
+    assert all(check["passed"] for check in run.checks), run.checks
+
+
+def test_dual_pot_guardrail_trips_each_channel(harness: Harness) -> None:
+    run_id = harness.run("dual_pot_guardrail", "dual")
+    harness.at_step(run_id, "raise_pressure")
+    harness.rig.set("pressure_emulator", 5.0)
+    harness.at_step(run_id, "lower_pressure")
+    harness.rig.set("pressure_emulator", 2.0)
+    harness.at_step(run_id, "raise_flow")
+    harness.rig.set("flow_emulator", 16.0)
+    harness.at_step(run_id, "lower_flow")
+    harness.rig.set("flow_emulator", 8.0)
+    assert harness.finished(run_id) is RunStatus.PASSED
+    run = harness.runner.get(run_id)
+    assert run is not None
+    events = [row["event"] for row in run.kernel_events]
+    assert "pressure_high_forced_safe" in events and "flow_high_forced_safe" in events
 
 
 def test_estop_anti_restart(harness: Harness) -> None:

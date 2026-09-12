@@ -16,6 +16,8 @@ def test_skill_index_loads_front_matter_and_matches_intents() -> None:
         "relay_truth_table",
         "adc_validation",
         "safe_powerdown",
+        "flow_guardrail",
+        "dual_pot_guardrail",
     } <= names
     skill = index.get("pressure_guardrail")
     assert skill is not None

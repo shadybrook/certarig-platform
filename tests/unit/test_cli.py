@@ -41,6 +41,8 @@ def test_parser_covers_every_subcommand() -> None:
     assert sim.sim_command == "run" and sim.verbose
     lib = parser.parse_args(["sim", "run-library", "--out", "/tmp/x", "--filter", "relay"])
     assert lib.filter == "relay"
+    stamp = parser.parse_args(["sim", "stamp-gate", "--out", "/tmp/stamps"])
+    assert stamp.sim_command == "stamp-gate" and stamp.out == "/tmp/stamps"
     agent = parser.parse_args(["agent", "run", "--url", "http://x", "hello"])
     assert agent.provider == "fake" and agent.intent == "hello"
     replay = parser.parse_args(["agent", "replay", "t.jsonl", "--lenient"])

@@ -35,6 +35,7 @@ class Principal(StrEnum):
     ANONYMOUS = "anonymous"
     AGENT = "agent"
     OPERATOR = "operator"
+    AUDITOR = "auditor"
 
 
 @dataclass(frozen=True)
@@ -251,6 +252,10 @@ class CapabilityManifest:
         if principal is Principal.ANONYMOUS:
             if spec.mutating:
                 raise CapabilityError(tool, policy, principal, "authentication required")
+            return Policy.ALLOWED
+        if principal is Principal.AUDITOR:
+            if spec.mutating:
+                raise CapabilityError(tool, policy, principal, "auditor is read-only")
             return Policy.ALLOWED
         if principal is Principal.OPERATOR:
             # The manifest governs the agent. A human operator keeps every tool except the

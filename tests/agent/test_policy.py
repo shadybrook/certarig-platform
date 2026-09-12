@@ -40,6 +40,8 @@ def test_opening_moves() -> None:
     assert _first_call(_turn("done")) == ("list_skills", {})
     assert _first_call(_turn("what can you do")) == ("list_skills", {})
     assert _first_call(_turn("verify the pressure trip")) == ("read_skill", {"name": "pressure_guardrail"})
+    assert _first_call(_turn("verify the flow trip")) == ("read_skill", {"name": "flow_guardrail"})
+    assert _first_call(_turn("run the dual pot test")) == ("read_skill", {"name": "dual_pot_guardrail"})
     assert _first_call(_turn("how is the flow")) == ("read_state", {})
     assert _first_call(_turn("gibberish")) == ("list_skills", {})
 

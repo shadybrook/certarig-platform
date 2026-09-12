@@ -65,11 +65,15 @@ class SimSettings:
     @classmethod
     def from_config(cls, config: RigConfig, raw: dict[str, Any] | None = None) -> SimSettings:
         raw = raw or {}
-        noise = {}
+        noise: dict[str, float] = {}
         if "noise_bar" in raw:
             noise["pressure"] = float(raw["noise_bar"])
         if "noise_l_min" in raw:
             noise["flow"] = float(raw["noise_l_min"])
+        extra = raw.get("noise")
+        if isinstance(extra, dict):
+            for concept, value in extra.items():
+                noise[str(concept)] = float(value)
         return cls(
             seed=int(raw.get("seed", 1)),
             time_scale=float(raw.get("time_scale", 1.0)),

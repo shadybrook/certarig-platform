@@ -1,6 +1,8 @@
 # CertaRig
 
-A test-operations platform for a real low-voltage dry bench. The LLM interprets and asks; deterministic code compares numbers, enforces limits and drives the output. The agent reaches the rig only through the Edge API, filtered by a capability manifest.
+A user-deployable test-operations platform. The LLM interprets and asks; deterministic code compares numbers, enforces limits and drives the output. The agent reaches the rig only through the Edge API, filtered by a capability manifest.
+
+This repository is **not** the 20 Sep Phase 3 course submission. That demo stays frozen on the Pi (`certarig_edge` live-dashboard on port 8080). Do not run `deploy/install_pi.sh` on that host. The dry bench is an optional lab, not the design target.
 
 ```
 Studio (browser)  ──►  Edge node  ──►  ProcessGuardrail  ──►  GPIO23 / simulator
@@ -24,13 +26,21 @@ make check                          # lint, types, unit/contract/agent/property/
 .venv/bin/python -m certarig sim serve --port 8080
 ```
 
-Open http://127.0.0.1:8080/ and sign in with the demo operator key printed at startup (`sim-operator-key-000001`). Then:
+Or, without a local venv:
 
-1. **Live** — telemetry and, on the simulator, sliders for the two pots plus an E-stop toggle.
-2. **Procedures** — start `relay_truth_table` (fully automatic) or `pressure_guardrail` (raise P1 past 4.2 bar, then bring it back below 3.5).
-3. **Approvals** — grant or deny agent requests (`reset_trip`, `shutdown`).
-4. **Agent** — type `run the relay truth table`. No LLM API key is required; a transparent rule-based policy drives the same tools a real model would.
-5. **Evidence** — export a checksummed zip (`SHA256SUMS.txt` + `export_manifest.json`).
+```bash
+docker compose -f deploy/docker-compose.yml up --build
+```
+
+Open http://127.0.0.1:8080/ and sign in with the demo operator key (`sim-operator-key-000001`). Optional auditor key: `sim-auditor-key-000001` (read-only). Then:
+
+1. **Live** — ready-to-arm scorecard, generic channel meters, and on the simulator sliders for every mapped signal.
+2. **Onboard** — preview a config diff (for example add a temperature channel) and apply it. MQTT and Modbus TCP are real observe-mode adapters. Save a bench briefing (P1/P2/E-stop/relay notes); it is copied into every evidence bundle.
+3. **Author** — pick the soak template, bind a signal, validate, save a draft, approve it. No LLM required.
+4. **Procedures** — run `relay_truth_table`, `pressure_guardrail`, `flow_guardrail`, `dual_pot_guardrail`, or `thermal_soak` (use `config/rig.thermal.sim.json`).
+5. **Approvals** — grant or deny agent requests (`reset_trip`, `shutdown`). A 428 from the agent deep-links here.
+6. **Agent** — type `run the relay truth table`. The pill shows Fake vs Anthropic/OpenAI. Default is Fake.
+7. **Evidence** — export a checksummed zip; every bundle names the adapter class and hostname. Outcomes land in `evidence/ledger/outcomes.jsonl`.
 
 From the shell, the same path:
 
@@ -42,6 +52,16 @@ CERTARIG_AGENT_KEY=sim-agent-key-0000000001 \
 .venv/bin/python -m certarig sim run-library --out /tmp/certarig-sim-lib
 .venv/bin/python -m certarig evidence pull --url http://127.0.0.1:8080 \
   --operator-key sim-operator-key-000001 --out /tmp/pulled
+
+# SDK (same 50-line path)
+python - <<'PY'
+from certarig.sdk import CertaRig
+rig = CertaRig("http://127.0.0.1:8080", "sim-operator-key-000001")
+print(rig.health()["ready_to_arm"])
+print(rig.live()["guardrail"]["reason"])
+print(rig.run("relay_truth_table")["run_id"])
+print(rig.pull_evidence("/tmp/pulled-sdk")["saved_to"])
+PY
 ```
 
 ## What is deterministic vs what is the model
@@ -79,19 +99,13 @@ make soak           # one simulated hour, accelerated
 make e2e            # Playwright against `certarig sim serve` (needs Node 20)
 ```
 
-Hardware-in-the-loop tests are marked `hil` and skip unless `certarig-pi.local:8080` answers. The bench is not required for `make check`.
+Hardware-in-the-loop tests are marked `hil`. Platform HIL defaults to port **8081** and skips unless `/health` has `ready_to_arm`. Phase 3 on `:8080` is checked only as “still the frozen dashboard.” `make check` never requires the Pi.
 
 A procedure whose hardware mode is `raspberry_pi` will not start unless the same procedure hash has passed on the simulator within the last 24 hours (the digital-twin gate). Simulator passes write `evidence/twin_gate/<hash>.json`.
 
-## Raspberry Pi (wave-1 bench)
+## Raspberry Pi (new install only)
 
-The Pi (`certarig-pi.local`, user `chintan`) is installed with:
-
-```bash
-sudo deploy/install_pi.sh
-```
-
-That creates `/etc/certarig/edge.env` (operator and agent keys, shown once), copies `config/rig.wave1.json`, enables `certarig-edge.service`, and installs a sudoers rule that allows **only** `systemctl poweroff`. Keys never go in the repo or in chat.
+`deploy/install_pi.sh` is for a **new** user Pi. It is unsafe on the Phase 3 submission host: it rsyncs `--delete` to `/opt/certarig` on port 8080 and will refuse if it finds `certarig_edge/cli.py`. The systemd unit’s `WatchdogSec=30` is a supervisor heartbeat, not a SIL loop.
 
 `CERTARIG_ENABLE_ACTUATION` stays `0` until the bench has been inspected. `POST /v1/ops/shutdown` still needs a human approval, refuses while a procedure run is active, forces the kernel safe, flushes evidence, then runs `CERTARIG_POWEROFF_CMD` if set.
 
