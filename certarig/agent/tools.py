@@ -221,6 +221,14 @@ class ToolRegistry:
             if approval:
                 payload["approval_id"] = approval
             return client.post("/v1/ops/shutdown", payload)
+        if name == "read_interview":
+            return client.get("/v1/ops/interview")
+        if name == "start_interview":
+            return client.post("/v1/ops/interview/start", {})
+        if name == "answer_interview":
+            return client.post("/v1/ops/interview/answer", args)
+        if name == "propose_rig_map":
+            return client.post("/v1/ops/interview/propose", {})
         raise KeyError(name)
 
     def _local(self, name: str, args: dict[str, Any]) -> dict[str, Any]:

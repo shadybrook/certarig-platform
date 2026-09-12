@@ -30,6 +30,14 @@ _STATUS_WORDS = {
 _SAFE_WORDS = {"stop", "safe", "halt", "kill"}
 _ABORT_WORDS = {"abort", "cancel"}
 _ACK_WORDS = {"done", "acknowledged", "confirmed", "continue"}
+_INTERVIEW_PHRASES = (
+    "commission this bench",
+    "commission the bench",
+    "commission this rig",
+    "map this rig",
+    "map the rig",
+    "commissioning interview",
+)
 
 
 class RuleBasedPolicy:
@@ -88,6 +96,10 @@ class RuleBasedPolicy:
                     tool_call("abort_procedure", {"run_id": run_id, "reason": "operator asked to abort"})
                 )
             return call(tool_call("force_safe"))
+        if self._wants_interview(request):
+            return call(tool_call("start_interview", {}))
+        if self._interview_pending(messages):
+            return call(tool_call("answer_interview", {"text": self._last_user(messages)}))
         if words & _SAFE_WORDS and not (words & {"powerdown", "shutdown", "shut", "power"}):
             return call(tool_call("force_safe"))
         if words & _ACK_WORDS:
@@ -182,6 +194,34 @@ class RuleBasedPolicy:
                 f"Poweroff: {record.get('poweroff')}. Wait for the SD activity LED to go idle, then remove "
                 "PWR IN and the external 5 V supply."
             )
+        if name == "start_interview":
+            missing = last.get("missing") or []
+            return say(
+                last.get("prompt")
+                or (
+                    "Tell me about this bench — what is on it, which signal is which, the trip "
+                    "numbers, and what stays observe-only. Ask me nothing back; just describe it."
+                    if not missing
+                    else f"I still need {', '.join(missing)}. Ask however you like; one reply can finish it."
+                )
+            )
+        if name == "answer_interview":
+            if last.get("status") == "complete":
+                return call(tool_call("propose_rig_map", {}))
+            missing = last.get("missing") or []
+            return say(
+                last.get("prompt")
+                or f"Got it. I still need {', '.join(missing) or 'nothing'}. Say more whenever you want."
+            )
+        if name == "propose_rig_map":
+            diff = "\n".join(str(row) for row in last.get("diff") or [])
+            return say(
+                f"Proposed rig map (next hash {last.get('next_hash')}). Diff:\n{diff}\n"
+                "A human must apply this in Onboard. The interview never arms the relay."
+            )
+        if name == "read_interview":
+            missing = last.get("missing") or []
+            return say(str(last.get("prompt") or (f"Still need {', '.join(missing)}" if missing else last.get("status"))))
         if name == "read_state":
             return say(self._state_summary(last))
         if name in {"force_safe", "reset_trip", "request_permit"}:
@@ -192,6 +232,28 @@ class RuleBasedPolicy:
         if name == "abort_procedure":
             return say(f"Run {last.get('run_id')} aborted; the kernel was forced safe.")
         return say(f"Done: {name} returned {json.dumps(last)[:300]}.")
+
+    @staticmethod
+    def _wants_interview(request: str) -> bool:
+        return any(phrase in request for phrase in _INTERVIEW_PHRASES)
+
+    @staticmethod
+    def _interview_pending(messages: Sequence[Message]) -> bool:
+        for message in reversed(messages):
+            if message.role != "tool" or message.name not in {
+                "start_interview",
+                "answer_interview",
+                "propose_rig_map",
+            }:
+                continue
+            try:
+                payload = json.loads(message.content)
+            except json.JSONDecodeError:
+                return False
+            if message.name == "propose_rig_map":
+                return False
+            return payload.get("status") in {"in_progress", "started"}
+        return False
 
     @staticmethod
     def _last_tool_args(messages: Sequence[Message], name: str) -> dict[str, Any]:

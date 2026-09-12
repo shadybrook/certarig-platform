@@ -312,6 +312,11 @@ class EdgeNode:
                     **self.manifest.to_dict(self.config.config_hash),
                     "principal": ctx.principal.value,
                     "agent_tools": self.manifest.agent_tools(),
+                    "document": (
+                        json.loads(self.capabilities_path.read_text(encoding="utf-8"))
+                        if self.capabilities_path is not None and self.capabilities_path.is_file()
+                        else None
+                    ),
                 },
             ),
             "read_capabilities",

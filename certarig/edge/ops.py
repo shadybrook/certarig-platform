@@ -160,6 +160,37 @@ class OpsService:
 
         return 200, write_briefing(self.evidence_dir, ctx.body)
 
+    def get_interview(self, ctx: RequestContext) -> tuple[int, dict[str, Any]]:
+        from .interview import read_interview
+
+        return 200, read_interview(self.evidence_dir)
+
+    def start_interview(self, ctx: RequestContext) -> tuple[int, dict[str, Any]]:
+        from .interview import start_interview
+
+        return 200, start_interview(self.evidence_dir)
+
+    def answer_interview(self, ctx: RequestContext) -> tuple[int, dict[str, Any]]:
+        from .interview import answer_interview
+
+        return 200, answer_interview(self.evidence_dir, ctx.body)
+
+    def propose_interview_map(self, ctx: RequestContext) -> tuple[int, dict[str, Any]]:
+        from .configurator import propose_rig
+        from .interview import attach_proposal, proposed_document, read_interview
+
+        interview = read_interview(self.evidence_dir)
+        if interview.get("status") != "complete":
+            raise HttpError(
+                409,
+                {"error": "interview is not complete", "code": "interview_incomplete"},
+            )
+        current = self.node._current_rig_raw()
+        document = proposed_document(current, interview)
+        preview = propose_rig(current, document)
+        saved = attach_proposal(self.evidence_dir, preview)
+        return 200, {**preview, "interview": saved}
+
     # ------------------------------------------------------------ evidence
     def _runs(self) -> list[dict[str, Any]]:
         procedures = self.node.extensions.get("procedures")
@@ -368,6 +399,10 @@ def install_ops(
     add("GET", "/v1/evidence/exports/{name}", service.export_file, "read_evidence")
     add("GET", "/v1/ops/briefing", service.get_briefing)
     add("POST", "/v1/ops/briefing", service.put_briefing)
+    add("GET", "/v1/ops/interview", service.get_interview, "read_interview")
+    add("POST", "/v1/ops/interview/start", service.start_interview, "start_interview")
+    add("POST", "/v1/ops/interview/answer", service.answer_interview, "answer_interview")
+    add("POST", "/v1/ops/interview/propose", service.propose_interview_map, "propose_rig_map")
     add("POST", "/v1/ops/recorder/stop", service.stop_recorder, "stop_recorder")
     add("POST", "/v1/ops/evidence/export", service.export_evidence, "export_evidence")
     add("POST", "/v1/ops/shutdown", service.shutdown, "shutdown")

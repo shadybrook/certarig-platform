@@ -151,6 +151,38 @@ TOOL_CATALOGUE: dict[str, ToolSpec] = {
         ),
         ToolSpec("bypass_interlock", "Never available. Present so a refusal is recorded.", True, _params()),
         ToolSpec("override_limits", "Never available. Present so a refusal is recorded.", True, _params()),
+        ToolSpec(
+            "read_interview",
+            "Read the commissioning interview state. Propose only; a human applies the map.",
+            False,
+            _params(),
+        ),
+        ToolSpec(
+            "start_interview",
+            "Open the commissioning fact list (modules, signals, observe-only). Ask in your own words. Never energises the output.",
+            True,
+            _params(),
+        ),
+        ToolSpec(
+            "answer_interview",
+            "Record facts learned from the operator. Partial is fine. One message may fill every slot.",
+            True,
+            _params(
+                {
+                    "text": {"type": "string"},
+                    "modules": {"type": "string"},
+                    "observe_only": {"type": "string"},
+                    "diagram": {"type": "string"},
+                    "signals": {"type": "array", "items": {"type": "object"}},
+                }
+            ),
+        ),
+        ToolSpec(
+            "propose_rig_map",
+            "Propose a rig.json from the completed interview. Apply stays operator-only.",
+            True,
+            _params(),
+        ),
     )
 }
 

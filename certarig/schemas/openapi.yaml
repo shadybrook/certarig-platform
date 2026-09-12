@@ -284,6 +284,30 @@ paths:
       responses:
         '200':
           description: Success
+  /v1/ops/interview:
+    get:
+      summary: GET /v1/ops/interview
+      responses:
+        '200':
+          description: Success
+  /v1/ops/interview/start:
+    post:
+      summary: POST /v1/ops/interview/start
+      responses:
+        '200':
+          description: Success
+  /v1/ops/interview/answer:
+    post:
+      summary: POST /v1/ops/interview/answer
+      responses:
+        '200':
+          description: Success
+  /v1/ops/interview/propose:
+    post:
+      summary: POST /v1/ops/interview/propose
+      responses:
+        '200':
+          description: Success
   /v1/ops/recorder/stop:
     post:
       summary: POST /v1/ops/recorder/stop

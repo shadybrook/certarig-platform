@@ -35,12 +35,18 @@ docker compose -f deploy/docker-compose.yml up --build
 Open http://127.0.0.1:8080/ and sign in with the demo operator key (`sim-operator-key-000001`). Optional auditor key: `sim-auditor-key-000001` (read-only). Then:
 
 1. **Live** — ready-to-arm scorecard, generic channel meters, and on the simulator sliders for every mapped signal.
-2. **Onboard** — preview a config diff (for example add a temperature channel) and apply it. MQTT and Modbus TCP are real observe-mode adapters. Save a bench briefing (P1/P2/E-stop/relay notes); it is copied into every evidence bundle.
+2. **Onboard** — start the commissioning interview (or type `commission this bench` in Agent), preview the proposed `rig.json`, and apply it as a human. Add or remove channels and flip capability policies without editing JSON by hand. Save a bench briefing; briefing and interview are copied into every evidence bundle.
 3. **Author** — pick the soak template, bind a signal, validate, save a draft, approve it. No LLM required.
-4. **Procedures** — run `relay_truth_table`, `pressure_guardrail`, `flow_guardrail`, `dual_pot_guardrail`, or `thermal_soak` (use `config/rig.thermal.sim.json`).
+4. **Procedures** — run `relay_truth_table`, `pressure_guardrail`, `flow_guardrail`, `dual_pot_guardrail`, or `thermal_soak` (use `config/rig.thermal.sim.json`). Trigger steps show which pot to move and the live value versus the target.
 5. **Approvals** — grant or deny agent requests (`reset_trip`, `shutdown`). A 428 from the agent deep-links here.
-6. **Agent** — type `run the relay truth table`. The pill shows Fake vs Anthropic/OpenAI. Default is Fake.
+6. **Agent** — type `run the relay truth table` or `commission this bench`. The pill shows Fake vs Anthropic/OpenAI. Default is Fake.
 7. **Evidence** — export a checksummed zip; every bundle names the adapter class and hostname. Outcomes land in `evidence/ledger/outcomes.jsonl`.
+
+Stranger path:
+
+```
+clone → sim serve → interview → apply → certarig sim stamp-gate → run a procedure → export
+```
 
 From the shell, the same path:
 
@@ -50,6 +56,9 @@ CERTARIG_AGENT_KEY=sim-agent-key-0000000001 \
   "run the relay truth table"
 
 .venv/bin/python -m certarig sim run-library --out /tmp/certarig-sim-lib
+.venv/bin/python -m certarig sim stamp-gate --out /tmp/certarig-sim-lib
+.venv/bin/python -m certarig evidence accept-twin-gate \
+  --from /tmp/certarig-sim-lib --into evidence/runs
 .venv/bin/python -m certarig evidence pull --url http://127.0.0.1:8080 \
   --operator-key sim-operator-key-000001 --out /tmp/pulled
 
@@ -106,6 +115,22 @@ A procedure whose hardware mode is `raspberry_pi` will not start unless the same
 ## Raspberry Pi (new install only)
 
 `deploy/install_pi.sh` is for a **new** user Pi. It is unsafe on the Phase 3 submission host: it rsyncs `--delete` to `/opt/certarig` on port 8080 and will refuse if it finds `certarig_edge/cli.py`. The systemd unit’s `WatchdogSec=30` is a supervisor heartbeat, not a SIL loop.
+
+Sidecar recipe when that host already runs Phase 3 on 8080: use a **separate folder** and a **free port** (8081). Never run `install_pi.sh` there. Two kernels must not both own GPIO23 / ADS1115.
+
+```bash
+# On the Pi, in the sidecar folder — not /opt/certarig
+export GPIOZERO_PIN_FACTORY=lgpio
+# Recreate the venv with --system-site-packages so OS lgpio is visible.
+# Isolated Python 3.13 venvs fail GPIO.
+certarig edge serve --port 8081
+# Halt: force_safe, then SIGINT (serve restores SIGINT if nohup ignored it),
+# sudo shutdown -h now, wait for the green SD LED, then pull PWR IN.
+```
+
+`GET /v1/errors` explains `gpio_backend` in English if the pin factory or lgpio import is wrong.
+
+Copy Mac twin-gate stamps onto the sidecar with `certarig evidence accept-twin-gate --from <sim-library> --into <sidecar-evidence>`.
 
 `CERTARIG_ENABLE_ACTUATION` stays `0` until the bench has been inspected. `POST /v1/ops/shutdown` still needs a human approval, refuses while a procedure run is active, forces the kernel safe, flushes evidence, then runs `CERTARIG_POWEROFF_CMD` if set.
 

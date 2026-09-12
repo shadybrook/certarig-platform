@@ -20,6 +20,8 @@ def test_health_exposes_ready_to_arm_and_error_catalog() -> None:
         catalog = edge.anonymous().get("/v1/errors")
         assert "stale_contract" in catalog["errors"]
         assert catalog["errors"]["twin_gate"]["next"]
+        assert "lgpio" in catalog["errors"]["gpio_backend"]["next"]
+        assert catalog["errors"]["interview_incomplete"]["next"]
 
 
 def test_rig_propose_and_apply_hot_reloads_limits() -> None:
