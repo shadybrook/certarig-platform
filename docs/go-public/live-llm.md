@@ -15,3 +15,10 @@ Prove two utterances against `certarig sim serve`:
 2. `run the relay truth table` — `read_skill` → `run_procedure` → `wait_for_run`. If 428, explain and `request_approval`.
 
 Studio Agent pill should leave `fake`. Keys live in `~/.env` or the shell. The pytest marker `live_llm` is skipped unless those env vars are set.
+
+## What CI proves (and what it does not)
+
+`make check` stays on Fake. `make_provider("anthropic")` and `make_provider("openai")` raise if the key is missing. A cloud or CI box without `ANTHROPIC_API_KEY` / `OPENAI_API_KEY` must skip `live_llm` — that is not a failed proof, it is the rule.
+
+The two utterances above are proven only on an engineering computer that already has a key. Do not paste a key into GBrain, a screenshot, or this repo to make the test go green.
+

@@ -3,7 +3,7 @@ VENV ?= .venv
 BIN := $(VENV)/bin
 COV_FAIL_UNDER ?= 90
 
-.PHONY: venv install lint typecheck test test-fast property scenario contract agent e2e soak coverage check clean
+.PHONY: venv install lint typecheck test test-fast property scenario contract agent e2e demo-film soak coverage check clean
 
 venv:
 	uv venv $(VENV) --python $(PYTHON) --seed --quiet || $(PYTHON) -m venv $(VENV)
@@ -39,6 +39,9 @@ coverage:
 
 e2e:
 	cd studio && npx playwright test
+
+demo-film:
+	cd studio && CERTARIG_DEMO_URL=$(CERTARIG_DEMO_URL) node scripts/record_product_film.mjs
 
 check: lint typecheck coverage
 
