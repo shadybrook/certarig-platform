@@ -1,0 +1,5 @@
+test_points,s1_position,reported_reading,result,interpretation
+lower_control_COM_to_DC_plus,COM-LOW,about 86.3 kohm rising/stabilizing,RECORDED,Not a basis for applying 3.3 V
+lower_control_COM_to_DC_minus,COM-LOW,about 0 ohm or very low/variable,RECORDED,Consistent with low reference through current jumper position
+lower_control_COM_to_CH1,COM-LOW,about 86.6 kohm,RECORDED,Module-specific internal network
+lower_control_COM_to_CH2,COM-LOW,OL,RECORDED,Unused channel remains unconnected

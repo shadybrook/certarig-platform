@@ -1,0 +1,7 @@
+{
+    "actuation_enabled": false,
+    "config_hash": "e9922ec2e77b1006a336b4739b200d6c5372b02b457446b1b44b9c45bfed29ed",
+    "hardware_mode": "raspberry_pi",
+    "rig_id": "certarig-wave1-dry-bench",
+    "status": "ok"
+}

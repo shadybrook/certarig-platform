@@ -1,0 +1,50 @@
+{
+  "rig_id": "certarig-wave1-dry-bench",
+  "revision": "phase3-wave1-2026-09-10",
+  "sample_interval_ms": 100,
+  "pressure_abort_bar": 4.2,
+  "hardware": {
+    "mode": "raspberry_pi",
+    "i2c_bus": 1,
+    "ads1115_address": 72,
+    "valve_output_gpio": 23,
+    "emergency_stop_gpio": 24,
+    "emergency_stop_active_high": true,
+    "relay_feedback_gpio": null,
+    "output_active_high": true
+  },
+  "channels": [
+    {
+      "channel_id": "pressure_emulator",
+      "kind": "analog",
+      "adc_channel": 0,
+      "unit": "bar",
+      "raw_min_v": 0.0,
+      "raw_max_v": 3.302,
+      "engineering_min": 0.0,
+      "engineering_max": 10.0,
+      "valid_min": 0.0,
+      "valid_max": 10.0,
+      "safe_min": 0.0,
+      "safe_max": 4.2,
+      "calibration_id": "W1-P1-20260910",
+      "required": true
+    },
+    {
+      "channel_id": "flow_emulator",
+      "kind": "analog",
+      "adc_channel": 1,
+      "unit": "L/min",
+      "raw_min_v": 0.0,
+      "raw_max_v": 3.3,
+      "engineering_min": 0.0,
+      "engineering_max": 20.0,
+      "valid_min": 0.0,
+      "valid_max": 20.0,
+      "safe_min": 0.0,
+      "safe_max": 15.0,
+      "calibration_id": "W1-P2-20260910",
+      "required": true
+    }
+  ]
+}

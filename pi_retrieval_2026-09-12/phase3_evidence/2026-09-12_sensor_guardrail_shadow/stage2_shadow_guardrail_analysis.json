@@ -1,0 +1,33 @@
+{
+  "duration_s": 758.701855,
+  "events": {
+    "estop_closed_reset_required": 1,
+    "estop_open_forced_safe": 1,
+    "flow_high_forced_safe": 2,
+    "pressure_high_forced_safe": 3,
+    "process_safe_reset_required": 41,
+    "sensor_invalid_forced_safe": 38,
+    "trip_reset_output_safe": 3
+  },
+  "final_gpio23_command_high": "false",
+  "final_trip_latched": "true",
+  "flow_l_min": {
+    "max": 18.71515,
+    "mean": 0.296143,
+    "min": -1.6
+  },
+  "forced_safe_events": 44,
+  "pressure_bar": {
+    "max": 7.12901,
+    "mean": 0.109349,
+    "min": -0.79952
+  },
+  "rows": 7591,
+  "sha256": "cb2f988626a90aa1b0aa59be27dc107a5b1a6b964244031e6e43a3f0ef8504b8",
+  "source_csv": "stage2_shadow_guardrail.csv",
+  "trip_latency_s": {
+    "max": null,
+    "mean": null,
+    "min": null
+  }
+}

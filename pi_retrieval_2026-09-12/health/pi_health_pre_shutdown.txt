@@ -1,0 +1,13 @@
+/usr/bin/rsync
+captured_utc=2026-09-12T07:40:26Z
+uptime:  13:10:26 up 42 min,  2 users,  load average: 0.25, 0.20, 0.17
+temp=41.9'C
+throttled=0x0
+volt=1.3400V
+git_head=02fc646ee8c34b8ba936eb36df63afdce99d7073
+?? certarig_edge.egg-info/
+?? phase3_evidence/2026-09-12_sensor_guardrail_shadow/
+?? phase3_evidence/live_runs/
+
+    PID     ELAPSED COMMAND
+   2600       15:46 python3 -m certarig_edge.cli live-dashboard --config config/rig.wave1.json --evidence-dir phase3_evidence/live_runs --bind 0.0.0.0 --port 8080

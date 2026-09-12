@@ -1,0 +1,36 @@
+test_id,test_points,estop_state,expected_result,measured_value,result,operator_timestamp_ist,notes
+U01,Pi physical pin 2 to fuse input,either,0-1 ohm,,,,
+U02,Removed 1 A fuse end to end,either,0-1 ohm,,,,
+U03,Fuse holder output to FUSED_5V row 12,either,0-1 ohm,,,,
+U04,FUSED_5V to capacitor positive,either,0-1 ohm,,,,
+U05,FUSED_5V to measured K1 COM,either,0-1 ohm,,,,
+U06,Pi physical pin 25 to ground row 13,either,0-1 ohm,,,,
+U07,Pi physical pin 25 to relay DC-,either,0-1 ohm,,,,
+U08,Pi physical pin 25 to BC547B emitter row C6,either,0-1 ohm,,,,
+U09,Pi physical pin 25 to capacitor negative stripe,either,0-1 ohm,,,,
+U10a,Pi physical pin 25 to red indicator negative,either,0-1 ohm,,,,
+U10b,Pi physical pin 25 to green indicator negative,either,0-1 ohm,,,,
+U11,Pi physical pin 16 through resistor to BC547B base C5,either,0.95-1.05 kohm,,,,
+U12,BC547B base row resistor to emitter row,either,record installed 10 kohm path and probe direction,,,,
+U13,BC547B collector C4 to relay CH1,either,0-1 ohm,,,,
+U14,Shared pin 17 3.3 V hub to relay lower/control COM,either,OL; no installed conductor,wire removed; meter confirmation pending,PENDING,2026-09-11,Corrected after isolation test; never reconnect this branch
+U15,FUSED_5V to relay DC+,reset,0-1 ohm,,,,
+U16,FUSED_5V to relay DC+,latched,OL,,,,
+U17,Pi physical pin 18 to pin 20,reset,0-1 ohm,,,,
+U18,Pi physical pin 18 to pin 20,latched,OL,,,,
+U19,Measured K1 COM to K1 NC,relay unpowered,no more than 1 ohm above shorted-probe baseline,0.02 kohm with probe baseline also 0.02 kohm,PASS-BASELINE-CORRECTED,2026-09-11 16:58:51 IST,Relay contact adds no measurable resistance on the selected 2 kohm meter range
+U20,Measured K1 COM to K1 NO,relay unpowered,OL,OL,PASS,2026-09-11 16:35:24 IST,Operator-reported value
+U21,Measured K1 NO terminal to breadboard F14,relay unpowered,0-1 ohm,0.4 unit reported,PASS-PROVISIONAL,2026-09-11 16:35:24 IST,Assumed ohms; confirm meter range or display
+U22,Measured K1 NO through installed branch resistor to green indicator positive,relay unpowered,0.95-1.05 kohm,0.978 kohm,PASS,2026-09-11 16:51:05 IST,Operator-reported value
+U23,Measured K1 NC through installed branch resistor to red indicator positive,relay unpowered,0.95-1.05 kohm,0.98 kohm,PASS,2026-09-11 16:51:05 IST,Operator-reported value
+U24,Pin 17 splitter to P1 high terminal,either,0-1 ohm,,,,
+U25,Pin 17 splitter to P2 high terminal,either,0-1 ohm,,,,
+U26,Relay lower/control COM to DC- with S1 on COM-LOW,either,record actual module-specific resistance,very low or variable,PASS-PROVISIONAL,2026-09-11,Operator-reported unpowered mapping; exact stable value not captured
+S01,FUSED_5V to common ground,latched fuse removed,no sustained continuity beep,no reading reported,PASS-PROVISIONAL,2026-09-11 16:51:05 IST,Treat as OL only if measured in continuity or resistance mode with no sustained beep
+S02,Pi 3.3 V hub to Pi 5 V,latched fuse removed,no continuity beep,,,,
+S03,Pi physical pin 16 GPIO23 to Pi 5 V,latched fuse removed,no continuity beep,,,,
+S04,BC547B collector to emitter,latched fuse removed,no sustained continuity beep,,,,
+S05,E-stop NC1 pair to NC2 pair,latched fuse removed,no cross-continuity,,,,
+S06,Shared pin 17 3.3 V hub to common ground,latched fuse removed,"no sustained beep; about 4.5 kohm with relay lower COM disconnected",9 ohm with sustained beep and no k symbol,FAIL-HISTORICAL-RETEST-REQUIRED,2026-09-11 17:48:36 IST,Fault later followed pin17-to-relay-lower-COM branch; repeat after correction
+S07,Pi-side fuse-holder input to common ground,latched fuse removed,no sustained continuity beep,displayed 1-1.2 V in continuity mode with no beep,PASS-PROVISIONAL,2026-09-11 17:47:39 IST,Display appears to be continuity or diode-test voltage; repeat in resistance mode later
+S08,Shared pin 17 3.3 V hub to relay lower/control COM,latched fuse removed,OL; no continuity,wire removed; meter confirmation pending,PENDING,2026-09-11,Required before Gate 1 retry

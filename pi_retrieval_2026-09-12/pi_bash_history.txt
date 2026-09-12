@@ -1,0 +1,179 @@
+hostname
+hostname -I
+date --iso-8601=seconds
+uptime
+cat /etc/os-release
+uname -a
+df -h /
+free -h
+systemctl is-active ssh
+vcgencmd get_throttled
+vcgencmd measure_temp
+command -v i2cdetect || true
+command -v git || true
+command -v python3 || true
+command -v node || true
+sudo -v
+sudo apt-get update
+sudo apt-get install -y git python3-venv python3-pip i2c-tools nodejs npm python3-gpiozero python3-lgpio python3-smbus2
+git --version
+python3 --version
+node --version
+npm --version
+i2cdetect -V
+sudo raspi-config nonint do_i2c 0
+sudo raspi-config nonint get_i2c; echo I2C_STATUS_RC=$?
+sudo systemctl reboot
+uptime
+vcgencmd get_throttled
+vcgencmd measure_temp
+ls -l /dev/i2c-*
+i2cdetect -l
+i2cdetect -y 1
+ls -ld ~/certarig-phase-2-poc 2>/dev/null || true
+git clone https://github.com/shadybrook/certarig-phase-2-poc.git ~/certarig-phase-2-poc
+cd ~/certarig-phase-2-poc
+git rev-parse HEAD
+git status --short --branch
+python3 -m venv .venv
+.venv/bin/python -m pip install --upgrade pip
+.venv/bin/python -m pip install -e '.[pi]'
+npm run check
+python3 tools/phase3_integrated_bench_logger.py --output phase3_evidence/2026-09-11_integrated_bench/gate1_reimage_monitor.csv --rate 10
+python3 -c 'import csv; p="phase3_evidence/2026-09-11_integrated_bench/gate1_reimage_monitor.csv"; r=list(csv.DictReader(open(p))); print("rows",len(r)); print("a0_min_max",min(float(x["a0_voltage_v"]) for x in r),max(float(x["a0_voltage_v"]) for x in r)); print("a1_min_max",min(float(x["a1_voltage_v"]) for x in r),max(float(x["a1_voltage_v"]) for x in r)); print("gpio24",sorted(set(x["gpio24_raw_level"] for x in r))); print("estop_active",sorted(set(x["estop_active"] for x in r))); print("gpio23",sorted(set(x["gpio23_command_high"] for x in r))); print("events",sorted(set(x["event"] for x in r if x["event"])))'
+git status --short --branch
+sudo systemctl poweroff
+cd ~/certarig-phase-2-poc
+vcgencmd get_throttled
+vcgencmd measure_temp
+i2cdetect -y 1
+python3 tools/phase3_integrated_bench_logger.py --output phase3_evidence/2026-09-11_integrated_bench/gate1_estop_transition_retry.csv --rate 10
+python3 -c 'import csv,collections; p="phase3_evidence/2026-09-11_integrated_bench/gate1_estop_transition_retry.csv"; r=list(csv.DictReader(open(p))); print("rows",len(r)); print("start_end",r[0]["timestamp_utc"],r[-1]["timestamp_utc"]); print("gpio24_counts",dict(collections.Counter(x["gpio24_raw_level"] for x in r))); print("estop_counts",dict(collections.Counter(x["estop_active"] for x in r))); print("gpio23",sorted(set(x["gpio23_command_high"] for x in r))); print("events",dict(collections.Counter(x["event"] for x in r if x["event"]))); print("transitions",sum(a["gpio24_raw_level"]!=b["gpio24_raw_level"] for a,b in zip(r,r[1:]))); print("a0_min_max",min(float(x["a0_voltage_v"]) for x in r),max(float(x["a0_voltage_v"]) for x in r)); print("a1_min_max",min(float(x["a1_voltage_v"]) for x in r),max(float(x["a1_voltage_v"]) for x in r))'
+python3 -c 'from gpiozero import DigitalInputDevice; d=DigitalInputDevice(24,pull_up=True); print("gpiozero_value",d.value); print("is_active",d.is_active); print("active_state",d.active_state); print("pull_up",d.pull_up); print("raw_pin_state",d.pin.state); d.close()'
+pinctrl get 24
+echo SESSION_OK && hostname && pinctrl get 24
+mv raspberry_pi.py certarig_edge/hardware/raspberry_pi.py
+mv phase3_integrated_bench_logger.py tools/phase3_integrated_bench_logger.py
+mv phase3_estop_logger.py tools/phase3_estop_logger.py
+mv test_raspberry_pi_hardware.py tests_py/test_raspberry_pi_hardware.py
+python3 -m unittest tests_py.test_raspberry_pi_hardware -v
+python3 tools/phase3_integrated_bench_logger.py --help | head -80
+python3 tools/phase3_integrated_bench_logger.py --output phase3_evidence/2026-09-11_integrated_bench/gate1_estop_fixed_released.csv --rate 10
+python3 - <<'PY'
+import csv
+from collections import Counter
+p='phase3_evidence/2026-09-11_integrated_bench/gate1_estop_fixed_released.csv'
+with open(p) as f: rows=list(csv.DictReader(f))
+for k in ('gpio24_raw_level','estop_active','gpio23_command_high','event'):
+ print(k, Counter(r[k] for r in rows))
+print('first', rows[0])
+print('last', rows[-1])
+PY
+
+python3 tools/phase3_integrated_bench_logger.py --output phase3_evidence/2026-09-11_integrated_bench/gate1_estop_transition_corrected.csv --rate 10
+python3 - <<'PY'
+import csv
+from collections import Counter
+p='phase3_evidence/2026-09-11_integrated_bench/gate1_estop_transition_corrected.csv'
+with open(p) as f: rows=list(csv.DictReader(f))
+transitions=[]
+last=rows[0]['gpio24_raw_level']
+for r in rows[1:]:
+ if r['gpio24_raw_level'] != last:
+  transitions.append((r['elapsed_s'], last, r['gpio24_raw_level'], r['event']))
+  last=r['gpio24_raw_level']
+print('samples',len(rows),'duration_s',rows[-1]['elapsed_s'])
+print('raw',Counter(r['gpio24_raw_level'] for r in rows))
+print('active',Counter(r['estop_active'] for r in rows))
+print('gpio23',Counter(r['gpio23_command_high'] for r in rows))
+print('transitions',len(transitions))
+for t in transitions: print(t)
+PY
+
+echo 'FINAL_GATE1_HEALTH'
+vcgencmd get_throttled
+pinctrl get 23 24
+i2cdetect -y 1 | grep -E '(^| )48( |$)'
+sudo poweroff
+cd ~/certarig-phase-2-poc
+printf 'GATE2_BOOT_CHECK\n'
+date --iso-8601=seconds
+vcgencmd get_throttled
+pinctrl get 23
+pinctrl get 24
+i2cdetect -y 1 | grep -E '(^| )48( |$)'
+pgrep -af 'certarig|phase3_integrated' || true
+python3 - <<'PY'
+from gpiozero import DigitalInputDevice
+from time import sleep
+s=DigitalInputDevice(24,pull_up=True,bounce_time=0.02)
+sleep(0.25)
+print('GPIO24_RAW', 'HIGH' if bool(s.pin.state) else 'LOW')
+print('ESTOP_ACTIVE', bool(s.pin.state))
+s.close()
+PY
+
+python3 tools/phase3_integrated_bench_logger.py --output phase3_evidence/2026-09-11_integrated_bench/gate2_nc2_power_interlock.csv --rate 10
+vcgencmd get_throttled
+sudo poweroff
+cd ~/certarig-phase-2-poc
+printf 'GATE2_LOW_TRIGGER_POSTCHECK\n'
+date --iso-8601=seconds
+vcgencmd get_throttled
+vcgencmd measure_temp
+pinctrl get 23
+i2cdetect -y 1 | grep -E '(^| )48( |$)'
+sudo poweroff
+vcgencmd get_throttled
+sudo poweroff
+cd ~/certarig-phase-2-poc
+python3 - <<'PY'
+from gpiozero import DigitalInputDevice, OutputDevice
+from time import sleep
+out=OutputDevice(23,active_high=True,initial_value=False)
+estop=DigitalInputDevice(24,pull_up=True,bounce_time=0.02)
+sleep(0.25)
+print('GPIO23_COMMAND', 'HIGH' if bool(out.pin.state) else 'LOW')
+print('GPIO24_RAW', 'HIGH' if bool(estop.pin.state) else 'LOW')
+print('ESTOP_ACTIVE', bool(estop.pin.state))
+out.off(); estop.close(); out.close()
+PY
+
+vcgencmd get_throttled
+cd ~/certarig-phase-2-poc
+python3 tools/phase3_integrated_bench_logger.py --output phase3_evidence/2026-09-12_integrated_bench/gate2_transistor_boot_safe.csv --rate 10
+python3 tools/phase3_integrated_bench_logger.py --output phase3_evidence/2026-09-12_integrated_bench/gate2_transistor_permit_safe.csv --rate 10 --allow-output --acknowledge-dry-bench
+python3 - <<'PY'
+import csv
+from collections import Counter
+p='phase3_evidence/2026-09-12_integrated_bench/gate2_transistor_permit_safe.csv'
+with open(p) as f: rows=list(csv.DictReader(f))
+print('samples',len(rows),'duration_s',rows[-1]['elapsed_s'])
+print('gpio23',Counter(r['gpio23_command_high'] for r in rows))
+print('events',[(r['elapsed_s'],r['event'],r['gpio23_command_high']) for r in rows if r['event']])
+PY
+
+vcgencmd get_throttled
+vcgencmd measure_temp
+sudo poweroff
+vcgencmd get_throttled
+sudo poweroff
+cd ~/certarig-phase-2-poc
+python3 tools/phase3_integrated_bench_logger.py --output phase3_evidence/2026-09-12_integrated_bench/gate3_integrated_truth_table.csv --rate 10 --allow-output --acknowledge-dry-bench
+python3 - <<'PY'
+import csv
+from collections import Counter
+p='phase3_evidence/2026-09-12_integrated_bench/gate3_integrated_truth_table.csv'
+with open(p) as f: rows=list(csv.DictReader(f))
+print('samples',len(rows),'duration_s',rows[-1]['elapsed_s'])
+print('gpio24',Counter(r['gpio24_raw_level'] for r in rows))
+print('estop',Counter(r['estop_active'] for r in rows))
+print('gpio23',Counter(r['gpio23_command_high'] for r in rows))
+print('events')
+for r in rows:
+ if r['event']: print(r['elapsed_s'],r['event'],r['gpio24_raw_level'],r['gpio23_command_high'])
+PY
+
+vcgencmd get_throttled
+vcgencmd measure_temp
+sudo poweroff

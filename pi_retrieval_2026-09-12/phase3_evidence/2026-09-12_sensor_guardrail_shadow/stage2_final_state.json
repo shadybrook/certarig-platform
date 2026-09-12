@@ -1,0 +1,67 @@
+{
+  "captured_at": "2026-09-12T07:19:51.547496+00:00",
+  "rig_id": "certarig-wave1-dry-bench",
+  "config_hash": "e9922ec2e77b1006a336b4739b200d6c5372b02b457446b1b44b9c45bfed29ed",
+  "actuation_enabled": false,
+  "samples": [
+    {
+      "channel_id": "pressure_emulator",
+      "quality": "good",
+      "raw_value": 0.0,
+      "unit": "bar",
+      "value": 0.0
+    },
+    {
+      "channel_id": "flow_emulator",
+      "quality": "good",
+      "raw_value": 0.0,
+      "unit": "L/min",
+      "value": 0.0
+    }
+  ],
+  "guardrail": {
+    "channels": [
+      {
+        "channel_id": "pressure_emulator",
+        "quality": "good",
+        "safe_max": 4.2,
+        "safe_min": 0.0,
+        "state": "safe",
+        "unit": "bar",
+        "value": 0.0
+      },
+      {
+        "channel_id": "flow_emulator",
+        "quality": "good",
+        "safe_max": 15.0,
+        "safe_min": 0.0,
+        "state": "safe",
+        "unit": "L/min",
+        "value": 0.0
+      }
+    ],
+    "drive_high": false,
+    "estop_active": false,
+    "event": "operator_safe",
+    "permit_requested": false,
+    "process_healthy": true,
+    "reason": "operator_safe",
+    "trip_latched": true
+  },
+  "outputs": {
+    "gpio23_command_high": false,
+    "green_indicator_expected": false,
+    "red_indicator_expected": true,
+    "relay_board_power_expected": true,
+    "relay_energized_expected": false,
+    "relay_state_source": "commanded_not_feedback"
+  },
+  "recording": {
+    "active": false,
+    "filename": null,
+    "samples": 7591
+  },
+  "last_event": "operator_safe",
+  "last_event_at": "2026-09-12T07:19:51.576756+00:00",
+  "warning": "Relay and panel-light states are expected from the command/contact model; no feedback sensor is fitted."
+}

@@ -1,0 +1,6 @@
+step_id,configuration,pwr_led_observation,result,source,interpretation
+D01,Pi powered only through PWR IN,stable red PWR,PASS,operator report,Pi and supply stable in isolated baseline
+D02,Add Pi physical pin 25 to breadboard A6,stable red PWR,PASS,operator report,Ground and emitter branch did not reproduce fault
+D03,Keep pin25 to A6 and add Pi physical pin 16 to A2,stable red PWR,PASS,operator report,GPIO23 and transistor-base branch did not reproduce fault
+D04,Add Pi physical pin 17 to relay lower/control COM,red PWR extinguished,FAIL-REPRODUCED,operator report,Fault followed prohibited pin17-to-relay-lower-COM branch
+D05,Remove only pin17-to-relay-lower-COM branch,stable red PWR restored,PASS-CORRECTED,operator report,Keep lower/control COM externally disconnected
