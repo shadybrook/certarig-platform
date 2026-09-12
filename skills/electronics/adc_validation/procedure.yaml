@@ -1,0 +1,63 @@
+id: adc_validation
+version: 1
+title: ADC channel validation sweep
+domain: electronics
+tags: [adc, ads1115, calibration, sensors]
+summary: >
+  Validates that both analogue channels read good quality, respond across their working range
+  when the operator sweeps the emulators, and return to a stable resting value. Output stays off.
+applies_to:
+  concepts: [pressure, flow]
+requires_output: false
+record: true
+timeout_s: 900
+preconditions:
+  - { quality: pressure, eq: good }
+  - { quality: flow, eq: good }
+steps:
+  - id: baseline
+    type: expect
+    predicate: { all: [{ quality: pressure, eq: good }, { quality: flow, eq: good }] }
+    hold_ms: 1000
+  - id: pressure_low
+    type: trigger
+    instruction: Turn P1 fully anticlockwise (minimum pressure).
+    predicate: { signal: pressure, op: "<", value: 0.5 }
+    timeout_s: 180
+  - id: pressure_high
+    type: trigger
+    instruction: Turn P1 slowly to maximum. Expect the trip indicator; the output is not armed.
+    predicate: { signal: pressure, op: ">", value: 8.0 }
+    timeout_s: 180
+  - id: pressure_mid
+    type: trigger
+    instruction: Return P1 to roughly the middle of its travel (2 to 3 bar).
+    predicate: { all: [{ signal: pressure, op: ">", value: 2.0 }, { signal: pressure, op: "<", value: 3.0 }] }
+    timeout_s: 180
+  - id: flow_low
+    type: trigger
+    instruction: Turn P2 fully anticlockwise (minimum flow).
+    predicate: { signal: flow, op: "<", value: 1.0 }
+    timeout_s: 180
+  - id: flow_high
+    type: trigger
+    instruction: Turn P2 slowly to maximum.
+    predicate: { signal: flow, op: ">", value: 17.0 }
+    timeout_s: 180
+  - id: flow_mid
+    type: trigger
+    instruction: Return P2 to roughly the middle of its travel (6 to 10 L/min).
+    predicate: { all: [{ signal: flow, op: ">", value: 6.0 }, { signal: flow, op: "<", value: 10.0 }] }
+    timeout_s: 180
+  - id: settle
+    type: expect
+    predicate: { all: [{ quality: pressure, eq: good }, { quality: flow, eq: good }] }
+    hold_ms: 2000
+  - id: output_never_armed
+    type: expect
+    predicate: { state: output_high, eq: false }
+evaluate:
+  - { event_not_observed: permit_accepted }
+  - { step_passed: settle }
+  - { signal: pressure, peak_below: 10.0 }
+  - { signal: flow, peak_below: 20.0 }

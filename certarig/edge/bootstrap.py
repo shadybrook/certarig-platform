@@ -19,6 +19,7 @@ from .models import RigConfig
 from .server import EdgeNode
 
 DEFAULT_STUDIO_ROOT = Path(__file__).resolve().parents[2] / "studio"
+DEFAULT_SKILLS_ROOT = Path(__file__).resolve().parents[2] / "skills"
 
 
 def build_hardware(config: RigConfig) -> HardwareAdapter:
@@ -45,6 +46,7 @@ class NodeSettings:
     operator_key: str
     agent_key: str | None
     allow_output: bool
+    skills_root: Path | None = None
 
     @classmethod
     def from_env(
@@ -53,6 +55,7 @@ class NodeSettings:
         capabilities_path: str | Path | None,
         evidence_dir: str | Path,
         static_root: str | Path | None = DEFAULT_STUDIO_ROOT,
+        skills_root: str | Path | None = DEFAULT_SKILLS_ROOT,
     ) -> NodeSettings:
         operator_key = os.environ.get("CERTARIG_OPERATOR_KEY", "")
         if len(operator_key) < 12:
@@ -66,6 +69,7 @@ class NodeSettings:
             operator_key=operator_key,
             agent_key=agent_key,
             allow_output=os.environ.get("CERTARIG_ENABLE_ACTUATION") == "1",
+            skills_root=Path(skills_root) if skills_root else None,
         )
 
 
@@ -89,7 +93,7 @@ def build_node(settings: NodeSettings, hardware: HardwareAdapter | None = None) 
     )
     from .procedures import install_procedures
 
-    install_procedures(node)
+    install_procedures(node, settings.skills_root)
     from .ops import install_ops
 
     install_ops(node)

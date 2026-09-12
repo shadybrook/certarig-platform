@@ -1,0 +1,66 @@
+id: estop_anti_restart
+version: 1
+title: E-stop trip and anti-restart verification
+domain: electronics
+tags: [estop, interlock, anti-restart]
+summary: >
+  Proves that pressing the E-stop while the permit output is energised removes the output
+  immediately, that releasing the E-stop does not restart it, and that a permit without a
+  reset is rejected.
+applies_to:
+  concepts: [pressure, emergency_stop]
+  actuators: [permit_relay]
+requires_output: true
+record: true
+timeout_s: 600
+preconditions:
+  - { state: estop_active, eq: false }
+  - { signal_state: pressure, eq: safe }
+steps:
+  - id: reset
+    type: command
+    command: reset
+    expect: { state: trip_latched, eq: false }
+  - id: permit
+    type: command
+    command: permit
+    expect: { state: output_high, eq: true }
+  - id: press_estop
+    type: trigger
+    title: Operator presses the E-stop
+    allow_estop: true
+    instruction: Press the E-stop mushroom head firmly until it latches.
+    predicate: { state: estop_active, eq: true }
+    timeout_s: 180
+  - id: output_removed
+    type: expect
+    allow_estop: true
+    predicate: { all: [{ state: output_high, eq: false }, { state: trip_latched, eq: true }] }
+    within_ms: 300
+  - id: release_estop
+    type: trigger
+    title: Operator releases the E-stop
+    allow_estop: true
+    instruction: Twist the E-stop head to release it.
+    predicate: { state: estop_active, eq: false }
+    timeout_s: 180
+  - id: no_restart
+    type: expect
+    predicate: { all: [{ state: output_high, eq: false }, { state: reason, eq: reset_required }] }
+    within_ms: 1000
+    hold_ms: 1000
+  - id: permit_rejected
+    type: command
+    command: permit
+    expect: { state: last_event, eq: permit_rejected_reset_required }
+  - id: end_safe
+    type: command
+    command: safe
+evaluate:
+  - { event_observed: estop_open_forced_safe }
+  - { event_observed: estop_closed_reset_required }
+  - { event_observed: permit_rejected_reset_required }
+  - { step: output_removed, max_elapsed_ms: 300 }
+recovery: >
+  If the output stayed on with the E-stop pressed, remove the external relay supply immediately.
+  Check NC1 wiring on GPIO24 and NC2 in the relay power branch.

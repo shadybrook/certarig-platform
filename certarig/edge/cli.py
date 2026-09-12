@@ -8,7 +8,7 @@ from collections.abc import Sequence
 from pathlib import Path
 
 from .app import CertaRigApplication, make_server
-from .bootstrap import DEFAULT_STUDIO_ROOT, NodeSettings, build_hardware, build_node
+from .bootstrap import DEFAULT_SKILLS_ROOT, DEFAULT_STUDIO_ROOT, NodeSettings, build_hardware, build_node
 from .config import load_config
 from .evidence import EvidenceStore
 from .server import make_edge_server
@@ -21,6 +21,7 @@ def serve(args: argparse.Namespace) -> None:
         args.capabilities,
         args.evidence_dir,
         None if args.no_studio else args.static_root,
+        args.skills_root,
     )
     node = build_node(settings)
     server = make_edge_server(node, args.bind, args.port)
@@ -38,6 +39,7 @@ def serve(args: argparse.Namespace) -> None:
                 "contract_hash": node.contract_hash,
                 "evidence_dir": str(Path(args.evidence_dir).resolve()),
                 "agent_principal_enabled": node.agent_key is not None,
+                "procedures": [row["id"] for row in node.extensions["procedures"].library.list()],
             },
             indent=2,
         ),
@@ -88,6 +90,7 @@ def add_edge_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentPars
     run.add_argument("--evidence-dir", default="evidence/runs")
     run.add_argument("--static-root", default=str(DEFAULT_STUDIO_ROOT))
     run.add_argument("--no-studio", action="store_true", help="do not serve Studio static files")
+    run.add_argument("--skills-root", default=str(DEFAULT_SKILLS_ROOT), help="directory of skills/procedures")
     run.add_argument("--bind", default="127.0.0.1")
     run.add_argument("--port", type=int, default=8080)
     run.set_defaults(func=serve)

@@ -1,0 +1,44 @@
+id: safe_powerdown
+version: 1
+title: Safe power-down of the edge node
+domain: ops
+tags: [ops, shutdown, evidence]
+summary: >
+  Brings the bench to a verified safe state, stops any active recording, checks the sensors
+  are quiet, has the operator confirm the supplies are ready to be removed, and leaves the
+  node ready for the shutdown tool. This is the procedure that was improvised over SSH on
+  2026-09-12, made deterministic.
+applies_to:
+  concepts: [emergency_stop]
+requires_output: false
+record: false
+timeout_s: 600
+steps:
+  - id: force_safe
+    type: command
+    command: safe
+    expect: { all: [{ state: output_high, eq: false }, { state: trip_latched, eq: true }] }
+  - id: hold_safe
+    type: expect
+    predicate: { state: output_high, eq: false }
+    hold_ms: 1000
+  - id: not_recording
+    type: expect
+    predicate: { state: recording_active, eq: false }
+    within_ms: 2000
+  - id: confirm_bench
+    type: await_operator
+    instruction: >
+      Confirm the green indicator is dark, the E-stop is released or pressed as you prefer for
+      storage, and that you are ready to remove the external 5 V supply after shutdown.
+    timeout_s: 300
+    confirm: { state: output_high, eq: false }
+  - id: final_safe
+    type: command
+    command: safe
+evaluate:
+  - { event_not_observed: permit_accepted }
+  - { step_passed: confirm_bench }
+recovery: >
+  If the node cannot reach a safe state, remove the external 5 V relay supply first, then the
+  Pi PWR IN. Record what was observed.

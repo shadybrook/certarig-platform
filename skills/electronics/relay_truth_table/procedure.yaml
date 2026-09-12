@@ -1,0 +1,76 @@
+id: relay_truth_table
+version: 1
+title: Relay command truth table
+domain: electronics
+tags: [relay, output, truth-table]
+summary: >
+  Cycles the kernel through safe, reset, permit and safe three times and proves the commanded
+  output and expected indicator states follow the truth table each time. No operator action.
+applies_to:
+  concepts: [pressure, flow, emergency_stop]
+  actuators: [permit_relay]
+requires_output: true
+record: true
+timeout_s: 300
+preconditions:
+  - { state: estop_active, eq: false }
+  - { state: process_healthy, eq: true }
+steps:
+  - id: boot_safe
+    type: expect
+    predicate: { all: [{ state: output_high, eq: false }, { state: relay_energized_expected, eq: false }] }
+  - id: cycle1_reset
+    type: command
+    command: reset
+    expect: { all: [{ state: trip_latched, eq: false }, { state: output_high, eq: false }] }
+  - id: cycle1_permit
+    type: command
+    command: permit
+    expect: { all: [{ state: output_high, eq: true }, { state: relay_energized_expected, eq: true }] }
+  - id: cycle1_hold
+    type: wait
+    duration_ms: 500
+  - id: cycle1_safe
+    type: command
+    command: safe
+    expect: { all: [{ state: output_high, eq: false }, { state: trip_latched, eq: true }] }
+  - id: cycle2_reset
+    type: command
+    command: reset
+    expect: { state: trip_latched, eq: false }
+  - id: cycle2_permit
+    type: command
+    command: permit
+    expect: { state: output_high, eq: true }
+  - id: cycle2_hold
+    type: wait
+    duration_ms: 500
+  - id: cycle2_safe
+    type: command
+    command: safe
+    expect: { state: output_high, eq: false }
+  - id: cycle3_reset
+    type: command
+    command: reset
+    expect: { state: trip_latched, eq: false }
+  - id: cycle3_permit
+    type: command
+    command: permit
+    expect: { state: output_high, eq: true }
+  - id: cycle3_hold
+    type: wait
+    duration_ms: 500
+  - id: cycle3_safe
+    type: command
+    command: safe
+    expect: { state: output_high, eq: false }
+  - id: permit_without_reset
+    type: command
+    command: permit
+    expect: { all: [{ state: output_high, eq: false }, { state: last_event, eq: permit_rejected_reset_required }] }
+evaluate:
+  - { event_observed: permit_accepted }
+  - { event_observed: operator_safe }
+  - { event_observed: permit_rejected_reset_required }
+  - { event_not_observed: pressure_high_forced_safe }
+  - { event_not_observed: estop_open_forced_safe }

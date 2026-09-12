@@ -129,11 +129,9 @@ def edge_server(
             operator_key=OPERATOR_KEY,
             agent_key=agent_key,
             allow_output=True,
+            skills_root=skills_dir if skills_dir is not None and skills_dir.is_dir() else None,
         )
         node = build_node(settings, hardware=rig)
-        procedures = node.extensions.get("procedures")
-        if procedures is not None and skills_dir is not None and skills_dir.is_dir():
-            procedures.load_library(skills_dir)
         server = make_edge_server(node, "127.0.0.1", 0)
         thread = threading.Thread(target=server.serve_forever, daemon=True)
         thread.start()
@@ -147,3 +145,26 @@ def edge_server(
             server.shutdown()
             server.server_close()
             node.close()
+
+
+def fast_config(name: str = "rig.wave1.json", **overrides: object) -> RigConfig:
+    """Wave-1 config with a 20 ms sample interval for quick in-process runtime tests."""
+    import json
+
+    from certarig.edge.config import load_config_dict
+
+    raw = json.loads((CONFIG_DIR / name).read_text())
+    raw["sample_interval_ms"] = 20
+    raw.update(overrides)
+    return load_config_dict(raw)
+
+
+def wait_until(predicate, timeout: float = 10.0, interval: float = 0.01) -> bool:  # type: ignore[no-untyped-def]
+    import time
+
+    end = time.monotonic() + timeout
+    while time.monotonic() < end:
+        if predicate():
+            return True
+        time.sleep(interval)
+    return bool(predicate())
