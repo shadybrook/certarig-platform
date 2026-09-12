@@ -69,6 +69,7 @@ def test_approval_dance() -> None:
     response = POLICY("s", refused, tools)
     assert response.tool_calls[0].name == "request_approval"
     assert response.tool_calls[0].arguments["tool"] == "reset_trip"
+    assert response.tool_calls[0].arguments["args"] == {}
     requested = refused + _turn("", ("request_approval", {"approval_id": "apr1"}))[1:]
     assert _first_call(requested) == ("wait_for_approval", {"approval_id": "apr1", "timeout_s": 300})
     granted = (
@@ -160,3 +161,19 @@ def test_state_and_command_summaries() -> None:
     assert "permit_accepted" in cmd
     assert "aborted" in _text(_turn("x", ("abort_procedure", {"run_id": "r"})))
     assert "Done: mystery" in _text(_turn("x", ("mystery", {"k": 1})))
+
+
+def test_powerdown_sequence_follows_the_skill() -> None:
+    passed = {"run_id": "r", "terminal": True, "status": "passed", "procedure_id": "safe_powerdown"}
+    assert _first_call(_turn("shut down", ("wait_for_run", passed))) == (
+        "export_evidence",
+        {"label": "pre-shutdown"},
+    )
+    exported = _turn("shut down", ("wait_for_run", passed), ("export_evidence", {"filename": "x.zip"}))
+    assert _first_call(exported) == ("shutdown", {"reason": "bench work complete; evidence exported"})
+    done = (
+        exported
+        + _turn("", ("shutdown", {"status": "shutting_down", "record": {"poweroff": "scheduled"}}))[1:]
+    )
+    text = _text(done)
+    assert "Shutdown accepted" in text and "Poweroff: scheduled" in text

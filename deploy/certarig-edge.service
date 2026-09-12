@@ -1,0 +1,33 @@
+# CertaRig Edge node. Install with deploy/install_pi.sh.
+# Secrets and rig configuration live in /etc/certarig/, never in the repository.
+[Unit]
+Description=CertaRig Edge node (deterministic kernel, procedure runtime, Studio)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=certarig
+Group=gpio
+SupplementaryGroups=i2c
+WorkingDirectory=/opt/certarig
+EnvironmentFile=/etc/certarig/edge.env
+ExecStart=/opt/certarig/.venv/bin/certarig edge serve \
+  --config /etc/certarig/rig.json \
+  --capabilities /etc/certarig/capabilities.json \
+  --evidence-dir /var/lib/certarig/evidence \
+  --bind 0.0.0.0 --port 8080
+# The runtime forces the output safe in close(); give it time to flush the recorder.
+KillSignal=SIGINT
+TimeoutStopSec=15
+Restart=on-failure
+RestartSec=3
+# Hardening. GPIO and I2C need /dev access, everything else is locked down.
+NoNewPrivileges=false
+ProtectSystem=strict
+ReadWritePaths=/var/lib/certarig
+ProtectHome=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

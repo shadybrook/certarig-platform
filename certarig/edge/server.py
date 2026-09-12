@@ -30,6 +30,8 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import parse_qs, urlparse
 
+from certarig import __version__
+
 from .approvals import ApprovalError, ApprovalRegistry
 from .capabilities import CapabilityError, CapabilityManifest, Policy, Principal
 from .live import LiveBenchRuntime
@@ -121,6 +123,7 @@ class EdgeNode:
         self._audit: deque[dict[str, Any]] = deque(maxlen=audit_size)
         self._audit_lock = threading.Lock()
         self.extensions: dict[str, Any] = {}
+        self.flags: dict[str, Any] = {}
         self._register_core_routes()
 
     # ------------------------------------------------------------------ contract
@@ -139,6 +142,8 @@ class EdgeNode:
             "contract_hash": self.contract_hash,
             "started_at": self.started_at,
             "extensions": sorted(self.extensions),
+            "version": __version__,
+            **self.flags,
         }
 
     def rig_document(self) -> dict[str, Any]:
@@ -218,6 +223,9 @@ class EdgeNode:
                         "error": f"{route.tool} requires a human approval; request one at POST /v1/approvals/request",
                         "code": "approval_required",
                         "tool": route.tool,
+                        "args": {
+                            k: v for k, v in ctx.body.items() if k not in {"approval_id", "contract_hash"}
+                        },
                     },
                 )
             args = {k: v for k, v in ctx.body.items() if k not in {"approval_id", "contract_hash"}}

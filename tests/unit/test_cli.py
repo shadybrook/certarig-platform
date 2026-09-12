@@ -187,3 +187,37 @@ def test_namespace_shape_for_sim_serve_matches_serve() -> None:
 
     assert "func" not in inspect.signature(sim_serve).parameters
     assert isinstance(argparse.Namespace(), argparse.Namespace)
+
+
+def test_evidence_cli_pull_verify_list(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from tests.support import wait_until
+
+    monkeypatch.delenv("CERTARIG_OPERATOR_KEY", raising=False)
+    monkeypatch.delenv("CERTARIG_AGENT_KEY", raising=False)
+    with pytest.raises(SystemExit, match="CERTARIG_OPERATOR_KEY"):
+        main(["evidence", "list", "--url", "http://127.0.0.1:1"])
+    with sim_server() as sim:
+        operator = sim.operator()
+        run_id = str(operator.run_procedure("relay_truth_table", "cli")["run_id"])
+        assert wait_until(lambda: operator.procedure_run(run_id)["terminal"], timeout=30)
+        common = ["--url", sim.url, "--operator-key", OPERATOR_KEY]
+        main(["evidence", "list", *common])
+        listing = json.loads(capsys.readouterr().out)
+        assert listing["runs"][0]["run_id"] == run_id
+        main(["evidence", "pull", *common, "--out", str(tmp_path / "pull"), "--run", run_id])
+        pulled = json.loads(capsys.readouterr().out)
+        assert pulled["ok"] is True and pulled["run_id"] == run_id
+        main(["evidence", "verify", pulled["archive"]])
+        assert json.loads(capsys.readouterr().out)["ok"] is True
+        main(["evidence", "verify", pulled["extracted_to"]])
+        assert json.loads(capsys.readouterr().out)["ok"] is True
+        Path(pulled["extracted_to"], "procedure_runs", run_id, "run.json").write_text("{}")
+        with pytest.raises(SystemExit) as exc:
+            main(["evidence", "verify", pulled["extracted_to"]])
+        assert exc.value.code == 1
+        assert json.loads(capsys.readouterr().out)["mismatched"] == [f"procedure_runs/{run_id}/run.json"]
+        with pytest.raises(SystemExit):
+            main(["evidence", "verify", str(tmp_path)])  # no SHA256SUMS
+        capsys.readouterr()

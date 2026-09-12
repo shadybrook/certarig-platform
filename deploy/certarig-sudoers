@@ -1,0 +1,4 @@
+# Installed to /etc/sudoers.d/certarig by deploy/install_pi.sh (mode 0440).
+# The Edge service may power the node off and nothing else. This is the only privilege
+# the shutdown tool needs; it is exercised only after a human-approved /v1/ops/shutdown.
+certarig ALL=(root) NOPASSWD: /usr/bin/systemctl poweroff, /bin/systemctl poweroff

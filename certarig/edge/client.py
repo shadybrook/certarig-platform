@@ -153,6 +153,34 @@ class EdgeClient:
     def deny(self, approval_id: str) -> dict[str, Any]:
         return self.post(f"/v1/approvals/{approval_id}/deny", {})
 
+    # ------------------------------------------------------------ evidence and ops
+    def evidence(self) -> dict[str, Any]:
+        return self.get("/v1/evidence")
+
+    def evidence_run(self, run_id: str) -> dict[str, Any]:
+        return self.get(f"/v1/evidence/runs/{run_id}")
+
+    def download(self, path: str) -> bytes:
+        data: bytes = self.request("GET", path, raw=True)
+        return data
+
+    def export_evidence(self, run_id: str | None = None, label: str | None = None) -> dict[str, Any]:
+        payload: dict[str, Any] = {}
+        if run_id:
+            payload["run_id"] = run_id
+        if label:
+            payload["label"] = label
+        return self.post("/v1/ops/evidence/export", payload)
+
+    def stop_recorder(self, force: bool = False) -> dict[str, Any]:
+        return self.post("/v1/ops/recorder/stop", {"force": True} if force else {})
+
+    def shutdown(self, reason: str, approval_id: str | None = None) -> dict[str, Any]:
+        payload: dict[str, Any] = {"reason": reason}
+        if approval_id:
+            payload["approval_id"] = approval_id
+        return self.post("/v1/ops/shutdown", payload)
+
     # ------------------------------------------------------------ procedures
     def procedures(self) -> dict[str, Any]:
         return self.get("/v1/procedures")

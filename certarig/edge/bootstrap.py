@@ -47,6 +47,7 @@ class NodeSettings:
     agent_key: str | None
     allow_output: bool
     skills_root: Path | None = None
+    poweroff_command: str | None = None
 
     @classmethod
     def from_env(
@@ -70,6 +71,7 @@ class NodeSettings:
             agent_key=agent_key,
             allow_output=os.environ.get("CERTARIG_ENABLE_ACTUATION") == "1",
             skills_root=Path(skills_root) if skills_root else None,
+            poweroff_command=os.environ.get("CERTARIG_POWEROFF_CMD") or None,
         )
 
 
@@ -94,9 +96,10 @@ def build_node(settings: NodeSettings, hardware: HardwareAdapter | None = None) 
     from .procedures import install_procedures
 
     install_procedures(node, settings.skills_root)
-    from .ops import install_ops
+    from .ops import install_ops, poweroff_command
 
-    install_ops(node)
+    poweroff = poweroff_command(settings.poweroff_command) if settings.poweroff_command else None
+    install_ops(node, poweroff)
     from certarig.sim.plant import SimulatedRig
 
     if isinstance(adapter, SimulatedRig):

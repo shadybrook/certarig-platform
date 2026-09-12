@@ -75,7 +75,7 @@ class RuleBasedPolicy:
         request = self._last_user(messages).lower()
         if not results:
             return self._open_turn(request, messages, tools)
-        return self._continue_turn(request, results, tools)
+        return self._continue_turn(request, results, tools, messages)
 
     def _open_turn(
         self, request: str, messages: Sequence[Message], tools: Sequence[ToolSpec]
@@ -103,7 +103,11 @@ class RuleBasedPolicy:
         return call(tool_call("list_skills"))
 
     def _continue_turn(
-        self, request: str, results: list[tuple[str, dict[str, Any]]], tools: Sequence[ToolSpec]
+        self,
+        request: str,
+        results: list[tuple[str, dict[str, Any]]],
+        tools: Sequence[ToolSpec],
+        messages: Sequence[Message],
     ) -> ProviderResponse:
         name, last = results[-1]
         # refusals first
@@ -112,7 +116,11 @@ class RuleBasedPolicy:
             return call(
                 tool_call(
                     "request_approval",
-                    {"tool": failed_tool, "args": {}, "reason": f"operator asked: {request[:120]}"},
+                    {
+                        "tool": failed_tool,
+                        "args": self._last_tool_args(messages, failed_tool),
+                        "reason": f"operator asked: {request[:120]}",
+                    },
                 )
             )
         if name == "request_approval" and last.get("approval_id"):
@@ -161,7 +169,19 @@ class RuleBasedPolicy:
                         f"Run {last['run_id']} is still in progress at step {last.get('current_step')}. Ask me again for an update."
                     )
                 return call(tool_call("wait_for_run", {"run_id": str(last["run_id"]), "timeout_s": 120}))
+            if last.get("procedure_id") == "safe_powerdown" and last.get("status") == "passed":
+                # SKILL.md sequence: bundle the evidence, then ask for the (human approved) shutdown.
+                return call(tool_call("export_evidence", {"label": "pre-shutdown"}))
             return say(self._report(last))
+        if name == "export_evidence":
+            return call(tool_call("shutdown", {"reason": "bench work complete; evidence exported"}))
+        if name == "shutdown":
+            record = last.get("record", {})
+            return say(
+                f"Shutdown accepted ({last.get('status')}); kernel forced safe and evidence flushed. "
+                f"Poweroff: {record.get('poweroff')}. Wait for the SD activity LED to go idle, then remove "
+                "PWR IN and the external 5 V supply."
+            )
         if name == "read_state":
             return say(self._state_summary(last))
         if name in {"force_safe", "reset_trip", "request_permit"}:
@@ -172,6 +192,15 @@ class RuleBasedPolicy:
         if name == "abort_procedure":
             return say(f"Run {last.get('run_id')} aborted; the kernel was forced safe.")
         return say(f"Done: {name} returned {json.dumps(last)[:300]}.")
+
+    @staticmethod
+    def _last_tool_args(messages: Sequence[Message], name: str) -> dict[str, Any]:
+        for message in reversed(messages):
+            if message.role == "assistant":
+                for item in message.tool_calls:
+                    if item.name == name:
+                        return {k: v for k, v in item.arguments.items() if k != "approval_id"}
+        return {}
 
     @staticmethod
     def _active_run_id(messages: Sequence[Message]) -> str | None:

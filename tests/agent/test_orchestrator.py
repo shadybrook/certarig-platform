@@ -122,9 +122,7 @@ def test_policy_hands_physical_steps_to_the_operator_and_resumes(tmp_path: Path)
         assert run["status"] == "awaiting_operator"
         operator.ack(run_id, "confirm_bench")
         assert wait_until(lambda: operator.procedure_run(run_id)["terminal"], timeout=10)
-        resumed = session.send("done")
-        assert resumed.tool_results[0].name == "wait_for_run"
-        assert "PASSED" in resumed.text
+        assert operator.procedure_run(run_id)["status"] == "passed"
         session.close()
 
 
@@ -191,8 +189,8 @@ def test_adversarial_model_is_contained_by_manifest_and_approvals(tmp_path: Path
         assert r[5].ok and r[5].result["status"] == "granted"
         assert r[6].ok and r[6].result["guardrail"]["event"] == "trip_reset_output_safe"
         assert r[7].ok is False and r[7].result["http_status"] == 403  # approvals are single use
-        assert r[8].ok is False  # shutdown still needs its own human approval (or route missing until M5)
-        assert r[8].result["http_status"] in {404, 428}
+        assert r[8].ok is False  # shutdown still needs its own human approval
+        assert r[8].result["http_status"] == 428
         # the audit log recorded every refusal against the agent principal
         audit = sim.operator().get("/v1/audit")["audit"]
         refused = [e for e in audit if e["principal"] == "agent" and e["status"] >= 400]
@@ -260,3 +258,42 @@ def test_fake_provider_script_exhaustion_and_policy_shape() -> None:
         provider.complete("s", [], [])
     assert len(provider.calls) == 2
     assert FakeProvider().complete("s", [], []).text == "I have nothing to do."
+
+
+def test_agent_powers_the_bench_down_with_operator_in_the_loop(tmp_path: Path) -> None:
+    with sim_server() as sim:
+        ops = sim.node.extensions["ops"]
+        powered_off = threading.Event()
+        ops.poweroff = powered_off.set
+        ops.shutdown_delay_s = 0.05
+        skills = SkillIndex.load(SKILLS_DIR)
+        session = _session(sim, FakeProvider(policy=RuleBasedPolicy(skills)), tmp_path)
+        operator = sim.operator()
+        first = session.send("power down the pi")
+        assert "Operator action needed" in first.text
+        run_id = first.tool_results[-1].result["run_id"]
+        operator.ack(run_id, "confirm_bench")
+        assert wait_until(lambda: operator.procedure_run(run_id)["terminal"], timeout=10)
+        stop = threading.Event()
+        _auto_grant(operator, stop)
+        try:
+            final = session.send("done")
+        finally:
+            stop.set()
+        session.close()
+        names = [r.name for r in final.tool_results]
+        assert names == [
+            "wait_for_run",
+            "export_evidence",
+            "shutdown",  # 428
+            "request_approval",
+            "wait_for_approval",
+            "shutdown",  # with approval
+        ], names
+        assert final.tool_results[2].result["code"] == "approval_required"
+        assert final.tool_results[5].ok is True
+        assert "Shutdown accepted" in final.text
+        assert powered_off.wait(5)
+        assert sim.rig.output is False
+        listing = operator.evidence()
+        assert listing["exports"] and listing["shutdowns"][0]["requested_by"]["principal"] == "agent"

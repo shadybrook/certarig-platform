@@ -159,6 +159,7 @@ class ToolRegistry:
             payload.setdefault("error", str(exc))
             payload["http_status"] = exc.status
             if exc.status == 428:
+                payload["arguments"] = {k: v for k, v in arguments.items() if k != "approval_id"}
                 payload["hint"] = (
                     "call request_approval with this tool and arguments, then wait_for_approval, then retry with approval_id"
                 )
