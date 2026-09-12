@@ -191,6 +191,27 @@ class OpsService:
         saved = attach_proposal(self.evidence_dir, preview)
         return 200, {**preview, "interview": saved}
 
+    def attach_interview_image(self, ctx: RequestContext) -> tuple[int, dict[str, Any]]:
+        from .interview import attach_interview_image
+
+        return 200, attach_interview_image(
+            self.evidence_dir,
+            filename=str(ctx.body.get("filename") or ""),
+            content_base64=str(ctx.body.get("content_base64") or ""),
+            media_type=str(ctx.body.get("media_type") or ""),
+        )
+
+    def request_auto_arm(self, ctx: RequestContext) -> tuple[int, dict[str, Any]]:
+        from .interview import acknowledge_auto_arm
+
+        return 200, acknowledge_auto_arm(
+            self.evidence_dir,
+            acknowledgement=str(ctx.body.get("acknowledgement") or ""),
+            operator=ctx.principal_name,
+            allow_output=bool(self.node.runtime.allow_output),
+            hardware_mode=self.node.config.hardware.mode,
+        )
+
     # ------------------------------------------------------------ evidence
     def _runs(self) -> list[dict[str, Any]]:
         procedures = self.node.extensions.get("procedures")
@@ -403,6 +424,8 @@ def install_ops(
     add("POST", "/v1/ops/interview/start", service.start_interview, "start_interview")
     add("POST", "/v1/ops/interview/answer", service.answer_interview, "answer_interview")
     add("POST", "/v1/ops/interview/propose", service.propose_interview_map, "propose_rig_map")
+    add("POST", "/v1/ops/interview/image", service.attach_interview_image, "attach_interview_image")
+    add("POST", "/v1/ops/auto-arm", service.request_auto_arm, "request_auto_arm")
     add("POST", "/v1/ops/recorder/stop", service.stop_recorder, "stop_recorder")
     add("POST", "/v1/ops/evidence/export", service.export_evidence, "export_evidence")
     add("POST", "/v1/ops/shutdown", service.shutdown, "shutdown")

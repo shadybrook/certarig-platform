@@ -34,8 +34,8 @@ Studio: http://127.0.0.1:8080/ with the documented demo operator key.
 
 ### What is not proven / not built
 
-- Agent-led commissioning of an *unknown* bench from a diagram (no pin OCR, no auto-energize). The thin interview is built: [commissioning-interview.md](commissioning-interview.md).
-- Live Anthropic/OpenAI on a real key (adapters exist; default stays Fake).
+- Agent-led commissioning of an *unknown* bench from unlabeled pin OCR. A labeled photo can fill the optional diagram slot; a human still applies. `request_auto_arm` exists and defaults to **never**.
+- Live Anthropic/OpenAI on a real key (adapters exist; default stays Fake). See [../go-public/live-llm.md](../go-public/live-llm.md).
 - OPC-UA, CAN, NI-DAQ, PLC, SSO, billing.
 - Installing this repo over the Phase 3 demo.
 

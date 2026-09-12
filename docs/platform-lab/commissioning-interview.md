@@ -14,7 +14,7 @@ Required:
 
 Optional:
 
-4. Diagram notes or a path under this node's evidence dir (never Phase 3 trees). No pin OCR.
+4. Diagram notes, a path under this node's evidence dir, or a **labeled** bench photo (`POST /v1/ops/interview/image`). Never Phase 3 trees. No unlabeled pin OCR. A photo never applies or arms.
 
 `GET /v1/ops/interview` returns `needs`, `missing`, and `known` answers. The live model reads that instead of walking a question script. Studio Onboard shows the same checklist.
 

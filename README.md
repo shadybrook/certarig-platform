@@ -144,7 +144,15 @@ export CERTARIG_AGENT_PROVIDER=anthropic
 .venv/bin/python -m certarig agent chat --url http://127.0.0.1:8080 --provider anthropic
 ```
 
-Adapters are untested live in this tree; every CI path uses FakeProvider.
+Adapters are untested live in this tree; every CI path uses FakeProvider. See [`docs/go-public/live-llm.md`](docs/go-public/live-llm.md).
+
+## Official
+
+- Public name: **CertaRig**. Schemas cite `https://certarig.dev` — confirm that domain before you print anything.
+- License: [MIT](LICENSE). Kernel stays auditable.
+- Security reports: [SECURITY.md](SECURITY.md).
+- Pilots / investors: [`docs/go-public/one-pager.md`](docs/go-public/one-pager.md).
+- Demo shot list: [`docs/go-public/demo-shot-list.md`](docs/go-public/demo-shot-list.md).
 
 ## Safety notes
 

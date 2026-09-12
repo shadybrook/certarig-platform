@@ -308,6 +308,18 @@ paths:
       responses:
         '200':
           description: Success
+  /v1/ops/interview/image:
+    post:
+      summary: POST /v1/ops/interview/image
+      responses:
+        '200':
+          description: Success
+  /v1/ops/auto-arm:
+    post:
+      summary: POST /v1/ops/auto-arm
+      responses:
+        '200':
+          description: Success
   /v1/ops/recorder/stop:
     post:
       summary: POST /v1/ops/recorder/stop

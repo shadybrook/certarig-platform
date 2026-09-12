@@ -6,7 +6,9 @@ from pathlib import Path
 from certarig.edge.bundle import render_report, write_run_bundle
 from certarig.edge.configurator import propose_rig
 from certarig.edge.interview import (
+    acknowledge_auto_arm,
     answer_interview,
+    attach_interview_image,
     attach_proposal,
     extract_facts,
     parse_signals,
@@ -148,6 +150,54 @@ def test_proposed_document_matches_sim_channels_without_explicit_concept() -> No
     preview = propose_rig(raw, proposed)
     assert preview["next_hash"]
     assert any("abort_limits" in row or "safe_max" in row or "channels" in row for row in preview["diff"])
+
+
+def test_attach_interview_image_fills_diagram_slot(tmp_path: Path) -> None:
+    import base64
+
+    png = base64.b64encode(b"\x89PNG\r\n\x1a\n" + b"fake-bench-photo").decode("ascii")
+    saved = attach_interview_image(
+        tmp_path, filename="bench.png", content_base64=png, media_type="image/png"
+    )
+    assert saved["answers"]["diagram"].startswith("interview-images/")
+    assert saved["images"][0]["bytes"] > 0
+    stored = tmp_path / saved["images"][0]["path"]
+    assert stored.is_file()
+
+
+def test_auto_arm_refuses_without_proposal_and_never_sets_valve(tmp_path: Path) -> None:
+    start_interview(tmp_path)
+    try:
+        acknowledge_auto_arm(
+            tmp_path,
+            acknowledgement="I applied the map and understand the kernel owns output",
+            operator="lab",
+            allow_output=True,
+            hardware_mode="simulator",
+        )
+    except RuntimeError as exc:
+        assert "proposed map" in str(exc)
+    else:
+        raise AssertionError("auto-arm must refuse before propose")
+    answer_interview(
+        tmp_path,
+        {
+            "text": "ADC pots, E-stop, relay. pressure 4.05 bar. observe-only: none.",
+            "modules": "ADC/pots, E-stop, relay",
+            "observe_only": "none",
+            "signals": [{"concept": "pressure", "unit": "bar", "trip": 4.05}],
+        },
+    )
+    attach_proposal(tmp_path, {"diff": [], "next_hash": "n", "current_hash": "c", "restart_required": False})
+    stamped = acknowledge_auto_arm(
+        tmp_path,
+        acknowledgement="I applied the map and understand the kernel owns output",
+        operator="lab",
+        allow_output=True,
+        hardware_mode="simulator",
+    )
+    assert stamped["auto_arm"]["set_valve"] is False
+    assert stamped["auto_arm"]["may_request_permit"] is True
 
 
 def test_attach_proposal_persists(tmp_path: Path) -> None:

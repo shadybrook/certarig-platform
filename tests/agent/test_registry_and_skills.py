@@ -40,6 +40,7 @@ def test_registry_only_exposes_manifest_tools_and_never_forbidden_ones() -> None
         assert "ack_operator_step" not in names
         assert "bypass_interlock" not in names
         assert "override_limits" not in names
+        assert "request_auto_arm" not in names
         assert registry.policies["reset_trip"] == "human_approval"
         assert "approval_id" in registry.edge_tools["reset_trip"].parameters["properties"]
 

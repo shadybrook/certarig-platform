@@ -229,6 +229,13 @@ class ToolRegistry:
             return client.post("/v1/ops/interview/answer", args)
         if name == "propose_rig_map":
             return client.post("/v1/ops/interview/propose", {})
+        if name == "attach_interview_image":
+            return client.post("/v1/ops/interview/image", args)
+        if name == "request_auto_arm":
+            payload = {"acknowledgement": str(args.get("acknowledgement") or "")}
+            if approval:
+                payload["approval_id"] = approval
+            return client.post("/v1/ops/auto-arm", payload)
         raise KeyError(name)
 
     def _local(self, name: str, args: dict[str, Any]) -> dict[str, Any]:

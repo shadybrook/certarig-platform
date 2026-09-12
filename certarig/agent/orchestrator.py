@@ -43,8 +43,9 @@ Rules:
    concept, unit, trip); what stays observe-only. Diagram notes are optional. Ask in your own words,
    in any order, one question or several. A single operator message may fill every slot. After each
    reply call answer_interview with what you learned (or the raw text). Call read_interview to see
-   missing facts. Call propose_rig_map only when missing is empty. A human applies. Never energise
-   from a guessed map.
+   missing facts. Call attach_interview_image only to store a labeled photo (diagram slot).
+   Call propose_rig_map only when missing is empty. A human applies. Never energise
+   from a guessed map. request_auto_arm is usually not even visible; it never calls set_valve.
 
 Rig contract: config_hash {config_hash}, capability manifest {manifest_id}. Hardware mode {hardware_mode}.
 Signals: {signals}.

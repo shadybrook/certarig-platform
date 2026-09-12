@@ -183,6 +183,25 @@ TOOL_CATALOGUE: dict[str, ToolSpec] = {
             True,
             _params(),
         ),
+        ToolSpec(
+            "attach_interview_image",
+            "Attach a labeled bench photo to the interview. Fills the optional diagram slot. Never applies or arms.",
+            True,
+            _params(
+                {
+                    "filename": {"type": "string"},
+                    "content_base64": {"type": "string"},
+                    "media_type": {"type": "string"},
+                },
+                ["filename", "content_base64"],
+            ),
+        ),
+        ToolSpec(
+            "request_auto_arm",
+            "Record an explicit auto-arm acknowledgement after a human applied the map. Never calls set_valve. Default policy is never.",
+            True,
+            _params({"acknowledgement": {"type": "string"}}, ["acknowledgement"]),
+        ),
     )
 }
 

@@ -616,10 +616,12 @@ async function renderOnboard() {
     </div>
     <div class="card">
       <p class="eyebrow">6 · Commissioning facts</p>
-      <p class="muted">The agent must learn these facts. It can ask in any order. One description can fill every slot. A human applies the map. Never auto-energize.</p>
+      <p class="muted">The agent must learn these facts. It can ask in any order. One description can fill every slot. A labeled photo is optional context. A human applies the map. A photo never arms the relay.</p>
       <ul id="interview-needs" data-testid="interview-needs"></ul>
       <p id="interview-prompt" data-testid="interview-prompt">Not started.</p>
       <label>Describe the bench <textarea id="interview-text" data-testid="interview-text" rows="4" placeholder="Pots, E-stop, relay. P1 pressure trip 4.2 bar. P2 flow 15 L/min. Nothing observe-only."></textarea></label>
+      <label>Bench photo (optional) <input id="interview-image" data-testid="interview-image" type="file" accept="image/png,image/jpeg,image/webp" /></label>
+      <p id="interview-image-status" class="muted" data-testid="interview-image-status"></p>
       <button id="interview-start" type="button" data-testid="interview-start">Start</button>
       <button id="interview-next" class="primary" type="button" data-testid="interview-record">Record facts</button>
       <button id="interview-propose" type="button" data-testid="interview-propose">Propose map</button>
@@ -660,6 +662,13 @@ function paintInterview(interview) {
     })
     .join("");
   $("#interview-prompt").textContent = interview.prompt || interview.status || "Not started.";
+  const images = interview.images || [];
+  const status = $("#interview-image-status");
+  if (status) {
+    status.textContent = images.length
+      ? `Stored ${images.length} photo(s); diagram slot ${interview.answers?.diagram || images.at(-1)?.path}. A photo never arms the relay.`
+      : "No photo attached. Optional. A human still applies.";
+  }
 }
 
 async function render() {
@@ -851,6 +860,34 @@ document.body.addEventListener("click", async (event) => {
       showToast("Bench briefing saved");
     }
     if (t.id === "logout") logout();
+  } catch (error) {
+    fail(error);
+  }
+});
+
+document.body.addEventListener("change", async (event) => {
+  const t = event.target;
+  if (!(t instanceof HTMLInputElement) || t.id !== "interview-image" || !t.files?.[0]) return;
+  const file = t.files[0];
+  if (file.size > 1_200_000) {
+    showToast("Photo must be under 1.2 MB", true);
+    t.value = "";
+    return;
+  }
+  try {
+    const buffer = await file.arrayBuffer();
+    const bytes = new Uint8Array(buffer);
+    let binary = "";
+    bytes.forEach((b) => {
+      binary += String.fromCharCode(b);
+    });
+    const attached = await post("/v1/ops/interview/image", {
+      filename: file.name,
+      media_type: file.type,
+      content_base64: btoa(binary),
+    });
+    paintInterview(attached);
+    showToast("Bench photo stored as diagram context");
   } catch (error) {
     fail(error);
   }

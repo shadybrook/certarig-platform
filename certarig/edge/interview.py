@@ -17,7 +17,16 @@ from .live import utc_now
 from .models import CONCEPT_BY_UNIT
 
 NAME = "interview.json"
+IMAGE_DIR = "interview-images"
+AUTO_ARM_NAME = "auto_arm.json"
 _FIELD_MAX = 2000
+_IMAGE_MAX_BYTES = 1_200_000
+_IMAGE_TYPES = {
+    "image/png": ".png",
+    "image/jpeg": ".jpg",
+    "image/jpg": ".jpg",
+    "image/webp": ".webp",
+}
 
 class Slot(TypedDict):
     id: str
@@ -80,7 +89,9 @@ def empty_interview() -> dict[str, Any]:
         "missing": [slot["id"] for slot in SLOTS if slot["required"]],
         "needs": [{"id": slot["id"], "required": slot["required"], "need": slot["need"]} for slot in SLOTS],
         "notes": [],
+        "images": [],
         "proposed": None,
+        "auto_arm": None,
         "prompt": _ask_prompt([slot["id"] for slot in SLOTS if slot["required"]]),
     }
 
@@ -144,6 +155,9 @@ def read_interview(evidence_dir: Any) -> dict[str, Any]:
         notes = loaded.get("notes")
         document["notes"] = notes if isinstance(notes, list) else []
         document["proposed"] = loaded.get("proposed")
+        images = loaded.get("images")
+        document["images"] = images if isinstance(images, list) else []
+        document["auto_arm"] = loaded.get("auto_arm")
         document["updated_at"] = str(loaded.get("updated_at") or "")
     return {"present": True, **_with_derived(document)}
 
@@ -361,6 +375,117 @@ def proposed_document(current_raw: dict[str, Any], interview: dict[str, Any]) ->
         hardware["observe_only"] = True
         document["hardware"] = hardware
     return document
+
+
+def attach_interview_image(
+    evidence_dir: Any,
+    *,
+    filename: str,
+    content_base64: str,
+    media_type: str = "",
+) -> dict[str, Any]:
+    """Store a bench photo under this node's evidence dir. Fills the optional diagram slot.
+
+    A photo never applies a map and never arms output.
+    """
+    import base64
+    import hashlib
+    from pathlib import Path
+
+    name = Path(str(filename or "bench.png")).name
+    if not name or name.startswith(".") or "phase3" in name.lower():
+        raise ValueError("image name is not allowed")
+    lowered = (media_type or "").split(";")[0].strip().lower()
+    suffix = _IMAGE_TYPES.get(lowered)
+    if suffix is None:
+        suffix = Path(name).suffix.lower()
+        if suffix not in {".png", ".jpg", ".jpeg", ".webp"}:
+            raise ValueError("only png, jpeg, or webp bench photos are accepted")
+        if suffix == ".jpeg":
+            suffix = ".jpg"
+    raw = str(content_base64 or "").strip()
+    if "," in raw and raw.lower().startswith("data:"):
+        raw = raw.split(",", 1)[1]
+    try:
+        payload = base64.b64decode(raw, validate=False)
+    except (ValueError, TypeError) as exc:
+        raise ValueError("image is not valid base64") from exc
+    if not payload or len(payload) > _IMAGE_MAX_BYTES:
+        raise ValueError(f"image must be between 1 and {_IMAGE_MAX_BYTES} bytes")
+    digest = hashlib.sha256(payload).hexdigest()
+    relative = f"{IMAGE_DIR}/{digest[:16]}{suffix}"
+    target = Path(evidence_dir) / relative
+    if "phase3" in str(target.resolve()).lower():
+        raise ValueError("refusing to write onto a Phase 3 tree")
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_bytes(payload)
+    current = read_interview(evidence_dir)
+    if current.get("status") in {None, "idle"}:
+        current = start_interview(evidence_dir)
+    images = list(current.get("images") or [])
+    images.append({"path": relative, "sha256": digest, "filename": name, "bytes": len(payload)})
+    answers = dict(current.get("answers") or {})
+    answers["diagram"] = relative
+    current["answers"] = answers
+    current["images"] = images[-8:]
+    current["status"] = "in_progress"
+    current.pop("present", None)
+    return _write(evidence_dir, current)
+
+
+def acknowledge_auto_arm(
+    evidence_dir: Any,
+    *,
+    acknowledgement: str,
+    operator: str,
+    allow_output: bool,
+    hardware_mode: str,
+) -> dict[str, Any]:
+    """Log an explicit auto-arm acknowledgement. Never calls set_valve.
+
+    Still requires a completed interview with a proposal, the env arm switch,
+    and (on raspberry_pi) a fresh twin-gate stamp somewhere in the evidence dir.
+    """
+    from pathlib import Path
+
+    from .atomic import write_json_atomic
+    from .twin_gate import check_gate
+
+    text = _clip(acknowledgement)
+    if len(text) < 8:
+        raise ValueError("acknowledgement must say, in words, that a human applied the map")
+    interview = read_interview(evidence_dir)
+    if interview.get("status") != "complete" or not interview.get("proposed"):
+        raise RuntimeError("auto-arm needs a completed interview and a proposed map a human can apply")
+    twin = None
+    if hardware_mode == "raspberry_pi":
+        stamps = list((Path(evidence_dir) / "twin_gate").glob("*.json")) if Path(evidence_dir).is_dir() else []
+        if not stamps:
+            twin = {
+                "error": "digital-twin gate: no simulator pass is on this node",
+                "code": "twin_gate",
+            }
+        else:
+            first = json.loads(stamps[0].read_text(encoding="utf-8"))
+            twin = check_gate(Path(evidence_dir), str(first.get("procedure_hash") or ""), hardware_mode)
+    stamp = {
+        "acknowledged": True,
+        "acknowledgement": text,
+        "operator": _clip(operator) or "operator",
+        "allow_output": bool(allow_output),
+        "hardware_mode": hardware_mode,
+        "twin_gate_ok": twin is None,
+        "twin_gate": twin,
+        "may_request_permit": bool(allow_output) and twin is None,
+        "set_valve": False,
+        "note": "A photo never calls set_valve. Kernel still owns drive_high.",
+    }
+    write_json_atomic(Path(evidence_dir) / AUTO_ARM_NAME, stamp)
+    current = dict(interview)
+    current.pop("present", None)
+    current["auto_arm"] = stamp
+    saved = _write(evidence_dir, current)
+    return {**saved, "auto_arm": stamp}
 
 
 def attach_proposal(evidence_dir: Any, preview: dict[str, Any]) -> dict[str, Any]:
