@@ -214,3 +214,28 @@ def test_briefing_round_trip_is_copied_into_a_run_bundle() -> None:
             (sim.evidence_dir / "procedure_runs" / run_id / "briefing.json").read_text()
         )
         assert briefing["p2_role"] == "Flow emulator P2"
+
+
+def test_auto_arm_is_never_for_the_agent() -> None:
+    with sim_server() as sim:
+        agent = sim.agent()
+        try:
+            agent.post("/v1/ops/auto-arm", {"acknowledgement": "I applied the map on purpose"})
+        except EdgeApiError as exc:
+            assert exc.status == 403
+            assert exc.payload.get("policy") == "never" or "never" in str(exc.payload).lower()
+        else:
+            raise AssertionError("request_auto_arm must stay never for the wave-1 agent")
+
+
+def test_incomplete_interview_cannot_propose() -> None:
+    with sim_server() as sim:
+        operator = sim.operator()
+        operator.post("/v1/ops/interview/start", {})
+        try:
+            operator.post("/v1/ops/interview/propose", {})
+        except EdgeApiError as exc:
+            assert exc.status == 409
+            assert exc.code == "interview_incomplete"
+        else:
+            raise AssertionError("propose should refuse an incomplete interview")

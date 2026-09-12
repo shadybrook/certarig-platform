@@ -144,6 +144,15 @@ def evidence_list(args: argparse.Namespace) -> None:
     print(json.dumps(listing, indent=2))
 
 
+def evidence_accept_twin_gate(args: argparse.Namespace) -> None:
+    from .twin_gate import accept_twin_gate
+
+    result = accept_twin_gate(Path(args.source), Path(args.into))
+    print(json.dumps(result, indent=2))
+    if result["count"] == 0:
+        sys.exit(1)
+
+
 def add_evidence_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
     evidence = subparsers.add_parser("evidence", help="pull, list and verify checksummed evidence bundles")
     sub = evidence.add_subparsers(dest="evidence_command", required=True)
@@ -168,3 +177,11 @@ def add_evidence_parser(subparsers: argparse._SubParsersAction[argparse.Argument
     ls = sub.add_parser("list", help="list runs, recordings and exports on the node")
     common(ls)
     ls.set_defaults(func=evidence_list)
+
+    ingest = sub.add_parser(
+        "accept-twin-gate",
+        help="copy simulator twin-gate stamps into a node evidence dir",
+    )
+    ingest.add_argument("--from", dest="source", required=True, help="sim library or twin_gate directory")
+    ingest.add_argument("--into", required=True, help="node evidence directory")
+    ingest.set_defaults(func=evidence_accept_twin_gate)

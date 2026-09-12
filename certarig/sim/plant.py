@@ -26,7 +26,7 @@ from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from certarig.edge.hardware.base import HardwareAdapter, HardwareError
-from certarig.edge.models import ChannelConfig, RigConfig, RigSnapshot, Sample
+from certarig.edge.models import ChannelConfig, RigConfig, RigSnapshot, Sample, in_valid_range
 
 
 @dataclass
@@ -220,7 +220,7 @@ class SimulatedRig(HardwareAdapter):
             span = (cfg.engineering_max - eng_min) or 1.0
             raw = cfg.raw_min_v + (value - eng_min) / span * (cfg.raw_max_v - cfg.raw_min_v)
             raw = round(raw, 5)
-        quality = "good" if cfg.valid_min <= value <= cfg.valid_max else "bad"
+        quality = "good" if in_valid_range(cfg, value) else "bad"
         if "bad_quality" in channel.faults:
             quality = "bad"
         return round(value, 5), raw, quality

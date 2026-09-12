@@ -112,3 +112,28 @@ def referenced_signals(predicate: dict[str, Any]) -> set[str]:
     if "not" in predicate:
         names |= referenced_signals(predicate["not"])
     return names
+
+
+def trigger_coach(raw: dict[str, Any]) -> dict[str, Any]:
+    """Studio-facing hint: which pot, which signal, and the numeric target."""
+    instruction = str(raw.get("instruction") or "")
+    predicate: dict[str, Any] = raw["predicate"] if isinstance(raw.get("predicate"), dict) else {}
+    signals = sorted(referenced_signals(predicate))
+    lowered = instruction.lower()
+    pot = ""
+    if "p1" in lowered or "pressure" in lowered:
+        pot = "P1"
+    elif "p2" in lowered or "flow" in lowered:
+        pot = "P2"
+    elif signals:
+        first = signals[0]
+        if first in {"pressure", "pressure_emulator"}:
+            pot = "P1"
+        elif first in {"flow", "flow_emulator"}:
+            pot = "P2"
+    return {
+        "instruction": instruction,
+        "signals": signals,
+        "target": describe(predicate) if predicate else "",
+        "pot": pot,
+    }

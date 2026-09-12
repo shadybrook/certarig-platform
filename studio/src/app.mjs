@@ -7,6 +7,7 @@ let health = {};
 let state = {};
 let sessionId = store.agentSession || null;
 let poll = null;
+let startLockUntil = 0;
 
 function showToast(message, bad = false) {
   toast.textContent = message;
@@ -33,7 +34,10 @@ function activate(name) {
     link.classList.toggle("active", link.dataset.view === name);
   });
   store.setView(name);
-  location.hash = name;
+  if (location.hash.replace("#", "") !== name) {
+    location.hash = name;
+    return;
+  }
   render();
 }
 
@@ -85,7 +89,8 @@ function startPolling() {
       $("#approval-count").textContent = n;
       $("#approval-count").classList.toggle("hidden", n === 0);
       const visible = document.querySelector(".view:not(.hidden)");
-      if (visible && ["telemetry", "procedures", "approvals"].includes(visible.dataset.view)) render();
+      if (visible && ["telemetry", "approvals"].includes(visible.dataset.view)) render();
+      if (visible?.dataset.view === "procedures") await renderProcedures();
     } catch {
       $("#health-pill").dataset.state = "down";
       $("#health-pill").textContent = "offline";
@@ -286,11 +291,38 @@ function renderTelemetry() {
 async function renderProcedures() {
   const [library, runs] = await Promise.all([get("/v1/procedures"), get("/v1/procedure_runs")]);
   const stored = store.runId;
-  const match = (runs.runs || []).find((r) => r.run_id === stored);
-  const active = match || (runs.runs || []).find((r) => !r.terminal) || (runs.runs || [])[0];
-  const detail = active ? await get(`/v1/procedure_runs/${active.run_id}`) : null;
-  if (detail?.run_id) store.setRunId(detail.run_id);
-  const list = (library.procedures || []).map((p) => `<option value="${esc(p.id)}">${esc(p.title || p.id)}</option>`).join("");
+  let detail = null;
+  if (stored) {
+    try {
+      detail = await get(`/v1/procedure_runs/${stored}`);
+    } catch {
+      detail = null;
+    }
+  }
+  if (!detail) {
+    const fallback = (runs.runs || []).find((r) => !r.terminal) || (runs.runs || [])[0];
+    detail = fallback ? await get(`/v1/procedure_runs/${fallback.run_id}`) : null;
+    if (detail?.run_id && !stored) store.setRunId(detail.run_id);
+  }
+  if (!$("#proc-id")) {
+    $("#view-procedures").innerHTML = `
+      <h1>Procedures</h1>
+      <div class="card">
+        <label>Run <select id="proc-id"></select></label>
+        <button id="proc-start" class="primary" type="button">Start</button>
+        <button id="proc-abort" class="danger" type="button">Abort</button>
+      </div>
+      <div id="procedure-coach"></div>
+      <div id="procedure-detail"></div>`;
+  }
+  const select = $("#proc-id");
+  const previous = detail?.procedure_id || select.value;
+  select.innerHTML = (library.procedures || [])
+    .map((p) => `<option value="${esc(p.id)}">${esc(p.title || p.id)}</option>`)
+    .join("");
+  if ([...select.options].some((option) => option.value === previous)) select.value = previous;
+  const abort = $("#proc-abort");
+  if (abort) abort.disabled = !detail;
   const steps = (detail?.steps || [])
     .map(
       (s) => `<li data-status="${esc(s.status)}" data-step="${esc(s.step_id)}">
@@ -300,23 +332,38 @@ async function renderProcedures() {
       </li>`
     )
     .join("");
-  $("#view-procedures").innerHTML = `
-    <h1>Procedures</h1>
-    <div class="card">
-      <label>Run <select id="proc-id">${list}</select></label>
-      <button id="proc-start" class="primary" type="button">Start</button>
-      <button id="proc-abort" class="danger" type="button" ${active ? "" : "disabled"}>Abort</button>
-    </div>
-    ${
-      detail
-        ? `<div class="card" id="active-run" data-run="${esc(detail.run_id)}" data-status="${esc(detail.status)}">
+  $("#procedure-coach").innerHTML = triggerCoach(detail);
+  $("#procedure-detail").innerHTML = detail
+    ? `<div class="card" id="active-run" data-run="${esc(detail.run_id)}" data-status="${esc(detail.status)}">
             <p class="eyebrow">Active run</p>
             <h2>${esc(detail.procedure_id)} · <span id="run-status">${esc(detail.status)}</span></h2>
             <p>${esc(detail.outcome_reason || "")}</p>
             <ol class="steps">${steps}</ol>
           </div>`
-        : "<p>No active run.</p>"
-    }`;
+    : "<p>No active run.</p>";
+}
+
+function triggerCoach(detail) {
+  const current = (detail?.steps || []).find((s) => s.step_id === detail?.current_step);
+  if (!current || current.type !== "trigger") return "";
+  const coach = current.detail?.trigger || {};
+  const instruction = coach.instruction || current.instruction || "";
+  if (!instruction) return "";
+  const live = (coach.signals || [])
+    .map((concept) => {
+      const row = (state.guardrail?.channels || []).find((c) => c.concept === concept || c.channel_id === concept);
+      const sample = (state.samples || []).find((s) => inferConcept(s) === concept || s.channel_id === concept);
+      const value = row?.value ?? sample?.value;
+      const unit = row?.unit || sample?.unit || "";
+      return `${concept} now ${value == null || value === "" ? "—" : Number(value).toFixed(2)} ${unit}`;
+    })
+    .join(" · ");
+  return `<div class="trigger-coach" id="trigger-coach" data-testid="trigger-coach">
+      <p class="eyebrow">Operator move</p>
+      <p class="trigger-pot">${esc(coach.pot || "Pot")} · target ${esc(coach.target || "see instruction")}</p>
+      <p class="trigger-instruction">${esc(instruction)}</p>
+      <p class="trigger-live" data-testid="trigger-live">${esc(live || "Waiting for a live sample…")}</p>
+    </div>`;
 }
 
 async function renderApprovals() {
@@ -385,15 +432,27 @@ async function renderEvidence() {
       .join("")}</ul>`;
 }
 
+function policySelect(name, policy) {
+  const locked = name === "bypass_interlock" || name === "override_limits";
+  const options = ["allowed", "human_approval", "never"]
+    .map((p) => `<option value="${p}" ${p === policy ? "selected" : ""}>${p}</option>`)
+    .join("");
+  return `<select data-cap="${esc(name)}" data-testid="cap-${esc(name)}" ${locked ? "disabled" : ""}>${options}</select>`;
+}
+
 async function renderCapabilities() {
   const caps = await get("/v1/capabilities");
-  const tools = (caps.agent_tools || [])
-    .map((t) => `<tr><td>${esc(t.name)}</td><td>${esc(t.policy)}</td><td>${esc(t.description)}</td></tr>`)
+  const tools = (caps.tools || [])
+    .map((t) => `<tr><td>${esc(t.name)}</td><td>${policySelect(t.name, t.policy)}</td><td>${esc(t.note || t.description || "")}</td></tr>`)
     .join("");
   $("#view-capabilities").innerHTML = `
     <h1>What the agent may do</h1>
     <p>Manifest ${esc(caps.manifest_id)} · contract ${esc(caps.contract_hash || "").slice(0, 16)}…</p>
-    <table><thead><tr><th>Tool</th><th>Policy</th><th>Why</th></tr></thead><tbody>${tools}</tbody></table>`;
+    <table><thead><tr><th>Tool</th><th>Policy</th><th>Why</th></tr></thead><tbody>${tools}</tbody></table>
+    <button id="caps-propose" type="button">Preview policy apply</button>
+    <button id="caps-apply" class="primary" type="button">Apply policies</button>
+    <pre id="caps-diff" data-testid="caps-diff"></pre>`;
+  $("#view-capabilities")._document = caps.document;
 }
 
 async function renderAuthor() {
@@ -445,6 +504,51 @@ async function renderAuthor() {
     ${draftCards || "<p>No drafts. Validate and save one.</p>"}`;
 }
 
+function collectOnboardDocument() {
+  const current = $("#view-onboard")._document;
+  if (!current) throw new Error("no writable rig document on this node");
+  const next = structuredClone(current);
+  const originals = next.channels || [];
+  const channels = [];
+  document.querySelectorAll("#onboard-channels tr").forEach((tr) => {
+    const inputs = [...tr.querySelectorAll("input[data-field]")];
+    if (!inputs.length) return;
+    const index = Number(inputs[0].dataset.ch);
+    const base = originals[index]
+      ? structuredClone(originals[index])
+      : {
+          channel_id: "new_signal",
+          kind: "analog",
+          concept: "signal",
+          unit: "unit",
+          valid_min: 0,
+          valid_max: 100,
+          safe_min: 0,
+          safe_max: 50,
+          required: true,
+          calibration_id: "UNCAL-new_signal",
+        };
+    inputs.forEach((input) => {
+      base[input.dataset.field] = input.type === "number" ? Number(input.value) : input.value;
+    });
+    channels.push(base);
+  });
+  next.channels = channels;
+  return next;
+}
+
+function collectCapsDocument(root) {
+  const source = root?._document || root?._capsDocument || $("#view-onboard")?._capsDocument;
+  if (!source) throw new Error("no writable capabilities document on this node");
+  const next = structuredClone(source);
+  next.tools = next.tools || {};
+  (root || document).querySelectorAll("select[data-cap]").forEach((sel) => {
+    const name = sel.dataset.cap;
+    next.tools[name] = { ...(next.tools[name] || {}), policy: sel.value };
+  });
+  return next;
+}
+
 async function renderOnboard() {
   const [rig, caps] = await Promise.all([get("/v1/rig"), get("/v1/capabilities")]);
   const mode = rig.rig.hardware.mode;
@@ -452,13 +556,17 @@ async function renderOnboard() {
   const real = new Set(["mock", "simulator", "raspberry_pi", "mqtt", "modbus_tcp"]);
   const channels = (rig.document?.channels || rig.rig.channels || [])
     .map(
-      (s, i) => `<tr>
+      (s, i) => `<tr data-row="${i}">
         <td><input data-ch="${i}" data-field="channel_id" value="${esc(s.channel_id)}" /></td>
-        <td><input data-ch="${i}" data-field="concept" value="${esc(s.concept)}" /></td>
+        <td><input data-ch="${i}" data-field="concept" value="${esc(s.concept || "")}" /></td>
         <td><input data-ch="${i}" data-field="unit" value="${esc(s.unit)}" /></td>
         <td><input data-ch="${i}" data-field="safe_max" type="number" step="0.1" value="${esc(s.safe_max)}" /></td>
+        <td><button type="button" data-remove-ch="${i}" data-testid="onboard-remove-${i}">Remove</button></td>
       </tr>`
     )
+    .join("");
+  const capRows = (caps.tools || [])
+    .map((t) => `<tr><td>${esc(t.name)}</td><td>${policySelect(t.name, t.policy)}</td></tr>`)
     .join("");
   $("#view-onboard").innerHTML = `
     <h1>Onboard this rig</h1>
@@ -480,8 +588,9 @@ async function renderOnboard() {
     </div>
     <div class="card">
       <p class="eyebrow">3 · Signals (writes a preview, then apply)</p>
-      <table><thead><tr><th>Channel</th><th>Concept</th><th>Unit</th><th>Safe max</th></tr></thead>
+      <table><thead><tr><th>Channel</th><th>Concept</th><th>Unit</th><th>Safe max</th><th></th></tr></thead>
       <tbody id="onboard-channels">${channels}</tbody></table>
+      <button id="onboard-add" type="button" data-testid="onboard-add">Add channel</button>
       <button id="onboard-propose" type="button">Preview apply</button>
       <button id="onboard-apply" class="primary" type="button">Apply</button>
       <pre id="onboard-diff" data-testid="onboard-diff"></pre>
@@ -489,6 +598,10 @@ async function renderOnboard() {
     <div class="card">
       <p class="eyebrow">4 · Capabilities</p>
       <p>${esc(caps.description || caps.manifest_id)}</p>
+      <table><thead><tr><th>Tool</th><th>Policy</th></tr></thead><tbody>${capRows}</tbody></table>
+      <button id="onboard-caps-propose" type="button">Preview policies</button>
+      <button id="onboard-caps-apply" class="primary" type="button">Apply policies</button>
+      <pre id="onboard-caps-diff" data-testid="onboard-caps-diff"></pre>
     </div>
     <div class="card">
       <p class="eyebrow">5 · Bench briefing</p>
@@ -500,9 +613,24 @@ async function renderOnboard() {
       <label>Diagram notes <textarea id="brief-notes" data-testid="brief-notes" rows="3" placeholder="Optional as-built notes or diagram path on this node"></textarea></label>
       <button id="brief-save" class="primary" type="button">Save briefing</button>
       <p id="brief-status" class="muted" data-testid="brief-status"></p>
+    </div>
+    <div class="card">
+      <p class="eyebrow">6 · Commissioning facts</p>
+      <p class="muted">The agent must learn these facts. It can ask in any order. One description can fill every slot. A labeled photo is optional context. A human applies the map. A photo never arms the relay.</p>
+      <ul id="interview-needs" data-testid="interview-needs"></ul>
+      <p id="interview-prompt" data-testid="interview-prompt">Not started.</p>
+      <label>Describe the bench <textarea id="interview-text" data-testid="interview-text" rows="4" placeholder="Pots, E-stop, relay. P1 pressure trip 4.2 bar. P2 flow 15 L/min. Nothing observe-only."></textarea></label>
+      <label>Bench photo (optional) <input id="interview-image" data-testid="interview-image" type="file" accept="image/png,image/jpeg,image/webp" /></label>
+      <p id="interview-image-status" class="muted" data-testid="interview-image-status"></p>
+      <button id="interview-start" type="button" data-testid="interview-start">Start</button>
+      <button id="interview-next" class="primary" type="button" data-testid="interview-record">Record facts</button>
+      <button id="interview-propose" type="button" data-testid="interview-propose">Propose map</button>
+      <button id="interview-apply" class="primary" type="button" data-testid="interview-apply">Confirm apply</button>
+      <pre id="interview-diff" data-testid="interview-diff"></pre>
     </div>`;
   $("#view-onboard").dataset.hash = rig.config_hash;
   $("#view-onboard")._document = rig.document;
+  $("#view-onboard")._capsDocument = caps.document;
   try {
     const saved = await get("/v1/ops/briefing");
     const b = saved.briefing || {};
@@ -514,6 +642,32 @@ async function renderOnboard() {
     $("#brief-status").textContent = saved.present ? `Saved ${saved.updated_at || ""}`.trim() : "Not saved yet.";
   } catch {
     $("#brief-status").textContent = "Briefing endpoint unavailable.";
+  }
+  try {
+    const interview = await get("/v1/ops/interview");
+    paintInterview(interview);
+  } catch {
+    $("#interview-prompt").textContent = "Interview endpoint unavailable.";
+  }
+}
+
+function paintInterview(interview) {
+  const missing = new Set(interview.missing || []);
+  const needs = interview.needs || [];
+  $("#interview-needs").innerHTML = needs
+    .map((slot) => {
+      const filled = !missing.has(slot.id) && interview.status !== "idle";
+      const mark = filled ? "known" : slot.required ? "need" : "optional";
+      return `<li data-slot="${esc(slot.id)}" data-state="${mark}">${esc(slot.id)} · ${esc(slot.need)}</li>`;
+    })
+    .join("");
+  $("#interview-prompt").textContent = interview.prompt || interview.status || "Not started.";
+  const images = interview.images || [];
+  const status = $("#interview-image-status");
+  if (status) {
+    status.textContent = images.length
+      ? `Stored ${images.length} photo(s); diagram slot ${interview.answers?.diagram || images.at(-1)?.path}. A photo never arms the relay.`
+      : "No photo attached. Optional. A human still applies.";
   }
 }
 
@@ -556,10 +710,17 @@ document.body.addEventListener("click", async (event) => {
     if (t.id === "cmd-permit") await post("/v1/live/commands/permit", {});
     if (t.id === "sim-estop") await post("/v1/sim/estop", { pressed: !state.guardrail?.estop_active });
     if (t.id === "proc-start") {
+      const current = $("#active-run");
+      const live = current && !["passed", "failed", "aborted", "cancelled"].includes(current.dataset.status || "");
+      if (live || Date.now() < startLockUntil) {
+        if (live) showToast("Abort the current run before starting another");
+        return;
+      }
+      startLockUntil = Date.now() + 1500;
       const id = $("#proc-id").value;
       const started = await post("/v1/procedure_runs", { procedure_id: id });
       store.setRunId(started.run_id || started.run?.run_id);
-      activate("procedures");
+      await renderProcedures();
     }
     if (t.id === "proc-abort") {
       const run = $("#active-run")?.dataset.run;
@@ -597,23 +758,95 @@ document.body.addEventListener("click", async (event) => {
       await post(`/v1/procedures/drafts/${t.dataset.reject}/reject`, {});
       await renderAuthor();
     }
-    if (t.id === "onboard-propose" || t.id === "onboard-apply") {
+    if (t.id === "onboard-add") {
       const current = $("#view-onboard")._document;
       if (!current) throw new Error("no writable rig document on this node");
-      const next = structuredClone(current);
-      document.querySelectorAll("#onboard-channels input").forEach((input) => {
-        const row = next.channels[Number(input.dataset.ch)];
-        if (!row) return;
-        const field = input.dataset.field;
-        row[field] = input.type === "number" ? Number(input.value) : input.value;
+      if (!current.channels) current.channels = [];
+      const i = current.channels.length;
+      current.channels.push({
+        channel_id: `signal_${i + 1}`,
+        kind: "analog",
+        concept: "signal",
+        unit: "unit",
+        valid_min: 0,
+        valid_max: 100,
+        safe_min: 0,
+        safe_max: 50,
+        required: true,
+        calibration_id: `UNCAL-signal_${i + 1}`,
       });
-      const preview = await post("/v1/rig/propose", { document: next });
-      $("#onboard-diff").textContent = `${(preview.diff || []).join("\n")}\nnext ${preview.next_hash}`;
-      if (t.id === "onboard-apply") {
-        await post("/v1/rig/apply", { document: next, expected_current_hash: preview.current_hash });
-        showToast("Rig config applied");
-        await renderOnboard();
+      $("#onboard-channels").insertAdjacentHTML(
+        "beforeend",
+        `<tr data-row="${i}">
+          <td><input data-ch="${i}" data-field="channel_id" value="signal_${i + 1}" /></td>
+          <td><input data-ch="${i}" data-field="concept" value="signal" /></td>
+          <td><input data-ch="${i}" data-field="unit" value="unit" /></td>
+          <td><input data-ch="${i}" data-field="safe_max" type="number" step="0.1" value="50" /></td>
+          <td><button type="button" data-remove-ch="${i}" data-testid="onboard-remove-${i}">Remove</button></td>
+        </tr>`
+      );
+    }
+    if (t.dataset.removeCh) {
+      t.closest("tr")?.remove();
+    }
+    if (t.id === "onboard-propose" || t.id === "onboard-apply") {
+      try {
+        const next = collectOnboardDocument();
+        const preview = await post("/v1/rig/propose", { document: next });
+        $("#onboard-diff").textContent = `${(preview.diff || []).join("\n")}\nnext ${preview.next_hash}`;
+        if (t.id === "onboard-apply") {
+          await post("/v1/rig/apply", { document: next, expected_current_hash: preview.current_hash });
+          showToast("Rig config applied");
+          await renderOnboard();
+        }
+      } catch (error) {
+        $("#onboard-diff").textContent = toastText(error);
+        throw error;
       }
+    }
+    if (t.id === "onboard-caps-propose" || t.id === "onboard-caps-apply" || t.id === "caps-propose" || t.id === "caps-apply") {
+      const next = collectCapsDocument(t.id.startsWith("onboard") ? $("#view-onboard") : $("#view-capabilities"));
+      const preview = await post("/v1/capabilities/propose", { document: next });
+      const diffEl = t.id.startsWith("onboard") ? $("#onboard-caps-diff") : $("#caps-diff");
+      if (diffEl) diffEl.textContent = `${(preview.diff || []).join("\n")}\nnext ${preview.next_hash}`;
+      if (t.id.endsWith("-apply")) {
+        await post("/v1/capabilities/apply", { document: next, expected_current_hash: preview.current_hash });
+        showToast("Capability policies applied");
+        if (t.id.startsWith("onboard")) await renderOnboard();
+        else await renderCapabilities();
+      }
+    }
+    if (t.id === "interview-start") {
+      const started = await post("/v1/ops/interview/start", {});
+      paintInterview(started);
+      $("#interview-text").value = "";
+      $("#interview-diff").textContent = "";
+    }
+    if (t.id === "interview-next") {
+      const answered = await post("/v1/ops/interview/answer", { text: $("#interview-text").value });
+      paintInterview(answered);
+      $("#interview-text").value = "";
+      if (answered.status === "complete") showToast("Required facts are in — propose the map");
+    }
+    if (t.id === "interview-propose") {
+      try {
+        const preview = await post("/v1/ops/interview/propose", {});
+        $("#view-onboard")._interviewPreview = preview;
+        $("#interview-diff").textContent = `${(preview.diff || []).join("\n")}\nnext ${preview.next_hash}`;
+      } catch (error) {
+        $("#interview-diff").textContent = toastText(error);
+        throw error;
+      }
+    }
+    if (t.id === "interview-apply") {
+      let preview = $("#view-onboard")._interviewPreview;
+      if (!preview) preview = await post("/v1/ops/interview/propose", {});
+      await post("/v1/rig/apply", {
+        document: preview.document,
+        expected_current_hash: preview.current_hash,
+      });
+      showToast("Interview map applied");
+      await renderOnboard();
     }
     if (t.id === "brief-save") {
       const saved = await post("/v1/ops/briefing", {
@@ -627,6 +860,34 @@ document.body.addEventListener("click", async (event) => {
       showToast("Bench briefing saved");
     }
     if (t.id === "logout") logout();
+  } catch (error) {
+    fail(error);
+  }
+});
+
+document.body.addEventListener("change", async (event) => {
+  const t = event.target;
+  if (!(t instanceof HTMLInputElement) || t.id !== "interview-image" || !t.files?.[0]) return;
+  const file = t.files[0];
+  if (file.size > 1_200_000) {
+    showToast("Photo must be under 1.2 MB", true);
+    t.value = "";
+    return;
+  }
+  try {
+    const buffer = await file.arrayBuffer();
+    const bytes = new Uint8Array(buffer);
+    let binary = "";
+    bytes.forEach((b) => {
+      binary += String.fromCharCode(b);
+    });
+    const attached = await post("/v1/ops/interview/image", {
+      filename: file.name,
+      media_type: file.type,
+      content_base64: btoa(binary),
+    });
+    paintInterview(attached);
+    showToast("Bench photo stored as diagram context");
   } catch (error) {
     fail(error);
   }

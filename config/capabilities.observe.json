@@ -24,6 +24,12 @@
     "stop_recorder": { "policy": "allowed" },
     "shutdown": { "policy": "human_approval" },
     "bypass_interlock": { "policy": "never" },
-    "override_limits": { "policy": "never" }
+    "override_limits": { "policy": "never" },
+    "read_interview": { "policy": "allowed" },
+    "start_interview": { "policy": "allowed", "note": "Opens the fact list. Ask in your own words; never arms the relay." },
+    "answer_interview": { "policy": "allowed", "note": "Record whatever you learned. Partial is fine." },
+    "propose_rig_map": { "policy": "allowed", "note": "Propose only. Apply is operator-only." },
+    "attach_interview_image": { "policy": "allowed", "note": "Labeled photo only. Never arms." },
+    "request_auto_arm": { "policy": "never", "note": "Never on an observe-first manifest." }
   }
 }

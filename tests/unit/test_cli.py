@@ -43,6 +43,10 @@ def test_parser_covers_every_subcommand() -> None:
     assert lib.filter == "relay"
     stamp = parser.parse_args(["sim", "stamp-gate", "--out", "/tmp/stamps"])
     assert stamp.sim_command == "stamp-gate" and stamp.out == "/tmp/stamps"
+    ingest = parser.parse_args(
+        ["evidence", "accept-twin-gate", "--from", "/tmp/stamps", "--into", "/tmp/ev"]
+    )
+    assert ingest.evidence_command == "accept-twin-gate" and ingest.source == "/tmp/stamps"
     agent = parser.parse_args(["agent", "run", "--url", "http://x", "hello"])
     assert agent.provider == "fake" and agent.intent == "hello"
     replay = parser.parse_args(["agent", "replay", "t.jsonl", "--lenient"])
@@ -189,6 +193,36 @@ def test_namespace_shape_for_sim_serve_matches_serve() -> None:
 
     assert "func" not in inspect.signature(sim_serve).parameters
     assert isinstance(argparse.Namespace(), argparse.Namespace)
+
+
+def test_restore_sigint_unignores_inherited_handler() -> None:
+    import signal
+
+    from certarig.edge.cli import restore_sigint
+
+    previous = signal.getsignal(signal.SIGINT)
+    signal.signal(signal.SIGINT, signal.SIG_IGN)
+    try:
+        assert restore_sigint() is True
+        assert signal.getsignal(signal.SIGINT) is signal.default_int_handler
+        assert restore_sigint() is False
+    finally:
+        signal.signal(signal.SIGINT, previous)
+
+
+def test_accept_twin_gate_cli(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    source = tmp_path / "lib" / "twin_gate"
+    source.mkdir(parents=True)
+    (source / "abc.json").write_text(
+        json.dumps({"procedure_hash": "abc", "procedure_id": "relay_truth_table"}),
+        encoding="utf-8",
+    )
+    (source / "skip.json").write_text("not-json", encoding="utf-8")
+    dest = tmp_path / "node-evidence"
+    main(["evidence", "accept-twin-gate", "--from", str(tmp_path / "lib"), "--into", str(dest)])
+    result = json.loads(capsys.readouterr().out)
+    assert result["count"] == 1 and result["copied"] == ["abc.json"]
+    assert (dest / "twin_gate" / "abc.json").is_file()
 
 
 def test_evidence_cli_pull_verify_list(

@@ -48,6 +48,10 @@ REPORT_TEMPLATE = """# {title}
 
 {briefing}
 
+## Commissioning interview
+
+{interview}
+
 ## Agent narrative
 
 The following text, if present, is the agent's explanation. It is **not** a measurement.
@@ -123,11 +127,45 @@ def _briefing_block(target: Path, context: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def _interview_block(target: Path, context: dict[str, Any]) -> str:
+    source = context.get("interview")
+    if not isinstance(source, dict):
+        candidates = []
+        root = context.get("evidence_root")
+        if root:
+            candidates.append(Path(root) / "interview.json")
+        candidates.append(target.parent.parent / "interview.json")
+        for path in candidates:
+            if path.is_file():
+                source = json.loads(path.read_text(encoding="utf-8"))
+                break
+        else:
+            source = None
+    if not source:
+        return "_No commissioning interview was saved._"
+    write_json_atomic(target / "interview.json", source)
+    answers = source.get("answers") if isinstance(source.get("answers"), dict) else {}
+    lines = [f"- **status**: {source.get('status') or 'unknown'}"]
+    for key in ("modules", "signals", "observe_only", "diagram"):
+        value = str(answers.get(key) or "").strip() or "_empty_"
+        lines.append(f"- **{key}**: {value.replace('|', '/')}")
+    for row in source.get("signals") or []:
+        if isinstance(row, dict):
+            lines.append(
+                f"- {row.get('customer_name') or row.get('concept')} "
+                f"{row.get('concept')} {row.get('trip')} {row.get('unit')}"
+            )
+    if source.get("updated_at"):
+        lines.append(f"- updated_at: `{source['updated_at']}`")
+    return "\n".join(lines)
+
+
 def render_report(
     run: dict[str, Any],
     context: dict[str, Any],
     narrative: str = "",
     briefing: str = "",
+    interview: str = "",
 ) -> str:
     recording = run.get("recording") or {}
     rec = (
@@ -154,6 +192,7 @@ def render_report(
         kernel_rows=kernel,
         recording=rec,
         briefing=briefing or "_No bench briefing was saved._",
+        interview=interview or "_No commissioning interview was saved._",
         narrative=narrative or "_No agent narrative was attached._",
         recovery=(run.get("recovery") or "_None._").strip(),
         hardware_identity=context.get("hardware_identity") or context.get("hardware_mode") or "unknown",
@@ -170,7 +209,11 @@ def write_run_bundle(
     events = run.get("events") or run.get("kernel_events") or []
     write_text_atomic(target / EVENTS_NAME, "".join(json.dumps(e, sort_keys=True) + "\n" for e in events))
     briefing = _briefing_block(target, context)
-    write_text_atomic(target / REPORT_NAME, render_report(run, context, narrative, briefing=briefing))
+    interview = _interview_block(target, context)
+    write_text_atomic(
+        target / REPORT_NAME,
+        render_report(run, context, narrative, briefing=briefing, interview=interview),
+    )
     listed = [
         path
         for path in sorted(target.iterdir())

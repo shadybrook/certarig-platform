@@ -43,7 +43,34 @@ def test_opening_moves() -> None:
     assert _first_call(_turn("verify the flow trip")) == ("read_skill", {"name": "flow_guardrail"})
     assert _first_call(_turn("run the dual pot test")) == ("read_skill", {"name": "dual_pot_guardrail"})
     assert _first_call(_turn("how is the flow")) == ("read_state", {})
+    assert _first_call(_turn("commission this bench")) == ("start_interview", {})
+    assert _first_call(_turn("map this rig")) == ("start_interview", {})
     assert _first_call(_turn("gibberish")) == ("list_skills", {})
+
+
+def test_interview_answers_until_propose() -> None:
+    started = _turn(
+        "commission this bench",
+        ("start_interview", {"status": "in_progress", "missing": ["modules"], "prompt": "Still need modules"}),
+    )
+    started.append(Message(role="assistant", content="What modules are present?"))
+    started.append(Message(role="user", content="temperature jacket, E-stop"))
+    assert _first_call(started) == (
+        "answer_interview",
+        {"text": "temperature jacket, E-stop"},
+    )
+    complete = _turn(
+        "commission this bench",
+        ("answer_interview", {"status": "complete", "prompt": "done"}),
+    )
+    assert _first_call(complete) == ("propose_rig_map", {})
+    proposed = _text(
+        _turn(
+            "commission this bench",
+            ("propose_rig_map", {"next_hash": "abc", "diff": ["~ abort_limits.temperature"]}),
+        )
+    )
+    assert "never arms" in proposed and "abc" in proposed
 
 
 def test_active_run_is_tracked_across_turns() -> None:

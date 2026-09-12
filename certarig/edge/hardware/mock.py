@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from datetime import UTC, datetime
 
-from ..models import RigConfig, RigSnapshot, Sample
+from ..models import RigConfig, RigSnapshot, Sample, in_valid_range
 from .base import HardwareAdapter
 
 
@@ -44,7 +44,7 @@ class MockHardware(HardwareAdapter):
                 value = flow
             else:
                 value = 1.0 if self.valve_open else 0.0
-            quality = "good" if channel.valid_min <= value <= channel.valid_max else "out_of_range"
+            quality = "good" if in_valid_range(channel, value) else "out_of_range"
             samples.append(
                 Sample(
                     channel_id=channel.channel_id,

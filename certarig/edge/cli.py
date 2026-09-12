@@ -14,8 +14,19 @@ from .evidence import EvidenceStore
 from .server import make_edge_server
 
 
+def restore_sigint() -> bool:
+    """nohup inherits SIG_IGN. Restore the default so Ctrl-C / SIGINT can halt the node."""
+    import signal
+
+    if signal.getsignal(signal.SIGINT) is signal.SIG_IGN:
+        signal.signal(signal.SIGINT, signal.default_int_handler)
+        return True
+    return False
+
+
 def serve(args: argparse.Namespace) -> None:
     """Run the unified Edge node: live kernel, procedures, approvals, ops and Studio."""
+    restore_sigint()
     settings = NodeSettings.from_env(
         args.config,
         args.capabilities,
@@ -59,6 +70,7 @@ def serve(args: argparse.Namespace) -> None:
 
 def legacy_plan_api(args: argparse.Namespace) -> None:
     """Phase 2 plan/approve/execute API. Kept for the archived PoC workflow only."""
+    restore_sigint()
     operator_key = os.environ.get("CERTARIG_OPERATOR_KEY", "")
     if len(operator_key) < 12:
         raise SystemExit("CERTARIG_OPERATOR_KEY must be set to at least 12 characters")

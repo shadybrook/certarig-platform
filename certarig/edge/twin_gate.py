@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import shutil
 import time
 from datetime import UTC, datetime
 from pathlib import Path
@@ -58,3 +59,32 @@ def check_gate(
             "last_pass": document,
         }
     return None
+
+
+def accept_twin_gate(source: Path, dest_evidence_dir: Path) -> dict[str, Any]:
+    """Copy simulator twin-gate stamps into a node's evidence dir without scp folklore."""
+    src = Path(source)
+    if (src / "twin_gate").is_dir():
+        src = src / "twin_gate"
+    dest = Path(dest_evidence_dir) / "twin_gate"
+    dest.mkdir(parents=True, exist_ok=True)
+    copied: list[str] = []
+    skipped: list[str] = []
+    for path in sorted(src.glob("*.json")):
+        try:
+            document = json.loads(path.read_text(encoding="utf-8"))
+        except ValueError:
+            skipped.append(path.name)
+            continue
+        if not isinstance(document, dict) or not document.get("procedure_hash"):
+            skipped.append(path.name)
+            continue
+        shutil.copy2(path, dest / path.name)
+        copied.append(path.name)
+    return {
+        "copied": copied,
+        "skipped": skipped,
+        "count": len(copied),
+        "dest": str(dest.resolve()),
+        "source": str(src.resolve()),
+    }

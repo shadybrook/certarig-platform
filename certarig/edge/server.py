@@ -312,6 +312,11 @@ class EdgeNode:
                     **self.manifest.to_dict(self.config.config_hash),
                     "principal": ctx.principal.value,
                     "agent_tools": self.manifest.agent_tools(),
+                    "document": (
+                        json.loads(self.capabilities_path.read_text(encoding="utf-8"))
+                        if self.capabilities_path is not None and self.capabilities_path.is_file()
+                        else None
+                    ),
                 },
             ),
             "read_capabilities",
@@ -633,9 +638,9 @@ def make_edge_handler(node: EdgeNode) -> type[BaseHTTPRequestHandler]:
         def _send_json(self, status: int, payload: dict[str, Any]) -> None:
             self._send_bytes(status, json.dumps(payload, sort_keys=True).encode("utf-8"), "application/json")
 
-        def _read_json(self) -> dict[str, Any]:
+        def _read_json(self, limit: int = 512_000) -> dict[str, Any]:
             length = int(self.headers.get("Content-Length", "0"))
-            if length > 512_000:
+            if length > limit:
                 raise HttpError(413, "request body is too large")
             if length == 0:
                 return {}
@@ -664,7 +669,8 @@ def make_edge_handler(node: EdgeNode) -> type[BaseHTTPRequestHandler]:
                         405 if path_matched else 404,
                         "method not allowed" if path_matched else "route not found",
                     )
-                body = self._read_json() if method != "GET" else {}
+                limit = 2_000_000 if path.endswith("/interview/image") else 512_000
+                body = self._read_json(limit) if method != "GET" else {}
                 principal, name = node.resolve_principal(self.headers)
                 ctx = RequestContext(
                     method=method,

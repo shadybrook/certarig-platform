@@ -74,6 +74,14 @@ class ProcessGuardrailTests(unittest.TestCase):
         self.assertEqual(result.event, "flow_high_forced_safe")
         self.assertFalse(result.drive_high)
 
+    def test_small_adc_undershoot_below_zero_stays_healthy(self) -> None:
+        guardrail = self.armed()
+        result = guardrail.observe(snapshot(pressure=-0.04, flow=-0.03))
+        self.assertTrue(result.process_healthy)
+        self.assertEqual(result.reason, "permit_active")
+        invalid = guardrail.observe(snapshot(pressure=-0.5))
+        self.assertEqual(invalid.event, "sensor_invalid_forced_safe")
+
     def test_missing_or_bad_sensor_forces_safe(self) -> None:
         guardrail = self.armed()
         missing = guardrail.observe(snapshot(include_flow=False))

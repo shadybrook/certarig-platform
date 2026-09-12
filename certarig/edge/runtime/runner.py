@@ -24,7 +24,7 @@ from ..live import LiveBenchRuntime
 from ..models import RigConfig
 from .facts import Facts, build_facts
 from .model import Procedure, ProcedureRun, RunStatus, Step, StepResult
-from .predicates import describe, evaluate, observed
+from .predicates import describe, evaluate, observed, trigger_coach
 
 
 class RunnerError(RuntimeError):
@@ -46,6 +46,15 @@ class _Fail(Exception):
 
 def utc_now() -> str:
     return datetime.now(UTC).isoformat()
+
+
+def _initial_step(step: Step) -> StepResult:
+    result = StepResult(step.id, step.type, step.title)
+    if step.raw.get("instruction"):
+        result.instruction = str(step.raw["instruction"])
+    if step.type == "trigger" and isinstance(step.raw.get("predicate"), dict):
+        result.detail["trigger"] = trigger_coach(step.raw)
+    return result
 
 
 class ProcedureRunner:
@@ -133,7 +142,7 @@ class ProcedureRunner:
                 created_at=utc_now(),
                 hardware_mode=self.config.hardware.mode,
                 recovery=procedure.raw.get("recovery"),
-                steps=[StepResult(step.id, step.type, step.title) for step in procedure.steps],
+                steps=[_initial_step(step) for step in procedure.steps],
             )
             self._runs[run.run_id] = run
             self._procedures[run.run_id] = procedure

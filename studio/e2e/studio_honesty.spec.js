@@ -20,6 +20,55 @@ async function contractHeaders(request) {
   };
 }
 
+test("commissioning facts from one description propose and apply a trip", async ({ page, request }) => {
+  await login(page);
+  await page.locator('#nav a[data-view="onboard"]').click();
+  await page.getByTestId("interview-start").click();
+  await expect(page.getByTestId("interview-needs")).toContainText("modules");
+  await page.getByTestId("interview-text").fill(
+    "ADC pots, E-stop, relay. pressure 4.05 bar, flow 14.5 L/min. observe-only: none. sim-stranger.md"
+  );
+  await page.getByTestId("interview-record").click();
+  await expect(page.getByTestId("interview-prompt")).toContainText("Required facts are in");
+  await page.getByTestId("interview-propose").click();
+  await expect(page.getByTestId("interview-diff")).toContainText("next");
+  await page.getByTestId("interview-apply").click();
+  const rig = await (await request.get("/v1/rig", { headers: { "X-CertaRig-Operator-Key": OPERATOR } })).json();
+  expect(rig.rig.abort_limits.pressure).toBe(4.05);
+});
+
+test("onboard can add a channel and preview without apply", async ({ page }) => {
+  await login(page);
+  await page.locator('#nav a[data-view="onboard"]').click();
+  await page.getByTestId("onboard-add").click();
+  await page.locator("#onboard-propose").click();
+  await expect(page.getByTestId("onboard-diff")).toContainText("channels");
+});
+
+test("trigger coach shows which pot to move", async ({ page, request }) => {
+  await login(page);
+  const headers = await contractHeaders(request);
+  const listing = await (await request.get("/v1/procedure_runs", { headers })).json();
+  for (const row of listing.runs || []) {
+    if (!row.terminal) {
+      await request.post(`/v1/procedure_runs/${row.run_id}/abort`, {
+        headers,
+        data: { reason: "e2e trigger cleanup leftover" },
+      });
+    }
+  }
+  await page.locator('#nav a[data-view="procedures"]').click();
+  await page.locator("#proc-id").selectOption("adc_validation");
+  await page.locator("#proc-start").click();
+  await expect(page.getByTestId("trigger-coach")).toBeVisible({ timeout: 20_000 });
+  await expect(page.getByTestId("trigger-coach")).toContainText("P1");
+  const runId = await page.locator("#active-run").getAttribute("data-run");
+  await request.post(`/v1/procedure_runs/${runId}/abort`, {
+    headers: await contractHeaders(request),
+    data: { reason: "e2e trigger cleanup" },
+  });
+});
+
 test("onboard briefing persists after reload", async ({ page }) => {
   await login(page);
   await page.locator('#nav a[data-view="onboard"]').click();
@@ -77,14 +126,19 @@ test("procedures reconnect to the stored run after reload", async ({ page, reque
       });
     }
   }
+  const started = await (
+    await request.post("/v1/procedure_runs", {
+      headers,
+      data: { procedure_id: "pressure_guardrail" },
+    })
+  ).json();
+  const runId = started.run_id;
+  await page.evaluate((id) => localStorage.setItem("certarig.runId", id), runId);
   await page.locator('#nav a[data-view="procedures"]').click();
-  await page.locator("#proc-id").selectOption("pressure_guardrail");
-  await page.locator("#proc-start").click();
-  await expect(page.locator("#active-run")).toBeVisible({ timeout: 10_000 });
-  const runId = await page.locator("#active-run").getAttribute("data-run");
-  await expect.poll(() => page.evaluate(() => localStorage.getItem("certarig.runId"))).toBe(runId);
+  await expect(page.locator("#active-run")).toHaveAttribute("data-run", runId);
   await page.reload();
   await expect(page.locator("#health-pill")).toHaveAttribute("data-state", "ok", { timeout: 15_000 });
+  await expect.poll(() => page.evaluate(() => localStorage.getItem("certarig.runId"))).toBe(runId);
   await page.locator('#nav a[data-view="procedures"]').click();
   await expect(page.locator("#active-run")).toHaveAttribute("data-run", runId);
   await request.post(`/v1/procedure_runs/${runId}/abort`, {
