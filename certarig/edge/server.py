@@ -370,6 +370,51 @@ class EdgeNode:
         return candidate.read_bytes(), content_type
 
     # ---------------------------------------------------------------- lifecycle
+    def invoke(
+        self,
+        method: str,
+        path: str,
+        headers: Any = None,
+        body: dict[str, Any] | None = None,
+        query: dict[str, list[str]] | None = None,
+    ) -> tuple[int, dict[str, Any] | bytes, str]:
+        """Dispatch a request in-process (used by the Studio agent session)."""
+        headers = headers or {}
+        route, params, path_matched = self.router.match(method, path)
+        if route is None:
+            raise HttpError(
+                405 if path_matched else 404,
+                "method not allowed" if path_matched else "route not found",
+            )
+        principal, name = self.resolve_principal(headers)
+        ctx = RequestContext(
+            method=method.upper(),
+            path=path,
+            params=params,
+            query=query or {},
+            body=body or {},
+            principal=principal,
+            principal_name=name,
+            tool=route.tool,
+            policy=None,
+        )
+        try:
+            self.enforce(ctx, route, headers)
+            result = route.handler(ctx)
+        except HttpError as exc:
+            if route.mutating:
+                self.audit(ctx, exc.status, exc.payload)
+            raise
+        if len(result) == 3:
+            status, raw, content_type = result
+            if route.mutating:
+                self.audit(ctx, status)
+            return status, raw, content_type
+        status, payload = result
+        if route.mutating:
+            self.audit(ctx, status)
+        return status, payload, "application/json"
+
     def start(self) -> None:
         self.runtime.start()
 

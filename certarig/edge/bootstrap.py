@@ -106,4 +106,7 @@ def build_node(settings: NodeSettings, hardware: HardwareAdapter | None = None) 
         from certarig.sim.api import install_sim_api
 
         install_sim_api(node, adapter)
+    from .agent_api import install_agent_api
+
+    install_agent_api(node, settings.skills_root)
     return node

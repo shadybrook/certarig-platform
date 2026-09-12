@@ -3,287 +3,54 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="CertaRig Phase 2 proof of concept for evidence backed test rig commissioning and revalidation." />
-    <title>CertaRig Phase 2 PoC</title>
+    <title>CertaRig Studio</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <a class="skip-link" href="#demo">Skip to proof of concept</a>
-    <header class="site-header">
-      <a class="brand" href="#top" aria-label="CertaRig home">
-        <span class="brand-mark" aria-hidden="true">CR</span>
-        <span>CertaRig</span>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="top">
+      <a class="brand" href="#telemetry">
+        <span class="mark">CR</span>
+        <span>CertaRig Studio</span>
       </a>
-      <nav aria-label="Primary navigation">
-        <a href="#community">Community</a>
-        <a href="#architecture">Architecture</a>
-        <a href="#data-flow">Data flow</a>
-        <a href="#demo">PoC</a>
-        <a href="#live-bench">Live bench</a>
+      <nav id="nav" aria-label="Studio">
+        <a href="#telemetry" data-view="telemetry">Live</a>
+        <a href="#procedures" data-view="procedures">Procedures</a>
+        <a href="#approvals" data-view="approvals">Approvals <span id="approval-count" class="badge hidden">0</span></a>
+        <a href="#agent" data-view="agent">Agent</a>
+        <a href="#evidence" data-view="evidence">Evidence</a>
+        <a href="#capabilities" data-view="capabilities">Capabilities</a>
+        <a href="#onboard" data-view="onboard">Onboard</a>
       </nav>
+      <div class="session">
+        <span id="health-pill" class="pill" data-state="down">offline</span>
+        <button id="logout" class="ghost" type="button">Clear keys</button>
+      </div>
     </header>
 
-    <main id="top">
-      <section class="hero section-shell">
-        <div class="hero-copy">
-          <p class="eyebrow">Phase 2 proof of concept</p>
-          <h1>Commission a test rig with evidence, limits, and a clear audit trail.</h1>
-          <p class="lead">CertaRig models devices and channels, checks the evidence behind each mapping, runs a bounded simulator plan, and explains why a result can be accepted or must stop.</p>
-          <div class="hero-actions">
-            <a class="button primary" href="#demo">Run the PoC</a>
-            <a class="button secondary" href="#architecture">See the design</a>
-          </div>
-          <p class="safety-note"><strong>Safety boundary:</strong> this Phase 2 build uses synthetic data only. It has no live hardware control authority.</p>
-        </div>
-        <div class="hero-panel" aria-label="CertaRig control boundary summary">
-          <div class="panel-kicker">Controlled engineering loop</div>
-          <ol class="loop-list">
-            <li><span>01</span>Discover evidence</li>
-            <li><span>02</span>Build the rig model</li>
-            <li><span>03</span>Validate a bounded plan</li>
-            <li><span>04</span>Observe and diagnose</li>
-            <li><span>05</span>Accept or request review</li>
-          </ol>
-        </div>
-      </section>
+    <aside id="gate" class="gate" hidden>
+      <form id="login-form" class="card">
+        <p class="eyebrow">Connect</p>
+        <h1>Authenticate to this Edge node</h1>
+        <p>Keys stay in this browser tab only. They are never written to the repository or GBrain.</p>
+        <label>Operator key <input id="operator-key" data-testid="operator-key" type="password" autocomplete="off" required minlength="12" /></label>
+        <label>Your name <input id="operator-name" type="text" value="studio-operator" /></label>
+        <button class="primary" type="submit">Open Studio</button>
+        <p id="login-error" class="error" hidden></p>
+      </form>
+    </aside>
 
-      <section id="community" class="section-shell narrative-grid">
-        <div>
-          <p class="eyebrow">User community</p>
-          <h2>Built for the people who must trust changed test systems.</h2>
-        </div>
-        <div class="community-cards">
-          <article><h3>Test engineers</h3><p>Review mappings, plans, measurements, and evidence before accepting a rig baseline.</p></article>
-          <article><h3>Instrumentation engineers</h3><p>Trace devices, channels, units, ranges, and calibration records without relying on memory.</p></article>
-          <article><h3>Project reviewers</h3><p>Inspect a reproducible record of inputs, decisions, test outcomes, and unresolved items.</p></article>
-        </div>
-      </section>
-
-      <section class="benefits-band">
-        <div class="section-shell benefit-grid">
-          <div><strong>Less rework</strong><span>Repeat only the checks affected by a change.</span></div>
-          <div><strong>Visible uncertainty</strong><span>Missing or conflicting evidence causes review, not a guess.</span></div>
-          <div><strong>Safe execution</strong><span>Deterministic limits remain authoritative over outputs.</span></div>
-          <div><strong>Audit ready</strong><span>Every case produces a versioned evidence bundle.</span></div>
-        </div>
-      </section>
-
-      <section id="architecture" class="section-shell diagram-section">
-        <div class="section-intro">
-          <p class="eyebrow">System architecture</p>
-          <h2>Reasoning is separated from execution and safety.</h2>
-          <p>The browser presents evidence and recommendations. The service layer maintains the rig graph, policy decisions, plans, and diagnoses. A deterministic runtime owns state transitions. Independent safety remains outside the AI path.</p>
-        </div>
-        <div class="architecture-grid" role="img" aria-label="Architecture with browser, agent services, validated storage, deterministic simulator, and independent safety">
-          <div class="arch-node browser-node"><small>Human layer</small><strong>Browser review interface</strong><span>Map, plan, telemetry, alarms, evidence</span></div>
-          <div class="arch-arrow" aria-hidden="true">↓</div>
-          <div class="arch-services">
-            <div><small>Reasoning</small><strong>Discovery</strong></div>
-            <div><small>Reasoning</small><strong>Rig model</strong></div>
-            <div><small>Reasoning</small><strong>Experiment</strong></div>
-            <div><small>Reasoning</small><strong>Diagnosis</strong></div>
-          </div>
-          <div class="arch-arrow" aria-hidden="true">↓ validated plan only</div>
-          <div class="arch-bottom">
-            <div class="arch-node"><small>Execution</small><strong>Deterministic runtime</strong><span>State machine, timeout, abort, replay</span></div>
-            <div class="arch-node"><small>Evidence</small><strong>Versioned store</strong><span>Rig graph, plans, telemetry, decisions</span></div>
-            <div class="arch-node safety"><small>Independent</small><strong>Safety boundary</strong><span>Limit policy and safe default state</span></div>
-          </div>
-        </div>
-      </section>
-
-      <section id="data-flow" class="flow-wrap">
-        <div class="section-shell">
-          <div class="section-intro light">
-            <p class="eyebrow">Data flow</p>
-            <h2>Every conclusion can be traced back to an input.</h2>
-          </div>
-          <ol class="flow-list">
-            <li><span>1</span><strong>Ingest</strong><p>Configuration, calibration, procedure, and telemetry records.</p></li>
-            <li><span>2</span><strong>Normalize</strong><p>Typed devices, channels, units, ranges, limits, and source references.</p></li>
-            <li><span>3</span><strong>Compare</strong><p>Version changes and the evidence or assumptions they invalidate.</p></li>
-            <li><span>4</span><strong>Plan</strong><p>Bounded checks with prerequisites, acceptance criteria, and abort rules.</p></li>
-            <li><span>5</span><strong>Execute</strong><p>Deterministic simulator states and measured responses.</p></li>
-            <li><span>6</span><strong>Report</strong><p>Outcome, diagnosis, evidence bundle, and items for human review.</p></li>
-          </ol>
-        </div>
-      </section>
-
-      <section id="demo" class="section-shell demo-section">
-        <div class="demo-intro">
-          <div class="section-intro">
-            <p class="eyebrow">Interactive proof of concept</p>
-            <h2>Four cases. One controlled decision path.</h2>
-            <p>Each case uses the same evidence contract and deterministic safety policy. Only the engineering condition changes.</p>
-          </div>
-          <div class="scope-card" aria-label="Phase 2 validation scope">
-            <span class="scope-dot" aria-hidden="true"></span>
-            <div><strong>Software PoC validated</strong><span>Synthetic data · no hardware authority</span></div>
-          </div>
-        </div>
-
-        <div id="case-selector" class="case-selector" aria-label="Demonstration cases"></div>
-
-        <div class="demo-workspace">
-          <div class="workspace-toolbar">
-            <div class="scenario-select-wrap">
-              <label for="scenario">Selected case</label>
-              <select id="scenario"></select>
-            </div>
-            <div class="workspace-actions">
-              <button id="run-analysis" class="button primary" type="button"><span class="button-dot" aria-hidden="true"></span>Run analysis</button>
-              <button id="export-report" class="button secondary" type="button">Export evidence JSON</button>
-            </div>
-          </div>
-          <p id="announcement" class="sr-only" aria-live="polite"></p>
-
-          <div class="result-heading">
-            <div class="result-copy">
-              <span id="case-number" class="case-number"></span>
-              <div><h3 id="case-title"></h3><p id="case-summary"></p></div>
-            </div>
-            <div class="outcome-wrap"><span>Decision</span><strong id="status" class="status-pill"></strong></div>
-          </div>
-
-          <div class="metric-grid">
-            <article><span>Mapped channels</span><strong id="metric-channels"></strong><small>typed I/O points</small></article>
-            <article><span>Model confidence</span><strong id="metric-confidence"></strong><small>evidence weighted</small></article>
-            <article><span>Findings</span><strong id="metric-findings"></strong><small>material observations</small></article>
-            <article><span>Maximum pressure</span><strong id="metric-pressure"></strong><small>limit 4.20 bar</small></article>
-          </div>
-
-          <section class="decision-card" aria-labelledby="decision-path-title">
-            <div class="card-heading decision-heading">
-              <div><p class="micro-label">Controlled workflow</p><h3 id="decision-path-title">Decision path</h3></div>
-              <span class="policy-chip">Deterministic policy</span>
-            </div>
-            <ol id="decision-path" class="decision-path"></ol>
-          </section>
-
-          <div class="demo-grid">
-            <section class="demo-card chart-card">
-              <div class="card-heading"><div><p class="micro-label">Synthetic telemetry</p><h3>Measured response</h3></div><div class="legend"><span class="pressure-key">Pressure</span><span class="flow-key">Flow</span></div></div>
-              <div id="telemetry-chart"></div>
-            </section>
-
-            <section class="demo-card diagnosis-card">
-              <div class="card-heading"><div><p class="micro-label">Explainable result</p><h3>Diagnosis</h3></div></div>
-              <ul id="findings" class="finding-list"></ul>
-            </section>
-
-            <section class="demo-card wide-card">
-              <div class="card-heading"><div><p class="micro-label">Traceable inputs</p><h3>Evidence backed channel map</h3></div></div>
-              <div class="table-wrap">
-                <table id="channel-table">
-                  <thead><tr><th>Channel</th><th>Device</th><th>Unit</th><th>Calibration</th><th>Confidence</th></tr></thead>
-                  <tbody></tbody>
-                </table>
-              </div>
-            </section>
-
-            <section class="demo-card wide-card">
-              <div class="card-heading"><div><p class="micro-label">Bounded execution</p><h3>Commissioning plan</h3></div></div>
-              <ol id="plan" class="plan-list"></ol>
-              <p class="abort-box"><span class="abort-icon" aria-hidden="true">!</span><span><strong>Abort rule</strong><span id="abort-rule"></span></span></p>
-            </section>
-          </div>
-
-          <div class="bundle-strip">
-            <div><span>Evidence checksum</span><strong id="bundle-checksum"></strong></div>
-            <div><span>Recorded items</span><strong id="bundle-records"></strong></div>
-            <div><span>Control authority</span><strong>Deterministic runtime</strong></div>
-          </div>
-        </div>
-      </section>
-
-      <section id="live-bench" class="live-section">
-        <div class="section-shell">
-          <div class="live-heading">
-            <div>
-              <p class="eyebrow">Phase 3 physical bench</p>
-              <h2>Live control and evidence console.</h2>
-              <p>The Pi reads both ADS1115 channels and the E-stop. A deterministic guardrail owns GPIO23, while this browser displays state and records auditable CSV evidence.</p>
-            </div>
-            <div class="live-connection" id="live-connection" data-state="connecting">
-              <span class="connection-dot" aria-hidden="true"></span>
-              <span><strong id="live-connection-label">Connecting to Pi</strong><small id="live-connection-detail">Waiting for live service</small></span>
-            </div>
-          </div>
-
-          <div class="live-console" aria-live="polite">
-            <div class="live-topline">
-              <div>
-                <span class="live-kicker">Guardrail state</span>
-                <strong id="live-guardrail-state">STARTUP SAFE</strong>
-                <small id="live-last-event">No live sample received</small>
-              </div>
-              <div class="live-mode"><span>Authority</span><strong id="live-mode">Unknown</strong></div>
-            </div>
-
-            <div class="live-grid">
-              <article class="sensor-card" data-sensor-state="unknown">
-                <div class="sensor-title"><span>P1 · ADS1115 A0</span><strong id="live-pressure-state">WAITING</strong></div>
-                <div class="sensor-reading"><strong id="live-pressure">—</strong><span>bar</span></div>
-                <div class="meter"><span id="live-pressure-meter"></span><i class="meter-limit pressure-limit" title="4.2 bar limit"></i></div>
-                <div class="sensor-meta"><span id="live-pressure-voltage">— V</span><span>Safe 0.0–4.2 bar</span></div>
-              </article>
-
-              <article class="sensor-card" data-sensor-state="unknown">
-                <div class="sensor-title"><span>P2 · ADS1115 A1</span><strong id="live-flow-state">WAITING</strong></div>
-                <div class="sensor-reading"><strong id="live-flow">—</strong><span>L/min</span></div>
-                <div class="meter"><span id="live-flow-meter"></span><i class="meter-limit flow-limit" title="15 L/min limit"></i></div>
-                <div class="sensor-meta"><span id="live-flow-voltage">— V</span><span>Safe 0.0–15.0 L/min</span></div>
-              </article>
-
-              <article class="state-card">
-                <div class="state-row"><span>E-stop NC1 input</span><strong id="live-estop" data-state="unknown">UNKNOWN</strong></div>
-                <div class="state-row"><span>Trip latch</span><strong id="live-trip" data-state="unknown">SET</strong></div>
-                <div class="state-row"><span>GPIO23 command</span><strong id="live-gpio23" data-state="unknown">LOW</strong></div>
-                <div class="state-row"><span>K1 relay</span><strong id="live-relay" data-state="unknown">EXPECTED OFF</strong></div>
-                <p>Relay status is command-derived because no K1 feedback sensor is fitted.</p>
-              </article>
-
-              <article class="indicator-card">
-                <span class="indicator-label">Panel indication model</span>
-                <div class="indicator-pair">
-                  <div><span id="live-red-lamp" class="panel-lamp red"></span><strong>RED</strong><small>Inhibited</small></div>
-                  <div><span id="live-green-lamp" class="panel-lamp green"></span><strong>GREEN</strong><small>Permitted</small></div>
-                </div>
-                <p>Expected from K1 NC/NO contacts, not optically measured.</p>
-              </article>
-            </div>
-
-            <section class="live-chart-card" aria-labelledby="live-chart-title">
-              <div class="card-heading"><div><p class="micro-label">Rolling telemetry</p><h3 id="live-chart-title">Last 30 seconds</h3></div><div class="legend"><span class="pressure-key">Pressure</span><span class="flow-key">Flow</span></div></div>
-              <div id="live-chart" class="live-chart"><span>Waiting for Pi telemetry…</span></div>
-            </section>
-
-            <div class="live-controls">
-              <div class="operator-auth">
-                <label for="live-operator-key">Operator key</label>
-                <input id="live-operator-key" type="password" autocomplete="off" placeholder="Required for commands; never stored" />
-              </div>
-              <div class="command-group" aria-label="Guardrail commands">
-                <button id="live-safe" class="button danger" type="button">Force safe</button>
-                <button id="live-reset" class="button secondary" type="button">Reset trip</button>
-                <button id="live-permit" class="button primary" type="button">Request permit</button>
-              </div>
-              <div class="record-group">
-                <input id="live-record-label" type="text" maxlength="40" value="phase3-randomized-test" aria-label="CSV recording label" />
-                <button id="live-record" class="button secondary" type="button">Start CSV</button>
-                <button id="live-download" class="button secondary" type="button" disabled>Download CSV</button>
-              </div>
-            </div>
-            <p id="live-message" class="live-message">The public Phase 2 page remains a simulation. Open this page from the Pi-hosted service for physical telemetry.</p>
-          </div>
-        </div>
-      </section>
+    <main id="main">
+      <section id="view-telemetry" class="view" data-view="telemetry"></section>
+      <section id="view-procedures" class="view hidden" data-view="procedures"></section>
+      <section id="view-approvals" class="view hidden" data-view="approvals"></section>
+      <section id="view-agent" class="view hidden" data-view="agent"></section>
+      <section id="view-evidence" class="view hidden" data-view="evidence"></section>
+      <section id="view-capabilities" class="view hidden" data-view="capabilities"></section>
+      <section id="view-onboard" class="view hidden" data-view="onboard"></section>
     </main>
 
-    <footer>
-      <div class="section-shell"><span>CertaRig Phase 2 PoC</span><span>Chintan Dedhia · 2023EB03005</span></div>
-    </footer>
+    <div id="toast" class="toast hidden" role="status"></div>
     <script type="module" src="./src/app.mjs"></script>
-    <script type="module" src="./src/live.mjs"></script>
   </body>
 </html>

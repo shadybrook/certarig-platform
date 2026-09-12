@@ -201,6 +201,42 @@ class EdgeClient:
         return self.post(f"/v1/procedure_runs/{run_id}/abort", {"run_id": run_id, "reason": reason})
 
 
+class InProcessClient(EdgeClient):
+    """Same interface as :class:`EdgeClient`, dispatched against an in-memory Edge node."""
+
+    def __init__(
+        self,
+        node: Any,
+        operator_key: str | None = None,
+        agent_key: str | None = None,
+        principal_name: str | None = None,
+    ) -> None:
+        super().__init__("in-process", operator_key, agent_key, principal_name)
+        self.node = node
+
+    def request(
+        self,
+        method: str,
+        path: str,
+        payload: dict[str, Any] | None = None,
+        *,
+        contract: bool = True,
+        raw: bool = False,
+    ) -> Any:
+        from .server import HttpError
+
+        headers = self._headers(contract)
+        try:
+            status, body, _content_type = self.node.invoke(method, path, headers, payload)
+        except HttpError as exc:
+            raise EdgeApiError(exc.status, exc.payload) from exc
+        if status >= 400:
+            raise EdgeApiError(status, body if isinstance(body, dict) else {"error": str(body)})
+        if raw:
+            return body if isinstance(body, bytes) else json.dumps(body).encode("utf-8")
+        return body if isinstance(body, dict) else {}
+
+
 class CertaRigClient:
     """Legacy Phase 2 plan API client."""
 
