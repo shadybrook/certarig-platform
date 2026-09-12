@@ -1,0 +1,50 @@
+{
+  "rig_id": "pressure-flow-rig-01",
+  "revision": "phase3-reference-1",
+  "sample_interval_ms": 100,
+  "pressure_abort_bar": 4.2,
+  "hardware": {
+    "mode": "mock",
+    "i2c_bus": 1,
+    "ads1115_address": 72,
+    "valve_output_gpio": 23,
+    "emergency_stop_gpio": 24,
+    "emergency_stop_active_high": true,
+    "relay_feedback_gpio": 25,
+    "output_active_high": true
+  },
+  "channels": [
+    {
+      "channel_id": "pressure_inlet",
+      "kind": "analog",
+      "adc_channel": 0,
+      "unit": "bar",
+      "raw_min_v": 0.5,
+      "raw_max_v": 4.5,
+      "engineering_min": 0.0,
+      "engineering_max": 10.0,
+      "valid_min": 0.0,
+      "valid_max": 10.0,
+      "safe_min": 0.0,
+      "safe_max": 4.2,
+      "calibration_id": "CAL-P-001",
+      "required": true
+    },
+    {
+      "channel_id": "flow_main",
+      "kind": "analog",
+      "adc_channel": 1,
+      "unit": "L/min",
+      "raw_min_v": 0.5,
+      "raw_max_v": 4.5,
+      "engineering_min": 0.0,
+      "engineering_max": 20.0,
+      "valid_min": 0.0,
+      "valid_max": 20.0,
+      "safe_min": 0.0,
+      "safe_max": 15.0,
+      "calibration_id": "CAL-F-001",
+      "required": true
+    }
+  ]
+}
