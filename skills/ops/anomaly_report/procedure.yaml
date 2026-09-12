@@ -1,0 +1,30 @@
+id: anomaly_report
+version: 1
+title: Capture a post-trip anomaly report
+domain: ops
+tags: [ops, trip, report]
+summary: >
+  Confirms the output is still safe after a trip and records a mark so the flight-recorder
+  dump and the run evidence sit together. The agent's narrative is attached afterwards.
+applies_to:
+  concepts: [emergency_stop]
+requires_output: false
+record: true
+timeout_s: 120
+preconditions:
+  - { state: trip_latched, eq: true }
+  - { state: output_high, eq: false }
+steps:
+  - id: still_safe
+    type: expect
+    predicate: { all: [{ state: output_high, eq: false }, { state: trip_latched, eq: true }] }
+    hold_ms: 200
+  - id: mark
+    type: wait
+    duration_ms: 200
+evaluate:
+  - { event_not_observed: permit_accepted }
+  - { step_passed: still_safe }
+recovery: >
+  Leave the trip latched. Inspect the flight-recorder dump and the last procedure run
+  before anyone requests a reset.

@@ -74,8 +74,9 @@ def test_library_loads_the_shipped_procedures() -> None:
         "relay_truth_table",
         "adc_validation",
         "safe_powerdown",
+        "anomaly_report",
     } <= set(ids)
-    assert library.skipped == []
+    assert [row["path"] for row in library.skipped] == []
     summary = library.get("pressure_guardrail").summary()  # type: ignore[union-attr]
     assert summary["operator_steps"] == 0 and summary["requires_output"] is True
     assert len(summary["procedure_hash"]) == 64

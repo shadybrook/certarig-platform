@@ -287,8 +287,33 @@ class LiveBenchRuntime:
             self._history.append(point)
             self._latest = state
             self._write_record(state)
+            event = str(state["guardrail"].get("event") or "")
+            if event.endswith("_forced_safe") or event in {"sensor_runtime_error_forced_safe"}:
+                self.dump_flight(event)
             self._sample_index += 1
             return {**state, "history": list(self._history)}
+
+    def dump_flight(self, reason: str) -> Path:
+        """Write the ring buffer (last ~30 s at the wave-1 100 ms interval) for a trip/abort."""
+        folder = self.evidence_dir / "flight"
+        folder.mkdir(parents=True, exist_ok=True)
+        stamp = utc_now().replace(":", "").replace("-", "")
+        path = folder / f"{stamp}_{reason}.json"
+        path.write_text(
+            json.dumps(
+                {
+                    "kind": "certarig_flight_recorder",
+                    "reason": reason,
+                    "dumped_at": utc_now(),
+                    "rig_id": self.config.rig_id,
+                    "config_hash": self.config.config_hash,
+                    "samples": list(self._history),
+                },
+                indent=2,
+            ),
+            encoding="utf-8",
+        )
+        return path
 
     def state(self) -> dict[str, Any]:
         with self._lock:

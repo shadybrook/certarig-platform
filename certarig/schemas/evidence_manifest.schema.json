@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://certarig.dev/schemas/evidence_manifest.schema.json",
+  "title": "CertaRig procedure-run evidence manifest",
+  "type": "object",
+  "required": [
+    "kind",
+    "certarig_version",
+    "rig_id",
+    "hardware_mode",
+    "config_hash",
+    "manifest_hash",
+    "contract_hash",
+    "procedure_id",
+    "procedure_hash",
+    "run_id",
+    "status",
+    "files"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "kind": { "const": "certarig_run_bundle" },
+    "certarig_version": { "type": "string" },
+    "rig_id": { "type": "string" },
+    "hardware_mode": { "type": "string" },
+    "config_hash": { "type": "string" },
+    "manifest_hash": { "type": "string" },
+    "contract_hash": { "type": "string" },
+    "procedure_id": { "type": "string" },
+    "procedure_hash": { "type": "string" },
+    "run_id": { "type": "string" },
+    "status": { "type": "string" },
+    "seed": { "type": ["integer", "null"] },
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "sha256"],
+        "properties": {
+          "path": { "type": "string" },
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "size": { "type": "integer" }
+        }
+      }
+    }
+  }
+}

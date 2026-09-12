@@ -1,0 +1,10 @@
+name: anomaly report after boot latch
+seed: 11
+procedure: anomaly_report
+duration_s: 30
+events: []
+expect:
+  outcome: passed
+  kernel_events_exclude: [permit_accepted]
+  final_output_high: false
+  invariants: [output_off_when_estop, output_off_when_process_unsafe, ends_safe]

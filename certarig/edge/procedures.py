@@ -24,6 +24,11 @@ class ProcedureService:
             node.config,
             node.runtime.evidence_dir,
             contract_hash=lambda: node.contract_hash,
+            bundle_context=lambda: {
+                "manifest_hash": node.manifest.manifest_hash,
+                "manifest_id": node.manifest.manifest_id,
+            },
+            on_finish=self._record_twin_pass,
         )
 
     def load_library(self, root: str | Path) -> list[str]:
@@ -93,11 +98,31 @@ class ProcedureService:
             raise HttpError(404, "draft not found") from exc
         return 200, {"status": "rejected"}
 
+    def _record_twin_pass(self, run: Any) -> None:
+        from .runtime.model import RunStatus
+        from .twin_gate import record_sim_pass
+
+        if run.status is not RunStatus.PASSED:
+            return
+        if self.node.config.hardware.mode != "simulator":
+            return
+        record_sim_pass(self.node.runtime.evidence_dir, run.procedure_id, run.procedure_hash, run.run_id)
+
     def start_run(self, ctx: RequestContext) -> tuple[int, dict[str, Any]]:
         procedure_id = str(ctx.body.get("procedure_id", ""))
         procedure = self.library.get(procedure_id)
         if procedure is None:
             raise HttpError(404, f"procedure {procedure_id!r} not found or not approved")
+        from certarig.edge.hardware.raspberry_pi import RaspberryPiHardware
+
+        from .twin_gate import check_gate
+
+        # The gate is about the physical adapter, not the config document. Tests inject a
+        # ControllableRig under rig.wave1.json (mode raspberry_pi) and must not be blocked.
+        mode = "raspberry_pi" if isinstance(self.node.runtime.hardware, RaspberryPiHardware) else "mock"
+        refusal = check_gate(self.node.runtime.evidence_dir, procedure.procedure_hash, mode)
+        if refusal is not None:
+            raise HttpError(409, refusal)
         label = str(ctx.body.get("label") or procedure_id)
         try:
             run = self.runner.start(procedure, label, ctx.principal_name)

@@ -57,6 +57,7 @@ class ProcedureRunner:
         contract_hash: Callable[[], str],
         poll_s: float | None = None,
         on_finish: Callable[[ProcedureRun], None] | None = None,
+        bundle_context: Callable[[], dict[str, Any]] | None = None,
     ) -> None:
         self.runtime = runtime
         self.config = config
@@ -64,6 +65,7 @@ class ProcedureRunner:
         self._contract_hash = contract_hash
         self.poll_s = poll_s if poll_s is not None else max(0.01, config.sample_interval_ms / 2000.0)
         self.on_finish = on_finish
+        self.bundle_context = bundle_context or (lambda: {})
         self._lock = threading.RLock()
         self._runs: dict[str, ProcedureRun] = {}
         self._procedures: dict[str, Procedure] = {}
@@ -494,3 +496,20 @@ class ProcedureRunner:
             document["status"] = status.value
             document["terminal"] = status.terminal
         (target / "run.json").write_text(json.dumps(document, indent=2, sort_keys=True), encoding="utf-8")
+        if status is not None and status.terminal:
+            from certarig.edge.bundle import write_run_bundle
+
+            seed = getattr(getattr(self.runtime.hardware, "settings", None), "seed", None)
+            write_run_bundle(
+                target,
+                document,
+                {
+                    "title": procedure.title if procedure is not None else run.procedure_id,
+                    "seed": seed,
+                    "contract_hash": self._contract_hash(),
+                    "rig_id": self.config.rig_id,
+                    "hardware_mode": self.config.hardware.mode,
+                    "config_hash": self.config.config_hash,
+                    **self.bundle_context(),
+                },
+            )
