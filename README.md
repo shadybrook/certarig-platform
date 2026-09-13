@@ -14,6 +14,17 @@ Studio (browser)  ──►  Edge node  ──►  ProcessGuardrail  ──►  
 
 The Phase 3 PoC that this was imported from is frozen. This repo is the platform.
 
+## Gate 0–5 evidence review and visual explainer
+
+The 12 September dry-bench progression is analysed as six gates, numbered Gate 0 through Gate 5. The review distinguishes measured evidence from interpretation and documents the product direction that follows from the lab.
+
+- [Evidence and product-direction report](deliverables/CertaRig_Gates_0_to_5_Evidence_and_Product_Direction.pdf) ([editable DOCX](deliverables/CertaRig_Gates_0_to_5_Evidence_and_Product_Direction.docx))
+- [Visual explainer video script](deliverables/CertaRig_Visual_Explainer_Video_Script.pdf) ([editable DOCX](deliverables/CertaRig_Visual_Explainer_Video_Script.docx))
+- [Source analysis](docs/explainer/2026-09-13-gates-0-to-5-analysis.md) and [script source](docs/explainer/2026-09-13-video-script.md)
+- [Derived hardware-run summary](docs/explainer/data/hardware_run_summary.csv), [evidence verification record](docs/explainer/data/evidence_verification.json), and [visual assets](docs/explainer/assets/)
+
+Rebuild the derived data, plots, and editable documents with the scripts in `tools/`. The hardware exports preserve run metadata, checks, events, peaks, sample counts, and recording hashes, but do not contain the referenced raw physical CSV recordings. Accordingly, the report does not reconstruct or invent physical waveforms.
+
 ## Clone to a simulated run (under ten minutes)
 
 You need Python 3.11+ (3.13 is fine) and Make. Node 20 is only required for Studio end-to-end tests.

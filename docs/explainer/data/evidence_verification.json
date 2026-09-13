@@ -1,0 +1,54 @@
+{
+  "verified_at_build": true,
+  "exports": [
+    {
+      "run_id": "run_20260912T162352_6515a9",
+      "archive": "evidence/lab-pulled/20260912T162432569490Z_run_20260912T162352_6515a9.zip",
+      "archive_sha256": "b73426a1eb01eeb29a58c34d3fbbdbc51321660b7a804361650f440afd8346df",
+      "files_verified": 7,
+      "manifest_hash": "a2338aa9c3b0ae78ee29426fbfbd79bbb68e91750f815624dc140d912f98ada5"
+    },
+    {
+      "run_id": "run_20260912T164217_0362c1",
+      "archive": "evidence/lab-pulled/20260912T164450258901Z_run_20260912T164217_0362c1.zip",
+      "archive_sha256": "a1b791bcf8cea13b772c42f7737c8b72e82c6f38179647a0e63e265244da9382",
+      "files_verified": 7,
+      "manifest_hash": "a2338aa9c3b0ae78ee29426fbfbd79bbb68e91750f815624dc140d912f98ada5"
+    },
+    {
+      "run_id": "run_20260912T164757_036efd",
+      "archive": "evidence/lab-pulled/20260912T164810167668Z_run_20260912T164757_036efd.zip",
+      "archive_sha256": "cd6788810db34aa892eadbaed4f499e80033ae0d3018b85662c9295259b20c69",
+      "files_verified": 7,
+      "manifest_hash": "a2338aa9c3b0ae78ee29426fbfbd79bbb68e91750f815624dc140d912f98ada5"
+    },
+    {
+      "run_id": "run_20260912T164815_fac7e1",
+      "archive": "evidence/lab-pulled/20260912T164908867002Z_run_20260912T164815_fac7e1.zip",
+      "archive_sha256": "c059b8d62b3ca1d776a08e5844fe2765bbbf3f660b5fb1ac7e6381557a120d5c",
+      "files_verified": 7,
+      "manifest_hash": "a2338aa9c3b0ae78ee29426fbfbd79bbb68e91750f815624dc140d912f98ada5"
+    },
+    {
+      "run_id": "run_20260912T164909_fa83c5",
+      "archive": "evidence/lab-pulled/20260912T165027347332Z_run_20260912T164909_fa83c5.zip",
+      "archive_sha256": "89fe95050d66029a0d0d4f2f760455c5cbde4af350d70213b79ef6ca22287e03",
+      "files_verified": 7,
+      "manifest_hash": "a2338aa9c3b0ae78ee29426fbfbd79bbb68e91750f815624dc140d912f98ada5"
+    },
+    {
+      "run_id": "run_20260912T165027_1abed2",
+      "archive": "evidence/lab-pulled/20260912T165154313995Z_run_20260912T165027_1abed2.zip",
+      "archive_sha256": "908f2ad825b621425b8c8661acf3492ebc86e983ff96d26b3b74ec18f94cae54",
+      "files_verified": 7,
+      "manifest_hash": "a2338aa9c3b0ae78ee29426fbfbd79bbb68e91750f815624dc140d912f98ada5"
+    },
+    {
+      "run_id": "run_20260912T165154_255355",
+      "archive": "evidence/lab-pulled/20260912T165231694041Z_run_20260912T165154_255355.zip",
+      "archive_sha256": "a9d9f3c24de999323c20508016822f3fd76cec8eaf89cc13c88ecc968d89098f",
+      "files_verified": 7,
+      "manifest_hash": "a2338aa9c3b0ae78ee29426fbfbd79bbb68e91750f815624dc140d912f98ada5"
+    }
+  ]
+}
