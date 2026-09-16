@@ -6,7 +6,14 @@ Veritasium question + 3Blue1Brown diagrams for the 20 September Phase 3 submissi
 **Target duration:** 11:40 to 12:20
 **Final line:** The AI can ask. Only the kernel can say yes.
 
-**Start here:** [PRODUCTION.md](PRODUCTION.md) and [motion/LOOKBOOK.mp4](motion/LOOKBOOK.mp4)
+**Start here:** [PRODUCTION.md](PRODUCTION.md)
+
+Clicking `LOOKBOOK.mp4` in Cursor chat or the editor usually does **nothing** — Cursor does not play MP4s from a file citation. Open it on disk instead:
+
+- Finder: `docs/explainer/phase3-film/motion/LOOKBOOK.mp4` (QuickTime)
+- Or watch the GIF: [motion/LOOKBOOK_preview.gif](motion/LOOKBOOK_preview.gif)
+
+If that folder is missing, you are not on branch `cursor/phase3-submission-video-533a`. Fetch/checkout that branch in the **certarig-platform** repo (GitHub: shadybrook/certarig-platform), not only the frozen Phase 3 PoC.
 
 This pack is the Phase 3 *submission* film. Edit spoken lines in [SCRIPT_EDIT_ME.md](SCRIPT_EDIT_ME.md). Motion graphics are in [motion/](motion/). Visual grammar is Veritasium question + 3Blue1Brown diagrams. The 13 September lab explainer remains at [`../2026-09-13-video-script.md`](../2026-09-13-video-script.md).
 
