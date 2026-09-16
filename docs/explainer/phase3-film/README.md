@@ -1,6 +1,6 @@
 # Phase 3 submission film pack
 
-Veritasium question + 3Blue1Brown diagrams for the 20 September Phase 3 submission.
+A quiet studio film for the 20 September Phase 3 submission. Objects first. Motion that explains. Type last.
 
 **Working title:** What is CertaRig?
 **Target duration:** 11:40 to 12:20
@@ -11,11 +11,12 @@ Veritasium question + 3Blue1Brown diagrams for the 20 September Phase 3 submissi
 Clicking `LOOKBOOK.mp4` in Cursor chat or the editor usually does **nothing** — Cursor does not play MP4s from a file citation. Open it on disk instead:
 
 - Finder: `docs/explainer/phase3-film/motion/LOOKBOOK.mp4` (QuickTime)
-- Or watch the GIF: [motion/LOOKBOOK_preview.gif](motion/LOOKBOOK_preview.gif)
+- Or watch the GIF of the pressure test: [motion/LOOKBOOK_preview.gif](motion/LOOKBOOK_preview.gif)
+- Or open stills in [motion/proof/](motion/proof/)
 
 If that folder is missing, you are not on branch `cursor/phase3-submission-video-533a`. Fetch/checkout that branch in the **certarig-platform** repo (GitHub: shadybrook/certarig-platform), not only the frozen Phase 3 PoC.
 
-This pack is the Phase 3 *submission* film. Edit spoken lines in [SCRIPT_EDIT_ME.md](SCRIPT_EDIT_ME.md). Motion graphics are in [motion/](motion/). Visual grammar is Veritasium question + 3Blue1Brown diagrams. The 13 September lab explainer remains at [`../2026-09-13-video-script.md`](../2026-09-13-video-script.md).
+This pack is the Phase 3 *submission* film. Edit spoken lines in [SCRIPT_EDIT_ME.md](SCRIPT_EDIT_ME.md). Motion is in [motion/](motion/). Visual grammar is one studio, photographic plates, and demonstrations (a trace that trips, a pin that stays down) rather than animated slides. The 13 September lab explainer remains at [`../2026-09-13-video-script.md`](../2026-09-13-video-script.md).
 
 ## What is in this folder
 
@@ -23,7 +24,7 @@ This pack is the Phase 3 *submission* film. Edit spoken lines in [SCRIPT_EDIT_ME
 | --- | --- |
 | [PRODUCTION.md](PRODUCTION.md) | **Do this.** Watch, read, record, patch |
 | [preview.html](preview.html) | Click-through of every motion clip |
-| [motion/LOOKBOOK.mp4](motion/LOOKBOOK.mp4) | 96-second visual of the finished film |
+| [motion/LOOKBOOK.mp4](motion/LOOKBOOK.mp4) | ~122-second studio film of the finished language |
 | [SCRIPT_EDIT_ME.md](SCRIPT_EDIT_ME.md) | Spoken lines you can rewrite |
 | [voiceover.md](voiceover.md) | Clean read-aloud |
 | [ANIMATION.md](ANIMATION.md) | Clip list and rebuild command |
@@ -31,6 +32,7 @@ This pack is the Phase 3 *submission* film. Edit spoken lines in [SCRIPT_EDIT_ME
 | [captions.srt](captions.srt) / [captions.md](captions.md) | Burned-in captions |
 | [capture-and-edit.md](capture-and-edit.md) | Demo capture, assembly order, stock search |
 | [stills/](stills/) | 16:9 diagrams and illustrations |
+| [plates/](plates/) | Photographic studio world for the film |
 
 Spoken track is about 1,500 words. Demo holds bring the cut to 11:40–12:20.
 

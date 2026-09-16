@@ -8,10 +8,10 @@ How to edit:
 3. Do not change the **Keep these facts** numbers (4.2 bar, 15 L/min, 12 Sep peaks, Fake on the bench).
 4. Tell me what you changed if you want stills and captions regenerated.
 
-Visual grammar (Veritasium + 3Blue1Brown):
+Visual grammar (atelier, not slides):
 - Watch [motion/LOOKBOOK.mp4](motion/LOOKBOOK.mp4) before editing.
-- One idea on screen at a time.
-- A question, then a demonstration, then what it means.
+- Admire the object. Type is late and small.
+- If a beat can be labeled or demonstrated, demonstrate it.
 - Motion clips in `motion/` are the picture. You record only the two live gaps.
 
 Capstone (this is the product, not a hydraulic plant):
