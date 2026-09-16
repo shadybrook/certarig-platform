@@ -9,7 +9,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = ROOT / "docs" / "explainer" / "phase3-film" / "script.md"
+SOURCE = ROOT / "docs" / "explainer" / "phase3-film" / "SCRIPT_EDIT_ME.md"
 OUT = ROOT / "deliverables" / "CertaRig_Phase3_Submission_Film_Script.docx"
 
 

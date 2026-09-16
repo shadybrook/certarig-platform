@@ -19,7 +19,7 @@ The Phase 3 PoC that this was imported from is frozen. This repo is the platform
 The 12 September dry-bench progression is analysed as six gates, numbered Gate 0 through Gate 5. The review distinguishes measured evidence from interpretation and documents the product direction that follows from the lab.
 
 - [Evidence and product-direction report](deliverables/CertaRig_Gates_0_to_5_Evidence_and_Product_Direction.pdf) ([editable DOCX](deliverables/CertaRig_Gates_0_to_5_Evidence_and_Product_Direction.docx))
-- [Phase 3 submission film pack](docs/explainer/phase3-film/README.md) (timed script, stills, captions, capture/edit checklist)
+- [Phase 3 submission film pack](docs/explainer/phase3-film/README.md) — edit [SCRIPT_EDIT_ME.md](docs/explainer/phase3-film/SCRIPT_EDIT_ME.md)
 - [Phase 3 submission film script](deliverables/CertaRig_Phase3_Submission_Film_Script.docx)
 - [Visual explainer video script](deliverables/CertaRig_Visual_Explainer_Video_Script.pdf) ([editable DOCX](deliverables/CertaRig_Visual_Explainer_Video_Script.docx))
 - [Source analysis](docs/explainer/2026-09-13-gates-0-to-5-analysis.md) and [lab explainer script source](docs/explainer/2026-09-13-video-script.md)

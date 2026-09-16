@@ -137,36 +137,32 @@ Checksummed evidence is the output
 of the procedure.
 
 29
-00:11:00,000 --> 00:11:08,000
-Mission 1
-Commissioning interview
+00:11:00,000 --> 00:11:12,000
+Capstone: deploy the agent
+on someone else's rig
 
 30
-00:11:08,000 --> 00:11:16,000
-Mission 2
-Second simulated plant
+00:11:12,000 --> 00:11:28,000
+Interview: modules, bus, pins,
+trips, observe-only
 
 31
-00:11:16,000 --> 00:11:24,000
-Mission 3
-Relay contact feedback
+00:11:28,000 --> 00:11:40,000
+Agent proposes a map.
+A human still applies it.
 
 32
-00:11:24,000 --> 00:11:32,000
-Mission 4
-Live bus, then hydraulic capstone
+00:11:40,000 --> 00:11:50,000
+Twin, then arm.
+The interview is not built yet.
 
 33
-00:11:32,000 --> 00:11:40,000
-Four missions.
-Kernel keeps authority.
-
-34
-00:11:40,000 --> 00:11:55,000
+00:11:50,000 --> 00:12:05,000
 The AI never had to own
 the dangerous decision.
 
-35
-00:11:55,000 --> 00:12:10,000
+34
+00:12:05,000 --> 00:12:20,000
 Phase 3 is complete.
-The AI can ask. Only the kernel can say yes.
+Put this on any mapped bench.
+

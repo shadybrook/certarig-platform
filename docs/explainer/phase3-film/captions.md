@@ -32,10 +32,9 @@ Import [`captions.srt`](captions.srt) into CapCut. Style: white Inter, lower cen
 | 9:45–10:15 | 15 L/min · independent trip. Same output |
 | 10:15–10:35 | Shutdown needs a human. Kernel forces safe first. |
 | 10:35–11:00 | Checksummed evidence is the output of the procedure. |
-| 11:00–11:08 | Mission 1. Commissioning interview |
-| 11:08–11:16 | Mission 2. Second simulated plant |
-| 11:16–11:24 | Mission 3. Relay contact feedback |
-| 11:24–11:32 | Mission 4. Live bus, then hydraulic capstone |
-| 11:32–11:40 | Four missions. Kernel keeps authority. |
-| 11:40–11:55 | The AI never had to own the dangerous decision. |
-| 11:55–12:10 | Phase 3 is complete. The AI can ask. Only the kernel can say yes. |
+| 11:00–11:12 | Capstone: deploy the agent on someone else's rig |
+| 11:12–11:28 | Interview: modules, bus, pins, trips, observe-only |
+| 11:28–11:40 | Agent proposes a map. A human still applies it. |
+| 11:40–11:50 | Twin, then arm. The interview is not built yet. |
+| 11:50–12:05 | The AI never had to own the dangerous decision. |
+| 12:05–12:20 | Phase 3 is complete. Put this on any mapped bench. |

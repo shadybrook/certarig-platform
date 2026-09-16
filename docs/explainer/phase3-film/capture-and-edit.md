@@ -100,5 +100,5 @@ Illustrated stills already cover the Curastra-style cartoon beats. Stock is cuta
 - Runtime is at most 12 minutes.
 - Both demos are in the cut, or the Phase 3 clip is explicitly replaced by a labelled screenshot.
 - Grok 4.6, Fake, Claude, and OpenAI are each named once.
-- Capstone missions are summarised.
+- Capstone is deploy-on-any-rig plus the commissioning interview, not a hydraulic plant.
 - Final card is `The AI can ask. Only the kernel can say yes.`

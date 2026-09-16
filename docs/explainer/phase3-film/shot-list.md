@@ -33,17 +33,16 @@ Clip names assume files in a folder called `CertaRig_P3_film_raw/`. Rename to ma
 | 09:45 | 10:15 | 30s | `studio_flow_trip.mp4` | VO 15 L/min | 15 L/min · independent trip · same output |
 | 10:15 | 10:35 | 20s | `studio_shutdown_approval.mp4` | VO shutdown | Shutdown needs a human |
 | 10:35 | 11:00 | 25s | `studio_evidence.mp4` | VO evidence / do not mix claims | Checksummed evidence is the output |
-| 11:00 | 11:08 | 8s | `stills/09_mission_1.png` | VO mission one | Commissioning interview |
-| 11:08 | 11:16 | 8s | `stills/10_mission_2.png` | VO mission two | Second simulated plant |
-| 11:16 | 11:24 | 8s | `stills/11_mission_3.png` | VO mission three | Relay contact feedback |
-| 11:24 | 11:32 | 8s | `stills/12_mission_4.png` | VO mission four | Live bus, then hydraulic capstone |
-| 11:32 | 11:40 | 8s | `stills/13_missions_summary.png` | VO last sentence of missions | Four missions. Kernel keeps authority. |
-| 11:40 | 12:10 | 30s | `stills/14_close.png` | VO close | The AI can ask. Only the kernel can say yes. |
+| 11:00 | 11:12 | 12s | `stills/09_any_rig.png` | VO capstone open | Deploy on someone else's rig |
+| 11:12 | 11:28 | 16s | `stills/10_interview.png` | VO interview questions | Modules, bus, pins, trips, observe-only |
+| 11:28 | 11:40 | 12s | `stills/11_map_locked.png` | VO proposed map | Agent proposes. Human applies. |
+| 11:40 | 11:50 | 10s | `stills/13_capstone_loop.png` | VO twin then arm | Twin, then arm. Interview not built yet. |
+| 11:50 | 12:20 | 30s | `stills/14_close.png` | VO close | The AI can ask. Only the kernel can say yes. |
 
 ## Assembly notes
 
-1. Put captions on a dedicated track. Curastra uses a dark rounded pill, white sans-serif, lower centre.
-2. Crossfade stills 8 to 12 frames. Hard-cut into screen recordings so the UI does not ghost.
+1. Put captions on a dedicated track. White sans-serif, charcoal rounded pill, lower centre.
+2. Ken-Burns stills (one idea per cut). Hard-cut into screen recordings so the UI does not ghost.
 3. If a demo take overruns, extend the shot and let VO breathe. Do not speed the operator up.
 4. If the Pi is off, the Studio block is still valid. Keep the `simulator` overlay on for the whole block.
 5. If you already have Gate 4 hardware footage, you may insert 8 seconds under the peaks figure. Label it `12 Sep hardware · Raspberry Pi`.

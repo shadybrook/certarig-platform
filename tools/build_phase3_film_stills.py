@@ -232,47 +232,136 @@ def output_equation() -> None:
     save(image, "08_output_equation.png")
 
 
-def mission_card(number: str, filename: str, title: str, body: str, accent: str, wash: str) -> None:
+def interview_card() -> None:
     image, draw = canvas()
-    rounded(draw, (80, 80, 280, 160), wash, 18)
-    draw.text((110, 98), f"MISSION {number}", font=font(22, "bold"), fill=accent)
-    draw.text((80, 220), title, font=font(56, "bold"), fill=INK)
-    y = 360
-    for line in wrap(draw, body, font(32), W - 200):
-        draw.text((80, y), line, font=font(32), fill=MUTED)
-        y += 48
-    draw.text((80, 920), "Capstone. Kernel authority does not move.", font=font(22), fill=MUTED)
-    save(image, filename)
-
-
-def missions_summary() -> None:
-    image, draw = canvas()
-    draw.text((80, 70), "Four capstone missions", font=font(48, "bold"), fill=INK)
-    draw.text((80, 140), "Phase 3 is complete. Authority stays with the kernel.", font=font(24), fill=MUTED)
-    draw.line((80, 200, W - 80, 200), fill=GRID, width=2)
-    items = [
-        ("1", "Commissioning interview", "Agent asks. Human applies the map."),
-        ("2", "Second simulated plant", "Thermal process before another physical output."),
-        ("3", "Relay contact feedback", "Measure the electrical response, not only GPIO."),
-        ("4", "Live bus, then hydraulic", "Plant proof, then containment, pumps, water, mains."),
+    draw.text((80, 64), "A short commissioning interview", font=font(46, "bold"), fill=INK)
+    draw.text(
+        (80, 132),
+        "The agent asks. It does not energize. Design for capstone — not built yet.",
+        font=font(22),
+        fill=MUTED,
+    )
+    draw.line((80, 190, W - 80, 190), fill=GRID, width=2)
+    questions = [
+        ("1", "What modules are here?", "Pots, ADC, E-stop, relay, PLC, other"),
+        ("2", "Which bus?", "GPIO/ADC, MQTT, Modbus, OPC UA, S7, EtherNet/IP, CAN"),
+        ("3", "Which pin, register, or tag?", "Pressure, flow, temperature — mapped, not guessed"),
+        ("4", "What are the trip numbers?", "Units and limits the kernel will compare"),
+        ("5", "What must stay observe-only?", "A browse is never a write"),
     ]
-    y = 250
-    for num, title, body in items:
-        rounded(draw, (80, y, W - 80, y + 160), WHITE, 22)
-        draw.rounded_rectangle((80, y, W - 80, y + 160), radius=22, outline=GRID, width=2)
-        draw.ellipse((120, y + 48, 184, y + 112), fill=GREEN_LIGHT)
+    y = 230
+    for num, title, body in questions:
+        rounded(draw, (80, y, W - 80, y + 130), WHITE, 20)
+        draw.rounded_rectangle((80, y, W - 80, y + 130), radius=20, outline=GRID, width=2)
+        draw.ellipse((120, y + 36, 184, y + 100), fill=BLUE_LIGHT)
         nw = draw.textlength(num, font=font(28, "bold"))
-        draw.text((152 - nw / 2, y + 62), num, font=font(28, "bold"), fill=GREEN)
-        draw.text((220, y + 40), title, font=font(32, "bold"), fill=INK)
-        draw.text((220, y + 92), body, font=font(24), fill=MUTED)
-        y += 180
-    save(image, "13_missions_summary.png")
+        draw.text((152 - nw / 2, y + 50), num, font=font(28, "bold"), fill=BLUE)
+        draw.text((220, y + 28), title, font=font(30, "bold"), fill=INK)
+        draw.text((220, y + 76), body, font=font(22), fill=MUTED)
+        y += 150
+    save(image, "10_interview.png")
+
+
+def map_locked() -> None:
+    image, draw = canvas()
+    draw.text((80, 70), "The map is a proposal, not permission.", font=font(44, "bold"), fill=INK)
+    draw.text((80, 140), "A diagram or a chat answer cannot reach GPIO23.", font=font(24), fill=MUTED)
+    draw.line((80, 200, W - 80, 200), fill=GRID, width=2)
+    steps = [
+        (BLUE_LIGHT, BLUE, "Agent", "Proposes rig.json from the interview"),
+        (GOLD_LIGHT, GOLD, "Human", "Reviews and applies the map"),
+        (GREEN_LIGHT, GREEN, "Twin", "Same procedure hash must pass in simulation"),
+        (RED_LIGHT, RED, "Arm", "Explicit actuation. Kernel still compares."),
+    ]
+    gap = 32
+    card_w = (W - 160 - gap * 3) // 4
+    for i, (bg, accent, title, body) in enumerate(steps):
+        x = 80 + i * (card_w + gap)
+        rounded(draw, (x, 280, x + card_w, 780), WHITE, 28)
+        draw.rounded_rectangle((x, 280, x + card_w, 780), radius=28, outline=GRID, width=2)
+        rounded(draw, (x + 36, 320, x + 200, 376), bg, 12)
+        draw.text((x + 52, 332), title.upper(), font=font(18, "bold"), fill=accent)
+        y = 430
+        for line in wrap(draw, body, font(26, "bold"), card_w - 72):
+            draw.text((x + 36, y), line, font=font(26, "bold"), fill=INK)
+            y += 40
+        if i < 3:
+            draw.polygon(
+                [(x + card_w + 4, 520), (x + card_w + gap - 4, 540), (x + card_w + 4, 560)],
+                fill=GRID,
+            )
+    note = "Never auto-energize from a guessed map."
+    nw = draw.textlength(note, font=font(24, "medium"))
+    draw.text(((W - nw) / 2, 880), note, font=font(24, "medium"), fill=RED)
+    save(image, "11_map_locked.png")
+
+
+def capstone_loop() -> None:
+    image, draw = canvas()
+    draw.text((80, 64), "Capstone is this loop, not a hydraulic plant.", font=font(42, "bold"), fill=INK)
+    draw.text(
+        (80, 128),
+        "Phase 3 proved the kernel on one mapped dry bench. Capstone puts the same system on their bench.",
+        font=font(22),
+        fill=MUTED,
+    )
+    draw.line((80, 190, W - 80, 190), fill=GRID, width=2)
+    items = [
+        ("Deploy", "Install CertaRig on their Pi, IPC, or laptop."),
+        ("Interview", "Modules, bus, pins or tags, trips, observe-only."),
+        ("Human apply", "Proposed rig.json does nothing until a person applies it."),
+        ("Twin, then arm", "Exact procedure hash in simulation, then explicit arm."),
+        ("Kernel", "Still the only thing allowed to say yes."),
+    ]
+    y = 230
+    for title, body in items:
+        rounded(draw, (80, y, W - 80, y + 130), WHITE, 20)
+        draw.rounded_rectangle((80, y, W - 80, y + 130), radius=20, outline=GRID, width=2)
+        draw.ellipse((118, y + 46, 150, y + 78), fill=GREEN)
+        draw.text((180, y + 24), title, font=font(28, "bold"), fill=INK)
+        draw.text((180, y + 72), body, font=font(22), fill=MUTED)
+        y += 148
+    save(image, "13_capstone_loop.png")
+
+
+def any_rig_card() -> None:
+    image, draw = canvas()
+    draw.text((80, 80), "The same agent, on their rig.", font=font(52, "bold"), fill=INK)
+    draw.text(
+        (80, 170),
+        "A Pi. An industrial PC. A laptop talking to their controller.",
+        font=font(26),
+        fill=MUTED,
+    )
+    hosts = [
+        ("Raspberry Pi", "GPIO + ADC dry bench, already proven"),
+        ("Industrial PC", "Sits next to the existing PLC / HMI"),
+        ("Laptop + bus", "MQTT, Modbus, OPC UA, S7, EIP, CAN"),
+    ]
+    gap = 36
+    card_w = (W - 160 - gap * 2) // 3
+    for i, (title, body) in enumerate(hosts):
+        x = 80 + i * (card_w + gap)
+        rounded(draw, (x, 300, x + card_w, 780), WHITE, 28)
+        draw.rounded_rectangle((x, 300, x + card_w, 780), radius=28, outline=GRID, width=2)
+        draw.ellipse((x + card_w / 2 - 36, 380, x + card_w / 2 + 36, 452), fill=GREEN_LIGHT)
+        draw.ellipse((x + card_w / 2 - 16, 400, x + card_w / 2 + 16, 432), fill=GREEN)
+        tf = font(30, "bold")
+        tw = draw.textlength(title, font=tf)
+        draw.text((x + (card_w - tw) / 2, 500), title, font=tf, fill=INK)
+        y = 580
+        for line in wrap(draw, body, font(22), card_w - 80):
+            lw = draw.textlength(line, font=font(22))
+            draw.text((x + (card_w - lw) / 2, y), line, font=font(22), fill=MUTED)
+            y += 34
+    draw.text((80, 900), "Not: an AI that discovers an unknown machine from a photograph and drives it.", font=font(22), fill=MUTED)
+    save(image, "09_any_rig.png")
 
 
 def close_card() -> None:
     image, draw = canvas()
     draw.rectangle((0, 0, W, H), fill=WHITE)
-    kicker = "Phase 3 is complete. The capstone project can move."
+    kicker = "Phase 3 is complete. Capstone: any mapped bench, short interview."
     kw = draw.textlength(kicker, font=font(24, "medium"))
     draw.text(((W - kw) / 2, 280), kicker, font=font(24, "medium"), fill=MUTED)
     line1 = "The AI can ask."
@@ -294,39 +383,10 @@ def main() -> None:
     ai_stack()
     ai_benchmark()
     output_equation()
-    mission_card(
-        "1",
-        "09_mission_1.png",
-        "Commissioning interview",
-        "The agent asks what modules and buses exist, which signal is pressure, which is flow, and what must stay observe-only. A human still applies the map.",
-        BLUE,
-        BLUE_LIGHT,
-    )
-    mission_card(
-        "2",
-        "10_mission_2.png",
-        "Second simulated plant",
-        "Prove the interview on a thermal process in the digital twin before touching another physical output.",
-        GREEN,
-        GREEN_LIGHT,
-    )
-    mission_card(
-        "3",
-        "11_mission_3.png",
-        "Relay contact feedback",
-        "Add isolated auxiliary contact or current sensing so we measure the electrical response, not only the GPIO command.",
-        GOLD,
-        GOLD_LIGHT,
-    )
-    mission_card(
-        "4",
-        "12_mission_4.png",
-        "Live bus, then hydraulic capstone",
-        "Take the same kernel to a live plant bus. Only then containment, pumps, water, and mains. Those are not proven today.",
-        RED,
-        RED_LIGHT,
-    )
-    missions_summary()
+    any_rig_card()
+    interview_card()
+    map_locked()
+    capstone_loop()
     close_card()
 
 

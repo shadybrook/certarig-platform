@@ -1,8 +1,8 @@
 # Voiceover — read this aloud
 
-Record in a quiet room, one pass if you can, or one file per heading. Aim for 140 words per minute. Pause one beat after every heading. When the demo section says “hold,” stop talking and let the screen work.
+Canonical editable copy: [SCRIPT_EDIT_ME.md](SCRIPT_EDIT_ME.md). If the two disagree, believe SCRIPT_EDIT_ME.
 
-Total spoken words: about 1,650. Target runtime with demo holds: 11:40 to 12:10.
+Record in a quiet room. Pause one beat after every heading. In the demo section, stop talking when you would be clicking.
 
 ---
 
@@ -10,7 +10,7 @@ Total spoken words: about 1,650. Target runtime with demo holds: 11:40 to 12:10.
 
 This is CertaRig. A test-operations platform where an AI can ask, and a deterministic kernel is the only thing allowed to say yes.
 
-## The problem
+## The question
 
 For most test benches, the work does not end when the sensors are wired. It actually begins there.
 
@@ -24,7 +24,7 @@ That is the wrong product.
 
 The useful question is not whether the AI is clever enough to operate the rig. The useful question is: who is allowed to say yes?
 
-## What CertaRig is
+## Split the jobs
 
 CertaRig splits those jobs.
 
@@ -38,7 +38,7 @@ Every run writes evidence: the procedure, the events, the checks, and a checksum
 
 The agent can ask. Only the kernel can say yes.
 
-## Who is the end customer
+## Who uses it
 
 Who is the end customer?
 
@@ -48,11 +48,11 @@ Today that customer is us, on a university dry bench. Two potentiometers pretend
 
 Tomorrow that customer is anyone with a mapped rig. A hydraulic cart. A battery pack on controller area network. A Siemens or Allen-Bradley cell. A Modbus skid.
 
-We are not claiming that an agent can look at a photograph of an unknown machine and take control. That is not proven, and it is not where the value is yet.
+We are not claiming that an agent can look at a photograph of an unknown machine and take control. That is not proven.
 
-The product is agent-guided commissioning and test operations for a mapped rig, with inspectable evidence.
+The product is an agentic system you deploy onto a mapped rig, with inspectable evidence.
 
-## Growing into industries
+## Same kernel, different buses
 
 The same kernel can sit on more than one bus.
 
@@ -60,7 +60,7 @@ If the plant already publishes MQTT topics, we observe those tags. If it is a re
 
 Every fieldbus example ships observe-only. A successful browse is not permission to write. A human still applies the map. Procedures that require an output still need a digital-twin pass, then an explicit arm.
 
-That is how this grows. Not by giving the model more authority, but by letting more industries plug the same safety kernel into the buses they already have.
+That is how this grows. Not by giving the model more authority, but by letting more benches plug the same safety kernel into the buses they already have.
 
 ## Why this AI
 
@@ -80,7 +80,7 @@ We do not benchmark these models on trivia. We benchmark them on this use case. 
 
 Live Anthropic and OpenAI adapters exist in the tree. They are not the proven bench path. The twelfth of September lab used Fake. We are not going to pretend otherwise.
 
-## How Phase 3 proved it
+## What Phase 3 proved
 
 We did not jump from code to an energized relay. We crossed six gates.
 
@@ -106,7 +106,7 @@ The output is on only when five things are true at once. Actuation enabled. A pe
 
 This is the frozen Phase 3 dashboard, on port eight zero eight zero. It is the course proof of concept. Live readings. The dry-bench map. Observe only.
 
-It is not the product we will take into capstone. It is the evidence that the low-voltage bench, the analog paths, the emergency stop, and the relay changeover already worked as a course submission.
+This is not the capstone product. It is the evidence that the low-voltage bench already worked.
 
 Watch the meters. Do not arm anything here.
 
@@ -138,17 +138,19 @@ Evidence. Every completed run is a folder. Procedure, events, result, report, ma
 
 What you are watching on the simulator is labelled as a simulation. What you saw on the twelfth of September hardware is labelled as Raspberry Pi. We do not mix those claims.
 
-## Capstone missions
+## Capstone
 
-Phase 3 ends with a mapped dry bench and a kernel that kept authority. Capstone is four missions.
+Phase 3 proved the kernel on one mapped dry bench. That is the foundation. It is not the capstone.
 
-One. A thin commissioning interview. The agent asks what modules and buses exist. A human still applies the map.
+The capstone is an agentic system you can deploy onto someone else’s test rig.
 
-Two. Prove that interview on a second simulated plant, a thermal process, before touching another physical output.
+They install it on their machine. A Pi. An industrial PC. A laptop talking to their controller.
 
-Three. Add isolated relay feedback or current sensing, so we measure the electrical response, not only the GPIO command.
+Then the agent runs a short commissioning interview. What modules are here? Which bus? GPIO and an analog converter, or MQTT, Modbus, OPC UA, Siemens S7, EtherNet/IP, CAN? Which pin, register, or tag is pressure? Which is flow? What are the trip numbers and units? What must stay observe-only?
 
-Four. Take the same kernel to a live plant bus, and only then to a hydraulic capstone. Containment, pumps, water, mains. Those are not proven today.
+The agent proposes a map. A human still has to apply it. The digital twin rehearses the exact procedure. Only then can anyone arm an output.
+
+We have not built that interview yet. Onboard today is a form, not discovery. Capstone is where the interview becomes the product, without ever giving the model the dangerous decision.
 
 ## Close
 
@@ -158,6 +160,6 @@ It is that the AI never had to own the dangerous decision.
 
 CertaRig let the agent ask, the operator approve, the kernel decide, and the evidence explain what happened afterward.
 
-Phase 3 is complete. The capstone project can move.
+Phase 3 is complete. The capstone is to put this on any mapped bench, starting with a short commissioning interview.
 
 The AI can ask. Only the kernel can say yes.

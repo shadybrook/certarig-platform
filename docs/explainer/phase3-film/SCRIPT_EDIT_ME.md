@@ -1,44 +1,39 @@
-# CertaRig Phase 3 submission script
+# EDIT THIS FILE
 
-**Edit the spoken lines in [SCRIPT_EDIT_ME.md](SCRIPT_EDIT_ME.md).** This file is the picture/timing companion. Visual grammar: Veritasium question + 3Blue1Brown one-idea diagrams, not a product ad.
+This is the voiceover you actually record. Change any line under **Say this**. Leave **Keep these facts** alone unless a number is wrong.
 
-**Working title:** What is CertaRig?
-**Presenter card:** Chintan Dedhia
-**Target duration:** 11:40 to 12:20
-**Spoken rate:** about 140 words per minute
-**Format:** Voiceover, diagrams that reveal one idea at a time, then a stitched product walkthrough. Optional face at open and close.
+How to edit:
+1. Open this file, or open `deliverables/CertaRig_Phase3_Submission_Film_Script.docx` in Word / Google Docs.
+2. Rewrite **Say this** in your own voice. Shorter is fine.
+3. Do not change the **Keep these facts** numbers (4.2 bar, 15 L/min, 12 Sep peaks, Fake on the bench).
+4. Tell me what you changed if you want stills and captions regenerated.
 
-## Production grammar
+Visual grammar (Veritasium + 3Blue1Brown, not a product ad):
+- One idea on screen at a time.
+- A question, then a demonstration, then what it means.
+- Diagrams, not talking-head lectures. A face at the open and close is optional.
+- Stills in `stills/` are the “animation.” Ken-Burns them. True motion graphics are not required.
 
-- White title cards. Flat illustrated scenes for the problem. One architecture diagram, revealed in pieces. Then the real UI.
-- Safety colours stay consistent: blue for observation, green for permitted, red for forced safe, gold for reset required.
-- Define every abbreviation on first use: analog to digital converter, emergency stop, hardware in the loop, general-purpose input/output.
-- Never call a simulated trace a hardware trace. Never call a GPIO command transition a measured relay response.
-- Never say Grok, Claude, or GPT tripped the relay.
-- On first use of a live clip, label the surface on screen: `Phase 3 dashboard · observe only` or `Studio · simulator` or `Studio · Raspberry Pi sidecar`.
-
-Word count of the spoken track is about 1,650 words, which is just under twelve minutes at 140 words per minute. Hold on demo screens when the operator is clicking; do not rush the 7:45 to 11:00 block.
+Capstone (this is the product, not a hydraulic plant):
+CertaRig deploys as an agentic test-operations layer on *someone else’s* rig. A short commissioning interview maps protocols, connections, pins, and components. A human still applies that map. The kernel still owns the output. That interview is designed, not built yet. Say so.
 
 ---
 
-## 0:00 to 0:20 — Title
+## 0:00–0:20  Title
+**Picture:** `stills/00_title.png`  
+**Optional:** 8 seconds of you on camera instead of the title card.
 
-**Picture:** `stills/00_title.png`. Hold three silent seconds, then Ken-Burns a slow push-in.
-
-**Narration:**
+**Say this:**
 
 This is CertaRig. A test-operations platform where an AI can ask, and a deterministic kernel is the only thing allowed to say yes.
 
-**On screen:** `What is CertaRig?`  
-**Lower third from 0:08:** `Presented by Chintan Dedhia`
-
 ---
 
-## 0:20 to 1:30 — The problem
+## 0:20–1:30  The question
+**Picture:** `stills/01_problem_operator.png`, then `stills/02_problem_relay.png`  
+**3B1B move:** language approaches a number line and stops.
 
-**Picture:** `stills/01_problem_operator.png` for the operator and clipboard. Cut stock B-roll of a test cell, a pressure gauge, and a PLC cabinet from the search list in [capture-and-edit.md](capture-and-edit.md). Return to `stills/02_problem_relay.png` on the last two sentences.
-
-**Narration:**
+**Say this:**
 
 For most test benches, the work does not end when the sensors are wired. It actually begins there.
 
@@ -52,15 +47,14 @@ That is the wrong product.
 
 The useful question is not whether the AI is clever enough to operate the rig. The useful question is: who is allowed to say yes?
 
-**On screen, last beat:** `Who is allowed to energize the output?`
+**Keep these facts:** 4.2 bar and 15 L/min are the dry-bench guardrails.
 
 ---
 
-## 1:30 to 2:20 — What CertaRig is
+## 1:30–2:20  Split the jobs
+**Picture:** `../assets/07_product_architecture.png` — reveal Operator, Agent, Kernel, Rig one block at a time.
 
-**Picture:** `../assets/07_product_architecture.png`. Reveal one block at a time: Operator and Studio, then Agent, then Kernel, then Rig.
-
-**Narration:**
+**Say this:**
 
 CertaRig splits those jobs.
 
@@ -74,15 +68,12 @@ Every run writes evidence: the procedure, the events, the checks, and a checksum
 
 The agent can ask. Only the kernel can say yes.
 
-**On screen:** `Agent interprets. Kernel decides. Evidence explains.`
-
 ---
 
-## 2:20 to 3:20 — Who is the end customer
+## 2:20–3:20  Who pays / who uses it
+**Picture:** `stills/03_customer.png`, then `stills/04_industries_hint.png`
 
-**Picture:** `stills/03_customer.png`, then a slow pan across `stills/04_industries_hint.png`.
-
-**Narration:**
+**Say this:**
 
 Who is the end customer?
 
@@ -92,19 +83,16 @@ Today that customer is us, on a university dry bench. Two potentiometers pretend
 
 Tomorrow that customer is anyone with a mapped rig. A hydraulic cart. A battery pack on controller area network. A Siemens or Allen-Bradley cell. A Modbus skid.
 
-We are not claiming that an agent can look at a photograph of an unknown machine and take control. That is not proven, and it is not where the value is yet.
+We are not claiming that an agent can look at a photograph of an unknown machine and take control. That is not proven.
 
-The product is agent-guided commissioning and test operations for a mapped rig, with inspectable evidence.
-
-**On screen:** `Mapped rigs. Not unknown machines.`
+The product is an agentic system you deploy onto a mapped rig, with inspectable evidence.
 
 ---
 
-## 3:20 to 4:20 — Growing into industries
+## 3:20–4:20  Same kernel, different buses
+**Picture:** `stills/05_protocol_strip.png` — pan across the row.
 
-**Picture:** `stills/05_protocol_strip.png`. Zoom along the row. Optional stock cutaways of a factory HMI, a motor-control cabinet, and an automotive bench.
-
-**Narration:**
+**Say this:**
 
 The same kernel can sit on more than one bus.
 
@@ -112,17 +100,14 @@ If the plant already publishes MQTT topics, we observe those tags. If it is a re
 
 Every fieldbus example ships observe-only. A successful browse is not permission to write. A human still applies the map. Procedures that require an output still need a digital-twin pass, then an explicit arm.
 
-That is how this grows. Not by giving the model more authority, but by letting more industries plug the same safety kernel into the buses they already have.
-
-**On screen:** `Same kernel. Different rig.json. Observe first.`
+That is how this grows. Not by giving the model more authority, but by letting more benches plug the same safety kernel into the buses they already have.
 
 ---
 
-## 4:20 to 5:40 — Why this AI, the benchmark, and the fallback
+## 4:20–5:40  Why this AI
+**Picture:** `stills/06_ai_stack.png`, then `stills/07_ai_benchmark.png`
 
-**Picture:** `stills/06_ai_stack.png`. Hold on each of the three columns as it is named. End on `stills/07_ai_benchmark.png`.
-
-**Narration:**
+**Say this:**
 
 Why this AI?
 
@@ -140,16 +125,14 @@ We do not benchmark these models on trivia. We benchmark them on this use case. 
 
 Live Anthropic and OpenAI adapters exist in the tree. They are not the proven bench path. The twelfth of September lab used Fake. We are not going to pretend otherwise.
 
-**On screen:** `Build-time: Grok 4.6. Runtime default: Fake. Live fallbacks: Claude, then OpenAI.`  
-**Second card:** `Benchmark: skill routing and tool discipline. Not chat quality.`
+**Keep these facts:** Fake ran the 12 Sep hardware. Live Claude/OpenAI are adapters, not the proven bench path.
 
 ---
 
-## 5:40 to 7:00 — How Phase 3 actually proved it
+## 5:40–7:00  What Phase 3 actually proved
+**Picture:** `../assets/01_gate_ladder.png`, then `../assets/02_hardware_peaks.png`, then `stills/08_output_equation.png` (reveal one term at a time).
 
-**Picture:** `../assets/01_gate_ladder.png`, then overhead bench B-roll if you have it, then `../assets/02_hardware_peaks.png`, then `stills/08_output_equation.png`. Optional insert: `../assets/05_kernel_event_timeline.png`.
-
-**Narration:**
+**Say this:**
 
 We did not jump from code to an energized relay. We crossed six gates.
 
@@ -171,16 +154,14 @@ Pressure crossed four point two bar and peaked at four point eight three. Flow c
 
 The output is on only when five things are true at once. Actuation enabled. A permit requested. No trip latched. The emergency stop closed. And the process healthy.
 
-**On screen:** `Observe, simulate, arm, run, restore.`  
-**Equation card:** `OUTPUT = enabled AND permit AND not tripped AND E-stop closed AND healthy`
+**Keep these facts:** 3,422 samples, 34/34 checks, 4.83 bar, 15.41 L/min, first ADC sweep failed and was kept.
 
 ---
 
-## 7:00 to 7:45 — Phase 3 dashboard, observe only
+## 7:00–7:45  Phase 3 dashboard (course PoC)
+**Picture:** your `P3_dashboard_8080.mp4`. Overlay: `Phase 3 dashboard · port 8080 · observe only`
 
-**Picture:** Screen recording of the frozen Phase 3 live dashboard on port 8080. Label the whole clip. Do not click arm. Optional cutaway of the physical bench sitting idle.
-
-**Narration:**
+**Say this:**
 
 This is the frozen Phase 3 dashboard, on port eight zero eight zero. It is the course proof of concept. Live readings. The dry-bench map. Observe only.
 
@@ -188,37 +169,20 @@ This is not the capstone product. It is the evidence that the low-voltage bench 
 
 Watch the meters. Do not arm anything here.
 
-**On screen, full clip:** `Phase 3 dashboard · port 8080 · observe only`
-
 ---
 
-## 7:45 to 11:00 — Stitch the product demo
+## 7:45–11:00  Studio demo (stitch your recording)
+**Picture:** your Studio clips. Overlay `Studio · simulator` or `Studio · Raspberry Pi sidecar :8081`. Hold on clicks. Do not talk over the trip.
 
-**Picture:** Screen recording of Studio against the simulator, or against the sidecar on port 8081 if the Pi is already up. Follow the capture checklist. Overlay the surface label for the first five seconds of each scene.
-
-Hold on the click. Do not talk over a trip crossing; let the graph and the kernel event speak, then resume.
-
-### 7:45 — Live
-
-**Narration:**
+**Say this:**
 
 Now the product. This is Studio, talking to the Edge node.
 
 Live shows both channels. Pressure in bar. Flow in litres per minute. Trip lines are drawn on the graph. The scorecard says whether the node is ready to arm.
 
-**On screen:** `Studio · Live` and either `simulator` or `Raspberry Pi sidecar :8081`
-
-### 8:15 — Onboard and Author, in passing
-
-**Narration:**
-
 Onboard is where a human reviews a proposed map. The agent may suggest. The human applies.
 
 Author is for procedures. We are not inventing a skill on a live output.
-
-### 8:35 — Procedures and Agent
-
-**Narration:**
 
 Procedures lists the approved pack. Relay truth table. Pressure guardrail. Flow guardrail. Dual input. Emergency stop.
 
@@ -226,51 +190,26 @@ Agent. This pill says Fake, because that is the proven path. Type what an operat
 
 The agent reads the skill, starts the named procedure, and waits. It does not watch the converter and decide that four point two has arrived.
 
-**On screen:** `Fake agent selects the skill. Kernel compares the number.`
-
-### 9:10 — Pressure trip
-
-**Narration:**
-
 Raise the pressure emulator. When the kernel sees the crossing, the commanded output goes safe and stays latched.
 
 Reset is not automatic. Reset is an approval. Without that human grant, a new permit is rejected.
 
-**On screen at the crossing:** `4.2 bar · kernel trip · output latched safe`
-
-### 9:45 — Flow trip
-
-**Narration:**
-
 Same pattern for fifteen litres per minute. Independent trip. Same output.
 
-**On screen:** `15 L/min · independent trip · same output`
-
-### 10:15 — Shutdown approval
-
-**Narration:**
-
 If I ask it to shut the bench down, that is also an approval. The kernel forces safe first.
-
-**On screen:** `Shutdown needs a human. Kernel forces safe first.`
-
-### 10:35 — Evidence
-
-**Narration:**
 
 Evidence. Every completed run is a folder. Procedure, events, result, report, manifest, checksums. That bundle is the product, not the screenshot.
 
 What you are watching on the simulator is labelled as a simulation. What you saw on the twelfth of September hardware is labelled as Raspberry Pi. We do not mix those claims.
 
-**On screen:** `Checksummed evidence is the output of the procedure.`
-
 ---
 
-## 11:00 to 11:50 — Capstone: any rig, short interview
-
+## 11:00–11:50  Capstone: any rig, short interview
 **Picture:** `stills/09_any_rig.png` → `stills/10_interview.png` → `stills/11_map_locked.png` → `stills/13_capstone_loop.png`
 
-**Narration:**
+This is the capstone. Not a hydraulic machine. Not “AI discovers an unknown plant from a photo and drives it.”
+
+**Say this:**
 
 Phase 3 proved the kernel on one mapped dry bench. That is the foundation. It is not the capstone.
 
@@ -284,15 +223,15 @@ The agent proposes a map. A human still has to apply it. The digital twin rehear
 
 We have not built that interview yet. Onboard today is a form, not discovery. Capstone is where the interview becomes the product, without ever giving the model the dangerous decision.
 
-**On screen:** `Deploy on their rig. Interview. Human applies. Twin. Then arm.`
+**Keep these facts:** interview is design, not proven. Twin-gate + human apply + explicit arm stay required.
 
 ---
 
-## 11:50 to 12:20 — Close
+## 11:50–12:20  Close
+**Picture:** `stills/14_close.png`  
+**Optional:** you on camera for the last two sentences.
 
-**Picture:** `stills/14_close.png`. Optional face for the last two sentences. Do not recreate an energized sequence solely for this edit.
-
-**Narration:**
+**Say this:**
 
 The most important Phase 3 result is not that an AI switched a relay.
 
@@ -303,5 +242,3 @@ CertaRig let the agent ask, the operator approve, the kernel decide, and the evi
 Phase 3 is complete. The capstone is to put this on any mapped bench, starting with a short commissioning interview.
 
 The AI can ask. Only the kernel can say yes.
-
-**Final card:** `The AI can ask. Only the kernel can say yes.`

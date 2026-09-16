@@ -1,25 +1,26 @@
 # Phase 3 submission film pack
 
-Curastra-grammar product film for the 20 September Phase 3 submission.
+Veritasium question + 3Blue1Brown diagrams for the 20 September Phase 3 submission.
 
 **Working title:** What is CertaRig?
-**Target duration:** 11:40 to 12:10
+**Target duration:** 11:40 to 12:20
 **Final line:** The AI can ask. Only the kernel can say yes.
 
-This pack is the Phase 3 *submission* film. The 13 September curiosity-led script remains at [`../2026-09-13-video-script.md`](../2026-09-13-video-script.md) as a lab explainer. Do not mix the two spines in one cut.
+This pack is the Phase 3 *submission* film. Edit spoken lines in [SCRIPT_EDIT_ME.md](SCRIPT_EDIT_ME.md) or the DOCX. Visual grammar is Veritasium question + 3Blue1Brown diagrams, not a product ad. The 13 September lab explainer remains at [`../2026-09-13-video-script.md`](../2026-09-13-video-script.md). Do not mix the two spines in one cut.
 
 ## What is in this folder
 
 | File | Use |
 | --- | --- |
-| [script.md](script.md) | Timed voiceover, picture, and on-screen text |
+| [SCRIPT_EDIT_ME.md](SCRIPT_EDIT_ME.md) | **Edit this.** Spoken lines, facts to keep, picture cues |
 | [voiceover.md](voiceover.md) | Clean read-aloud, no picture notes |
+| [ANIMATION.md](ANIMATION.md) | What I generate vs what you Ken-Burns |
 | [shot-list.md](shot-list.md) | CapCut in/out labels |
-| [captions.srt](captions.srt) / [captions.md](captions.md) | Burned-in captions, Curastra lower-third style |
+| [captions.srt](captions.srt) / [captions.md](captions.md) | Burned-in captions |
 | [capture-and-edit.md](capture-and-edit.md) | Demo capture, assembly order, stock search |
-| [stills/](stills/) | 16:9 title, problem, customer, AI, protocol, mission, and close cards |
+| [stills/](stills/) | 16:9 diagrams and illustrations |
 
-Spoken track is about 1,480 words (~10:35 at 140 wpm). Demo holds bring the cut to 11:40–12:10.
+Spoken track is about 1,500 words. Demo holds bring the cut to 11:40–12:20.
 
 ### Stills
 
@@ -34,8 +35,12 @@ Spoken track is about 1,480 words (~10:35 at 140 wpm). Demo holds bring the cut 
 | `stills/06_ai_stack.png` | Grok / Fake / Claude then OpenAI |
 | `stills/07_ai_benchmark.png` | Use-case benchmark, not trivia |
 | `stills/08_output_equation.png` | Five-term output invariant |
-| `stills/09_mission_1.png` … `12_mission_4.png` | Capstone missions |
-| `stills/13_missions_summary.png` | Four-mission recap |
+| `stills/09_any_rig.png` | Capstone: deploy on someone else's bench |
+| `stills/09_any_rig_illustration.png` | Optional cutaway of Pi / IPC / laptop |
+| `stills/10_interview.png` | Commissioning interview questions |
+| `stills/10_interview_illustration.png` | Optional cutaway of chat vs locked schematic |
+| `stills/11_map_locked.png` | Proposed map, locked until a human applies |
+| `stills/13_capstone_loop.png` | Interview → apply → twin → arm |
 | `stills/14_close.png` | Final card |
 
 Rebuild the typographic cards with `python3 tools/build_phase3_film_stills.py`. Rebuild the DOCX with `PYTHONPATH=tools python3 tools/build_phase3_film_docx.py`.
