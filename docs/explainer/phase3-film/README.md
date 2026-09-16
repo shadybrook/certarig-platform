@@ -6,15 +6,20 @@ Veritasium question + 3Blue1Brown diagrams for the 20 September Phase 3 submissi
 **Target duration:** 11:40 to 12:20
 **Final line:** The AI can ask. Only the kernel can say yes.
 
-This pack is the Phase 3 *submission* film. Edit spoken lines in [SCRIPT_EDIT_ME.md](SCRIPT_EDIT_ME.md) or the DOCX. Visual grammar is Veritasium question + 3Blue1Brown diagrams, not a product ad. The 13 September lab explainer remains at [`../2026-09-13-video-script.md`](../2026-09-13-video-script.md). Do not mix the two spines in one cut.
+**Start here:** [PRODUCTION.md](PRODUCTION.md) and [motion/LOOKBOOK.mp4](motion/LOOKBOOK.mp4)
+
+This pack is the Phase 3 *submission* film. Edit spoken lines in [SCRIPT_EDIT_ME.md](SCRIPT_EDIT_ME.md). Motion graphics are in [motion/](motion/). Visual grammar is Veritasium question + 3Blue1Brown diagrams. The 13 September lab explainer remains at [`../2026-09-13-video-script.md`](../2026-09-13-video-script.md).
 
 ## What is in this folder
 
 | File | Use |
 | --- | --- |
-| [SCRIPT_EDIT_ME.md](SCRIPT_EDIT_ME.md) | **Edit this.** Spoken lines, facts to keep, picture cues |
-| [voiceover.md](voiceover.md) | Clean read-aloud, no picture notes |
-| [ANIMATION.md](ANIMATION.md) | What I generate vs what you Ken-Burns |
+| [PRODUCTION.md](PRODUCTION.md) | **Do this.** Watch, read, record, patch |
+| [preview.html](preview.html) | Click-through of every motion clip |
+| [motion/LOOKBOOK.mp4](motion/LOOKBOOK.mp4) | 96-second visual of the finished film |
+| [SCRIPT_EDIT_ME.md](SCRIPT_EDIT_ME.md) | Spoken lines you can rewrite |
+| [voiceover.md](voiceover.md) | Clean read-aloud |
+| [ANIMATION.md](ANIMATION.md) | Clip list and rebuild command |
 | [shot-list.md](shot-list.md) | CapCut in/out labels |
 | [captions.srt](captions.srt) / [captions.md](captions.md) | Burned-in captions |
 | [capture-and-edit.md](capture-and-edit.md) | Demo capture, assembly order, stock search |

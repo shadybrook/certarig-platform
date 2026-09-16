@@ -8,11 +8,11 @@ How to edit:
 3. Do not change the **Keep these facts** numbers (4.2 bar, 15 L/min, 12 Sep peaks, Fake on the bench).
 4. Tell me what you changed if you want stills and captions regenerated.
 
-Visual grammar (Veritasium + 3Blue1Brown, not a product ad):
+Visual grammar (Veritasium + 3Blue1Brown):
+- Watch [motion/LOOKBOOK.mp4](motion/LOOKBOOK.mp4) before editing.
 - One idea on screen at a time.
 - A question, then a demonstration, then what it means.
-- Diagrams, not talking-head lectures. A face at the open and close is optional.
-- Stills in `stills/` are the “animation.” Ken-Burns them. True motion graphics are not required.
+- Motion clips in `motion/` are the picture. You record only the two live gaps.
 
 Capstone (this is the product, not a hydraulic plant):
 CertaRig deploys as an agentic test-operations layer on *someone else’s* rig. A short commissioning interview maps protocols, connections, pins, and components. A human still applies that map. The kernel still owns the output. That interview is designed, not built yet. Say so.

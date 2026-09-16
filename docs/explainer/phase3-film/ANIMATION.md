@@ -1,58 +1,39 @@
-# Animations, diagrams, and what I will make
+# Animations
 
-Short answer: I make the **diagrams and stills**. You Ken-Burns them in CapCut. That is the Veritasium / 3Blue1Brown look we can actually ship for this deadline. I am not handing you an After Effects project or a rendered 3Blue1Brown movie.
+Motion graphics now exist. Watch them before you change the script or record the bench.
 
-## What already exists
+- **Lookbook (96s, film order):** [motion/LOOKBOOK.mp4](motion/LOOKBOOK.mp4)
+- **Interactive preview:** [preview.html](preview.html)
+- **What you still record:** [PRODUCTION.md](PRODUCTION.md)
 
-| Kind | Where | Use |
-| --- | --- | --- |
-| Title / close cards | `stills/00_title.png`, `stills/14_close.png` | Hold 4–8s, slow push-in |
-| Problem illustrations | `stills/01_…` to `04_…` | B-roll under the question |
-| 3B1B-style diagrams | `stills/05_protocol_strip.png`, `06_ai_stack.png`, `07_ai_benchmark.png`, `08_output_equation.png` | Reveal one block at a time |
-| Capstone diagrams | `stills/09_any_rig.png`, `10_interview.png`, `11_map_locked.png`, `13_capstone_loop.png` | The product destination |
-| Evidence figures | `docs/explainer/assets/01_gate_ladder.png`, `02_hardware_peaks.png`, `07_product_architecture.png` | Do not redraw |
+Rebuild with `python3 tools/render_phase3_motion.py`.
 
-## What “animation” means here
+## What I made
 
-3Blue1Brown is usually **Manim**: objects appear, labels attach, one idea at a time. Veritasium is usually **a question + a physical demo + a simple diagram**.
+Dark 3Blue1Brown grammar: one idea at a time, Inter type, teal kernel / gold question / red lock.
 
-For a 12-minute course film, the honest version of that is:
+| Clip | Beat |
+| --- | --- |
+| `01_title.mp4` | What is CertaRig? |
+| `02_question.mp4` | Who is allowed to say yes? |
+| `03_language_stops.mp4` | Speech hits 4.2 bar, relay stays locked |
+| `04_architecture.mp4` | Operator → Agent → Kernel → Rig |
+| `05_and_gate.mp4` | Five terms; trip; no auto-restart |
+| `06_protocols.mp4` | Observe-only buses |
+| `07_two_ais.mp4` | Grok / Fake / Claude then OpenAI |
+| `08_six_gates.mp4` | Gate 0–5 |
+| `R1_record_dashboard.mp4` | Placeholder for your 8080 clip |
+| `R2_record_studio.mp4` | Placeholder for Studio demo |
+| `09_interview.mp4` | Capstone interview |
+| `10_capstone_loop.mp4` | Deploy → apply → twin → arm |
+| `11_close.mp4` | Final lockup |
 
-1. Put one still full-screen.
-2. Scale 100% → 108% (Ken Burns).
-3. Cut to the next still when the next sentence starts.
-4. Hard-cut to your real dashboard / Studio recording for the demo.
+Stills in `stills/` remain as posters / extra B-roll. The **cut uses the mp4s**.
 
-That *reads* like animation. It is not a cartoon of a person walking through a hospital.
+## What I did not make
 
-If you later want true motion (AND-gates lighting, a map assembling), say so and I can render Manim clips for those two beats only. Do not try to animate the whole film.
+- Your voice
+- The live dashboard / Studio recordings
+- After Effects, Manim source, or a finished 12-minute mp4
 
-## What I will keep creating
-
-- New diagrams when you rewrite a **Say this** block.
-- Caption / shot-list updates to match your edit.
-- Optional presenter lower-thirds if you film a face at open and close.
-
-## What I will not create
-
-- A finished mp4.
-- After Effects / CapCut project files with your microphone.
-- Copies of Veritasium or 3Blue1Brown footage.
-- A fake live demo of the commissioning interview. That interview is design, not built.
-
-## CapCut recipe for a 3B1B beat
-
-Example, output equation, 5:40–7:00:
-
-1. Start on `08_output_equation.png` cropped to the five terms.
-2. Every 3 seconds, zoom out to reveal the next term.
-3. End on the full `OUTPUT = …` bar.
-
-Example, capstone, 11:00–11:50:
-
-1. `09_any_rig.png` — “someone else’s rig”
-2. `10_interview.png` — questions appear
-3. `11_map_locked.png` — proposed map, locked
-4. `13_capstone_loop.png` — apply → twin → arm
-
-One idea per cut. No stock hospital footage. No talking over the trip in the Studio demo.
+True Manim (mathematical objects that morph) can still be added later for two luxury beats. The lookbook is already the film language.

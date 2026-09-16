@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CertaRig Phase 3 · film lookbook</title>
+  <style>
+    :root {
+      --bg: #0b0f14;
+      --card: #141a22;
+      --ink: #f4f1ea;
+      --muted: #8e969f;
+      --gold: #e8c547;
+      --teal: #3ecf8e;
+      --line: #2a3240;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font: 16px/1.5 Inter, ui-sans-serif, system-ui, sans-serif;
+    }
+    header {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 48px 24px 16px;
+    }
+    header p.kicker {
+      color: var(--gold);
+      letter-spacing: 0.16em;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    header h1 { font-size: 42px; line-height: 1.1; margin: 8px 0 12px; }
+    header .lede { color: var(--muted); max-width: 640px; }
+    .lookbook {
+      max-width: 1080px;
+      margin: 0 auto 64px;
+      padding: 0 24px;
+    }
+    .lookbook video {
+      width: 100%;
+      border-radius: 18px;
+      background: #000;
+      margin: 12px 0 40px;
+    }
+    section {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 0 24px 72px;
+      display: grid;
+      gap: 28px;
+    }
+    article {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 20px 20px 16px;
+    }
+    article.record { border-color: var(--gold); }
+    article h2 {
+      margin: 0 0 6px;
+      font-size: 13px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+    article h3 { margin: 0 0 12px; font-size: 22px; }
+    article p { margin: 0 0 12px; color: var(--muted); }
+    article video {
+      width: 100%;
+      border-radius: 12px;
+      background: #000;
+      margin-top: 8px;
+    }
+    .say {
+      color: var(--ink);
+      font-size: 15px;
+      border-left: 3px solid var(--teal);
+      padding-left: 12px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <p class="kicker">CertaRig · Phase 3 film</p>
+    <h1>Watch this before you record anything.</h1>
+    <p class="lede">
+      A 96-second lookbook of the motion graphics. Gold cards are the only live footage you still have to shoot.
+      Then read the voiceover and patch it in post.
+    </p>
+  </header>
+
+  <div class="lookbook">
+    <video controls preload="metadata" src="motion/LOOKBOOK.mp4"></video>
+  </div>
+
+  <section>
+    <article>
+      <h2>01 · Title</h2>
+      <h3>What is CertaRig?</h3>
+      <p class="say">This is CertaRig. A test-operations platform where an AI can ask, and a deterministic kernel is the only thing allowed to say yes.</p>
+      <video controls preload="metadata" src="motion/01_title.mp4"></video>
+    </article>
+    <article>
+      <h2>02 · The question</h2>
+      <h3>Who is allowed to energize the output?</h3>
+      <p class="say">The useful question is not whether the AI is clever enough. It is: who is allowed to say yes?</p>
+      <video controls preload="metadata" src="motion/02_question.mp4"></video>
+    </article>
+    <article>
+      <h2>03 · Language vs number</h2>
+      <h3>A sentence cannot cross 4.2 bar</h3>
+      <p class="say">Four point two bar is not a vibe. Fifteen litres per minute is not “about that high.”</p>
+      <video controls preload="metadata" src="motion/03_language_stops.mp4"></video>
+    </article>
+    <article>
+      <h2>04 · Architecture</h2>
+      <h3>Operator → Agent → Kernel → Rig</h3>
+      <p class="say">The agent interprets. The kernel measures, latches, and owns GPIO23.</p>
+      <video controls preload="metadata" src="motion/04_architecture.mp4"></video>
+    </article>
+    <article>
+      <h2>05 · The surprising rule</h2>
+      <h3>Returning to normal does not restart it</h3>
+      <p class="say">The output is on only when five things are true. After a trip, reset is required.</p>
+      <video controls preload="metadata" src="motion/05_and_gate.mp4"></video>
+    </article>
+    <article>
+      <h2>06–08 · Stack</h2>
+      <h3>Buses, two AIs, six gates</h3>
+      <p>Same kernel on MQTT through CAN. Grok builds. Fake runs the bench. Claude then OpenAI are fallbacks.</p>
+      <video controls preload="metadata" src="motion/06_protocols.mp4"></video>
+      <video controls preload="metadata" src="motion/07_two_ais.mp4"></video>
+      <video controls preload="metadata" src="motion/08_six_gates.mp4"></video>
+    </article>
+    <article class="record">
+      <h2>You record this</h2>
+      <h3>Phase 3 dashboard · 45 seconds</h3>
+      <p>Port 8080. Observe only. Do not arm. This card is a placeholder for your screen capture.</p>
+      <video controls preload="metadata" src="motion/R1_record_dashboard.mp4"></video>
+    </article>
+    <article class="record">
+      <h2>You record this</h2>
+      <h3>Studio demo · ~4 minutes</h3>
+      <p>Simulator is enough. Fake agent. 4.2 bar, then 15 L/min, then shutdown, then Evidence. Overlay: Studio · simulator.</p>
+      <video controls preload="metadata" src="motion/R2_record_studio.mp4"></video>
+    </article>
+    <article>
+      <h2>09–10 · Capstone</h2>
+      <h3>Any rig. Short interview. Human applies.</h3>
+      <p class="say">The capstone is an agentic system on someone else’s test rig, plus a short commissioning interview. We have not built the interview yet.</p>
+      <video controls preload="metadata" src="motion/09_interview.mp4"></video>
+      <video controls preload="metadata" src="motion/10_capstone_loop.mp4"></video>
+    </article>
+    <article>
+      <h2>11 · Close</h2>
+      <h3>The AI can ask. Only the kernel can say yes.</h3>
+      <video controls preload="metadata" src="motion/11_close.mp4"></video>
+    </article>
+  </section>
+</body>
+</html>
