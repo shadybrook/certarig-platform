@@ -14,7 +14,17 @@ I already made the motion graphics. Post is: lookbook clips + your two recording
 
 ## 1. Watch the lookbook
 
-Open [motion/LOOKBOOK.mp4](motion/LOOKBOOK.mp4). Film order:
+Do **not** expect the `.mp4` to play when you click it in Cursor chat. Cursor does not open video files that way.
+
+On your Mac, in this repo, after checking out `cursor/phase3-submission-video-533a`:
+
+```bash
+open docs/explainer/phase3-film/motion/LOOKBOOK.mp4
+```
+
+That launches QuickTime. Or double-click the file in Finder.
+
+A silent GIF that *will* show in GitHub/markdown: [motion/LOOKBOOK_preview.gif](motion/LOOKBOOK_preview.gif)
 
 | Clip | What you see |
 | --- | --- |
