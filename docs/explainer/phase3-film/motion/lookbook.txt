@@ -1,13 +1,2 @@
-file '01_title.mp4'
-file '02_question.mp4'
-file '03_language_stops.mp4'
-file '04_architecture.mp4'
-file '05_and_gate.mp4'
-file '06_protocols.mp4'
-file '07_two_ais.mp4'
-file '08_six_gates.mp4'
-file 'R1_record_dashboard.mp4'
-file 'R2_record_studio.mp4'
-file '09_interview.mp4'
-file '10_capstone_loop.mp4'
-file '11_close.mp4'
+atelier lookbook — one studio, not a slide deck
+rebuild: python3 tools/render_phase3_atelier.py
