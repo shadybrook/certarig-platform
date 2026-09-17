@@ -49,6 +49,29 @@ with "anyone with link can view", or any direct-download URLs) and provides a
 `manifest.json` per `tools/phase3_edit/README.md`. Everything downstream is
 scripted and runs here.
 
+## Outcome (17 Sep, cloud run)
+
+- Footage received via Google Drive folder; all five files verified against
+  laptop sizes byte-for-byte.
+- Clap sync: topdown clock = screen clock + 1.14 s, confirmed on three
+  matching transients and by frame inspection (hand mid-clap; Studio Live
+  visible at the same instant).
+- `out/CertaRig_Phase3_Film.mp4` — 12.7 min, 48 segments per
+  `tools/phase3_edit/edl/phase3_film.json`. Sections 1–5 narration over the
+  atelier animations, stills, and bench close-ups; section 6 narration
+  patched across Studio screen crops (ChatGPT shoot-helper sidebar cropped
+  out) and top-down bench zooms at the verified event times (permit ~8:20,
+  pressure trip ~12:25, flow trip ~15:40, E-stop cycle ~20:40–21:11, agent
+  pressure ~23:44, agent flow ~25:00 on the screen clock); sections 7–9 over
+  the capstone clips. Video-model QC passed: continuous voiceover, correct
+  visuals per narration, clean captions, no broken cuts, no doubled audio.
+- `out/CertaRig_Phase3_Uncut_Bench_Run.mp4` — 29.6 min uncut synced stitch,
+  screen recording main canvas + top-down picture-in-picture, top-down audio.
+  Sync spot-verified at the pressure raise (hand on pot while the trace
+  climbs).
+- Both deliverables and a 480p review proxy uploaded as run artifacts for the
+  operator to download and place in Google Drive.
+
 ## Honesty rails carried into the edit
 
 - Simulator footage is always labelled simulator; hardware is always labelled
