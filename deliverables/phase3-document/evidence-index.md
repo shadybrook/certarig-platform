@@ -57,13 +57,14 @@ Maps every factual claim in `CertaRig_Phase3_Document.md` to its evidence source
 
 | Claim | Evidence source |
 | --- | --- |
-| Build-time assistant: Cursor with Grok 4.6; never drives the relay | `docs/explainer/phase3-film/script.md` (4:20–5:40 "Why this AI") |
+| AI is used to translate varied operator language into approved procedures and explanations, while deterministic code performs arithmetic and safety decisions | `certarig/agent/orchestrator.py` (`SYSTEM_PROMPT`); `README.md` ("What is deterministic vs what is the model") |
 | Runtime default is Fake: deterministic rule-based policy, no API key; used by CI and on the 12 Sep bench | `README.md` (LLM providers; step 6); `certarig/agent/providers/fake.py`; script.md (same section) |
-| Claude Sonnet 4.5 first choice (tool use); model string in code | `certarig/agent/providers/anthropic_provider.py` (`DEFAULT_MODEL = "claude-sonnet-4-5"`); script.md |
-| OpenAI GPT-4.1-mini / any OpenAI-compatible endpoint as fallback | `certarig/agent/providers/openai_provider.py` (`DEFAULT_MODEL = "gpt-4.1-mini"`); `README.md` (`OPENAI_BASE_URL`) |
+| Claude Sonnet 4.5 is the first intended live choice because the adapter uses native tool-use blocks; exact model string is `claude-sonnet-4-5` | `certarig/agent/providers/anthropic_provider.py` (`DEFAULT_MODEL`, `to_anthropic_tools`, `parse_anthropic_response`); `docs/explainer/phase3-film/SCRIPT_EDIT_ME.md` (4:20–5:40) |
+| OpenAI GPT-4.1-mini is the second choice; the adapter supports an OpenAI-compatible endpoint through `OPENAI_BASE_URL`; alternatives are configurable rather than automatic failover | `certarig/agent/providers/openai_provider.py` (`DEFAULT_MODEL = "gpt-4.1-mini"`, `base_url`); `README.md` (LLM providers) |
 | Live adapters exist but are NOT the proven bench path; untested live | `README.md` ("Adapters are untested live in this tree; every CI path uses FakeProvider"); `docs/platform-lab/product-state.md` ("not proven") |
 | Replay provider / exact transcript re-runs | `certarig/agent/transcript.py`, replay references in `certarig/agent/orchestrator.py`, `certarig/agent/cli.py`; script.md |
-| Benchmark on skill routing and tool discipline for this use case, not chat quality | script.md (4:20–5:40 benchmark cards) |
+| Use-case benchmark criteria: approved-skill routing, manifest-limited tools, no numeric safety decision, approval stops, and reproducible replay | `docs/explainer/phase3-film/SCRIPT_EDIT_ME.md` (4:20–5:40 benchmark cards); `certarig/agent/orchestrator.py`; `config/capabilities.wave1.json`; `tests/agent/`; `tests/contract/test_agent_api.py`; `tests/contract/test_ops_api.py` |
+| Fake has hardware-transcript and automated-test evidence; no live Claude/OpenAI comparative benchmark has been run | `docs/explainer/2026-09-13-gates-0-to-5-analysis.md` ("What the data says" point 4); `README.md` (LLM providers); `tests/agent/test_providers.py`, `tests/agent/test_policy.py`, `tests/agent/test_orchestrator.py` |
 | Never claim a simulated trace is hardware; never claim an LLM tripped the relay | script.md ("Production grammar" rules) |
 
 ## Limitations claims
@@ -83,10 +84,12 @@ Maps every factual claim in `CertaRig_Phase3_Document.md` to its evidence source
 | --- | --- |
 | Capstone: deployable agentic test-operations layer for someone else's mapped rig; interview proposes map, human applies, twin rehearses, explicit arm | `docs/explainer/phase3-film/SCRIPT_EDIT_ME.md` (Capstone note); script.md (11:00–11:50); `docs/platform-lab/commissioning-interview.md` |
 | End customer: owner/commissioner of a test bench (lab engineer, technician, team needing auditable records); tomorrow anyone with a mapped rig (hydraulic cart, battery pack on CAN, Siemens/Allen-Bradley cell, Modbus skid) | script.md (2:20–3:20 "Who is the end customer" and 3:20–4:20 industries) |
+| Target growth areas and enabling advances: electrified/connected/software-defined equipment; low-cost edge computing, structured industrial protocols, tool-using model APIs, digital twins, and hashing | Product-direction rationale in `docs/explainer/phase3-film/SCRIPT_EDIT_ME.md` (3:20–5:40); presented in the document as an unquantified hypothesis requiring capstone customer validation |
 | Governing invariant: no unreviewed mapping can reach an output | analysis doc ("Recommended next milestone") |
 | Second simulated plant (e.g. thermal) before another physical output | analysis doc ("The bench is mapped, not discovered" Correction); `docs/platform-lab/product-state.md` ("Next product step"); thermal skill: `config/rig.thermal.sim.json`, `README.md` step 4 |
 | Relay feedback / current sensing next | analysis doc ("Relay state is command derived" Correction) |
 | Interview questions (modules, bus, pin/register/tag mapping, trip numbers/units, observe-only scope) | `docs/platform-lab/commissioning-interview.md` (Interview section); script.md (11:00–11:50) |
+| Capstone readiness is bounded: core platform and one hardware path are proven, while live-provider qualification, second-rig validation, complete exports, and electrical feedback remain gates | Phase 3 document Sections 3, 6, and 7; analysis doc ("Recommended next milestone"); `docs/platform-lab/product-state.md` |
 
 ## Deliverables claims
 

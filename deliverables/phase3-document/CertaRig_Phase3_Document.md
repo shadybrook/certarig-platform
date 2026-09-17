@@ -19,9 +19,9 @@
 
 ### 1.1 Purpose of Phase 3
 
-Phase 3 demonstrates implementation readiness. Its purpose is to show that the design choices made in the earlier phases have been validated through a working implementation, and to assess honestly what the system can and cannot do today: its reliability under test, its measured behaviour on real hardware, its known limitations, and its potential as the foundation for the capstone project.
+Phase 3 asks whether CertaRig is ready to move from proof of concept to capstone development. This document therefore evaluates four things: what is implemented, how it was tested, what the physical bench evidence proves, and which limitations must be resolved next.
 
-CertaRig is a test-operations platform for instrumented test benches ("rigs"). For a reader with no prior exposure to the project, the core idea is this: an AI agent interprets what an operator asks for in natural language ("run the 4.2 bar pressure test"), but a small, deterministic software kernel is the only component allowed to measure sensor values, compare them to limits, latch trips, and drive the physical output — on the demonstration bench, a relay commanded through Raspberry Pi general-purpose input/output pin 23 (GPIO23). Every run produces a checksummed evidence bundle as a first-class output. The design question Phase 3 set out to validate is not "can an AI operate a rig?" but "who is allowed to say yes when a physical output may be energized?" — and to prove the answer (the kernel, never the model) with hardware evidence.
+CertaRig is a test-operations platform for instrumented test benches ("rigs"). An AI agent translates an operator's natural-language request, such as "run the 4.2 bar pressure test," into an approved procedure. A small deterministic software kernel then reads the sensors, compares values with configured limits, latches trips, and controls the output. On the demonstration bench, that output is a relay commanded through Raspberry Pi general-purpose input/output pin 23 (GPIO23). Every run produces checksummed evidence. The central design question is therefore not "can an AI operate a rig?" but "who is allowed to authorize a physical output?" CertaRig's answer is the kernel, never the language model.
 
 ### 1.2 Summary of Work Completed So Far
 
@@ -29,7 +29,7 @@ CertaRig is a test-operations platform for instrumented test benches ("rigs"). F
 
 **Phase 2 — design and proof of concept.** Phase 2 produced the design and the proof-of-concept implementation: the `certarig_edge` package with the `ProcessGuardrail` safety kernel, the `DryBenchInterlock`, a live observe-only dashboard, procedure execution, and evidence writing. That proof of concept was validated incrementally on the bench (ADS1115 commissioning, potentiometer sweeps, dual-potentiometer sweeps, E-stop tests, and integrated bench runs recorded between 9 and 12 September 2026, retained under `pi_retrieval_2026-09-12/phase3_evidence/`). The PoC repository is frozen as the Phase 3 evidence source; the platform repository documented here was imported from it at commit `23988a3` and is where all further engineering happens (see `docs/PROVENANCE.md`).
 
-**Phase 3 — implementation and validation (this document).** The platform was hardened into a user-deployable system (Edge API, Studio operator console, digital twin, provider-neutral agent, evidence pipeline), and on 12 September 2026 it crossed a six-gate commissioning ladder on the physical dry bench, culminating in agent-initiated hardware procedures with the kernel owning every safety decision, followed by clean restoration of the frozen Phase 3 dashboard.
+**Phase 3 — implementation and validation (this document).** The PoC was developed into a deployable platform: Edge API, Studio operator console, digital twin, provider-neutral agent, and evidence pipeline. On 12 September 2026 it crossed a six-gate commissioning ladder on the dry bench. Agent-initiated procedures ran on hardware while the kernel retained every safety decision, after which the frozen course dashboard was restored and verified.
 
 ---
 
@@ -46,7 +46,7 @@ CertaRig is a test-operations platform for instrumented test benches ("rigs"). F
 - Evidence pipeline: every run writes a CSV recording, `run.json`, `report.md`, and SHA-256 checksums; bundles export as checksummed zip archives naming the adapter class and hostname; run outcomes append to a ledger.
 - Provider-neutral agent orchestrator (`certarig/agent/`) with the deterministic **Fake** provider as the default (rule-based, no API key — the provider used in all continuous integration and on the hardware bench), plus a replay capability for re-running transcripts exactly.
 - Studio operator console (browser-based: Live, Onboard, Author, Procedures, Approvals, Agent, and Evidence views) and a Python SDK.
-- Human-approval workflow: `reset_trip` and `shutdown` always require a human grant; the agent receives an HTTP 428 that deep-links to the Approvals view.
+- Human-approval workflow: an agent cannot invoke `reset_trip` or `shutdown` without a human grant; an unapproved attempt receives HTTP 428 and deep-links to the Approvals view.
 
 **Partially implemented (present in the tree, not yet validated end-to-end):**
 
@@ -65,15 +65,34 @@ CertaRig is a test-operations platform for instrumented test benches ("rigs"). F
 | Feature | Description |
 | --- | --- |
 | Safety kernel | Deterministic guardrail owning measurement, comparison, trip latching, and the physical output; enforces the five-condition output invariant |
-| Six approved procedures | ADC validation, relay truth table, pressure guardrail (4.2 bar), flow guardrail (15 L/min), dual-input guardrail, E-stop anti-restart |
+| Six bench qualification procedures | ADC validation, relay truth table, pressure guardrail (4.2 bar), flow guardrail (15 L/min), dual-input guardrail, E-stop anti-restart; a thermal-soak skill is an additional simulator extension |
 | Digital twin + twin gate | Simulator rehearsal required within 24 hours before the identical procedure hash may run on hardware |
 | Agent orchestrator | Interprets operator language, selects an approved skill, starts the named procedure, waits for the deterministic result; never compares numbers |
 | Provider neutrality | Fake (default, deterministic), Anthropic, OpenAI/compatible, and transcript replay behind one interface |
 | Evidence bundles | Checksummed zip per pull; per-run CSV, `run.json`, `report.md`, events, checks, SHA-256 manifest; outcomes ledger |
 | Studio console | Live dual-channel graphs with trip lines, ready-to-arm scorecard, onboarding config diff/apply, procedure authoring and approval, agent chat, evidence export |
-| Approvals | `reset_trip` and `shutdown` gated on explicit human grants |
+| Approvals | Agent requests for `reset_trip` and `shutdown` are gated on explicit human grants |
 | Observe-mode adapters | MQTT and Modbus TCP observation of external tags/registers |
 | Deployment | `make install` / Docker Compose simulator path for a stranger; `deploy/install_pi.sh` + systemd for a new Raspberry Pi (with guards refusing to run over the frozen Phase 3 host) |
+
+### 2.3 Why This AI, Benchmarking, and Fallbacks
+
+**Why use AI at all?** Test operators express intent in varied language, while rigs require exact procedure identifiers, units, and ordered steps. A language model is useful at that translation and explanation boundary. It is deliberately not used for arithmetic or safety: deterministic code is easier to test, reproduce, and audit for those tasks.
+
+**Why these specific choices?** The proven runtime choice is **Fake**, a deterministic rule-based provider. It requires no API key, gives repeatable routing in tests, and was the provider that initiated the 12 September hardware procedures. For a future live interpreter, the first configured choice is **Anthropic `claude-sonnet-4-5`** because its API exposes tool use directly and the adapter maps CertaRig's provider-neutral tool schema to native tool-use blocks. The second choice is **OpenAI `gpt-4.1-mini`** through the OpenAI API; the same adapter can target an OpenAI-compatible endpoint through `OPENAI_BASE_URL`, including a local service. Transcript replay is a further deterministic regression option. These are configurable alternatives, not automatic failover: no live provider has yet been qualified on the bench.
+
+The benchmark is specific to CertaRig, not a general chat or trivia score:
+
+| Use-case criterion | Required behaviour | Current evidence |
+| --- | --- | --- |
+| Approved-skill routing | Map operator wording to the correct approved procedure | Fake routed the lab procedures; agent policy and orchestrator tests pass |
+| Tool discipline | Call only tools exposed by the capability manifest | Enforced by manifest filtering and contract tests; dangerous tools remain unavailable |
+| Safety-boundary discipline | Never compare live values or claim to make a trip decision | Fake transcripts show read skill → start procedure → wait → report kernel result |
+| Human boundary | Stop for approval on `reset_trip` and `shutdown` | HTTP 428 approval flow is covered by contract tests |
+| Reproducibility | Preserve and replay the complete interaction | Transcript and strict replay providers are implemented and tested |
+| Provider comparison | Run the same prompt suite unchanged across candidates | Pending for Claude and OpenAI; live adapters are unit-tested only |
+
+This benchmark establishes a clear admission rule for the capstone: Claude or the OpenAI fallback may assist on a real rig only after passing the same routing, tool, approval, refusal, and replay cases as Fake. Phase 3 validates the deterministic provider and the individual policy, approval, and replay mechanisms; it does **not** report a live-model comparison that was never run.
 
 ---
 
@@ -138,7 +157,7 @@ What is **not** validated: live LLM operation on hardware, discovery of an unmap
 
 **Responsiveness.** Kernel-commanded safety transitions on the bench measured 0.608 ms (pressure trip), 0.801 ms (flow trip), and 0.867 ms (E-stop) from the kernel observing the condition to the commanded GPIO state changing — comfortably below any human-perceptible delay, with the caveat above that mechanical relay response is not yet instrumented. The Studio Live view streams both channels with trip lines in near real time; the observe run sampled at roughly 10 samples per second (1,291 samples over 129.0 s).
 
-**Stability.** The kernel is exercised by a Hypothesis property-based state machine that attempts arbitrary command orderings and sensor faults; no sequence violating the output invariant or anti-restart property has been found. All 213 software tests pass, `make check` enforces 90% coverage, and a `make soak` target runs one simulated hour of operation accelerated. On hardware, six consecutive procedures completed without a kernel fault, and the dual-input run demonstrated trip → reset → permit → second independent trip within a single run.
+**Stability.** A Hypothesis property-based state machine generates arbitrary command orderings and sensor faults while continuously checking the output invariant and anti-restart rule. All 213 software tests in the stated suites passed in this environment; `make check` sets a 90% coverage threshold, and `make soak` runs one accelerated simulated hour. On hardware, six procedures completed without a kernel fault. The dual-input run also demonstrated trip → reset → permit → a second independent trip within one run.
 
 **Resource usage.** The full stack (kernel, Edge API, Studio, evidence writer) ran as a user-local sidecar on a Raspberry Pi 3 Model A+ — a constrained single-board computer — alongside the frozen Phase 3 tree, while sampling two ADC channels and serving the browser console. No resource exhaustion was observed during the lab. The simulator path runs on any machine with Python 3.11+ (a stranger can go from clone to a running simulated rig in under ten minutes, or use Docker Compose).
 
@@ -183,14 +202,26 @@ Stated plainly, because clarity here is worth more than optimism:
 
 ## 7. Future Enhancements and Scope Extension
 
-The capstone direction is a **deployable agentic test-operations layer for someone else's mapped rig**. The end customer is not a chatbot user: it is the person who already owns or is commissioning a test bench — a lab engineer, a technician repeating the same qualification, a team that needs a record that survives the shift change. Today that customer is the project's own university dry bench; tomorrow it is anyone with a mapped rig (a hydraulic cart, a battery pack on CAN, a Siemens or Allen-Bradley cell, a Modbus skid) in industries where test and commissioning workloads are growing. The planned missions, in order of dependency:
+### 7.1 End Customer, Industry Opportunity, and Enabling Advances
+
+The end customer is not a general chatbot user. It is the owner or commissioner of a test bench: a lab engineer defining a qualification, a technician repeating it, or a team that needs an auditable record to survive a shift change. Phase 3's immediate customer context is a university dry bench. The capstone target is a customer with an already-understood rig who wants safer guided operation and consistent evidence.
+
+Relevant applications include hydraulic test carts, battery and vehicle benches on CAN, factory cells using Siemens or Allen-Bradley controllers, and Modbus skids. Electrification, connected industrial equipment, and increasingly software-defined products are the proposed growth drivers because they create more sensors, configurations, and repeatable verification work. Three technical advances make CertaRig timely: capable low-cost edge computers can run the kernel beside a rig; standard protocols such as MQTT, Modbus, OPC UA, and CAN expose structured signals; and tool-using language-model APIs can translate operator intent without being given output authority. Digital twins and inexpensive cryptographic hashing add rehearsal and auditable evidence. CertaRig combines those advances while keeping the safety decision deterministic. This is a product hypothesis, not a quantified market claim; capstone customer interviews must test it.
+
+### 7.2 Summary of Capstone Missions
+
+The capstone product is a **deployable agentic test-operations layer for someone else's mapped rig**. Its planned missions, in dependency order, are:
 
 1. **Commissioning interview (the capstone product core).** The agent interviews the owner of a new rig — what modules exist, which bus (GPIO/ADC, MQTT, Modbus, OPC UA, S7, EtherNet/IP, CAN), which pin/register/tag maps to which concept, what trip numbers and units apply, what must remain observe-only — and proposes a `rig.json`. A human reviews and applies it; the twin rehearses the exact procedure; only then can an output be armed. The governing invariant: a new rig can be described in language and proposed as configuration, but no unreviewed mapping can ever reach an output.
 2. **Second simulated plant.** Prove the interview against a different physics (for example a thermal plant, building on the existing `thermal_soak` skill and `rig.thermal.sim.json`) before any new physical output is energized.
 3. **Evidence completeness.** Ship the exporter fix so bundles contain raw recordings, with the hash-verification contract test.
 4. **Relay feedback / current sensing.** Add an isolated auxiliary contact or current sensor so electrical trip response can be measured, upgrading the latency claim from commanded to observed.
-5. **Live-provider qualification.** Benchmark Claude Sonnet 4.5 and the OpenAI fallback on the project's own use case — approved-skill routing accuracy, tool discipline under the capability manifest, refusal to compare numbers, correct stopping at human-approval boundaries — using the replay provider for exact regression, before any live model is used near a bench.
-6. **Broader industry reach.** Extend observe-mode adapters toward the buses growing industries already use — factory OPC UA cells, battery/vehicle benches on CAN, Modbus skids — always observe-first, with human-applied maps.
+5. **Live-provider qualification.** Run `claude-sonnet-4-5` and `gpt-4.1-mini` through the Section 2.3 benchmark: approved-skill routing, capability-manifest discipline, no numeric safety decisions, correct approval stops, and replayable results. A live model remains optional and outside the kernel.
+6. **Broader industry reach.** Extend observe-mode adapters toward factory OPC UA cells, battery and vehicle benches on CAN, and Modbus skids. Every new integration starts observe-only and uses a human-applied map.
+
+### 7.3 Readiness to Move to the Capstone
+
+CertaRig is ready for the capstone as a platform foundation, not as a finished industrial product. The kernel, Edge API, simulator gate, approvals, Studio workflow, and hardware procedure path exist and have evidence. The next work is therefore a bounded extension—commissioning a second mapped rig safely—rather than a redesign of the safety architecture. Readiness is conditional on preserving three rules: no unreviewed map reaches an output, simulated evidence is never presented as hardware, and no live model is admitted until it passes the use-case benchmark. Industrial sale or safety certification would require additional work beyond the capstone, including electrical output feedback, completed evidence export, broader hardware validation, and appropriate certified safeguards.
 
 ---
 
@@ -198,7 +229,7 @@ The capstone direction is a **deployable agentic test-operations layer for someo
 
 - **Splitting interpretation from authority is the design, not a feature.** The most transferable lesson is architectural: the useful question was never whether the model is clever, but who may say yes. Making the kernel the only answer simplified every downstream decision, from tool design to evidence.
 - **Failures are evidence.** Retaining the failed Gate 2 sweep, rather than re-running until clean, made the validation more credible, and demonstrated that procedures can refuse to pass.
-- **Honesty about the AI stack matters.** Keeping three distinct facts straight — the build-time assistant (Cursor with Grok 4.6, which never touches the relay), the runtime default (Fake, deterministic, the actual bench path), and the intended live adapters (Claude first, OpenAI fallback, present but unproven) — prevented the project from over-claiming, and shaped a benchmark philosophy of measuring models on this use case (skill routing, tool discipline) rather than chat quality.
+- **Honesty about the AI stack matters.** The build-time coding assistant does not operate the product. At runtime, Fake is the proven deterministic path; Claude is the intended first live choice and OpenAI the fallback, but both remain unproven live. Keeping those roles separate prevented over-claiming and led to a benchmark based on skill routing and tool discipline rather than chat quality.
 - **Commissioning discipline is a product feature.** The six-gate ladder (read-only, sidecar, observe, twin, actuate, restore) began as lab hygiene and turned out to be the product's user journey.
 - **Restoration is part of success.** Leaving the frozen Phase 3 system exactly as found, verified by a test, taught that a credible result includes the exit, not just the demonstration.
 - **Practical engineering breadth.** The project exercised embedded hardware (ADC, GPIO, E-stop wiring), safety-state-machine design, property-based testing, HTTP API and schema contracts, browser front-end work, deployment (systemd, Docker), and evidence/audit design in one system.
@@ -221,9 +252,9 @@ The capstone direction is a **deployable agentic test-operations layer for someo
 
 ## 10. Conclusion
 
-Phase 3 set out to demonstrate implementation readiness, and the evidence supports that it did. The design choice at the heart of the project — an agent that interprets while a deterministic kernel measures, compares, latches, and owns the output — was implemented in full and validated on real hardware through a disciplined six-gate ladder: 213 software tests pass, six exact procedure hashes crossed the digital twin before hardware, six hardware runs recorded 3,422 samples and passed 34 of 34 evaluated checks, guardrails tripped and latched at 4.2 bar and 15 L/min, the emergency stop's anti-restart held, and the frozen course submission system was verifiably restored afterwards.
+Phase 3 demonstrates implementation readiness within a defined boundary. The core architecture—an agent that interprets while a deterministic kernel measures, compares, latches, and owns the output—was validated through a six-gate hardware progression. In this environment, 213 software tests passed. On 12 September, six exact procedure hashes passed the twin gate before six hardware runs recorded 3,422 samples and passed 34 of 34 checks. The 4.2 bar and 15 L/min guardrails latched safe, E-stop anti-restart held, and the frozen course system was restored and verified.
 
-Just as importantly, the project knows its own edges: the missing raw CSVs in exported bundles, the unproven live-LLM path, the command-derived relay state, and the not-yet-built commissioning interview are stated, with concrete corrections planned. That combination — a working, honestly-scoped system with hardware evidence and a defined next invariant ("no unreviewed mapping can reach an output") — is exactly the foundation the capstone needs. The objectives of Phase 3 are achieved, and the project is prepared to move into the capstone: making CertaRig deployable on someone else's mapped rig, beginning with the commissioning interview.
+The result does not prove live-LLM operation, unknown-rig discovery, fieldbus actuation, or mechanical relay latency. It also leaves raw CSV export incomplete. Those limits define the capstone rather than weaken the Phase 3 result: build the commissioning interview, prove a second plant, complete evidence export, add electrical feedback, and qualify live providers. The project is ready to proceed on that bounded mission while retaining the invariant that no unreviewed mapping can reach an output.
 
 The AI can ask. Only the kernel can say yes.
 
