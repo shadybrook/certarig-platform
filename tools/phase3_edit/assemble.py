@@ -123,7 +123,9 @@ class Assembler:
             if "in" in video:
                 cmd += ["-ss", f"{float(video['in']):.3f}"]
             cmd += ["-i", str(src)]
+            crop = f"crop={video['crop']}," if video.get("crop") else ""
             vf = (
+                f"{crop}"
                 f"scale={W}:{H}:force_original_aspect_ratio=decrease:flags=lanczos,"
                 f"pad={W}:{H}:(ow-iw)/2:(oh-ih)/2:color=0x101216,fps={FPS},"
                 f"tpad=stop_mode=clone:stop_duration=600"
