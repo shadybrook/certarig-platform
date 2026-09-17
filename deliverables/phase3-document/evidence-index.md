@@ -96,14 +96,14 @@ Maps every factual claim in `CertaRig_Phase3_Document.md` to its evidence source
 | Claim | Evidence source |
 | --- | --- |
 | Gates 0–5 evidence & product-direction report (PDF + DOCX) | `deliverables/CertaRig_Gates_0_to_5_Evidence_and_Product_Direction.pdf` / `.docx` |
-| Phase 3 submission film: script + production pack, ~12 min, stitched demo | `docs/explainer/phase3-film/` (script.md: target duration 11:40–12:20; PRODUCTION.md); `deliverables/CertaRig_Phase3_Submission_Film_Script.docx` |
+| Phase 3 submission film (12.7 min) | https://github.com/shadybrook/certarig-platform/releases/download/phase3-submission-videos-2026-09-17/CertaRig_Phase3_Film.mp4 ; cut list `tools/phase3_edit/edl/phase3_film.json` |
+| Uncut clap-synced bench run (29.6 min) | https://github.com/shadybrook/certarig-platform/releases/download/phase3-submission-videos-2026-09-17/CertaRig_Phase3_Uncut_Bench_Run.mp4 |
 | Derived data: hardware run summary, evidence verification record | `docs/explainer/data/hardware_run_summary.csv`, `docs/explainer/data/evidence_verification.json` |
-| Uncut dry-bench demo video on Google Drive | Stated per task brief; **link not present in the repo — TBD at submission** |
+| Source footage Drive folder | https://drive.google.com/drive/folders/1mlegZnq_AQurnBIKY-Ckh1S6TyZ_Q8Bk |
 
 ## Items NOT verifiable in this repository
 
 - `docs/platform-lab/shoot-handoff-20260917.md` — listed as research input but does not exist in the tree.
 - `evidence/` folder (lab-pulled bundles, sim-library, agent transcripts) — gitignored per `docs/platform-lab/2026-09-12-dry-bench.md`; hardware numbers are cited from the committed lab record and analysis instead.
-- Google Drive link for the uncut dry-bench video — not in the repo; left as [links TBD].
 - Course title, student ID, and advisor name — placeholders by instruction.
 - Phase 1 / Phase 2 recap detail (problem definition, planning) — reconstructed from `docs/PROVENANCE.md`, the analysis doc, and the film script; no standalone Phase 1/Phase 2 report exists in this tree.

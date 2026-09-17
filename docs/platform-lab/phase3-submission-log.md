@@ -69,8 +69,16 @@ scripted and runs here.
   screen recording main canvas + top-down picture-in-picture, top-down audio.
   Sync spot-verified at the pressure raise (hand on pot while the trace
   climbs).
-- Both deliverables and a 480p review proxy uploaded as run artifacts for the
-  operator to download and place in Google Drive.
+- Both deliverables published as GitHub release
+  `phase3-submission-videos-2026-09-17`:
+  - Film: https://github.com/shadybrook/certarig-platform/releases/download/phase3-submission-videos-2026-09-17/CertaRig_Phase3_Film.mp4
+  - Uncut: https://github.com/shadybrook/certarig-platform/releases/download/phase3-submission-videos-2026-09-17/CertaRig_Phase3_Uncut_Bench_Run.mp4
+- Source footage remains in Drive folder
+  https://drive.google.com/drive/folders/1mlegZnq_AQurnBIKY-Ckh1S6TyZ_Q8Bk
+  The IDE browser was not signed into Google, so the finished videos were
+  published on GitHub rather than uploaded into that folder. Copy the two
+  mp4s into Drive if the course portal requires a Drive URL.
+
 
 ## Honesty rails carried into the edit
 

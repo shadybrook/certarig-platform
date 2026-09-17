@@ -246,7 +246,7 @@ CertaRig is ready for the capstone as a platform foundation, not as a finished i
 | Documentation | `README.md`; `docs/platform-lab/` (product state, dry-bench lab record, commissioning-interview design); `docs/explainer/` (gates 0–5 evidence analysis); this Phase 3 document |
 | Evidence | Seven checksummed hardware bundles from 12 Sep 2026 (hashes in `docs/platform-lab/2026-09-12-dry-bench.md`); derived summary data in `docs/explainer/data/`; Phase 2 bench evidence in `pi_retrieval_2026-09-12/phase3_evidence/` |
 | Evidence & product-direction report | `deliverables/CertaRig_Gates_0_to_5_Evidence_and_Product_Direction.pdf` (+ editable DOCX) |
-| Presentation / demo material | **Phase 3 submission film** (script and production pack in `docs/explainer/phase3-film/`; ~12-minute stitched demo with diagrams and labelled live captures) and the **uncut dry-bench demo video** on Google Drive — links to be added at submission [links TBD] |
+| Presentation / demo material | **Phase 3 submission film** (12.7 min): [CertaRig_Phase3_Film.mp4](https://github.com/shadybrook/certarig-platform/releases/download/phase3-submission-videos-2026-09-17/CertaRig_Phase3_Film.mp4). **Uncut clap-synced bench run** (29.6 min, screen + top-down picture-in-picture): [CertaRig_Phase3_Uncut_Bench_Run.mp4](https://github.com/shadybrook/certarig-platform/releases/download/phase3-submission-videos-2026-09-17/CertaRig_Phase3_Uncut_Bench_Run.mp4). Release page: https://github.com/shadybrook/certarig-platform/releases/tag/phase3-submission-videos-2026-09-17. Source footage folder: https://drive.google.com/drive/folders/1mlegZnq_AQurnBIKY-Ckh1S6TyZ_Q8Bk |
 
 ---
 
