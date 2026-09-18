@@ -400,7 +400,7 @@ def scene_protocols(t: float, dur: float) -> Image.Image:
         bx = x + (card_w - bw) / 2
         rounded(draw, (bx - 14, 720, bx + bw + 14, 768), fade(BLUE_LIGHT, a), 12, None)
         draw.text((bx, 730), badge, font=font(15, "medium"), fill=fade(BLUE, a))
-    caption(draw, "A browse is not a write.", u, 0.84, color=INK, size=28)
+    caption(draw, "A browse is not a write.", u, 0.72, color=INK, size=28)
     return image
 
 
@@ -448,12 +448,6 @@ def scene_architecture(t: float, dur: float) -> Image.Image:
         prepared = load_cover(ASSETS / "07_product_architecture.png", 1.10)
         kb = kenburns(prepared, u, start=0.66)
         image = blend_over(image, kb, kb_a)
-        draw = ImageDraw.Draw(image)
-        center_text(
-            draw, (W / 2, 1000),
-            "The agent can ask. Only the kernel can say yes.",
-            font(24, "medium"), fade(TEAL, kb_a),
-        )
     return image
 
 
