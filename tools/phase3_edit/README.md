@@ -45,10 +45,11 @@ python3 tools/phase3_edit/fetch_footage.py manifest.json --dest /tmp/certarig_fo
    --out-dir /tmp/certarig_out/transcripts/`. If sentence boundaries differ
    from the EDL audio in/out by more than ~0.4 s, snap the EDL. Do not
    reshuffle act order.
-4. **Cut list** — `edl/phase3_film_v4.json`. Act A atelier + stills + early
-   wiring/LED bench. Act B clap-synced **Studio | bench split** (left 1310,
-   gutter 2, right 608). Trip crossings use `audio=video` (top-down mic).
-   Act C gates / records / capstone. Target 14–16 min.
+4. **Cut list** — `edl/phase3_film_v4.json`. Act A/C motion is one explainer
+   clip per spoken beat (`python3 tools/render_phase3_explainer.py`; cream
+   paper, not atelier). Live early wiring/LED bench stays. Act B clap-synced
+   **Studio | bench split** (left 1310, gutter 2, right 608). Trip crossings
+   use `audio=video` (top-down mic). Target 14–16 min.
 5. **Assemble** — v4 split compositor:
 
    ```bash
@@ -71,7 +72,10 @@ python3 tools/phase3_edit/fetch_footage.py manifest.json --dest /tmp/certarig_fo
    python3 tools/phase3_edit/make_uncut.py \
      /tmp/certarig_footage/screen.mov /tmp/certarig_footage/topdown.mov \
      /tmp/certarig_out/CertaRig_Phase3_Uncut_Bench_Run.mp4 \
-     --offset 1.14 --crf 21
+     --offset -1.14 --crf 21
+   # --offset is sync_clap's signed value (REF=screen). A −1.14 result
+   # means topdown_time = screen_time + 1.14; the uncut timeline equals
+   # the screen clock. Do not pass the unsigned 1.14 magnitude.
    ```
 
    Screen crop `min(iw,2160):ih:max(0,iw-2160):0` drops the left 720 px

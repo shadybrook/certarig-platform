@@ -1,51 +1,18 @@
 # Production: what you do vs what is already made
 
-Watch `motion/LOOKBOOK.mp4` first (~122 seconds). It is one studio, not a stack of animated cards. The only things you still have to record sit behind two quiet RECORD lamps.
+Watch the explainer clips in `motion/` (cream paper, one idea at a time). See [ANIMATION.md](ANIMATION.md). The live Studio|bench pictures for this submission are already in `tools/phase3_edit/edl/phase3_film_v4.json`.
 
-Then you only do three things:
+Do **not** use `LOOKBOOK.mp4` or the retired atelier room. Rebuild motion with `python3 tools/render_phase3_explainer.py`.
 
-1. Read the voiceover.
-2. Record two live clips.
-3. Drop those clips into the RECORD gaps.
-
-I already made the motion. Post is: lookbook clips + your two recordings + your voice.
+Voiceover, two live captures, and post remain as below. Post is explainer clips + live footage + voice. Never `-stream_loop`. Never imply Grok or Claude tripped the relay — Fake ran the bench.
 
 ---
 
-## 1. Watch the lookbook
+## 1. Watch the explainer pack
 
-Do **not** expect the `.mp4` to play when you click it in Cursor chat. Cursor does not open video files that way.
+Open [preview.html](preview.html) or the mp4s in `motion/`. Clip duration equals the spoken beat. Atelier files, if kept, are in `motion/atelier_retired/`.
 
-On your Mac, in this repo, after checking out `cursor/phase3-submission-video-533a`:
-
-```bash
-open docs/explainer/phase3-film/motion/LOOKBOOK.mp4
-```
-
-That launches QuickTime. Or double-click the file in Finder.
-
-If the mp4 is stubborn, open the stills in `motion/proof/` — especially `05_pressure_trip.jpg` and `05_pressure_latched.jpg`. That pair is the whole argument: the number crosses 4.2, the lamp dies, the number comes home, the lamp stays dead.
-
-A silent GIF of that test: [motion/LOOKBOOK_preview.gif](motion/LOOKBOOK_preview.gif)
-
-| Clip | What you see |
-| --- | --- |
-| `01_title.mp4` | The object. What is this allowed to do? |
-| `02_question.mp4` | Who may turn this on? |
-| `03_language_stops.mp4` | A sentence hits 4.2 bar |
-| `04_architecture.mp4` | Light stops at the kernel |
-| `05_and_gate.mp4` | Live pressure test. Latch. No restart |
-| `05b_latch.mp4` | The pin, after |
-| `06_protocols.mp4` | MQTT through CAN, observe-only |
-| `07_two_ais.mp4` | Grok / Fake / Claude then OpenAI |
-| `08_six_gates.mp4` | Six lamps. The last waits |
-| **`R1_record_dashboard.mp4`** | **YOU RECORD: Phase 3 dashboard, 45s** |
-| **`R2_record_studio.mp4`** | **YOU RECORD: Studio demo** |
-| `09_interview.mp4` | Questions as lights on the desks |
-| `10_capstone_loop.mp4` | Deploy · Interview · Apply · Twin · Arm |
-| `11_close.mp4` | The AI can ask. Only the kernel can say yes. |
-
-If a beat feels wrong, change **Say this** in [SCRIPT_EDIT_ME.md](SCRIPT_EDIT_ME.md) and tell me. Do not record the bench until the lookbook feels right.
+If a beat feels wrong, change **Say this** in [SCRIPT_EDIT_ME.md](SCRIPT_EDIT_ME.md) and tell me.
 
 ---
 
@@ -53,7 +20,7 @@ If a beat feels wrong, change **Say this** in [SCRIPT_EDIT_ME.md](SCRIPT_EDIT_ME
 
 Clean copy: [voiceover.md](voiceover.md). Editable copy: [SCRIPT_EDIT_ME.md](SCRIPT_EDIT_ME.md).
 
-Record in a quiet room, phone is fine. Pause one beat at each heading. When the lookbook shows a RECORD lamp, you will be talking over your own screen capture instead of a motion clip.
+Record in a quiet room, phone is fine. Pause one beat at each heading. Live Section 6 is the Studio|bench split in the v4 EDL, not a RECORD lamp card.
 
 ---
 
@@ -99,7 +66,7 @@ Never label simulator traces as Raspberry Pi.
 
 CapCut, 1920×1080, 30 fps.
 
-1. Import everything in `motion/` except `LOOKBOOK.mp4`, `LOOKBOOK_preview.gif`, `lookbook.txt`, and `proof/`.
+1. Import the explainer mp4s in `motion/` (not `LOOKBOOK.mp4`, not `atelier_retired/`).
 2. Import your `P3_dashboard_8080.mp4` and `studio_*.mp4`.
 3. Timeline order = the table above. Replace R1 with Clip A. Replace R2 with the Studio takes in the table order.
 4. Hold the last frame of a motion clip if the voiceover needs more air. Crossfade the studio plates; hard-cut into screen recordings.
@@ -110,5 +77,5 @@ CapCut, 1920×1080, 30 fps.
 Rebuild motion later with:
 
 ```bash
-python3 tools/render_phase3_atelier.py
+python3 tools/render_phase3_explainer.py
 ```

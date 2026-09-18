@@ -5,7 +5,7 @@ Renders every segment to a uniform 1920x1080 30 fps intermediate (H.264 +
 48 kHz stereo AAC in MPEG-TS) and concatenates. Picture bible:
 
 - Stills: ``-loop 1`` on the image input. No Ken Burns unless requested.
-- Atelier clips play once at native speed (never ``-stream_loop``). Freeze
+- Explainer clips play once at native speed (never ``-stream_loop``). Freeze
   the last frame with tpad if the audio slice is longer than the clip.
 - ``fit=pillarbox``: rotate portrait sources with
   ``transpose=clock:passthrough=portrait``, optional crop, then decrease+pad

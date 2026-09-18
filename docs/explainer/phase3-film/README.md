@@ -1,22 +1,15 @@
 # Phase 3 submission film pack
 
-A quiet studio film for the 20 September Phase 3 submission. Objects first. Motion that explains. Type last.
+A 3Blue1Brown / Veritasium explainer pack for the 20 September Phase 3 submission. Cream paper. One idea at a time. Reveals across the spoken beat.
 
 **Working title:** What is CertaRig?
-**Target duration:** 11:40 to 12:20
 **Final line:** The AI can ask. Only the kernel can say yes.
 
-**Start here:** [PRODUCTION.md](PRODUCTION.md)
+**Start here:** [ANIMATION.md](ANIMATION.md) · [PRODUCTION.md](PRODUCTION.md)
 
-Clicking `LOOKBOOK.mp4` in Cursor chat or the editor usually does **nothing** — Cursor does not play MP4s from a file citation. Open it on disk instead:
+Rebuild motion with `python3 tools/render_phase3_explainer.py`. Do not call `render_phase3_atelier.py`. Do not put `LOOKBOOK.mp4` in the film.
 
-- Finder: `docs/explainer/phase3-film/motion/LOOKBOOK.mp4` (QuickTime)
-- Or watch the GIF of the pressure test: [motion/LOOKBOOK_preview.gif](motion/LOOKBOOK_preview.gif)
-- Or open stills in [motion/proof/](motion/proof/)
-
-If that folder is missing, you are not on branch `cursor/phase3-submission-video-533a`. Fetch/checkout that branch in the **certarig-platform** repo (GitHub: shadybrook/certarig-platform), not only the frozen Phase 3 PoC.
-
-This pack is the Phase 3 *submission* film. Edit spoken lines in [SCRIPT_EDIT_ME.md](SCRIPT_EDIT_ME.md). Motion is in [motion/](motion/). Visual grammar is one studio, photographic plates, and demonstrations (a trace that trips, a pin that stays down) rather than animated slides. The 13 September lab explainer remains at [`../2026-09-13-video-script.md`](../2026-09-13-video-script.md).
+This pack is the Phase 3 *submission* film. Edit spoken lines in [SCRIPT_EDIT_ME.md](SCRIPT_EDIT_ME.md). Motion is in [motion/](motion/). Visual grammar is paper stills plus timed explainer clips, then the designed Studio|bench split for Section 6. The 13 September lab explainer remains at [`../2026-09-13-video-script.md`](../2026-09-13-video-script.md).
 
 ## What is in this folder
 
@@ -24,7 +17,6 @@ This pack is the Phase 3 *submission* film. Edit spoken lines in [SCRIPT_EDIT_ME
 | --- | --- |
 | [PRODUCTION.md](PRODUCTION.md) | **Do this.** Watch, read, record, patch |
 | [preview.html](preview.html) | Click-through of every motion clip |
-| [motion/LOOKBOOK.mp4](motion/LOOKBOOK.mp4) | ~122-second studio film of the finished language |
 | [SCRIPT_EDIT_ME.md](SCRIPT_EDIT_ME.md) | Spoken lines you can rewrite |
 | [voiceover.md](voiceover.md) | Clean read-aloud |
 | [ANIMATION.md](ANIMATION.md) | Clip list and rebuild command |

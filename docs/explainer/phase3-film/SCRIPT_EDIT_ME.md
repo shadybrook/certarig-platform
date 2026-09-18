@@ -8,11 +8,11 @@ How to edit:
 3. Do not change the **Keep these facts** numbers (4.2 bar, 15 L/min, 12 Sep peaks, Fake on the bench).
 4. Tell me what you changed if you want stills and captions regenerated.
 
-Visual grammar (atelier, not slides):
-- Watch [motion/LOOKBOOK.mp4](motion/LOOKBOOK.mp4) before editing.
-- Admire the object. Type is late and small.
+Visual grammar (3Blue1Brown / Veritasium paper pack, not the dark atelier):
+- Watch the explainer clips in [motion/](motion/) — rebuild with `python3 tools/render_phase3_explainer.py`.
+- Cream/white paper, teal/gold/ink, one idea at a time. Reveals span the spoken duration.
 - If a beat can be labeled or demonstrated, demonstrate it.
-- Motion clips in `motion/` are the picture. You record only the two live gaps.
+- Motion clips in `motion/` are the picture. Live Studio|bench split is footage, not LOOKBOOK.
 
 Capstone (this is the product, not a hydraulic plant):
 CertaRig deploys as an agentic test-operations layer on *someone else’s* rig. A short commissioning interview maps protocols, connections, pins, and components. A human still applies that map. The kernel still owns the output. That interview is designed, not built yet. Say so.
