@@ -96,8 +96,9 @@ Maps every factual claim in `CertaRig_Phase3_Document.md` to its evidence source
 | Claim | Evidence source |
 | --- | --- |
 | Gates 0–5 evidence & product-direction report (PDF + DOCX) | `deliverables/CertaRig_Gates_0_to_5_Evidence_and_Product_Direction.pdf` / `.docx` |
-| Phase 3 submission film (12.7 min) | https://github.com/shadybrook/certarig-platform/releases/download/phase3-submission-videos-2026-09-17/CertaRig_Phase3_Film.mp4 ; cut list `tools/phase3_edit/edl/phase3_film.json` |
-| Uncut clap-synced bench run (29.6 min) | https://github.com/shadybrook/certarig-platform/releases/download/phase3-submission-videos-2026-09-17/CertaRig_Phase3_Uncut_Bench_Run.mp4 |
+| Phase 3 submission film v4 (13.4 min, paper explainer + Studio/bench split) | https://github.com/shadybrook/certarig-platform/releases/download/phase3-submission-videos-v4/CertaRig_Phase3_Film.mp4 ; cut list `tools/phase3_edit/edl/phase3_film_v4.json` ; rebuild `python3 tools/render_phase3_explainer.py` |
+| Uncut clap-synced bench run v4 (29.6 min, 1310+608 split) | https://github.com/shadybrook/certarig-platform/releases/download/phase3-submission-videos-v4/CertaRig_Phase3_Uncut_Bench_Run.mp4 |
+| Uncut action windows v4 (no VO) | https://github.com/shadybrook/certarig-platform/releases/download/phase3-submission-videos-v4/CertaRig_Phase3_Uncut_Action.mp4 |
 | Derived data: hardware run summary, evidence verification record | `docs/explainer/data/hardware_run_summary.csv`, `docs/explainer/data/evidence_verification.json` |
 | Source footage Drive folder | https://drive.google.com/drive/folders/1mlegZnq_AQurnBIKY-Ckh1S6TyZ_Q8Bk |
 

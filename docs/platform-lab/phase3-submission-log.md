@@ -79,6 +79,59 @@ scripted and runs here.
   published on GitHub rather than uploaded into that folder. Copy the two
   mp4s into Drive if the course portal requires a Drive URL.
 
+## Outcome (18 Sep, v4)
+
+Cloud render of the designed Studio|bench split, then a rebuild of the motion pack after the operator rejected the dark atelier lookbook. Branch `cursor/phase3-film-v4-2e0e`. Selftest PASS (sync −3.21 s within 50 ms; uncut 1920×1080 split pixels; 15.1 s five-segment film including pillarbox and split).
+
+- Footage from Drive folder
+  https://drive.google.com/drive/folders/1mlegZnq_AQurnBIKY-Ckh1S6TyZ_Q8Bk
+  renamed to `/tmp/certarig_footage/{screen,topdown,narr_1_5,narr_6,narr_7_9}.mov`
+  (sizes match the laptop: screen 943 MB, topdown 1.8 GB, narr 223/140/127 MB).
+- Clap offset **1.14 s**: `topdown_time = screen_time + 1.14`. Windowed
+  `sync_clap.py` (REF=screen) returned −1.14 s (clap onsets screen 3.92 s /
+  topdown 5.06 s; pressure-raise window −1.17 s at confidence 5.9). Spot-check
+  at screen t=743: Studio Live 3.34 bar climbing, hand on the left pot on the
+  aligned top-down frame at 744.14 s. `make_uncut.py --offset -1.14` (the
+  signed `sync_clap` value) so the uncut timeline equals the screen clock.
+- **Motion rebuild:** `tools/render_phase3_explainer.py` (not
+  `render_phase3_atelier.py`). Cream/white paper, teal/gold/ink, Inter, 1920×1080
+  30 fps libx264 crf 20, frames piped to ffmpeg stdin. Each clip duration equals
+  the spoken beat; reveals use `u = t/dur` across the full length. No LOOKBOOK.
+  No `-stream_loop`. Atelier files (dark studio, LOOKBOOK, old 7 s clips) live in
+  `docs/explainer/phase3-film/motion/atelier_retired/`. Act A/C in
+  `edl/phase3_film_v4.json` are one motion clip per beat; still-fillers removed.
+  Live bench + Section 6 split stay as designed. Fake is the proven runtime;
+  never imply Grok or Claude tripped the relay.
+- Film **13.4 min** (`801 s`) from `tools/phase3_edit/edl/phase3_film_v4.json`
+  (45 segments, `--prefix a_/b_/c_`). No LOOKBOOK.mp4. No overlay PiP.
+- Uncut **29.6 min** 1310|608 split archive. Action windows **4.5 min**
+  (permit 500–517, pressure 730–787, flow 940–975, E-stop 1238–1271,
+  agent 1410–1515, evidence 1600–1620 on the screen clock).
+- Picture bible: explainer clips play once at native spoken duration; proof
+  beats `layout=split` (left Studio 1310×1080 decrease+pad, 2 px charcoal
+  gutter, right portrait bench 608×1080 cover-fit); screen crops cards
+  `2160:1215:720:66` / graph `2160:1215:720:585` (drops ChatGPT sidebar);
+  bench punch-in `1080:1440:0:200` after `transpose=clock:passthrough=portrait`.
+  Act A bench is early wiring (~61–111 s) and permit LEDs (~491–527 s), never
+  pressure-trip hands (~730+). Trip crossings use live top-down audio. Labels
+  fade at 4 s and stay off the Live trace. Honesty: Studio · Raspberry Pi
+  sidecar :8081 / Dry bench · Raspberry Pi. Fake ran the bench.
+- QC: Act A title frames are cream paper (not the dark atelier room). Act A
+  wiring/LED frames show the idle dry bench, no 730 s pot-trip hand. Act B
+  pressure-trip split at local t≈8 s is 1920×1080; left pane is the Studio
+  graph (4.00 bar, trace at the 4.2 line, Output off, provider fake, no
+  ChatGPT sidebar); right pane is a full-height portrait bench with the hand
+  on the pressure pot (not a lower-right stamp, not squashed 16:9). Flow-trip
+  split similarly shows the climbing flow trace and the hand on the right pot.
+  Uncut at t=743 shows both panes alive and clap-synced.
+- GitHub release `phase3-submission-videos-v4` (film asset replaced after the
+  explainer rebuild):
+  - Film: https://github.com/shadybrook/certarig-platform/releases/download/phase3-submission-videos-v4/CertaRig_Phase3_Film.mp4
+  - Uncut: https://github.com/shadybrook/certarig-platform/releases/download/phase3-submission-videos-v4/CertaRig_Phase3_Uncut_Bench_Run.mp4
+  - Action: https://github.com/shadybrook/certarig-platform/releases/download/phase3-submission-videos-v4/CertaRig_Phase3_Uncut_Action.mp4
+  - Release page: https://github.com/shadybrook/certarig-platform/releases/tag/phase3-submission-videos-v4
+- Drive upload was not available from this VM (same as v1–v3); GitHub is
+  the delivery. Source footage remains in the Drive folder above.
 
 ## Honesty rails carried into the edit
 

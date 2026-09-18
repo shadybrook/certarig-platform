@@ -1,0 +1,491 @@
+{
+  "_notes": [
+    "Phase 3 film v4, 18 Sep 2026. Designed Studio|bench split. No LOOKBOOK.mp4.",
+    "Explainer motion (tools/render_phase3_explainer.py): cream/teal/gold paper pack.",
+    "Act A/C motion is ONE clip per spoken beat at that duration. No still-fillers.",
+    "No -stream_loop. Atelier lookbook clips are retired (motion/atelier_retired/).",
+    "Clap: topdown_time = screen_time + 1.14 s (reconfirm with sync_clap.py).",
+    "Screen crops (2880x1800): cards=2160:1215:720:66, graph=2160:1215:720:585",
+    "(drops ChatGPT sidebar). Bench punch-in 1080:1440:0:200 after",
+    "transpose=clock:passthrough=portrait. Act A bench is early wiring (~61-111)",
+    "and permit LEDs (~491-527). NEVER pressure-trip hands (~730+) in Act A.",
+    "Trip crossings: layout=split, audio=video (topdown mic). Do not talk over the latch.",
+    "Labels fade at 4 s, never on the Live trace.",
+    "Honesty: Studio · Raspberry Pi sidecar :8081 / Dry bench · Raspberry Pi. Fake ran the bench."
+  ],
+  "sources": {
+    "screen": "/tmp/certarig_footage/screen.mov",
+    "topdown": "/tmp/certarig_footage/topdown.mov",
+    "narr_1_5": "/tmp/certarig_footage/narr_1_5.mov",
+    "narr_6": "/tmp/certarig_footage/narr_6.mov",
+    "narr_7_9": "/tmp/certarig_footage/narr_7_9.mov"
+  },
+  "sync": {
+    "topdown_minus_screen": 1.14
+  },
+  "crops": {
+    "cards": "2160:1215:720:66",
+    "graph": "2160:1215:720:585",
+    "bench": "1080:1440:0:200"
+  },
+  "segments": [
+    {
+      "id": "a_title",
+      "duration": 8.0,
+      "video": {"src": "docs/explainer/phase3-film/motion/01_title.mp4"},
+      "audio": {"src": "narr_1_5", "in": 0.0, "out": 8.0}
+    },
+    {
+      "id": "a_question",
+      "duration": 7.5,
+      "video": {"src": "docs/explainer/phase3-film/motion/02_question.mp4"},
+      "audio": {"src": "narr_1_5", "in": 8.0, "out": 15.5}
+    },
+    {
+      "id": "a_problem",
+      "duration": 12.5,
+      "video": {"src": "docs/explainer/phase3-film/motion/03_problem.mp4"},
+      "audio": {"src": "narr_1_5", "in": 15.5, "out": 28.0}
+    },
+    {
+      "id": "a_language_stops",
+      "duration": 9.5,
+      "video": {"src": "docs/explainer/phase3-film/motion/03_language_stops.mp4"},
+      "audio": {"src": "narr_1_5", "in": 28.0, "out": 37.5}
+    },
+    {
+      "id": "a_relay",
+      "duration": 10.5,
+      "video": {"src": "docs/explainer/phase3-film/motion/03b_relay.mp4"},
+      "audio": {"src": "narr_1_5", "in": 37.5, "out": 48.0}
+    },
+    {
+      "id": "a_protocols",
+      "duration": 23.8,
+      "video": {"src": "docs/explainer/phase3-film/motion/06_protocols.mp4"},
+      "audio": {"src": "narr_1_5", "in": 48.0, "out": 71.8}
+    },
+    {
+      "id": "a_architecture",
+      "duration": 28.6,
+      "video": {"src": "docs/explainer/phase3-film/motion/04_architecture.mp4"},
+      "audio": {"src": "narr_1_5", "in": 71.8, "out": 100.14}
+    },
+    {
+      "id": "a_bench_pots",
+      "video": {
+        "src": "topdown",
+        "in": 61.1,
+        "out": 81.6,
+        "crop": "1080:1440:0:200",
+        "fit": "pillarbox"
+      },
+      "audio": {"src": "narr_1_5", "in": 100.14, "out": 120.92},
+      "label": "Dry bench \u00b7 two pots emulate pressure and flow"
+    },
+    {
+      "id": "a_bench_adc",
+      "video": {
+        "src": "topdown",
+        "in": 86.1,
+        "out": 111.2,
+        "crop": "1080:1440:0:200",
+        "fit": "pillarbox"
+      },
+      "audio": {"src": "narr_1_5", "in": 120.92, "out": 145.56},
+      "label": "ADS1115 \u00b7 Raspberry Pi"
+    },
+    {
+      "id": "a_indicators",
+      "video": {
+        "src": "topdown",
+        "in": 491.1,
+        "out": 514.4,
+        "crop": "1080:1440:0:200",
+        "fit": "pillarbox"
+      },
+      "audio": {"src": "narr_1_5", "in": 145.56, "out": 169.94},
+      "label": "Red inhibited \u00b7 green permitted"
+    },
+    {
+      "id": "a_split_jobs",
+      "video": {"still": "docs/explainer/assets/07_product_architecture.png"},
+      "audio": {"src": "narr_1_5", "in": 169.94, "out": 185.42}
+    },
+    {
+      "id": "a_and_gate",
+      "duration": 18.5,
+      "video": {"src": "docs/explainer/phase3-film/motion/05_and_gate.mp4"},
+      "audio": {"src": "narr_1_5", "in": 185.42, "out": 203.92}
+    },
+    {
+      "id": "a_latch",
+      "duration": 9.3,
+      "video": {"src": "docs/explainer/phase3-film/motion/05b_latch.mp4"},
+      "audio": {"src": "narr_1_5", "in": 203.92, "out": 213.22}
+    },
+    {
+      "id": "a_wiring",
+      "video": {
+        "src": "topdown",
+        "in": 62.14,
+        "out": 70.14,
+        "crop": "1080:1440:0:200",
+        "fit": "pillarbox"
+      },
+      "audio": {"src": "narr_1_5", "in": 213.24, "out": 220.88},
+      "label": "Dry bench \u00b7 Raspberry Pi"
+    },
+    {
+      "id": "a_indicators_2",
+      "video": {
+        "src": "topdown",
+        "in": 492.14,
+        "out": 508.84,
+        "crop": "1080:1440:0:200",
+        "fit": "pillarbox"
+      },
+      "audio": {"src": "narr_1_5", "in": 220.88, "out": 238.72},
+      "label": "Dry bench \u00b7 Raspberry Pi"
+    },
+    {
+      "id": "a_output_eq",
+      "duration": 18.5,
+      "video": {"src": "docs/explainer/phase3-film/motion/08_output_equation.mp4"},
+      "audio": {"src": "narr_1_5", "in": 238.72, "out": 257.22}
+    },
+    {
+      "id": "a_two_ais",
+      "duration": 7.5,
+      "video": {"src": "docs/explainer/phase3-film/motion/07_two_ais.mp4"},
+      "audio": {"src": "narr_1_5", "in": 257.22, "out": 264.72}
+    },
+    {
+      "id": "a_ai_stack",
+      "duration": 48.0,
+      "video": {"src": "docs/explainer/phase3-film/motion/07b_ai_stack.mp4"},
+      "audio": {"src": "narr_1_5", "in": 264.72, "out": 312.72}
+    },
+    {
+      "id": "a_benchmark",
+      "duration": 35.2,
+      "video": {"src": "docs/explainer/phase3-film/motion/07c_benchmark.mp4"},
+      "audio": {"src": "narr_1_5", "in": 312.72, "out": 347.32}
+    },
+    {
+      "id": "b_intro_studio",
+      "video": {
+        "src": "screen",
+        "in": 22.0,
+        "out": 34.0,
+        "crop": "2160:1215:720:66"
+      },
+      "audio": {"src": "narr_6", "in": 0.0, "out": 12.66},
+      "label": "Studio \u00b7 Raspberry Pi sidecar :8081"
+    },
+    {
+      "id": "b_intro_bench",
+      "video": {
+        "src": "topdown",
+        "in": 41.1,
+        "out": 50.5,
+        "crop": "1080:1440:0:200",
+        "fit": "pillarbox"
+      },
+      "audio": {"src": "narr_6", "in": 12.66, "out": 21.1},
+      "label": "Dry bench \u00b7 Raspberry Pi"
+    },
+    {
+      "id": "b_permit",
+      "video": {
+        "layout": "split",
+        "left": {
+          "src": "screen",
+          "in": 500.0,
+          "out": 517.1,
+          "crop": "2160:1215:720:66"
+        },
+        "right": {
+          "src": "topdown",
+          "in": 501.14,
+          "out": 518.24
+        }
+      },
+      "audio": {"src": "narr_6", "in": 21.1, "out": 38.73},
+      "label": "Studio \u00b7 Raspberry Pi sidecar :8081"
+    },
+    {
+      "id": "b_pressure_raise",
+      "video": {
+        "layout": "split",
+        "left": {
+          "src": "screen",
+          "in": 730.7,
+          "out": 743.0,
+          "crop": "2160:1215:720:585"
+        },
+        "right": {
+          "src": "topdown",
+          "in": 731.84,
+          "out": 744.14
+        }
+      },
+      "audio": {"src": "narr_6", "in": 38.73, "out": 50.51},
+      "label": "Pressure guardrail \u00b7 4.2 bar"
+    },
+    {
+      "id": "b_pressure_trip",
+      "video": {
+        "layout": "split",
+        "left": {
+          "src": "screen",
+          "in": 743.0,
+          "out": 773.0,
+          "crop": "2160:1215:720:585"
+        },
+        "right": {
+          "src": "topdown",
+          "in": 744.14,
+          "out": 774.14
+        }
+      },
+      "audio": "video"
+    },
+    {
+      "id": "b_pressure_latch",
+      "video": {
+        "layout": "split",
+        "left": {
+          "src": "screen",
+          "in": 773.0,
+          "out": 787.0,
+          "crop": "2160:1215:720:585"
+        },
+        "right": {
+          "src": "topdown",
+          "in": 774.14,
+          "out": 788.14
+        }
+      },
+      "audio": {"src": "narr_6", "in": 50.8, "out": 64.62},
+      "label": "Studio \u00b7 Raspberry Pi sidecar :8081"
+    },
+    {
+      "id": "b_flow_raise",
+      "video": {
+        "layout": "split",
+        "left": {
+          "src": "screen",
+          "in": 940.0,
+          "out": 955.5,
+          "crop": "2160:1215:720:585"
+        },
+        "right": {
+          "src": "topdown",
+          "in": 941.14,
+          "out": 956.64
+        }
+      },
+      "audio": {"src": "narr_6", "in": 64.62, "out": 80.74},
+      "label": "Flow guardrail \u00b7 15 L/min"
+    },
+    {
+      "id": "b_flow_trip",
+      "video": {
+        "layout": "split",
+        "left": {
+          "src": "screen",
+          "in": 955.5,
+          "out": 975.0,
+          "crop": "2160:1215:720:585"
+        },
+        "right": {
+          "src": "topdown",
+          "in": 956.64,
+          "out": 976.14
+        }
+      },
+      "audio": "video"
+    },
+    {
+      "id": "b_estop_bench",
+      "video": {
+        "src": "topdown",
+        "in": 1238.1,
+        "out": 1256.6,
+        "crop": "1080:1440:0:200",
+        "fit": "pillarbox"
+      },
+      "audio": {"src": "narr_6", "in": 81.76, "out": 100.3},
+      "label": "Dry bench \u00b7 Raspberry Pi"
+    },
+    {
+      "id": "b_estop_release",
+      "video": {
+        "src": "screen",
+        "in": 1262.0,
+        "out": 1271.1,
+        "crop": "2160:1215:720:66"
+      },
+      "audio": {"src": "narr_6", "in": 101.8, "out": 109.26},
+      "label": "Studio \u00b7 Raspberry Pi sidecar :8081"
+    },
+    {
+      "id": "b_agent_intro",
+      "video": {
+        "src": "screen",
+        "in": 1410.0,
+        "out": 1422.0,
+        "crop": "2160:1215:720:66"
+      },
+      "audio": {"src": "narr_6", "in": 111.04, "out": 122.84},
+      "label": "Fake agent selects the skill"
+    },
+    {
+      "id": "b_agent_pressure",
+      "video": {
+        "src": "screen",
+        "in": 1424.0,
+        "out": 1440.0,
+        "crop": "2160:1215:720:66"
+      },
+      "audio": {"src": "narr_6", "in": 122.84, "out": 139.54},
+      "label": "Studio \u00b7 Raspberry Pi sidecar :8081"
+    },
+    {
+      "id": "b_agent_hand",
+      "video": {
+        "layout": "split",
+        "left": {
+          "src": "screen",
+          "in": 1438.0,
+          "out": 1444.5,
+          "crop": "2160:1215:720:585"
+        },
+        "right": {
+          "src": "topdown",
+          "in": 1439.14,
+          "out": 1445.64
+        }
+      },
+      "audio": {"src": "narr_6", "in": 139.54, "out": 145.3},
+      "label": "Studio \u00b7 Raspberry Pi sidecar :8081"
+    },
+    {
+      "id": "b_agent_flow",
+      "video": {
+        "layout": "split",
+        "left": {
+          "src": "screen",
+          "in": 1500.0,
+          "out": 1514.8,
+          "crop": "2160:1215:720:585"
+        },
+        "right": {
+          "src": "topdown",
+          "in": 1501.14,
+          "out": 1515.94
+        }
+      },
+      "audio": {"src": "narr_6", "in": 145.3, "out": 156.86},
+      "label": "Studio \u00b7 Raspberry Pi sidecar :8081"
+    },
+    {
+      "id": "b_review",
+      "video": {
+        "src": "screen",
+        "in": 1600.0,
+        "out": 1620.9,
+        "crop": "2160:1215:720:585"
+      },
+      "audio": {"src": "narr_6", "in": 156.86, "out": 178.02},
+      "label": "Studio \u00b7 Raspberry Pi sidecar :8081"
+    },
+    {
+      "id": "b_powerdown",
+      "video": {
+        "src": "screen",
+        "in": 1740.0,
+        "out": 1761.9,
+        "crop": "2160:1215:720:66"
+      },
+      "audio": {"src": "narr_6", "in": 178.02, "out": 202.92},
+      "label": "Studio \u00b7 Raspberry Pi sidecar :8081"
+    },
+    {
+      "id": "b_disclaimer",
+      "video": {
+        "src": "topdown",
+        "in": 1767.1,
+        "out": 1779.6,
+        "crop": "1080:1440:0:200",
+        "fit": "pillarbox"
+      },
+      "audio": {"src": "narr_6", "in": 205.6, "out": 215.3},
+      "label": "Dry bench \u00b7 Raspberry Pi"
+    },
+    {
+      "id": "c_gates",
+      "duration": 16.9,
+      "video": {"src": "docs/explainer/phase3-film/motion/08_six_gates.mp4"},
+      "audio": {"src": "narr_7_9", "in": 0.0, "out": 16.9}
+    },
+    {
+      "id": "c_session",
+      "video": {
+        "src": "screen",
+        "in": 1410.0,
+        "out": 1418.1,
+        "crop": "2160:1215:720:66"
+      },
+      "audio": {"src": "narr_7_9", "in": 17.2, "out": 25.52},
+      "label": "Studio \u00b7 Raspberry Pi sidecar :8081"
+    },
+    {
+      "id": "c_records",
+      "video": {
+        "src": "screen",
+        "in": 1600.0,
+        "out": 1618.0,
+        "crop": "2160:1215:720:585"
+      },
+      "audio": {"src": "narr_7_9", "in": 25.52, "out": 42.24},
+      "label": "Studio \u00b7 Raspberry Pi sidecar :8081"
+    },
+    {
+      "id": "c_peaks",
+      "video": {"still": "docs/explainer/assets/02_hardware_peaks.png"},
+      "audio": {"src": "narr_7_9", "in": 42.24, "out": 61.9}
+    },
+    {
+      "id": "c_interview",
+      "duration": 38.8,
+      "video": {"src": "docs/explainer/phase3-film/motion/09_interview.mp4"},
+      "audio": {"src": "narr_7_9", "in": 63.1, "out": 101.9}
+    },
+    {
+      "id": "c_map",
+      "duration": 24.4,
+      "video": {"src": "docs/explainer/phase3-film/motion/09b_map.mp4"},
+      "audio": {"src": "narr_7_9", "in": 101.9, "out": 126.3}
+    },
+    {
+      "id": "c_capstone",
+      "duration": 45.25,
+      "video": {"src": "docs/explainer/phase3-film/motion/10_capstone_loop.mp4"},
+      "audio": {"src": "narr_7_9", "in": 126.3, "out": 171.55}
+    },
+    {
+      "id": "c_close",
+      "duration": 9.5,
+      "video": {"src": "docs/explainer/phase3-film/motion/11_close.mp4"},
+      "audio": {"src": "narr_7_9", "in": 171.55, "out": 181.05}
+    },
+    {
+      "id": "c_thanks",
+      "duration": 14.8,
+      "video": {"src": "docs/explainer/phase3-film/motion/11b_thanks.mp4"},
+      "audio": {"src": "narr_7_9", "in": 181.05, "out": 195.85}
+    }
+  ]
+}
