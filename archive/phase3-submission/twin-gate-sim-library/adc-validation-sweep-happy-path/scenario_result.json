@@ -1,0 +1,580 @@
+{
+  "csv_path": "/var/folders/99/c5_m53v15k72rfv61qxs06br0000gn/T/tmplyw1ykug/evidence/20260912T120004283733Z_adc_validation.csv",
+  "csv_rows": 375,
+  "evidence_dir": "evidence/sim-library/adc-validation-sweep-happy-path",
+  "failures": [],
+  "invariants": {
+    "csv_rows_contiguous": {
+      "passed": true,
+      "problem_count": 0,
+      "problems": []
+    },
+    "ends_safe": {
+      "passed": true,
+      "problem_count": 0,
+      "problems": []
+    },
+    "output_off_when_estop": {
+      "passed": true,
+      "problem_count": 0,
+      "problems": []
+    },
+    "output_off_when_process_unsafe": {
+      "passed": true,
+      "problem_count": 0,
+      "problems": []
+    }
+  },
+  "kernel_events": [
+    "pressure_high_forced_safe",
+    "process_safe_reset_required",
+    "flow_high_forced_safe",
+    "process_safe_reset_required",
+    "operator_safe"
+  ],
+  "name": "adc validation sweep happy path",
+  "notes": [],
+  "passed": true,
+  "rig_log": [
+    {
+      "channel": "pressure_emulator",
+      "over_s": 0.5,
+      "t": 1.04,
+      "to": 0.1,
+      "what": "ramp"
+    },
+    {
+      "channel": "pressure_emulator",
+      "over_s": 0.8,
+      "t": 1.56,
+      "to": 9.0,
+      "what": "ramp"
+    },
+    {
+      "channel": "pressure_emulator",
+      "over_s": 0.8,
+      "t": 2.4,
+      "to": 2.5,
+      "what": "ramp"
+    },
+    {
+      "channel": "flow_emulator",
+      "over_s": 0.5,
+      "t": 3.28,
+      "to": 0.2,
+      "what": "ramp"
+    },
+    {
+      "channel": "flow_emulator",
+      "over_s": 0.8,
+      "t": 3.88,
+      "to": 18.5,
+      "what": "ramp"
+    },
+    {
+      "channel": "flow_emulator",
+      "over_s": 0.8,
+      "t": 4.76,
+      "to": 8.0,
+      "what": "ramp"
+    }
+  ],
+  "run": {
+    "checks": [
+      {
+        "check": {
+          "event_not_observed": "permit_accepted"
+        },
+        "observed_events": [
+          "csv_recording_started",
+          "estop_closed_reset_required",
+          "flow_high_forced_safe",
+          "pressure_high_forced_safe",
+          "process_safe_reset_required"
+        ],
+        "passed": true
+      },
+      {
+        "check": {
+          "step_passed": "settle"
+        },
+        "passed": true
+      },
+      {
+        "check": {
+          "peak_below": 10.0,
+          "signal": "pressure"
+        },
+        "passed": true,
+        "peak": 8.34457
+      },
+      {
+        "check": {
+          "peak_below": 20.0,
+          "signal": "flow"
+        },
+        "passed": true,
+        "peak": 17.51935
+      }
+    ],
+    "config_hash": "9e6a03f94e6db04e063c4cbeb54e4eadd9d8357e7b8c939a995e963249041129",
+    "contract_hash": "ac68338b687f7c9b6b39403c4e6da522f60d0d1ff0b2791884494bc75408707b",
+    "created_at": "2026-09-12T12:00:04.283504+00:00",
+    "current_step": null,
+    "ended_at": "2026-09-12T12:00:11.782962+00:00",
+    "events": [
+      {
+        "at": "2026-09-12T12:00:04.283648+00:00",
+        "kind": "preflight"
+      },
+      {
+        "at": "2026-09-12T12:00:04.284169+00:00",
+        "filename": "20260912T120004283733Z_adc_validation.csv",
+        "kind": "recording_started"
+      },
+      {
+        "at": "2026-09-12T12:00:04.284188+00:00",
+        "kind": "step_started",
+        "step": "baseline",
+        "type": "expect"
+      },
+      {
+        "at": "2026-09-12T12:00:05.292746+00:00",
+        "elapsed_ms": 1008.545,
+        "kind": "step_passed",
+        "step": "baseline"
+      },
+      {
+        "at": "2026-09-12T12:00:05.292755+00:00",
+        "kind": "step_started",
+        "step": "pressure_low",
+        "type": "trigger"
+      },
+      {
+        "at": "2026-09-12T12:00:05.292762+00:00",
+        "instruction": "Turn P1 fully anticlockwise (minimum pressure).",
+        "kind": "instruction",
+        "step": "pressure_low"
+      },
+      {
+        "at": "2026-09-12T12:00:05.806113+00:00",
+        "elapsed_ms": 513.351,
+        "kind": "step_passed",
+        "step": "pressure_low"
+      },
+      {
+        "at": "2026-09-12T12:00:05.806126+00:00",
+        "kind": "step_started",
+        "step": "pressure_high",
+        "type": "trigger"
+      },
+      {
+        "at": "2026-09-12T12:00:05.806133+00:00",
+        "instruction": "Turn P1 slowly to maximum. Expect the trip indicator; the output is not armed.",
+        "kind": "instruction",
+        "step": "pressure_high"
+      },
+      {
+        "at": "2026-09-12T12:00:06.648783+00:00",
+        "elapsed_ms": 842.647,
+        "kind": "step_passed",
+        "step": "pressure_high"
+      },
+      {
+        "at": "2026-09-12T12:00:06.648789+00:00",
+        "kind": "step_started",
+        "step": "pressure_mid",
+        "type": "trigger"
+      },
+      {
+        "at": "2026-09-12T12:00:06.648793+00:00",
+        "instruction": "Return P1 to roughly the middle of its travel (2 to 3 bar).",
+        "kind": "instruction",
+        "step": "pressure_mid"
+      },
+      {
+        "at": "2026-09-12T12:00:07.528179+00:00",
+        "elapsed_ms": 879.379,
+        "kind": "step_passed",
+        "step": "pressure_mid"
+      },
+      {
+        "at": "2026-09-12T12:00:07.528187+00:00",
+        "kind": "step_started",
+        "step": "flow_low",
+        "type": "trigger"
+      },
+      {
+        "at": "2026-09-12T12:00:07.528191+00:00",
+        "instruction": "Turn P2 fully anticlockwise (minimum flow).",
+        "kind": "instruction",
+        "step": "flow_low"
+      },
+      {
+        "at": "2026-09-12T12:00:08.131426+00:00",
+        "elapsed_ms": 603.23,
+        "kind": "step_passed",
+        "step": "flow_low"
+      },
+      {
+        "at": "2026-09-12T12:00:08.131440+00:00",
+        "kind": "step_started",
+        "step": "flow_high",
+        "type": "trigger"
+      },
+      {
+        "at": "2026-09-12T12:00:08.131457+00:00",
+        "instruction": "Turn P2 slowly to maximum.",
+        "kind": "instruction",
+        "step": "flow_high"
+      },
+      {
+        "at": "2026-09-12T12:00:09.003814+00:00",
+        "elapsed_ms": 872.364,
+        "kind": "step_passed",
+        "step": "flow_high"
+      },
+      {
+        "at": "2026-09-12T12:00:09.003828+00:00",
+        "kind": "step_started",
+        "step": "flow_mid",
+        "type": "trigger"
+      },
+      {
+        "at": "2026-09-12T12:00:09.003834+00:00",
+        "instruction": "Return P2 to roughly the middle of its travel (6 to 10 L/min).",
+        "kind": "instruction",
+        "step": "flow_mid"
+      },
+      {
+        "at": "2026-09-12T12:00:09.770628+00:00",
+        "elapsed_ms": 766.792,
+        "kind": "step_passed",
+        "step": "flow_mid"
+      },
+      {
+        "at": "2026-09-12T12:00:09.770642+00:00",
+        "kind": "step_started",
+        "step": "settle",
+        "type": "expect"
+      },
+      {
+        "at": "2026-09-12T12:00:11.780985+00:00",
+        "elapsed_ms": 2010.31,
+        "kind": "step_passed",
+        "step": "settle"
+      },
+      {
+        "at": "2026-09-12T12:00:11.781018+00:00",
+        "kind": "step_started",
+        "step": "output_never_armed",
+        "type": "expect"
+      },
+      {
+        "at": "2026-09-12T12:00:11.781210+00:00",
+        "elapsed_ms": 0.191,
+        "kind": "step_passed",
+        "step": "output_never_armed"
+      },
+      {
+        "at": "2026-09-12T12:00:11.781556+00:00",
+        "kernel_event": "operator_safe",
+        "kind": "kernel_forced_safe"
+      },
+      {
+        "at": "2026-09-12T12:00:11.782952+00:00",
+        "filename": "20260912T120004283733Z_adc_validation.csv",
+        "kind": "recording_stopped",
+        "samples": 375,
+        "sha256": "c43a0abd94602a9883bc29d46178839f6ea3254ab8c48fcdc236fde0e970e371"
+      },
+      {
+        "at": "2026-09-12T12:00:11.783015+00:00",
+        "kind": "finished",
+        "reason": "all steps and checks passed",
+        "status": "passed"
+      }
+    ],
+    "evidence_dir": "/var/folders/99/c5_m53v15k72rfv61qxs06br0000gn/T/tmplyw1ykug/evidence/procedure_runs/run_20260912T120004_4ae689",
+    "hardware_mode": "simulator",
+    "kernel_events": [
+      {
+        "at": "2026-09-12T12:00:04.258099+00:00",
+        "event": "estop_closed_reset_required",
+        "reason": "reset_required"
+      },
+      {
+        "at": "2026-09-12T12:00:04.284100+00:00",
+        "event": "csv_recording_started",
+        "reason": "reset_required"
+      },
+      {
+        "at": "2026-09-12T12:00:06.281087+00:00",
+        "event": "pressure_high_forced_safe",
+        "reason": "pressure_high"
+      },
+      {
+        "at": "2026-09-12T12:00:07.360549+00:00",
+        "event": "process_safe_reset_required",
+        "reason": "reset_required"
+      },
+      {
+        "at": "2026-09-12T12:00:08.883598+00:00",
+        "event": "flow_high_forced_safe",
+        "reason": "flow_high"
+      },
+      {
+        "at": "2026-09-12T12:00:09.382540+00:00",
+        "event": "process_safe_reset_required",
+        "reason": "reset_required"
+      }
+    ],
+    "label": "adc_validation",
+    "outcome_reason": "all steps and checks passed",
+    "peaks": {
+      "flow": 17.51935,
+      "flow_emulator": 17.51935,
+      "pressure": 8.34457,
+      "pressure_emulator": 8.34457
+    },
+    "procedure_hash": "c8a138df2e810a9bbabc6d8ba64317f54e9e0ae5b48006aadfb522eeeaae8a9b",
+    "procedure_id": "adc_validation",
+    "procedure_title": "ADC channel validation sweep",
+    "recording": {
+      "filename": "20260912T120004283733Z_adc_validation.csv",
+      "samples": 375,
+      "sha256": "c43a0abd94602a9883bc29d46178839f6ea3254ab8c48fcdc236fde0e970e371"
+    },
+    "recovery": null,
+    "requested_by": "scenario",
+    "rig_id": "certarig-wave1-sim",
+    "run_id": "run_20260912T120004_4ae689",
+    "started_at": "2026-09-12T12:00:04.283640+00:00",
+    "status": "passed",
+    "steps": [
+      {
+        "detail": {
+          "held_ms": 1000,
+          "observed": {
+            "flow.quality": "good",
+            "pressure.quality": "good"
+          },
+          "predicate": "(pressure quality == good and flow quality == good)",
+          "satisfied_after_ms": 0.064
+        },
+        "elapsed_ms": 1008.545,
+        "ended_at": "2026-09-12T12:00:05.292722+00:00",
+        "instruction": null,
+        "started_at": "2026-09-12T12:00:04.284185+00:00",
+        "status": "passed",
+        "step_id": "baseline",
+        "title": "baseline",
+        "type": "expect"
+      },
+      {
+        "detail": {
+          "observed": {
+            "pressure": 0.47593
+          },
+          "predicate": "pressure < 0.5",
+          "triggered_after_ms": 513.299
+        },
+        "elapsed_ms": 513.351,
+        "ended_at": "2026-09-12T12:00:05.806092+00:00",
+        "instruction": "Turn P1 fully anticlockwise (minimum pressure).",
+        "started_at": "2026-09-12T12:00:05.292752+00:00",
+        "status": "passed",
+        "step_id": "pressure_low",
+        "title": "pressure_low",
+        "type": "trigger"
+      },
+      {
+        "detail": {
+          "observed": {
+            "pressure": 8.11914
+          },
+          "predicate": "pressure > 8.0",
+          "triggered_after_ms": 842.611
+        },
+        "elapsed_ms": 842.647,
+        "ended_at": "2026-09-12T12:00:06.648767+00:00",
+        "instruction": "Turn P1 slowly to maximum. Expect the trip indicator; the output is not armed.",
+        "started_at": "2026-09-12T12:00:05.806121+00:00",
+        "status": "passed",
+        "step_id": "pressure_high",
+        "title": "pressure_high",
+        "type": "trigger"
+      },
+      {
+        "detail": {
+          "observed": {
+            "pressure": 2.95851
+          },
+          "predicate": "(pressure > 2.0 and pressure < 3.0)",
+          "triggered_after_ms": 879.325
+        },
+        "elapsed_ms": 879.379,
+        "ended_at": "2026-09-12T12:00:07.528164+00:00",
+        "instruction": "Return P1 to roughly the middle of its travel (2 to 3 bar).",
+        "started_at": "2026-09-12T12:00:06.648787+00:00",
+        "status": "passed",
+        "step_id": "pressure_mid",
+        "title": "pressure_mid",
+        "type": "trigger"
+      },
+      {
+        "detail": {
+          "observed": {
+            "flow": 0.88777
+          },
+          "predicate": "flow < 1.0",
+          "triggered_after_ms": 603.169
+        },
+        "elapsed_ms": 603.23,
+        "ended_at": "2026-09-12T12:00:08.131382+00:00",
+        "instruction": "Turn P2 fully anticlockwise (minimum flow).",
+        "started_at": "2026-09-12T12:00:07.528184+00:00",
+        "status": "passed",
+        "step_id": "flow_low",
+        "title": "flow_low",
+        "type": "trigger"
+      },
+      {
+        "detail": {
+          "observed": {
+            "flow": 17.19339
+          },
+          "predicate": "flow > 17.0",
+          "triggered_after_ms": 872.147
+        },
+        "elapsed_ms": 872.364,
+        "ended_at": "2026-09-12T12:00:09.003641+00:00",
+        "instruction": "Turn P2 slowly to maximum.",
+        "started_at": "2026-09-12T12:00:08.131435+00:00",
+        "status": "passed",
+        "step_id": "flow_high",
+        "title": "flow_high",
+        "type": "trigger"
+      },
+      {
+        "detail": {
+          "observed": {
+            "flow": 9.94969
+          },
+          "predicate": "(flow > 6.0 and flow < 10.0)",
+          "triggered_after_ms": 766.697
+        },
+        "elapsed_ms": 766.792,
+        "ended_at": "2026-09-12T12:00:09.770575+00:00",
+        "instruction": "Return P2 to roughly the middle of its travel (6 to 10 L/min).",
+        "started_at": "2026-09-12T12:00:09.003823+00:00",
+        "status": "passed",
+        "step_id": "flow_mid",
+        "title": "flow_mid",
+        "type": "trigger"
+      },
+      {
+        "detail": {
+          "held_ms": 2000,
+          "observed": {
+            "flow.quality": "good",
+            "pressure.quality": "good"
+          },
+          "predicate": "(pressure quality == good and flow quality == good)",
+          "satisfied_after_ms": 0.101
+        },
+        "elapsed_ms": 2010.31,
+        "ended_at": "2026-09-12T12:00:11.780892+00:00",
+        "instruction": null,
+        "started_at": "2026-09-12T12:00:09.770638+00:00",
+        "status": "passed",
+        "step_id": "settle",
+        "title": "settle",
+        "type": "expect"
+      },
+      {
+        "detail": {
+          "observed": {
+            "output_high": false
+          },
+          "predicate": "output_high == false",
+          "satisfied_after_ms": 0.14
+        },
+        "elapsed_ms": 0.191,
+        "ended_at": "2026-09-12T12:00:11.781201+00:00",
+        "instruction": null,
+        "started_at": "2026-09-12T12:00:11.781012+00:00",
+        "status": "passed",
+        "step_id": "output_never_armed",
+        "title": "output_never_armed",
+        "type": "expect"
+      }
+    ],
+    "terminal": true
+  },
+  "scenario": {
+    "duration_s": 120,
+    "events": [
+      {
+        "action": "ramp",
+        "at_step": "pressure_low",
+        "channel": "pressure",
+        "over_s": 0.5,
+        "to": 0.1
+      },
+      {
+        "action": "ramp",
+        "at_step": "pressure_high",
+        "channel": "pressure",
+        "over_s": 0.8,
+        "to": 9.0
+      },
+      {
+        "action": "ramp",
+        "at_step": "pressure_mid",
+        "channel": "pressure",
+        "over_s": 0.8,
+        "to": 2.5
+      },
+      {
+        "action": "ramp",
+        "at_step": "flow_low",
+        "channel": "flow",
+        "over_s": 0.5,
+        "to": 0.2
+      },
+      {
+        "action": "ramp",
+        "at_step": "flow_high",
+        "channel": "flow",
+        "over_s": 0.8,
+        "to": 18.5
+      },
+      {
+        "action": "ramp",
+        "at_step": "flow_mid",
+        "channel": "flow",
+        "over_s": 0.8,
+        "to": 8.0
+      }
+    ],
+    "expect": {
+      "final_output_high": false,
+      "invariants": [
+        "output_off_when_estop",
+        "output_off_when_process_unsafe",
+        "csv_rows_contiguous",
+        "ends_safe"
+      ],
+      "kernel_events_exclude": [
+        "permit_accepted"
+      ],
+      "outcome": "passed"
+    },
+    "name": "adc validation sweep happy path",
+    "procedure": "adc_validation",
+    "seed": 41
+  },
+  "sim_time_s": 7.54,
+  "wall_time_s": 7.729
+}

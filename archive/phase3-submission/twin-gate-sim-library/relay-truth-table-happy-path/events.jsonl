@@ -1,0 +1,43 @@
+{"at": "2026-09-12T12:00:02.536480+00:00", "kind": "preflight"}
+{"at": "2026-09-12T12:00:02.537012+00:00", "filename": "20260912T120002536556Z_relay_truth_table.csv", "kind": "recording_started"}
+{"at": "2026-09-12T12:00:02.537031+00:00", "kind": "step_started", "step": "boot_safe", "type": "expect"}
+{"at": "2026-09-12T12:00:02.537113+00:00", "elapsed_ms": 0.081, "kind": "step_passed", "step": "boot_safe"}
+{"at": "2026-09-12T12:00:02.537118+00:00", "kind": "step_started", "step": "cycle1_reset", "type": "command"}
+{"at": "2026-09-12T12:00:02.537211+00:00", "command": "reset", "kernel_event": "trip_reset_output_safe", "kind": "command", "step": "cycle1_reset"}
+{"at": "2026-09-12T12:00:02.537279+00:00", "elapsed_ms": 0.16, "kind": "step_passed", "step": "cycle1_reset"}
+{"at": "2026-09-12T12:00:02.537284+00:00", "kind": "step_started", "step": "cycle1_permit", "type": "command"}
+{"at": "2026-09-12T12:00:02.537358+00:00", "command": "permit", "kernel_event": "permit_accepted", "kind": "command", "step": "cycle1_permit"}
+{"at": "2026-09-12T12:00:02.537415+00:00", "elapsed_ms": 0.131, "kind": "step_passed", "step": "cycle1_permit"}
+{"at": "2026-09-12T12:00:02.537419+00:00", "kind": "step_started", "step": "cycle1_hold", "type": "wait"}
+{"at": "2026-09-12T12:00:03.037573+00:00", "elapsed_ms": 500.14, "kind": "step_passed", "step": "cycle1_hold"}
+{"at": "2026-09-12T12:00:03.037585+00:00", "kind": "step_started", "step": "cycle1_safe", "type": "command"}
+{"at": "2026-09-12T12:00:03.037764+00:00", "command": "safe", "kernel_event": "operator_safe", "kind": "command", "step": "cycle1_safe"}
+{"at": "2026-09-12T12:00:03.037853+00:00", "elapsed_ms": 0.266, "kind": "step_passed", "step": "cycle1_safe"}
+{"at": "2026-09-12T12:00:03.037858+00:00", "kind": "step_started", "step": "cycle2_reset", "type": "command"}
+{"at": "2026-09-12T12:00:03.037935+00:00", "command": "reset", "kernel_event": "trip_reset_output_safe", "kind": "command", "step": "cycle2_reset"}
+{"at": "2026-09-12T12:00:03.037988+00:00", "elapsed_ms": 0.13, "kind": "step_passed", "step": "cycle2_reset"}
+{"at": "2026-09-12T12:00:03.037993+00:00", "kind": "step_started", "step": "cycle2_permit", "type": "command"}
+{"at": "2026-09-12T12:00:03.038061+00:00", "command": "permit", "kernel_event": "permit_accepted", "kind": "command", "step": "cycle2_permit"}
+{"at": "2026-09-12T12:00:03.038108+00:00", "elapsed_ms": 0.115, "kind": "step_passed", "step": "cycle2_permit"}
+{"at": "2026-09-12T12:00:03.038121+00:00", "kind": "step_started", "step": "cycle2_hold", "type": "wait"}
+{"at": "2026-09-12T12:00:03.540544+00:00", "elapsed_ms": 502.414, "kind": "step_passed", "step": "cycle2_hold"}
+{"at": "2026-09-12T12:00:03.540550+00:00", "kind": "step_started", "step": "cycle2_safe", "type": "command"}
+{"at": "2026-09-12T12:00:03.540730+00:00", "command": "safe", "kernel_event": "operator_safe", "kind": "command", "step": "cycle2_safe"}
+{"at": "2026-09-12T12:00:03.540800+00:00", "elapsed_ms": 0.249, "kind": "step_passed", "step": "cycle2_safe"}
+{"at": "2026-09-12T12:00:03.540805+00:00", "kind": "step_started", "step": "cycle3_reset", "type": "command"}
+{"at": "2026-09-12T12:00:03.540876+00:00", "command": "reset", "kernel_event": "trip_reset_output_safe", "kind": "command", "step": "cycle3_reset"}
+{"at": "2026-09-12T12:00:03.540932+00:00", "elapsed_ms": 0.127, "kind": "step_passed", "step": "cycle3_reset"}
+{"at": "2026-09-12T12:00:03.540937+00:00", "kind": "step_started", "step": "cycle3_permit", "type": "command"}
+{"at": "2026-09-12T12:00:03.541007+00:00", "command": "permit", "kernel_event": "permit_accepted", "kind": "command", "step": "cycle3_permit"}
+{"at": "2026-09-12T12:00:03.541054+00:00", "elapsed_ms": 0.117, "kind": "step_passed", "step": "cycle3_permit"}
+{"at": "2026-09-12T12:00:03.541060+00:00", "kind": "step_started", "step": "cycle3_hold", "type": "wait"}
+{"at": "2026-09-12T12:00:04.041628+00:00", "elapsed_ms": 500.551, "kind": "step_passed", "step": "cycle3_hold"}
+{"at": "2026-09-12T12:00:04.041644+00:00", "kind": "step_started", "step": "cycle3_safe", "type": "command"}
+{"at": "2026-09-12T12:00:04.042027+00:00", "command": "safe", "kernel_event": "operator_safe", "kind": "command", "step": "cycle3_safe"}
+{"at": "2026-09-12T12:00:04.042161+00:00", "elapsed_ms": 0.516, "kind": "step_passed", "step": "cycle3_safe"}
+{"at": "2026-09-12T12:00:04.042170+00:00", "kind": "step_started", "step": "permit_without_reset", "type": "command"}
+{"at": "2026-09-12T12:00:04.042306+00:00", "command": "permit", "kernel_event": "permit_rejected_reset_required", "kind": "command", "step": "permit_without_reset"}
+{"at": "2026-09-12T12:00:04.042457+00:00", "elapsed_ms": 0.286, "kind": "step_passed", "step": "permit_without_reset"}
+{"at": "2026-09-12T12:00:04.042661+00:00", "kernel_event": "operator_safe", "kind": "kernel_forced_safe"}
+{"at": "2026-09-12T12:00:04.043484+00:00", "filename": "20260912T120002536556Z_relay_truth_table.csv", "kind": "recording_stopped", "samples": 86, "sha256": "6cc675caae48a44e1948bbbf9df197dd6475b21e07cc17e17b8a8f5c07c7f41f"}
+{"at": "2026-09-12T12:00:04.043507+00:00", "kind": "finished", "reason": "all steps and checks passed", "status": "passed"}

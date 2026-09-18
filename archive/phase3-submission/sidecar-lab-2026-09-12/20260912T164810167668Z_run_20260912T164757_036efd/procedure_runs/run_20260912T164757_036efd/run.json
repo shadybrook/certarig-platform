@@ -1,0 +1,670 @@
+{
+  "checks": [
+    {
+      "check": {
+        "event_observed": "permit_accepted"
+      },
+      "observed_events": [
+        "estop_closed_reset_required",
+        "operator_safe",
+        "permit_accepted",
+        "permit_rejected_reset_required",
+        "trip_reset_output_safe"
+      ],
+      "passed": true
+    },
+    {
+      "check": {
+        "event_observed": "operator_safe"
+      },
+      "observed_events": [
+        "estop_closed_reset_required",
+        "operator_safe",
+        "permit_accepted",
+        "permit_rejected_reset_required",
+        "trip_reset_output_safe"
+      ],
+      "passed": true
+    },
+    {
+      "check": {
+        "event_observed": "permit_rejected_reset_required"
+      },
+      "observed_events": [
+        "estop_closed_reset_required",
+        "operator_safe",
+        "permit_accepted",
+        "permit_rejected_reset_required",
+        "trip_reset_output_safe"
+      ],
+      "passed": true
+    },
+    {
+      "check": {
+        "event_not_observed": "pressure_high_forced_safe"
+      },
+      "observed_events": [
+        "estop_closed_reset_required",
+        "operator_safe",
+        "permit_accepted",
+        "permit_rejected_reset_required",
+        "trip_reset_output_safe"
+      ],
+      "passed": true
+    },
+    {
+      "check": {
+        "event_not_observed": "estop_open_forced_safe"
+      },
+      "observed_events": [
+        "estop_closed_reset_required",
+        "operator_safe",
+        "permit_accepted",
+        "permit_rejected_reset_required",
+        "trip_reset_output_safe"
+      ],
+      "passed": true
+    }
+  ],
+  "config_hash": "e9922ec2e77b1006a336b4739b200d6c5372b02b457446b1b44b9c45bfed29ed",
+  "contract_hash": "9e144a0f814cb0726daa25d675af6993ce183b9e3e3db58fc8a621dcc23db1f7",
+  "created_at": "2026-09-12T16:47:57.428470+00:00",
+  "current_step": null,
+  "ended_at": "2026-09-12T16:47:59.004682+00:00",
+  "events": [
+    {
+      "at": "2026-09-12T16:47:57.431655+00:00",
+      "kind": "preflight"
+    },
+    {
+      "at": "2026-09-12T16:47:57.436197+00:00",
+      "filename": "20260912T164757432718Z_relay_truth_table.csv",
+      "kind": "recording_started"
+    },
+    {
+      "at": "2026-09-12T16:47:57.436598+00:00",
+      "kind": "step_started",
+      "step": "boot_safe",
+      "type": "expect"
+    },
+    {
+      "at": "2026-09-12T16:47:57.437795+00:00",
+      "elapsed_ms": 1.185,
+      "kind": "step_passed",
+      "step": "boot_safe"
+    },
+    {
+      "at": "2026-09-12T16:47:57.437901+00:00",
+      "kind": "step_started",
+      "step": "cycle1_reset",
+      "type": "command"
+    },
+    {
+      "at": "2026-09-12T16:47:57.439316+00:00",
+      "command": "reset",
+      "kernel_event": "trip_reset_output_safe",
+      "kind": "command",
+      "step": "cycle1_reset"
+    },
+    {
+      "at": "2026-09-12T16:47:57.440715+00:00",
+      "elapsed_ms": 2.795,
+      "kind": "step_passed",
+      "step": "cycle1_reset"
+    },
+    {
+      "at": "2026-09-12T16:47:57.440797+00:00",
+      "kind": "step_started",
+      "step": "cycle1_permit",
+      "type": "command"
+    },
+    {
+      "at": "2026-09-12T16:47:57.442106+00:00",
+      "command": "permit",
+      "kernel_event": "permit_accepted",
+      "kind": "command",
+      "step": "cycle1_permit"
+    },
+    {
+      "at": "2026-09-12T16:47:57.443192+00:00",
+      "elapsed_ms": 2.382,
+      "kind": "step_passed",
+      "step": "cycle1_permit"
+    },
+    {
+      "at": "2026-09-12T16:47:57.443331+00:00",
+      "kind": "step_started",
+      "step": "cycle1_hold",
+      "type": "wait"
+    },
+    {
+      "at": "2026-09-12T16:47:57.943633+00:00",
+      "elapsed_ms": 500.27,
+      "kind": "step_passed",
+      "step": "cycle1_hold"
+    },
+    {
+      "at": "2026-09-12T16:47:57.943746+00:00",
+      "kind": "step_started",
+      "step": "cycle1_safe",
+      "type": "command"
+    },
+    {
+      "at": "2026-09-12T16:47:57.945390+00:00",
+      "command": "safe",
+      "kernel_event": "operator_safe",
+      "kind": "command",
+      "step": "cycle1_safe"
+    },
+    {
+      "at": "2026-09-12T16:47:57.974678+00:00",
+      "elapsed_ms": 30.908,
+      "kind": "step_passed",
+      "step": "cycle1_safe"
+    },
+    {
+      "at": "2026-09-12T16:47:57.974783+00:00",
+      "kind": "step_started",
+      "step": "cycle2_reset",
+      "type": "command"
+    },
+    {
+      "at": "2026-09-12T16:47:57.976526+00:00",
+      "command": "reset",
+      "kernel_event": "trip_reset_output_safe",
+      "kind": "command",
+      "step": "cycle2_reset"
+    },
+    {
+      "at": "2026-09-12T16:47:57.977873+00:00",
+      "elapsed_ms": 3.074,
+      "kind": "step_passed",
+      "step": "cycle2_reset"
+    },
+    {
+      "at": "2026-09-12T16:47:57.977976+00:00",
+      "kind": "step_started",
+      "step": "cycle2_permit",
+      "type": "command"
+    },
+    {
+      "at": "2026-09-12T16:47:57.979639+00:00",
+      "command": "permit",
+      "kernel_event": "permit_accepted",
+      "kind": "command",
+      "step": "cycle2_permit"
+    },
+    {
+      "at": "2026-09-12T16:47:57.980752+00:00",
+      "elapsed_ms": 2.76,
+      "kind": "step_passed",
+      "step": "cycle2_permit"
+    },
+    {
+      "at": "2026-09-12T16:47:57.980856+00:00",
+      "kind": "step_started",
+      "step": "cycle2_hold",
+      "type": "wait"
+    },
+    {
+      "at": "2026-09-12T16:47:58.481160+00:00",
+      "elapsed_ms": 500.274,
+      "kind": "step_passed",
+      "step": "cycle2_hold"
+    },
+    {
+      "at": "2026-09-12T16:47:58.481240+00:00",
+      "kind": "step_started",
+      "step": "cycle2_safe",
+      "type": "command"
+    },
+    {
+      "at": "2026-09-12T16:47:58.482482+00:00",
+      "command": "safe",
+      "kernel_event": "operator_safe",
+      "kind": "command",
+      "step": "cycle2_safe"
+    },
+    {
+      "at": "2026-09-12T16:47:58.483308+00:00",
+      "elapsed_ms": 2.055,
+      "kind": "step_passed",
+      "step": "cycle2_safe"
+    },
+    {
+      "at": "2026-09-12T16:47:58.483404+00:00",
+      "kind": "step_started",
+      "step": "cycle3_reset",
+      "type": "command"
+    },
+    {
+      "at": "2026-09-12T16:47:58.484657+00:00",
+      "command": "reset",
+      "kernel_event": "trip_reset_output_safe",
+      "kind": "command",
+      "step": "cycle3_reset"
+    },
+    {
+      "at": "2026-09-12T16:47:58.485599+00:00",
+      "elapsed_ms": 2.185,
+      "kind": "step_passed",
+      "step": "cycle3_reset"
+    },
+    {
+      "at": "2026-09-12T16:47:58.485670+00:00",
+      "kind": "step_started",
+      "step": "cycle3_permit",
+      "type": "command"
+    },
+    {
+      "at": "2026-09-12T16:47:58.486652+00:00",
+      "command": "permit",
+      "kernel_event": "permit_accepted",
+      "kind": "command",
+      "step": "cycle3_permit"
+    },
+    {
+      "at": "2026-09-12T16:47:58.487551+00:00",
+      "elapsed_ms": 1.869,
+      "kind": "step_passed",
+      "step": "cycle3_permit"
+    },
+    {
+      "at": "2026-09-12T16:47:58.487626+00:00",
+      "kind": "step_started",
+      "step": "cycle3_hold",
+      "type": "wait"
+    },
+    {
+      "at": "2026-09-12T16:47:58.987945+00:00",
+      "elapsed_ms": 500.279,
+      "kind": "step_passed",
+      "step": "cycle3_hold"
+    },
+    {
+      "at": "2026-09-12T16:47:58.988042+00:00",
+      "kind": "step_started",
+      "step": "cycle3_safe",
+      "type": "command"
+    },
+    {
+      "at": "2026-09-12T16:47:58.989342+00:00",
+      "command": "safe",
+      "kernel_event": "operator_safe",
+      "kind": "command",
+      "step": "cycle3_safe"
+    },
+    {
+      "at": "2026-09-12T16:47:58.990180+00:00",
+      "elapsed_ms": 2.126,
+      "kind": "step_passed",
+      "step": "cycle3_safe"
+    },
+    {
+      "at": "2026-09-12T16:47:58.990257+00:00",
+      "kind": "step_started",
+      "step": "permit_without_reset",
+      "type": "command"
+    },
+    {
+      "at": "2026-09-12T16:47:58.991398+00:00",
+      "command": "permit",
+      "kernel_event": "permit_rejected_reset_required",
+      "kind": "command",
+      "step": "permit_without_reset"
+    },
+    {
+      "at": "2026-09-12T16:47:58.992729+00:00",
+      "elapsed_ms": 2.456,
+      "kind": "step_passed",
+      "step": "permit_without_reset"
+    },
+    {
+      "at": "2026-09-12T16:47:58.994254+00:00",
+      "kernel_event": "operator_safe",
+      "kind": "kernel_forced_safe"
+    },
+    {
+      "at": "2026-09-12T16:47:59.004623+00:00",
+      "filename": "20260912T164757432718Z_relay_truth_table.csv",
+      "kind": "recording_stopped",
+      "samples": 27,
+      "sha256": "23cfcba8eca31e8dd43db571d20e775f6fe625d59dd2b45b923a85abcd5c8735"
+    },
+    {
+      "at": "2026-09-12T16:47:59.004728+00:00",
+      "kind": "finished",
+      "reason": "all steps and checks passed",
+      "status": "passed"
+    }
+  ],
+  "evidence_dir": "evidence/runs/procedure_runs/run_20260912T164757_036efd",
+  "hardware_mode": "raspberry_pi",
+  "kernel_events": [
+    {
+      "at": "2026-09-12T16:47:32.768998+00:00",
+      "event": "estop_closed_reset_required",
+      "reason": "reset_required"
+    },
+    {
+      "at": "2026-09-12T16:47:57.438154+00:00",
+      "event": "trip_reset_output_safe",
+      "reason": "output_safe"
+    },
+    {
+      "at": "2026-09-12T16:47:57.441080+00:00",
+      "event": "permit_accepted",
+      "reason": "permit_active"
+    },
+    {
+      "at": "2026-09-12T16:47:57.944016+00:00",
+      "event": "operator_safe",
+      "reason": "reset_required"
+    },
+    {
+      "at": "2026-09-12T16:47:57.975025+00:00",
+      "event": "trip_reset_output_safe",
+      "reason": "output_safe"
+    },
+    {
+      "at": "2026-09-12T16:47:57.978272+00:00",
+      "event": "permit_accepted",
+      "reason": "permit_active"
+    },
+    {
+      "at": "2026-09-12T16:47:58.481463+00:00",
+      "event": "operator_safe",
+      "reason": "operator_safe"
+    },
+    {
+      "at": "2026-09-12T16:47:58.483620+00:00",
+      "event": "trip_reset_output_safe",
+      "reason": "output_safe"
+    },
+    {
+      "at": "2026-09-12T16:47:58.485887+00:00",
+      "event": "permit_accepted",
+      "reason": "permit_active"
+    },
+    {
+      "at": "2026-09-12T16:47:58.988271+00:00",
+      "event": "operator_safe",
+      "reason": "operator_safe"
+    },
+    {
+      "at": "2026-09-12T16:47:58.990441+00:00",
+      "event": "permit_rejected_reset_required",
+      "reason": "reset_required"
+    }
+  ],
+  "label": "relay_truth_table",
+  "outcome_reason": "all steps and checks passed",
+  "peaks": {
+    "flow": 8.59394,
+    "flow_emulator": 8.59394,
+    "pressure": 2.16838,
+    "pressure_emulator": 2.16838
+  },
+  "procedure_hash": "434b0189c3a1b844836f63c43323620d88d00e96b41d770c3a66d15fa2abc718",
+  "procedure_id": "relay_truth_table",
+  "procedure_title": "Relay command truth table",
+  "recording": {
+    "filename": "20260912T164757432718Z_relay_truth_table.csv",
+    "samples": 27,
+    "sha256": "23cfcba8eca31e8dd43db571d20e775f6fe625d59dd2b45b923a85abcd5c8735"
+  },
+  "recovery": null,
+  "requested_by": "certarig-agent",
+  "rig_id": "certarig-wave1-dry-bench",
+  "run_id": "run_20260912T164757_036efd",
+  "started_at": "2026-09-12T16:47:57.431576+00:00",
+  "status": "passed",
+  "steps": [
+    {
+      "detail": {
+        "observed": {
+          "output_high": false,
+          "relay_energized_expected": false
+        },
+        "predicate": "(output_high == false and relay_energized_expected == false)",
+        "satisfied_after_ms": 0.926
+      },
+      "elapsed_ms": 1.185,
+      "ended_at": "2026-09-12T16:47:57.437706+00:00",
+      "instruction": null,
+      "started_at": "2026-09-12T16:47:57.436548+00:00",
+      "status": "passed",
+      "step_id": "boot_safe",
+      "title": "boot_safe",
+      "type": "expect"
+    },
+    {
+      "detail": {
+        "expect": "(trip_latched == false and output_high == false)",
+        "kernel_event": "trip_reset_output_safe",
+        "kernel_reason": "output_safe",
+        "observed": {
+          "output_high": false,
+          "trip_latched": false
+        },
+        "satisfied_after_ms": 1.04
+      },
+      "elapsed_ms": 2.795,
+      "ended_at": "2026-09-12T16:47:57.440622+00:00",
+      "instruction": null,
+      "started_at": "2026-09-12T16:47:57.437845+00:00",
+      "status": "passed",
+      "step_id": "cycle1_reset",
+      "title": "cycle1_reset",
+      "type": "command"
+    },
+    {
+      "detail": {
+        "expect": "(output_high == true and relay_energized_expected == true)",
+        "kernel_event": "permit_accepted",
+        "kernel_reason": "permit_active",
+        "observed": {
+          "output_high": true,
+          "relay_energized_expected": true
+        },
+        "satisfied_after_ms": 0.807
+      },
+      "elapsed_ms": 2.382,
+      "ended_at": "2026-09-12T16:47:57.443127+00:00",
+      "instruction": null,
+      "started_at": "2026-09-12T16:47:57.440763+00:00",
+      "status": "passed",
+      "step_id": "cycle1_permit",
+      "title": "cycle1_permit",
+      "type": "command"
+    },
+    {
+      "detail": {},
+      "elapsed_ms": 500.27,
+      "ended_at": "2026-09-12T16:47:57.943499+00:00",
+      "instruction": null,
+      "started_at": "2026-09-12T16:47:57.443295+00:00",
+      "status": "passed",
+      "step_id": "cycle1_hold",
+      "title": "cycle1_hold",
+      "type": "wait"
+    },
+    {
+      "detail": {
+        "expect": "(output_high == false and trip_latched == true)",
+        "kernel_event": "operator_safe",
+        "kernel_reason": "operator_safe",
+        "observed": {
+          "output_high": false,
+          "trip_latched": true
+        },
+        "satisfied_after_ms": 28.895
+      },
+      "elapsed_ms": 30.908,
+      "ended_at": "2026-09-12T16:47:57.974564+00:00",
+      "instruction": null,
+      "started_at": "2026-09-12T16:47:57.943701+00:00",
+      "status": "passed",
+      "step_id": "cycle1_safe",
+      "title": "cycle1_safe",
+      "type": "command"
+    },
+    {
+      "detail": {
+        "expect": "trip_latched == false",
+        "kernel_event": "trip_reset_output_safe",
+        "kernel_reason": "output_safe",
+        "observed": {
+          "trip_latched": false
+        },
+        "satisfied_after_ms": 1.033
+      },
+      "elapsed_ms": 3.074,
+      "ended_at": "2026-09-12T16:47:57.977789+00:00",
+      "instruction": null,
+      "started_at": "2026-09-12T16:47:57.974740+00:00",
+      "status": "passed",
+      "step_id": "cycle2_reset",
+      "title": "cycle2_reset",
+      "type": "command"
+    },
+    {
+      "detail": {
+        "expect": "output_high == true",
+        "kernel_event": "permit_accepted",
+        "kernel_reason": "permit_active",
+        "observed": {
+          "output_high": true
+        },
+        "satisfied_after_ms": 0.857
+      },
+      "elapsed_ms": 2.76,
+      "ended_at": "2026-09-12T16:47:57.980680+00:00",
+      "instruction": null,
+      "started_at": "2026-09-12T16:47:57.977933+00:00",
+      "status": "passed",
+      "step_id": "cycle2_permit",
+      "title": "cycle2_permit",
+      "type": "command"
+    },
+    {
+      "detail": {},
+      "elapsed_ms": 500.274,
+      "ended_at": "2026-09-12T16:47:58.481036+00:00",
+      "instruction": null,
+      "started_at": "2026-09-12T16:47:57.980813+00:00",
+      "status": "passed",
+      "step_id": "cycle2_hold",
+      "title": "cycle2_hold",
+      "type": "wait"
+    },
+    {
+      "detail": {
+        "expect": "output_high == false",
+        "kernel_event": "operator_safe",
+        "kernel_reason": "operator_safe",
+        "observed": {
+          "output_high": false
+        },
+        "satisfied_after_ms": 0.585
+      },
+      "elapsed_ms": 2.055,
+      "ended_at": "2026-09-12T16:47:58.483189+00:00",
+      "instruction": null,
+      "started_at": "2026-09-12T16:47:58.481210+00:00",
+      "status": "passed",
+      "step_id": "cycle2_safe",
+      "title": "cycle2_safe",
+      "type": "command"
+    },
+    {
+      "detail": {
+        "expect": "trip_latched == false",
+        "kernel_event": "trip_reset_output_safe",
+        "kernel_reason": "output_safe",
+        "observed": {
+          "trip_latched": false
+        },
+        "satisfied_after_ms": 0.725
+      },
+      "elapsed_ms": 2.185,
+      "ended_at": "2026-09-12T16:47:58.485541+00:00",
+      "instruction": null,
+      "started_at": "2026-09-12T16:47:58.483353+00:00",
+      "status": "passed",
+      "step_id": "cycle3_reset",
+      "title": "cycle3_reset",
+      "type": "command"
+    },
+    {
+      "detail": {
+        "expect": "output_high == true",
+        "kernel_event": "permit_accepted",
+        "kernel_reason": "permit_active",
+        "observed": {
+          "output_high": true
+        },
+        "satisfied_after_ms": 0.717
+      },
+      "elapsed_ms": 1.869,
+      "ended_at": "2026-09-12T16:47:58.487493+00:00",
+      "instruction": null,
+      "started_at": "2026-09-12T16:47:58.485641+00:00",
+      "status": "passed",
+      "step_id": "cycle3_permit",
+      "title": "cycle3_permit",
+      "type": "command"
+    },
+    {
+      "detail": {},
+      "elapsed_ms": 500.279,
+      "ended_at": "2026-09-12T16:47:58.987802+00:00",
+      "instruction": null,
+      "started_at": "2026-09-12T16:47:58.487594+00:00",
+      "status": "passed",
+      "step_id": "cycle3_hold",
+      "title": "cycle3_hold",
+      "type": "wait"
+    },
+    {
+      "detail": {
+        "expect": "output_high == false",
+        "kernel_event": "operator_safe",
+        "kernel_reason": "operator_safe",
+        "observed": {
+          "output_high": false
+        },
+        "satisfied_after_ms": 0.651
+      },
+      "elapsed_ms": 2.126,
+      "ended_at": "2026-09-12T16:47:58.990126+00:00",
+      "instruction": null,
+      "started_at": "2026-09-12T16:47:58.988007+00:00",
+      "status": "passed",
+      "step_id": "cycle3_safe",
+      "title": "cycle3_safe",
+      "type": "command"
+    },
+    {
+      "detail": {
+        "expect": "(output_high == false and last_event == permit_rejected_reset_required)",
+        "kernel_event": "permit_rejected_reset_required",
+        "kernel_reason": "reset_required",
+        "observed": {
+          "last_event": "permit_rejected_reset_required",
+          "output_high": false
+        },
+        "satisfied_after_ms": 0.996
+      },
+      "elapsed_ms": 2.456,
+      "ended_at": "2026-09-12T16:47:58.992645+00:00",
+      "instruction": null,
+      "started_at": "2026-09-12T16:47:58.990224+00:00",
+      "status": "passed",
+      "step_id": "permit_without_reset",
+      "title": "permit_without_reset",
+      "type": "command"
+    }
+  ],
+  "terminal": true
+}

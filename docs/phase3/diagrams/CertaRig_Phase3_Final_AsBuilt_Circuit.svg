@@ -1,0 +1,167 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2000" height="1400" viewBox="0 0 2000 1400" role="img" aria-labelledby="title desc">
+  <title id="title">CertaRig Phase 3 final as-built low-voltage dry-bench circuit</title>
+  <desc id="desc">Verified Raspberry Pi 3 A Plus, ADS1115, two potentiometer emulators, dual-channel emergency stop, fused five volt relay and red-green indicator circuit.</desc>
+  <defs>
+    <style>
+      .bg{fill:#f6f8fb}.panel{stroke:#23364d;stroke-width:3;rx:18;ry:18}.pi{fill:#e8f1ff}.adc{fill:#e8fbf5}.sensor{fill:#f1eaff}.safety{fill:#fff1e6}.power{fill:#fff7d6}.relay{fill:#eef3f8}.output{fill:#eef9ed}.note{fill:#ffffff;stroke:#7b8ca2;stroke-width:2;rx:14;ry:14}
+      .title{font:700 38px Arial,sans-serif;fill:#102a43}.subtitle{font:22px Arial,sans-serif;fill:#486581}.h{font:700 23px Arial,sans-serif;fill:#102a43}.t{font:18px Arial,sans-serif;fill:#243b53}.small{font:16px Arial,sans-serif;fill:#334e68}.tiny{font:14px Arial,sans-serif;fill:#334e68}.warn{font:700 18px Arial,sans-serif;fill:#b42318}.ok{font:700 18px Arial,sans-serif;fill:#13795b}.mono{font:16px Menlo,Consolas,monospace;fill:#243b53}.tableh{font:700 17px Arial,sans-serif;fill:#ffffff}.table{font:16px Arial,sans-serif;fill:#243b53}
+      .w3{stroke:#7b3ff2;stroke-width:6;fill:none}.w5{stroke:#d64545;stroke-width:6;fill:none}.gnd{stroke:#1d2733;stroke-width:6;fill:none}.sig{stroke:#087f5b;stroke-width:6;fill:none}.contact{stroke:#d28b00;stroke-width:6;fill:none}.thin{stroke:#7b8ca2;stroke-width:2;fill:none}.dash{stroke-dasharray:12 9}.junction{fill:#ffffff;stroke:#243b53;stroke-width:3}.label{fill:#ffffff;stroke:#7b8ca2;stroke-width:1.5;rx:8;ry:8}
+    </style>
+    <marker id="a3" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0 0L0 6L9 3Z" fill="#7b3ff2"/></marker>
+    <marker id="a5" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0 0L0 6L9 3Z" fill="#d64545"/></marker>
+    <marker id="as" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0 0L0 6L9 3Z" fill="#087f5b"/></marker>
+  </defs>
+
+  <rect class="bg" width="2000" height="1400"/>
+  <text x="70" y="58" class="title">CertaRig Phase 3 — final as-built dry-bench circuit</text>
+  <text x="70" y="96" class="subtitle">Verified 12 September 2026 • low voltage only • Raspberry Pi 3 A+ • relay channel K1 • no hydraulic or mains load</text>
+
+  <!-- Raspberry Pi -->
+  <rect x="60" y="145" width="375" height="790" class="panel pi"/>
+  <text x="90" y="188" class="h">Raspberry Pi 3 Model A+</text>
+  <text x="90" y="222" class="small">Powered only through PWR IN</text>
+  <text x="90" y="270" class="t">Pin 1  • 3V3 → ADS VDD</text>
+  <text x="90" y="315" class="t">Pin 3  • GPIO2 / SDA1</text>
+  <text x="90" y="360" class="t">Pin 5  • GPIO3 / SCL1</text>
+  <text x="90" y="405" class="t">Pin 6  • GND → ADS GND</text>
+  <text x="90" y="465" class="t">Pin 2  • 5V → 1 A fuse</text>
+  <text x="90" y="525" class="t">Pin 16 • GPIO23 command</text>
+  <text x="90" y="580" class="t">Pin 17 • 3V3 → P1/P2 hub</text>
+  <text x="90" y="635" class="t">Pin 18 • GPIO24 E-stop sense</text>
+  <text x="90" y="680" class="t">Pin 20 • GND for NC1</text>
+  <text x="90" y="735" class="t">Pin 25 • output common GND</text>
+  <text x="90" y="790" class="t">Pin 14 • P1 GND</text>
+  <text x="90" y="835" class="t">Pin 9  • P2 GND</text>
+  <text x="90" y="885" class="t">Pin 22 • GPIO25 EMPTY</text>
+  <text x="90" y="920" class="warn">Physical pin ≠ BCM number</text>
+
+  <!-- ADS1115 -->
+  <rect x="535" y="145" width="400" height="350" class="panel adc"/>
+  <text x="565" y="188" class="h">ADS1115 16-bit ADC</text>
+  <text x="565" y="222" class="small">I²C bus 1 • detected at 0x48</text>
+  <text x="565" y="270" class="t">VDD ← Pi pin 1 / 3.3 V</text>
+  <text x="565" y="310" class="t">GND ← Pi pin 6</text>
+  <text x="565" y="350" class="t">SDA ← Pi pin 3 / GPIO2</text>
+  <text x="565" y="390" class="t">SCL ← Pi pin 5 / GPIO3</text>
+  <text x="565" y="430" class="t">A0 ← P1 pressure-emulator wiper</text>
+  <text x="565" y="468" class="t">A1 ← P2 flow-emulator wiper</text>
+
+  <!-- ADS wires -->
+  <path d="M435 260 H510 V265 H535" class="w3" marker-end="url(#a3)"/>
+  <path d="M435 315 H500 V350 H535" class="sig" marker-end="url(#as)"/>
+  <path d="M435 360 H490 V390 H535" class="sig" marker-end="url(#as)"/>
+  <path d="M435 405 H480 V310 H535" class="gnd"/>
+
+  <!-- Potentiometers -->
+  <rect x="535" y="570" width="400" height="160" class="panel sensor"/>
+  <text x="565" y="612" class="h">P1 pressure emulator</text>
+  <text x="565" y="650" class="t">A → shared pin-17 3.3 V hub</text>
+  <text x="565" y="685" class="t">B / wiper → ADS1115 A0</text>
+  <text x="565" y="718" class="t">C → Pi physical pin 14 GND</text>
+
+  <rect x="535" y="770" width="400" height="160" class="panel sensor"/>
+  <text x="565" y="812" class="h">P2 flow emulator</text>
+  <text x="565" y="850" class="t">A → shared pin-17 3.3 V hub</text>
+  <text x="565" y="885" class="t">B / wiper → ADS1115 A1</text>
+  <text x="565" y="918" class="t">C → Pi physical pin 9 GND</text>
+
+  <path d="M435 580 H470 V650 H535" class="w3" marker-end="url(#a3)"/>
+  <circle cx="470" cy="650" r="9" class="junction"/>
+  <path d="M470 650 V850 H535" class="w3" marker-end="url(#a3)"/>
+  <path d="M535 685 H505 V430 H535" class="sig" marker-end="url(#as)"/>
+  <path d="M535 885 H485 V468 H535" class="sig" marker-end="url(#as)"/>
+  <path d="M435 790 H500 V718 H535" class="gnd"/>
+  <path d="M435 835 H515 V918 H535" class="gnd"/>
+
+  <!-- E-stop dual channels -->
+  <rect x="1015" y="145" width="370" height="350" class="panel safety"/>
+  <text x="1045" y="188" class="h">Dual-NC latching E-stop</text>
+  <text x="1045" y="224" class="small">Released = contacts closed • latched = open</text>
+  <rect x="1045" y="260" width="310" height="90" class="note"/>
+  <text x="1068" y="292" class="h">NC1 software sense</text>
+  <text x="1068" y="325" class="small">GPIO24 ↔ NC1 ↔ GND pin 20</text>
+  <rect x="1045" y="375" width="310" height="90" class="note"/>
+  <text x="1068" y="407" class="h">NC2 power interlock</text>
+  <text x="1068" y="440" class="small">FUSED_5V ↔ NC2 ↔ relay DC+</text>
+  <text x="1045" y="486" class="ok">LOW healthy • HIGH/open active</text>
+
+  <path d="M435 635 H500 V530 H980 V305 H1045" class="sig" marker-end="url(#as)"/>
+  <path d="M1045 335 H950 V535 H500 V680 H435" class="gnd"/>
+  <rect x="795" y="290" width="170" height="38" class="label"/>
+  <text x="810" y="316" class="tiny">internal pull-up enabled</text>
+
+  <!-- Power, fuse and capacitor -->
+  <rect x="1015" y="555" width="370" height="365" class="panel power"/>
+  <text x="1045" y="598" class="h">Fused 5 V output branch</text>
+  <text x="1045" y="642" class="t">Pi pin 2 → 1 A fuse → FUSED_5V</text>
+  <text x="1045" y="684" class="t">FUSED_5V → K1 contact COM</text>
+  <text x="1045" y="726" class="t">FUSED_5V → NC2 → relay DC+</text>
+  <text x="1045" y="768" class="t">100 µF: + to FUSED_5V</text>
+  <text x="1045" y="806" class="t">100 µF: − stripe to common GND</text>
+  <text x="1045" y="850" class="small">K1 COM is upstream of NC2 so red</text>
+  <text x="1045" y="878" class="small">remains available in the inhibited state.</text>
+  <text x="1045" y="908" class="warn">No second 5 V supply • no mains load</text>
+
+  <path d="M435 465 H470 V520 H960 V640 H1015" class="w5" marker-end="url(#a5)"/>
+  <path d="M995 640 V420 H1045" class="w5" marker-end="url(#a5)"/>
+
+  <!-- Transistor driver -->
+  <rect x="1015" y="965" width="370" height="210" class="panel sensor"/>
+  <text x="1045" y="1008" class="h">BC547 relay-input interface</text>
+  <text x="1045" y="1050" class="t">GPIO23 → 1 kΩ → base</text>
+  <text x="1045" y="1088" class="t">10 kΩ from base to emitter</text>
+  <text x="1045" y="1126" class="t">Emitter → common GND</text>
+  <text x="1045" y="1164" class="t">Collector → relay CH1</text>
+  <path d="M435 525 H980 V1045 H1015" class="sig" marker-end="url(#as)"/>
+  <path d="M435 735 H970 V1125 H1015" class="gnd"/>
+
+  <!-- Relay module -->
+  <rect x="1460" y="145" width="470" height="650" class="panel relay"/>
+  <text x="1490" y="188" class="h">5 V relay module — use K1 only</text>
+  <text x="1490" y="230" class="t">DC+ ← E-stop NC2 output</text>
+  <text x="1490" y="270" class="t">DC− ← common GND</text>
+  <text x="1490" y="310" class="t">CH1 ← BC547 collector</text>
+  <text x="1490" y="350" class="t">CH2 = EMPTY</text>
+  <text x="1490" y="390" class="t">Lower control COM = NO EXTERNAL WIRE</text>
+  <text x="1490" y="430" class="t">S1 jumper bridges LOW–COM</text>
+  <line x1="1490" y1="460" x2="1900" y2="460" class="thin"/>
+  <text x="1490" y="505" class="h">K1 changeover contacts</text>
+  <text x="1490" y="548" class="t">COM ← FUSED_5V before NC2</text>
+  <text x="1490" y="590" class="t">NC → 1 kΩ → red indicator +</text>
+  <text x="1490" y="632" class="t">NO → 1 kΩ → green indicator +</text>
+  <text x="1490" y="685" class="small">GPIO23 HIGH pulls CH1 LOW:</text>
+  <text x="1490" y="716" class="small">K1 energized, green permitted.</text>
+  <text x="1490" y="760" class="warn">Pin 22 / GPIO25 remains unconnected</text>
+
+  <path d="M1385 420 H1425 V230 H1460" class="w5" marker-end="url(#a5)"/>
+  <path d="M1385 1125 H1420 V310 H1460" class="sig" marker-end="url(#as)"/>
+  <path d="M1385 685 H1435 V548 H1460" class="w5" marker-end="url(#a5)"/>
+  <path d="M1385 1125 H1405 V270 H1460" class="gnd"/>
+
+  <!-- Indicators -->
+  <rect x="1460" y="835" width="470" height="340" class="panel output"/>
+  <text x="1490" y="878" class="h">Panel-state outputs</text>
+  <circle cx="1520" cy="940" r="25" fill="#dc2626" stroke="#7f1d1d" stroke-width="4"/>
+  <text x="1570" y="932" class="h">RED — inhibited / safe output</text>
+  <text x="1570" y="962" class="small">K1 de-energized; NC contact closed</text>
+  <circle cx="1520" cy="1035" r="25" fill="#16a34a" stroke="#14532d" stroke-width="4"/>
+  <text x="1570" y="1027" class="h">GREEN — permitted</text>
+  <text x="1570" y="1057" class="small">K1 energized; NO contact closed</text>
+  <text x="1490" y="1110" class="t">Both indicator negatives → common GND</text>
+  <text x="1490" y="1145" class="small">Each positive branch retains a 1 kΩ limiter.</text>
+
+  <path d="M1930 590 H1960 V940 H1930" class="contact"/>
+  <path d="M1930 632 H1975 V1035 H1930" class="contact"/>
+  <path d="M1930 1110 H1980 V1225 H435 V735" class="gnd"/>
+
+  <!-- Truth table -->
+  <rect x="60" y="1220" width="1870" height="135" class="panel note"/>
+  <rect x="60" y="1220" width="1870" height="38" fill="#23364d" rx="16" ry="16"/>
+  <text x="85" y="1246" class="tableh">Verified operating truth table</text>
+  <text x="85" y="1285" class="table">E-stop released, before reset:</text><text x="350" y="1285" class="table">board powered • K1 OFF • RED ON • GREEN OFF</text>
+  <text x="85" y="1320" class="table">Reset + permit accepted:</text><text x="350" y="1320" class="table">GPIO23 HIGH • K1 ON • RED OFF • GREEN ON</text>
+  <text x="1015" y="1285" class="table">E-stop latched / open:</text><text x="1245" y="1285" class="table">relay DC+ removed • GPIO23 LOW • K1 OFF</text>
+  <text x="1015" y="1320" class="table">Release after trip:</text><text x="1245" y="1320" class="table">K1 remains OFF until explicit reset + new permit</text>
+
+  <text x="60" y="1385" class="warn">Submission boundary: this diagram represents the tested low-voltage dry bench only. Hydraulic commissioning and real actuator loads remain capstone work.</text>
+</svg>

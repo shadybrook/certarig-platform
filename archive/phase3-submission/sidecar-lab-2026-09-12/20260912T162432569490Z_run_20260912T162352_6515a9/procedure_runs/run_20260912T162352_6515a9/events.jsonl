@@ -1,0 +1,13 @@
+{"at": "2026-09-12T16:23:52.038105+00:00", "kind": "preflight"}
+{"at": "2026-09-12T16:23:52.043010+00:00", "filename": "20260912T162352039157Z_observe-adc.csv", "kind": "recording_started"}
+{"at": "2026-09-12T16:23:52.043379+00:00", "kind": "step_started", "step": "baseline", "type": "expect"}
+{"at": "2026-09-12T16:23:53.063961+00:00", "elapsed_ms": 1020.552, "kind": "step_passed", "step": "baseline"}
+{"at": "2026-09-12T16:23:53.064090+00:00", "kind": "step_started", "step": "pressure_low", "type": "trigger"}
+{"at": "2026-09-12T16:23:53.064151+00:00", "instruction": "Turn P1 fully anticlockwise (minimum pressure).", "kind": "instruction", "step": "pressure_low"}
+{"at": "2026-09-12T16:23:53.088710+00:00", "elapsed_ms": 24.602, "kind": "step_passed", "step": "pressure_low"}
+{"at": "2026-09-12T16:23:53.088801+00:00", "kind": "step_started", "step": "pressure_high", "type": "trigger"}
+{"at": "2026-09-12T16:23:53.088853+00:00", "instruction": "Turn P1 slowly to maximum. Expect the trip indicator; the output is not armed.", "kind": "instruction", "step": "pressure_high"}
+{"at": "2026-09-12T16:24:08.809045+00:00", "kind": "step_failed", "reason": "sensor invalid during step: pressure, pressure_emulator", "step": "pressure_high"}
+{"at": "2026-09-12T16:24:08.810830+00:00", "kernel_event": "operator_safe", "kind": "kernel_forced_safe"}
+{"at": "2026-09-12T16:24:08.814131+00:00", "filename": "20260912T162352039157Z_observe-adc.csv", "kind": "recording_stopped", "samples": 169, "sha256": "fbabf42bf15716bb561907504adb0a66c92c47ae35decb4b00815786d14f65d1"}
+{"at": "2026-09-12T16:24:08.814254+00:00", "kind": "finished", "reason": "step pressure_high failed: sensor invalid during step: pressure, pressure_emulator", "status": "failed"}

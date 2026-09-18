@@ -1,0 +1,176 @@
+{
+  "applies_to": {
+    "concepts": [
+      "pressure",
+      "flow"
+    ]
+  },
+  "domain": "electronics",
+  "evaluate": [
+    {
+      "event_not_observed": "permit_accepted"
+    },
+    {
+      "step_passed": "settle"
+    },
+    {
+      "peak_below": 10.0,
+      "signal": "pressure"
+    },
+    {
+      "peak_below": 20.0,
+      "signal": "flow"
+    }
+  ],
+  "id": "adc_validation",
+  "preconditions": [
+    {
+      "eq": "good",
+      "quality": "pressure"
+    },
+    {
+      "eq": "good",
+      "quality": "flow"
+    }
+  ],
+  "record": true,
+  "requires_output": false,
+  "steps": [
+    {
+      "hold_ms": 1000,
+      "id": "baseline",
+      "predicate": {
+        "all": [
+          {
+            "eq": "good",
+            "quality": "pressure"
+          },
+          {
+            "eq": "good",
+            "quality": "flow"
+          }
+        ]
+      },
+      "type": "expect"
+    },
+    {
+      "id": "pressure_low",
+      "instruction": "Turn P1 fully anticlockwise (minimum pressure).",
+      "predicate": {
+        "op": "<",
+        "signal": "pressure",
+        "value": 0.5
+      },
+      "timeout_s": 180,
+      "type": "trigger"
+    },
+    {
+      "id": "pressure_high",
+      "instruction": "Turn P1 slowly to maximum. Expect the trip indicator; the output is not armed.",
+      "predicate": {
+        "op": ">",
+        "signal": "pressure",
+        "value": 8.0
+      },
+      "timeout_s": 180,
+      "type": "trigger"
+    },
+    {
+      "id": "pressure_mid",
+      "instruction": "Return P1 to roughly the middle of its travel (2 to 3 bar).",
+      "predicate": {
+        "all": [
+          {
+            "op": ">",
+            "signal": "pressure",
+            "value": 2.0
+          },
+          {
+            "op": "<",
+            "signal": "pressure",
+            "value": 3.0
+          }
+        ]
+      },
+      "timeout_s": 180,
+      "type": "trigger"
+    },
+    {
+      "id": "flow_low",
+      "instruction": "Turn P2 fully anticlockwise (minimum flow).",
+      "predicate": {
+        "op": "<",
+        "signal": "flow",
+        "value": 1.0
+      },
+      "timeout_s": 180,
+      "type": "trigger"
+    },
+    {
+      "id": "flow_high",
+      "instruction": "Turn P2 slowly to maximum.",
+      "predicate": {
+        "op": ">",
+        "signal": "flow",
+        "value": 17.0
+      },
+      "timeout_s": 180,
+      "type": "trigger"
+    },
+    {
+      "id": "flow_mid",
+      "instruction": "Return P2 to roughly the middle of its travel (6 to 10 L/min).",
+      "predicate": {
+        "all": [
+          {
+            "op": ">",
+            "signal": "flow",
+            "value": 6.0
+          },
+          {
+            "op": "<",
+            "signal": "flow",
+            "value": 10.0
+          }
+        ]
+      },
+      "timeout_s": 180,
+      "type": "trigger"
+    },
+    {
+      "hold_ms": 2000,
+      "id": "settle",
+      "predicate": {
+        "all": [
+          {
+            "eq": "good",
+            "quality": "pressure"
+          },
+          {
+            "eq": "good",
+            "quality": "flow"
+          }
+        ]
+      },
+      "type": "expect"
+    },
+    {
+      "id": "output_never_armed",
+      "predicate": {
+        "eq": false,
+        "state": "output_high"
+      },
+      "type": "expect"
+    }
+  ],
+  "summary": "Validates that both analogue channels read good quality, respond across their working range when the operator sweeps the emulators, and return to a stable resting value. Output stays off.\n",
+  "tags": [
+    "adc",
+    "ads1115",
+    "calibration",
+    "sensors"
+  ],
+  "timeout_s": 900,
+  "title": "ADC channel validation sweep",
+  "version": 1
+}

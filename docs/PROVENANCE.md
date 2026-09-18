@@ -18,3 +18,5 @@ What was imported unchanged (apart from typing fixes required by the stricter ga
 - the vanilla ESM dashboard (`index.html`, `styles.css`, `src/*.mjs`) under `studio/`
 
 Dropped: `mcp_server.py` (superseded by the manifest-driven agent tool registry).
+
+Phase 3 submission artefacts retained in this tree (circuit, BOM, CSVs, photos, sidecar bundles) are mapped in `docs/phase3-submission/README.md`. They are copies for retrieval, not a licence to edit the frozen PoC.

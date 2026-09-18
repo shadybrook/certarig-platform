@@ -1,0 +1,168 @@
+1
+00:00:08,000 --> 00:00:20,000
+What is CertaRig?
+Presented by Chintan Dedhia
+
+2
+00:00:20,000 --> 00:00:32,000
+Work does not end when the sensors are wired.
+It begins there.
+
+3
+00:00:32,000 --> 00:00:48,000
+Procedures, screenshots, and a story
+that is hard to audit.
+
+4
+00:00:48,000 --> 00:01:05,000
+People speak English.
+Rigs speak numbers.
+
+5
+00:01:05,000 --> 00:01:18,000
+4.2 bar is not a vibe.
+15 L/min is not “about that high.”
+
+6
+00:01:18,000 --> 00:01:30,000
+Who is allowed to energize the output?
+
+7
+00:01:30,000 --> 00:01:55,000
+The agent interprets.
+The kernel decides.
+
+8
+00:01:55,000 --> 00:02:20,000
+The agent can ask.
+Only the kernel can say yes.
+
+9
+00:02:20,000 --> 00:02:50,000
+End customer: the person who owns the bench.
+Not a chatbot user.
+
+10
+00:02:50,000 --> 00:03:20,000
+Mapped rigs.
+Not unknown machines.
+
+11
+00:03:20,000 --> 00:03:50,000
+MQTT · Modbus · OPC UA
+S7 · EtherNet/IP · CAN
+
+12
+00:03:50,000 --> 00:04:20,000
+Same kernel. Different rig.json.
+Observe first.
+
+13
+00:04:20,000 --> 00:04:45,000
+Build-time AI: Grok 4.6
+It never drives the relay.
+
+14
+00:04:45,000 --> 00:05:15,000
+Runtime default: Fake
+Proven on CI and the 12 Sep bench.
+
+15
+00:05:15,000 --> 00:05:28,000
+Live fallbacks: Claude Sonnet 4.5
+then OpenAI / OpenAI-compatible.
+
+16
+00:05:28,000 --> 00:05:40,000
+Benchmark: skill routing and tool discipline.
+Not chat quality.
+
+17
+00:05:40,000 --> 00:06:10,000
+Six gates.
+Observe before actuation.
+
+18
+00:06:10,000 --> 00:06:25,000
+Twin, then arm, then restore.
+
+19
+00:06:25,000 --> 00:06:45,000
+Pressure peak 4.83 bar against 4.2
+Flow peak 15.41 L/min against 15.0
+
+20
+00:06:45,000 --> 00:07:00,000
+OUTPUT = enabled AND permit
+AND not tripped AND E-stop closed AND healthy
+
+21
+00:07:00,000 --> 00:07:45,000
+Phase 3 dashboard · port 8080
+Observe only
+
+22
+00:07:45,000 --> 00:08:15,000
+Studio · Live
+Both channels, trip lines, ready-to-arm
+
+23
+00:08:15,000 --> 00:08:35,000
+A human applies the map.
+No invented skill on a live output.
+
+24
+00:08:35,000 --> 00:09:10,000
+Fake agent selects the skill.
+Kernel compares the number.
+
+25
+00:09:10,000 --> 00:09:45,000
+4.2 bar · kernel trip
+Output latched safe
+
+26
+00:09:45,000 --> 00:10:15,000
+15 L/min · independent trip
+Same output
+
+27
+00:10:15,000 --> 00:10:35,000
+Shutdown needs a human.
+Kernel forces safe first.
+
+28
+00:10:35,000 --> 00:11:00,000
+Checksummed evidence is the output
+of the procedure.
+
+29
+00:11:00,000 --> 00:11:12,000
+Capstone: deploy the agent
+on someone else's rig
+
+30
+00:11:12,000 --> 00:11:28,000
+Interview: modules, bus, pins,
+trips, observe-only
+
+31
+00:11:28,000 --> 00:11:40,000
+Agent proposes a map.
+A human still applies it.
+
+32
+00:11:40,000 --> 00:11:50,000
+Twin, then arm.
+The interview is not built yet.
+
+33
+00:11:50,000 --> 00:12:05,000
+The AI never had to own
+the dangerous decision.
+
+34
+00:12:05,000 --> 00:12:20,000
+Phase 3 is complete.
+Put this on any mapped bench.
+
