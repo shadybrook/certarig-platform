@@ -1,0 +1,39 @@
+{
+  "certarig_version": "0.4.0",
+  "config_hash": "9e6a03f94e6db04e063c4cbeb54e4eadd9d8357e7b8c939a995e963249041129",
+  "contract_hash": "ac68338b687f7c9b6b39403c4e6da522f60d0d1ff0b2791884494bc75408707b",
+  "created_at": "2026-09-12T12:00:11.791766+00:00",
+  "files": [
+    {
+      "path": "events.jsonl",
+      "sha256": "7cf87129a0c77e5f6a96bcee3bd76d641f4deda7552d943364744ef61da492b0",
+      "size": 3579
+    },
+    {
+      "path": "procedure.json",
+      "sha256": "fad02e32337436be82ccf8c006951ac621cf5e94fd6debb498f3c7482a64e6f0",
+      "size": 3625
+    },
+    {
+      "path": "report.md",
+      "sha256": "d8b8783bc6eee6798ea2e982722958f731be5d4f61b521c002598989ec4d8a9b",
+      "size": 1895
+    },
+    {
+      "path": "run.json",
+      "sha256": "0d8a146224ec0ba62b00627fefa16d290b7bb9cb692086c1aa14cb3098a696f6",
+      "size": 12055
+    }
+  ],
+  "hardware_identity": "SimulatedRig@Chintans-MacBook-Air.local config=9e6a03f94e6d",
+  "hardware_mode": "simulator",
+  "kind": "certarig_run_bundle",
+  "manifest_hash": "a2338aa9c3b0ae78ee29426fbfbd79bbb68e91750f815624dc140d912f98ada5",
+  "outcome_reason": "all steps and checks passed",
+  "procedure_hash": "c8a138df2e810a9bbabc6d8ba64317f54e9e0ae5b48006aadfb522eeeaae8a9b",
+  "procedure_id": "adc_validation",
+  "rig_id": "certarig-wave1-sim",
+  "run_id": "run_20260912T120004_4ae689",
+  "seed": 41,
+  "status": "passed"
+}

@@ -2,7 +2,7 @@
 
 This folder is a **template** for a for-grade write-up of the *platform* dry-bench lab. It is not the 20 Sep Phase 3 submission. Do not copy Phase 3 evidence here. Do not invent HIL results.
 
-The 12 Sep 2026 sidecar lab is written up in [2026-09-12-dry-bench.md](2026-09-12-dry-bench.md). Bundles live off-git in `evidence/lab-pulled/` (copied from `/tmp/certarig-lab-pulled/`).
+The 12 Sep 2026 sidecar lab is written up in [2026-09-12-dry-bench.md](2026-09-12-dry-bench.md). Working copies stay gitignored under `evidence/lab-pulled/`. The GitHub snapshot is [archive/phase3-submission/sidecar-lab-2026-09-12/](../../archive/phase3-submission/sidecar-lab-2026-09-12/). Map: [docs/phase3-submission/README.md](../phase3-submission/README.md).
 
 ## What to attach
 

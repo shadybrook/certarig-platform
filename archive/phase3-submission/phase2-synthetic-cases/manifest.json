@@ -1,0 +1,36 @@
+{
+  "project": "CertaRig",
+  "phase": "Phase 2 proof of concept",
+  "generated_from": "src/engine.mjs",
+  "synthetic_data_only": true,
+  "cases": [
+    {
+      "case_id": "normal",
+      "title": "Case 1: Approved baseline",
+      "expected_outcome": "accepted",
+      "evidence_checksum": "CERTARIG-NORMAL-20260824",
+      "file": "normal.json"
+    },
+    {
+      "case_id": "swapped",
+      "title": "Case 2: Swapped analog channels",
+      "expected_outcome": "review",
+      "evidence_checksum": "CERTARIG-SWAPPED-20260824",
+      "file": "swapped.json"
+    },
+    {
+      "case_id": "missingCalibration",
+      "title": "Case 3: Missing calibration evidence",
+      "expected_outcome": "stopped",
+      "evidence_checksum": "CERTARIG-MISSINGCALIBRATION-20260824",
+      "file": "missingCalibration.json"
+    },
+    {
+      "case_id": "safetyLimit",
+      "title": "Case 4: Pressure safety limit breach",
+      "expected_outcome": "aborted",
+      "evidence_checksum": "CERTARIG-SAFETYLIMIT-20260824",
+      "file": "safetyLimit.json"
+    }
+  ]
+}

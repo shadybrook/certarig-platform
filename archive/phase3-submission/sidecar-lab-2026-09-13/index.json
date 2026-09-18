@@ -1,0 +1,128 @@
+{
+  "kind": "certarig_lab_evidence_index",
+  "date": "2026-09-13",
+  "node": "http://certarig-pi.local:8081",
+  "rig_id": "certarig-wave1-dry-bench",
+  "hardware_mode": "raspberry_pi",
+  "runs": [
+    {
+      "run_id": "run_20260913T065327_f66d82",
+      "procedure_id": "pressure_guardrail",
+      "status": "passed",
+      "outcome_reason": "all steps and checks passed",
+      "peaks": {
+        "flow": 7.44242,
+        "flow_emulator": 7.44242,
+        "pressure": 4.79104,
+        "pressure_emulator": 4.79104
+      },
+      "kernel_events": [
+        "estop_closed_reset_required",
+        "operator_safe",
+        "trip_reset_output_safe",
+        "permit_accepted",
+        "pressure_high_forced_safe",
+        "process_safe_reset_required",
+        "permit_rejected_reset_required",
+        "operator_safe"
+      ],
+      "config_hash": "e9922ec2e77b1006a336b4739b200d6c5372b02b457446b1b44b9c45bfed29ed",
+      "evidence_files": [
+        "SHA256SUMS.txt",
+        "briefing.json",
+        "events.jsonl",
+        "manifest.json",
+        "procedure.json",
+        "report.md",
+        "run.json"
+      ],
+      "bundle": "20260913T070321372704Z_run_20260913T065327_f66d82.zip",
+      "bundle_sha256": "63611a857fe419167e6f8addad3534487cc67913dbc07a2ec4e2f55a7e7ca21e",
+      "bundle_files": 7,
+      "saved_to": "evidence/lab-pulled/2026-09-13/20260913T070321372704Z_run_20260913T065327_f66d82.zip",
+      "verify_ok": true
+    },
+    {
+      "run_id": "run_20260913T065513_890ca9",
+      "procedure_id": "flow_guardrail",
+      "status": "passed",
+      "outcome_reason": "all steps and checks passed",
+      "peaks": {
+        "flow": 16.94545,
+        "flow_emulator": 16.94545,
+        "pressure": 3.24046,
+        "pressure_emulator": 3.24046
+      },
+      "kernel_events": [
+        "csv_recording_stopped",
+        "operator_safe",
+        "trip_reset_output_safe",
+        "permit_accepted",
+        "flow_high_forced_safe",
+        "process_safe_reset_required",
+        "permit_rejected_reset_required",
+        "operator_safe"
+      ],
+      "config_hash": "e9922ec2e77b1006a336b4739b200d6c5372b02b457446b1b44b9c45bfed29ed",
+      "evidence_files": [
+        "SHA256SUMS.txt",
+        "briefing.json",
+        "events.jsonl",
+        "manifest.json",
+        "procedure.json",
+        "report.md",
+        "run.json"
+      ],
+      "bundle": "20260913T070321483687Z_run_20260913T065513_890ca9.zip",
+      "bundle_sha256": "1c9732342234d56b5784a70c91eb9555de94d20ebc0a7e2e62849b8aa7dfd119",
+      "bundle_files": 7,
+      "saved_to": "evidence/lab-pulled/2026-09-13/20260913T070321483687Z_run_20260913T065513_890ca9.zip",
+      "verify_ok": true
+    },
+    {
+      "run_id": "run_20260913T065842_dc1f88",
+      "procedure_id": "pressure_guardrail",
+      "status": "passed",
+      "outcome_reason": "all steps and checks passed",
+      "peaks": {
+        "flow": 9.3697,
+        "flow_emulator": 9.3697,
+        "pressure": 5.36039,
+        "pressure_emulator": 5.36039
+      },
+      "kernel_events": [
+        "estop_closed_reset_required",
+        "operator_safe",
+        "trip_reset_output_safe",
+        "permit_accepted",
+        "pressure_high_forced_safe",
+        "process_safe_reset_required",
+        "permit_rejected_reset_required",
+        "operator_safe"
+      ],
+      "config_hash": "ed2f30f44470baacbb38996f8a3e2d06d679cbaad99a9df05651b95334b3254b",
+      "evidence_files": [
+        "SHA256SUMS.txt",
+        "briefing.json",
+        "events.jsonl",
+        "manifest.json",
+        "procedure.json",
+        "report.md",
+        "run.json"
+      ],
+      "bundle": "20260913T070321587973Z_run_20260913T065842_dc1f88.zip",
+      "bundle_sha256": "645e8c1aacec02bc1339e1cbc4ea269d6176af52b48f814138a4d7ecd409ac4a",
+      "bundle_files": 7,
+      "saved_to": "evidence/lab-pulled/2026-09-13/20260913T070321587973Z_run_20260913T065842_dc1f88.zip",
+      "verify_ok": true
+    }
+  ],
+  "session_bundle": {
+    "label": "2026-09-13-session",
+    "bundle": "20260913T070321689331Z_2026-09-13-session.zip",
+    "bundle_sha256": "876430f41291f14807939648b7a708edeede4f805fd25ba82146a87dc08ff1b6",
+    "bundle_files": 148,
+    "saved_to": "evidence/lab-pulled/2026-09-13/20260913T070321689331Z_2026-09-13-session.zip",
+    "verify_ok": true
+  }
+}

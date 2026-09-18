@@ -14,6 +14,8 @@ Studio (browser)  ──►  Edge node  ──►  ProcessGuardrail  ──►  
 
 The Phase 3 PoC that this was imported from is frozen. This repo is the platform.
 
+**Phase 3 evidence, CSVs, graphs, circuit, BOM, and lab bundles:** start at [docs/phase3-submission/README.md](docs/phase3-submission/README.md). Frozen source: https://github.com/shadybrook/certarig-phase-2-poc
+
 ## Gate 0–5 evidence review and visual explainer
 
 The 12 September dry-bench progression is analysed as six gates, numbered Gate 0 through Gate 5. The review distinguishes measured evidence from interpretation and documents the product direction that follows from the lab.
