@@ -17,11 +17,13 @@ from pathlib import Path
 from docx import Document
 from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_BREAK
-from docx.shared import Pt, RGBColor
+from docx.shared import Inches, Pt, RGBColor
 
 HERE = Path(__file__).resolve().parent
+REPO = HERE.parents[1]
 MD_PATH = HERE / "CertaRig_Phase3_Document.md"
 DOCX_PATH = HERE / "CertaRig_Phase3_Document.docx"
+IMAGE_RE = re.compile(r"^!\[(.*?)\]\((.+?)\)$")
 
 BOLD_RE = re.compile(r"\*\*(.+?)\*\*")
 CODE_RE = re.compile(r"`([^`]+)`")
@@ -76,6 +78,11 @@ def parse_blocks(lines: list[str]):
             yield ("heading", (len(m.group(1)), m.group(2).strip()))
             i += 1
             continue
+        img = IMAGE_RE.match(stripped)
+        if img:
+            yield ("figure", (img.group(1).strip(), img.group(2).strip()))
+            i += 1
+            continue
         if stripped.startswith("|"):
             rows = []
             while i < n and lines[i].strip().startswith("|"):
@@ -113,7 +120,8 @@ def parse_blocks(lines: list[str]):
         while i < n:
             nxt = lines[i].strip()
             if (not nxt or nxt == "---" or nxt.startswith("#") or nxt.startswith("|")
-                    or re.match(r"^\s*[-*]\s+", lines[i]) or re.match(r"^\s*\d+\.\s+", lines[i])
+                    or nxt.startswith("![") or re.match(r"^\s*[-*]\s+", lines[i])
+                    or re.match(r"^\s*\d+\.\s+", lines[i])
                     or set(nxt) <= {"_"}):
                 break
             para_lines.append(nxt)
@@ -175,6 +183,34 @@ def build_cover_page(doc: Document, cover_rows: list[list[str]]) -> None:
     # page break after the cover
     p = doc.add_paragraph()
     p.add_run().add_break(WD_BREAK.PAGE)
+
+
+def resolve_image(src: str) -> Path:
+    raw = Path(src)
+    candidates = [
+        raw if raw.is_absolute() else None,
+        HERE / src,
+        REPO / src,
+    ]
+    for path in candidates:
+        if path is not None and path.exists():
+            return path
+    raise FileNotFoundError(f"Figure not found: {src}")
+
+
+def add_figure(doc: Document, src: str, caption: str) -> None:
+    path = resolve_image(src)
+    picture = doc.add_paragraph()
+    picture.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    run = picture.add_run()
+    run.add_picture(str(path), width=Inches(6.3))
+    cap = doc.add_paragraph()
+    cap.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    cap_run = cap.add_run(caption)
+    cap_run.italic = True
+    cap_run.font.size = Pt(10)
+    cap_run.font.color.rgb = RGBColor(0x33, 0x33, 0x33)
+    doc.add_paragraph()
 
 
 def add_table(doc: Document, rows: list[list[str]]) -> None:
@@ -255,6 +291,9 @@ def main() -> None:
                 add_runs(p, item)
         elif kind == "table":
             add_table(doc, payload)
+        elif kind == "figure":
+            caption, src = payload
+            add_figure(doc, src, caption)
         elif kind == "blank_line":
             p = doc.add_paragraph()
             p.add_run("_" * 65)

@@ -7,14 +7,21 @@ Maps every factual claim in `CertaRig_Phase3_Document.md` to its evidence source
 | Claim | Evidence source |
 | --- | --- |
 | Agent interprets natural language; deterministic kernel measures, compares, latches, owns the output; agent reaches the rig only via the Edge API filtered by a capability manifest | `README.md` (intro + "What is deterministic vs what is the model" table); `certarig/edge/commissioning.py` (`ProcessGuardrail`, `DryBenchInterlock`) |
+| Edge API is the product control plane; SSH GPIO commands and operator gpiozero are not the product path; gpiozero is the kernel's internal Pi driver (`GPIOZERO_PIN_FACTORY=lgpio`) | `README.md` (opening paragraph); `docs/platform-lab/product-state.md` ("Lab host facts"); `skills/ops/safe_powerdown/SKILL.md` (12 Sep SSH improvisation vs procedure) |
 | Output invariant: OUTPUT = enabled AND permit AND not-tripped AND E-stop-closed AND healthy; unsafe state clears permit and latches safe; recovery = healthy → reset → permit | `docs/explainer/2026-09-13-gates-0-to-5-analysis.md` ("The problem CertaRig is solving", `ProcessGuardrail.drive_high` condition); `certarig/edge/commissioning.py` |
 | GPIO23 is the relay output pin, owned exclusively by the kernel | `README.md` (Safety notes); `certarig/edge/live.py`, `certarig/edge/ops.py`; `docs/platform-lab/product-state.md` ("Two kernels must not both own GPIO23 / ADS1115") |
 | `bypass_interlock` and `override_limits` do not exist as callable tools | `README.md` ("What is deterministic vs what is the model") |
 | Evidence bundles with checksums are first-class outputs (CSV, `run.json`, `report.md`, SHA-256; adapter class + hostname; outcomes ledger) | `README.md` (kernel/agent table; step 7 "Evidence"); `certarig/edge/evidence.py` |
 | `reset_trip` / `shutdown` require human approval; agent gets HTTP 428 deep-link | `README.md` (step 5 "Approvals"); `tests/contract/test_ops_api.py`, `tests/contract/test_agent_api.py` |
+| Approved shutdown path is `safe_powerdown` (kernel forces safe first) then human-approved `shutdown` (refuse if a run is active, force safe, flush evidence, then power-off). 12 Sep halt was still SSH; the procedure is implemented and software-tested, not a Gate 4 hardware run | `skills/ops/safe_powerdown/SKILL.md` and `procedure.yaml` (`force_safe` then hold); `certarig/edge/ops.py` (`shutdown` forces `command("safe")`); `README.md` (Raspberry Pi section); `certarig/agent/policy.py` (after `safe_powerdown` passed → export → shutdown) |
 | Studio views: Live, Onboard, Author, Procedures, Approvals, Agent, Evidence; SDK; sim serve / Docker path; under-ten-minutes stranger path | `README.md` ("Clone to a simulated run"); `studio/` |
-| Dry-bench hardware: two potentiometers (pressure/flow), ADS1115 ADC, physical E-stop, low-voltage relay; Raspberry Pi 3 Model A+ | `docs/explainer/phase3-film/script.md` (2:20–3:20 customer section); `docs/platform-lab/product-state.md` ("Lab host facts") |
+| Dry-bench hardware: two potentiometers (pressure/flow), ADS1115 ADC, physical E-stop, low-voltage relay; Raspberry Pi 3 Model A+ | `docs/explainer/phase3-film/script.md` (2:20–3:20 customer section); `docs/platform-lab/product-state.md` ("Lab host facts"); as-built circuit `docs/phase3/diagrams/CertaRig_Phase3_Final_AsBuilt_Circuit.png` |
 | Guardrail limits 4.2 bar and 15.0 L/min | `config/rig.example.json` (`pressure_abort_bar: 4.2`, `safe_max: 4.2` / `15.0`); `docs/explainer/phase3-film/SCRIPT_EDIT_ME.md` ("Keep these facts") |
+| Cover identity: Course Title Study Project; Student ID 2023EB03005; Advisor Professor Raj Kumar | Submitted Phase 2 report (Google Doc `1d3Xguv-8qeDTHnpuTDTPGu-XgSUYmM6fnER9rABAyp4`); `docs/PHASE2_SUBMISSION.md` in the PoC tree. GBrain has no separate identity page; advisor name also on `projects/certarig-phase3-professor-scope-2026-09-07` |
+| 7 Sep advisor freeze: dry Wave 1 bench is Phase 3 proof; water loop deferred; circuit/architecture/photographs/live demo/video required | GBrain `projects/certarig-phase3-professor-scope-2026-09-07` |
+| 16 Sep video brief: beginner-friendly film, end customer, AI choice + benchmark + fallback, stitched PoC, capstone | GBrain `projects/certarig-video-production-brief-2026-09-16` |
+| As-built pin map, red/green indicators, GPIO25 unused, broken-NC1 not tested | GBrain `projects/certarig-phase3-integrated-bench-pass-2026-09-12`; `docs/phase3/diagrams/CertaRig_Phase3_Final_AsBuilt_Circuit.svg` |
+| BOM / inventory IDs R01–R17, Robu INV2627/225826 dated 4 Sep 2026 | `docs/phase3/CertaRig_Phase_3_Hardware_Inventory_Register_2026-09-06.md` |
 
 ## Phase 1 / Phase 2 recap
 
@@ -82,7 +89,7 @@ Maps every factual claim in `CertaRig_Phase3_Document.md` to its evidence source
 
 | Claim | Evidence source |
 | --- | --- |
-| Capstone: deployable agentic test-operations layer for someone else's mapped rig; interview proposes map, human applies, twin rehearses, explicit arm | `docs/explainer/phase3-film/SCRIPT_EDIT_ME.md` (Capstone note); script.md (11:00–11:50); `docs/platform-lab/commissioning-interview.md` |
+| Capstone: deployable agentic test-operations layer for someone else's mapped rig; interview proposes map, human applies, twin rehearses, explicit arm. Not photo-to-control: a diagram/photo may be sidecar context, never permission to energize | `docs/explainer/phase3-film/SCRIPT_EDIT_ME.md` (Capstone note); script.md (11:00–11:50); `docs/platform-lab/commissioning-interview.md`; analysis doc ("does not yet discover an unknown bench from a photograph or circuit diagram") |
 | End customer: owner/commissioner of a test bench (lab engineer, technician, team needing auditable records); tomorrow anyone with a mapped rig (hydraulic cart, battery pack on CAN, Siemens/Allen-Bradley cell, Modbus skid) | script.md (2:20–3:20 "Who is the end customer" and 3:20–4:20 industries) |
 | Target growth areas and enabling advances: electrified/connected/software-defined equipment; low-cost edge computing, structured industrial protocols, tool-using model APIs, digital twins, and hashing | Product-direction rationale in `docs/explainer/phase3-film/SCRIPT_EDIT_ME.md` (3:20–5:40); presented in the document as an unquantified hypothesis requiring capstone customer validation |
 | Governing invariant: no unreviewed mapping can reach an output | analysis doc ("Recommended next milestone") |
@@ -96,8 +103,11 @@ Maps every factual claim in `CertaRig_Phase3_Document.md` to its evidence source
 | Claim | Evidence source |
 | --- | --- |
 | Gates 0–5 evidence & product-direction report (PDF + DOCX) | `deliverables/CertaRig_Gates_0_to_5_Evidence_and_Product_Direction.pdf` / `.docx` |
-| Phase 3 submission film (12.7 min) | https://github.com/shadybrook/certarig-platform/releases/download/phase3-submission-videos-2026-09-17/CertaRig_Phase3_Film.mp4 ; cut list `tools/phase3_edit/edl/phase3_film.json` |
-| Uncut clap-synced bench run (29.6 min) | https://github.com/shadybrook/certarig-platform/releases/download/phase3-submission-videos-2026-09-17/CertaRig_Phase3_Uncut_Bench_Run.mp4 |
+| Phase 3 submission film v4 (13.4 min, paper explainer motion + Studio\|bench split; atelier retired) | https://github.com/shadybrook/certarig-platform/releases/download/phase3-submission-videos-v4/CertaRig_Phase3_Film.mp4 ; cut list `tools/phase3_edit/edl/phase3_film_v4.json`; rebuild `python3 tools/render_phase3_explainer.py` |
+| Uncut clap-synced bench run (29.6 min, 1310\|608 split) | https://github.com/shadybrook/certarig-platform/releases/download/phase3-submission-videos-v4/CertaRig_Phase3_Uncut_Bench_Run.mp4 |
+| Action windows only (no VO) | https://github.com/shadybrook/certarig-platform/releases/download/phase3-submission-videos-v4/CertaRig_Phase3_Uncut_Action.mp4 |
+| As-built circuit map (SVG/PNG/PDF) | `docs/phase3/diagrams/CertaRig_Phase3_Final_AsBuilt_Circuit.png` (also `.svg`, `.pdf`) |
+| Hardware inventory register / BOM | `docs/phase3/CertaRig_Phase_3_Hardware_Inventory_Register_2026-09-06.md` (+ PDF) |
 | Derived data: hardware run summary, evidence verification record | `docs/explainer/data/hardware_run_summary.csv`, `docs/explainer/data/evidence_verification.json` |
 | Source footage Drive folder | https://drive.google.com/drive/folders/1mlegZnq_AQurnBIKY-Ckh1S6TyZ_Q8Bk |
 
@@ -105,5 +115,7 @@ Maps every factual claim in `CertaRig_Phase3_Document.md` to its evidence source
 
 - `docs/platform-lab/shoot-handoff-20260917.md` — listed as research input but does not exist in the tree.
 - `evidence/` folder (lab-pulled bundles, sim-library, agent transcripts) — gitignored per `docs/platform-lab/2026-09-12-dry-bench.md`; hardware numbers are cited from the committed lab record and analysis instead.
-- Course title, student ID, and advisor name — placeholders by instruction.
-- Phase 1 / Phase 2 recap detail (problem definition, planning) — reconstructed from `docs/PROVENANCE.md`, the analysis doc, and the film script; no standalone Phase 1/Phase 2 report exists in this tree.
+- Course title, student ID, and advisor are filled from the submitted Phase 2 report (Study Project / 2023EB03005 / Professor Raj Kumar). GBrain has no dedicated identity page for those three fields.
+- `.cursor/skills/professor-bench-demo/SKILL.md` — cited as a professor-brief source in the 18 Sep plan; not present in this tree. Professor-brief checks used GBrain `projects/certarig-phase3-professor-scope-2026-09-07`, `projects/certarig-video-production-brief-2026-09-16`, `docs/platform-lab/product-state.md`, `README.md`, `skills/ops/safe_powerdown/`, and `docs/platform-lab/commissioning-interview.md`.
+- Comparative live-LLM benchmark requested on 16 Sep remains unrun.
+- Nothing was written onto `certarig-phase3-*` GBrain pages from this session.
