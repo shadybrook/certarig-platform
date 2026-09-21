@@ -10,22 +10,18 @@ export function renderHero(el) {
   el.innerHTML = `
     <div class="gap-stage" data-phase="0">
       <div class="gap-lang">
-        <p class="gap-kicker">Agent · language</p>
         <div class="bubble" data-b="0">“Run the pressure test.”</div>
-        <div class="bubble" data-b="1">“Why did the rig stop?”</div>
-        <div class="bubble" data-b="2">Narrative only.</div>
+        <div class="bubble" data-b="1">“Why did it stop?”</div>
         <p class="stops">stops here</p>
       </div>
-      <div class="gap-bar" aria-hidden="true"><span>manifest</span></div>
+      <div class="gap-bar" aria-hidden="true"></div>
       <div class="gap-kernel">
-        <p class="gap-kicker">Kernel · ProcessGuardrail</p>
-        <p class="gap-claim">The model does not get a vote.</p>
         <div class="and-bus">
           ${TERMS.map((t) => `<div class="and-term" data-ok="false"><span>${t}</span><i></i></div>`).join("")}
         </div>
         <div class="out-lamp" data-on="false">
           <span class="bulb"></span>
-          <span class="lamp-copy">Output locked.</span>
+          <span class="lamp-copy">0</span>
         </div>
       </div>
     </div>
@@ -46,17 +42,15 @@ export function renderHero(el) {
         stage.dataset.phase = String(phase);
       }
       bubbles.forEach((b, i) => {
-        const on = p > 0.04 + i * 0.09;
-        b.classList.toggle("in", on);
+        b.classList.toggle("in", p > 0.04 + i * 0.12);
       });
-      const stopOn = p > 0.32;
-      stage.classList.toggle("stopped", stopOn);
+      stage.classList.toggle("stopped", p > 0.32);
       terms.forEach((t, i) => {
         t.setAttribute("data-ok", String(p > 0.42 + i * 0.07));
       });
       const out = p > 0.82;
       lamp.dataset.on = String(out);
-      copy.textContent = out ? "OUTPUT 1 — kernel said yes." : "OUTPUT 0 — language never crossed.";
+      copy.textContent = out ? "1" : "0";
     },
   };
 }

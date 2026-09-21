@@ -3,84 +3,75 @@ import { tickCopy } from "../scroll.js";
 const STEPS = ["observe", "twin", "arm", "actuate", "restore"];
 
 const COPY = {
-  observe: ["Observe.", "Data quality before authority."],
-  twin: ["Twin.", "Same hash. Then metal."],
-  arm: ["Arm.", "Bypass is not a tool."],
-  actuate: ["Actuate.", "Only the kernel says yes."],
-  restore: ["Restore.", "Leaving is part of the proof."],
+  observe: "Observe.",
+  twin: "Twin.",
+  arm: "Arm.",
+  actuate: "Actuate.",
+  restore: "Restore.",
 };
 
 const FACES = {
   observe: {
     led: "bad",
-    title: "observe · actuation 0",
+    title: "observe",
     html: `
-      <p class="face-label">Before output authority</p>
       <div class="traces">
         <div class="trace-card">
-          <span>P1 · pressure</span>
+          <span>P1</span>
           <svg viewBox="0 0 200 64" aria-hidden="true">
             <path class="wave" d="M0 48 C 20 48, 28 12, 50 12 S 80 52, 110 40 S 160 8, 200 18" fill="none" stroke="#0071e3" stroke-width="2"/>
             <line x1="0" y1="22" x2="200" y2="22" stroke="#c41e3a" stroke-dasharray="3 4" stroke-width="1"/>
           </svg>
-          <strong>invalid once</strong>
-          <span>kept the failure</span>
+          <strong>invalid</strong>
         </div>
         <div class="trace-card">
-          <span>P2 · flow</span>
+          <span>P2</span>
           <svg viewBox="0 0 200 64" aria-hidden="true">
             <path class="wave" d="M0 50 C 30 50, 40 20, 70 22 S 120 54, 150 36 S 180 16, 200 20" fill="none" stroke="#64d2ff" stroke-width="2"/>
             <line x1="0" y1="18" x2="200" y2="18" stroke="#c41e3a" stroke-dasharray="3 4" stroke-width="1"/>
           </svg>
-          <strong>sweep required</strong>
-          <span>not a permit</span>
+          <strong>locked</strong>
         </div>
       </div>
-      <p class="lock">Output locked.</p>
     `,
   },
   twin: {
     led: "gold",
-    title: "twin · same procedure hash",
+    title: "twin",
     html: `
-      <p class="face-label">Do not improvise on metal</p>
       <div class="hash-row"><span>sim</span><span>six procedures</span><em>pass</em></div>
-      <div class="hash-row"><span>hw</span><span>same hashes · 24 h</span><em>match</em></div>
-      <div class="hash-row"><span>map</span><span>human applies rig.json</span><em>fence</em></div>
-      <p class="stamp">a guessed map never auto-energizes</p>
+      <div class="hash-row"><span>hw</span><span>same hashes</span><em>match</em></div>
+      <div class="hash-row"><span>map</span><span>rig.json</span><em>fence</em></div>
     `,
   },
   arm: {
     led: "gold",
-    title: "arm · capability fence",
+    title: "arm",
     html: `
-      <p class="face-label">Policy is never</p>
       <div class="fence">
         <div class="col">
-          <strong>Agent may</strong>
+          <strong>May</strong>
           <ul>
-            <li>choose an approved procedure</li>
-            <li>write narrative</li>
+            <li>approved procedure</li>
+            <li>narrative</li>
           </ul>
         </div>
         <div class="gap" aria-hidden="true"></div>
         <div class="col">
-          <strong>Agent may not</strong>
+          <strong>May not</strong>
           <ul>
             <li>bypass_interlock</li>
             <li>override_limits</li>
-            <li>reset_trip · shutdown</li>
+            <li>reset_trip</li>
           </ul>
         </div>
       </div>
-      <p class="never">428 → a human on Approvals.</p>
     `,
   },
   actuate: {
     led: "ok",
-    title: "actuate · kernel owns GPIO",
+    title: "actuate",
     html: `
-      <p class="face-label">Fake selected. Fake did not compare.</p>
       <div class="and-bus">
         <div class="and-term" data-ok="true"><span>actuation enabled</span><i></i></div>
         <div class="and-term" data-ok="true"><span>permit requested</span><i></i></div>
@@ -88,19 +79,17 @@ const FACES = {
         <div class="and-term" data-ok="true"><span>e-stop closed</span><i></i></div>
         <div class="and-term" data-ok="true"><span>process healthy</span><i></i></div>
       </div>
-      <div class="out-lamp" data-on="true"><span class="bulb"></span> Commanded output — not contact motion.</div>
+      <div class="out-lamp" data-on="true"><span class="bulb"></span></div>
     `,
   },
   restore: {
     led: "ok",
-    title: "restore · proof includes leaving",
+    title: "restore",
     html: `
-      <p class="face-label">Success is the previous system, intact</p>
       <div class="restore-grid">
-        <div><strong>Returned</strong>Observe-only. Actuation 0. Halted.</div>
-        <div><strong>Written</strong>Checksummed bundle. Ledger row.</div>
+        <div><strong>Returned</strong>Actuation 0</div>
+        <div><strong>Written</strong>The zip</div>
       </div>
-      <p class="stamp">if you cannot leave the bench, the run is not finished</p>
     `,
   },
 };
@@ -115,7 +104,7 @@ export function renderLoop(el) {
             <div class="instrument">
               <div class="instrument-chrome">
                 <span class="led" data-tone="${spec.led}"></span>
-                <span>CertaRig · mapped rig</span>
+                <span>CertaRig</span>
                 <span class="spacer">${spec.title}</span>
               </div>
               <div class="instrument-face">${spec.html}</div>
@@ -126,7 +115,6 @@ export function renderLoop(el) {
   `;
 
   const title = document.getElementById("loop-title");
-  const line = document.getElementById("loop-line");
   const buttons = document.querySelectorAll(".loop-rail button");
   const bar = document.querySelector(".loop-scrub i");
   const faces = [...el.querySelectorAll(".face")];
@@ -146,8 +134,7 @@ export function renderLoop(el) {
       buttons.forEach((btn) => {
         btn.setAttribute("aria-current", btn.dataset.step === step ? "true" : "false");
       });
-      tickCopy(title, COPY[step][0]);
-      if (line) line.textContent = COPY[step][1];
+      tickCopy(title, COPY[step]);
     }
   }
 

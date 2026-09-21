@@ -4,11 +4,11 @@ const MANIFEST =
   "a2338aa9c3b0ae78ee29426fbfbd79bbb68e91750f815624dc140d912f98ada5";
 
 const SHEETS = [
-  { name: "SHA256SUMS", hash: "the contract a stranger re-runs", offset: 0, narrative: false },
-  { name: "manifest.json", hash: "a2338aa9c3b0ae78…2f98ada5", offset: 10, narrative: false },
-  { name: "report.md", hash: "numbers from the kernel", offset: 20, narrative: false },
-  { name: "events.jsonl", hash: "procedure · checks · latch", offset: 30, narrative: false },
-  { name: "narrative.md", hash: "labelled NARRATIVE", offset: 48, narrative: true },
+  { name: "SHA256SUMS", hash: "", offset: 0, narrative: false },
+  { name: "manifest.json", hash: "", offset: 10, narrative: false },
+  { name: "report.md", hash: "", offset: 20, narrative: false },
+  { name: "events.jsonl", hash: "", offset: 30, narrative: false },
+  { name: "narrative.md", hash: "narrative", offset: 48, narrative: true },
 ];
 
 function hexWalk(target, step) {
@@ -33,15 +33,14 @@ export function renderZip(el) {
     <div class="instrument">
       <div class="instrument-chrome">
         <span class="led" data-tone="gold"></span>
-        <span>evidence bundle</span>
-        <span class="spacer">auditor · read-only</span>
+        <span>zip</span>
+        <span class="spacer">rehash</span>
       </div>
       <div class="instrument-face zip-face">
-        <p class="face-label">12 Sep · run_20260912T162352_6515a9</p>
         <div class="zip-stack">${sheets}</div>
         <div class="zip-actions">
-          <button type="button" data-rehash>Rehash as a stranger</button>
-          <span class="rehash-out" aria-live="polite">CSV waveforms are not in this export yet. That is a defect.</span>
+          <button type="button" data-rehash>Rehash</button>
+          <span class="rehash-out" aria-live="polite">CSV missing. Defect.</span>
         </div>
       </div>
     </div>

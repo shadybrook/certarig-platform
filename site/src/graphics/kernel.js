@@ -12,9 +12,8 @@ const BEATS = [
     tripLatched: false,
     estopClosed: true,
     healthy: true,
-    note: "All five true. Kernel said yes.",
+    note: "Yes.",
     title: "The model does not get a vote.",
-    line: "Five terms. One output.",
   },
   {
     at: 0.22,
@@ -23,9 +22,8 @@ const BEATS = [
     tripLatched: true,
     estopClosed: true,
     healthy: false,
-    note: "Over-limit. Trip latched. Permit cleared.",
+    note: "Latched.",
     title: "Break one term.",
-    line: "Output is false.",
   },
   {
     at: 0.44,
@@ -34,9 +32,8 @@ const BEATS = [
     tripLatched: true,
     estopClosed: true,
     healthy: true,
-    note: "Healthy again. Still latched. No auto-restart.",
+    note: "Still latched.",
     title: "Healthy is not a restart.",
-    line: "The latch holds.",
   },
   {
     at: 0.64,
@@ -45,9 +42,8 @@ const BEATS = [
     tripLatched: false,
     estopClosed: true,
     healthy: true,
-    note: "Reset accepted. Awaiting a new permit.",
+    note: "Need permit.",
     title: "Reset. Then permit.",
-    line: "A human owns the irreversible act.",
   },
   {
     at: 0.84,
@@ -56,9 +52,8 @@ const BEATS = [
     tripLatched: false,
     estopClosed: true,
     healthy: true,
-    note: "Permit requested. The kernel — not the agent — said yes.",
+    note: "Yes.",
     title: "Only the kernel said yes.",
-    line: "Language never crossed this panel.",
   },
 ];
 
@@ -80,7 +75,6 @@ export function renderKernel(el) {
   let holdUntil = 0;
   let lastBeat = null;
   const title = document.getElementById("kernel-title");
-  const line = document.getElementById("kernel-line");
 
   function trip(why) {
     state.tripLatched = true;
@@ -101,9 +95,7 @@ export function renderKernel(el) {
     rows.forEach((row, i) => row.setAttribute("data-ok", String(oks[i])));
     const lamp = el.querySelector(".out-lamp");
     lamp.dataset.on = String(on);
-    el.querySelector(".lamp-copy").textContent = on
-      ? "Output true — kernel said yes."
-      : "Output false — kernel said no.";
+    el.querySelector(".lamp-copy").textContent = on ? "1" : "0";
     const bit = el.querySelector(".kernel-bit");
     bit.textContent = on ? "1" : "0";
     bit.parentElement.dataset.on = String(on);
@@ -134,7 +126,7 @@ export function renderKernel(el) {
           <div class="and-term" data-ok="true"><span>emergency stop closed</span><i></i></div>
           <div class="and-term" data-ok="true"><span>process healthy</span><i></i></div>
         </div>
-        <div class="out-lamp" data-on="true"><span class="bulb"></span><span class="lamp-copy">Output true — kernel said yes.</span></div>
+        <div class="out-lamp" data-on="true"><span class="bulb"></span><span class="lamp-copy">1</span></div>
         <div class="kernel-controls">
           <button class="term-toggle" type="button" data-act="actuation" aria-pressed="true">Actuation: enabled</button>
           <button class="term-toggle" type="button" data-act="healthy" aria-pressed="true">Process: healthy</button>
@@ -156,33 +148,33 @@ export function renderKernel(el) {
       state.actuationEnabled = !state.actuationEnabled;
       if (!state.actuationEnabled) {
         state.permit = false;
-        state.note = "Actuation held at 0. Enabling is not a yes.";
+        state.note = "Held at 0.";
       } else {
-        state.note = "Actuation enabled. Still needs a permit.";
+        state.note = "Need permit.";
       }
     } else if (act === "healthy") {
       if (state.healthy) {
         state.healthy = false;
-        trip("Over-limit. Trip latched. Returning to healthy will not restart it.");
+        trip("Latched.");
       } else {
         state.healthy = true;
-        state.note = "Healthy again. Still latched.";
+        state.note = "Still latched.";
       }
     } else if (act === "estop") {
       if (state.estopClosed) {
         state.estopClosed = false;
-        trip("E-stop open. Forced safe. Release will not restore a permit.");
+        trip("E-stop open.");
       } else {
         state.estopClosed = true;
-        state.note = "E-stop closed. Still latched. Still no permit.";
+        state.note = "Still latched.";
       }
     } else if (act === "reset") {
       state.tripLatched = false;
       state.permit = false;
-      state.note = "Reset accepted. Now a human may request a permit.";
+      state.note = "Need permit.";
     } else if (act === "permit") {
       state.permit = true;
-      state.note = "Permit requested. The kernel said yes.";
+      state.note = "Yes.";
     }
     apply();
   });
@@ -204,7 +196,6 @@ export function renderKernel(el) {
         note: b.note,
       });
       tickCopy(title, b.title);
-      if (line) line.textContent = b.line;
     },
     holding: () => Date.now() < holdUntil,
   };
