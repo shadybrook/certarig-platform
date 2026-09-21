@@ -4,11 +4,11 @@ const MANIFEST =
   "a2338aa9c3b0ae78ee29426fbfbd79bbb68e91750f815624dc140d912f98ada5";
 
 const SHEETS = [
-  { name: "SHA256SUMS", hash: "the contract a stranger re-runs", y: 12, z: 5, narrative: false },
-  { name: "manifest.json", hash: "a2338aa9c3b0ae78…2f98ada5", y: 48, z: 4, narrative: false },
-  { name: "report.md", hash: "numbers from the kernel", y: 84, z: 3, narrative: false },
-  { name: "events.jsonl", hash: "procedure · checks · latch", y: 120, z: 2, narrative: false },
-  { name: "narrative.md", hash: "labelled NARRATIVE · never the measurement", y: 168, z: 1, narrative: true },
+  { name: "SHA256SUMS", hash: "the contract a stranger re-runs", offset: 0, narrative: false },
+  { name: "manifest.json", hash: "a2338aa9c3b0ae78…2f98ada5", offset: 10, narrative: false },
+  { name: "report.md", hash: "numbers from the kernel", offset: 20, narrative: false },
+  { name: "events.jsonl", hash: "procedure · checks · latch", offset: 30, narrative: false },
+  { name: "narrative.md", hash: "labelled NARRATIVE · never the measurement", offset: 48, narrative: true },
 ];
 
 function hexWalk(target, step) {
@@ -22,7 +22,7 @@ function hexWalk(target, step) {
 export function renderZip(el) {
   const sheets = SHEETS.map(
     (s) => `
-      <div class="zip-sheet${s.narrative ? " narrative" : ""}" style="top:${s.y}px; z-index:${s.z}; transform: translate(${(5 - s.z) * 10}px, 0)">
+      <div class="zip-sheet${s.narrative ? " narrative" : ""}" style="--offset:${s.offset}px">
         <span>${s.name}</span>
         <span class="hash">${s.hash}</span>
       </div>

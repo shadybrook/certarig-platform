@@ -23,7 +23,7 @@ const FACES = {
             <line x1="0" y1="18" x2="200" y2="18" stroke="#c41e3a" stroke-dasharray="3 4" stroke-width="1"/>
           </svg>
           <strong>sweep required</strong>
-          <span>envelope 20 L/min · trip later 15.0</span>
+          <span>envelope 20 L/min · trip 15.0</span>
         </div>
       </div>
       <p class="lock"><b>Output authority locked.</b> First ADC run failed and was kept. Second pass: 1,291 samples, 129 s. Crossing a future trip while observing is not a permit.</p>
@@ -117,7 +117,10 @@ function face(step) {
 }
 
 export function renderLoop(el) {
-  const setStep = (step) => {
+  let holdUntil = 0;
+  const setStep = (step, fromClick = false) => {
+    if (fromClick) holdUntil = Date.now() + 1500;
+    else if (Date.now() < holdUntil) return;
     el.dataset.step = step;
     el.innerHTML = face(step);
     document.querySelectorAll(".loop-rail button").forEach((btn) => {
@@ -129,8 +132,8 @@ export function renderLoop(el) {
 
   document.querySelectorAll(".loop-rail button").forEach((btn) => {
     btn.addEventListener("click", () => {
-      setStep(btn.dataset.step);
-      document.getElementById(`step-${btn.dataset.step}`)?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      setStep(btn.dataset.step, true);
+      document.getElementById(`step-${btn.dataset.step}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
     });
   });
 

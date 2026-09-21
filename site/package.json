@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && node scripts/inline.mjs",
     "preview": "vite preview --host 127.0.0.1 --port 4173"
   },
   "devDependencies": {
