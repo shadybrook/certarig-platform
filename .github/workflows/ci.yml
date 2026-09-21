@@ -60,6 +60,8 @@ jobs:
           grep -F 'href="/try"' dist/index.html
           grep -F "small test station" dist/try.html
           grep -F "Bring a real bench" dist/try.html
+          grep -F "github.com/shadybrook/certarig-platform" dist/try.html
+          grep -F "Your own station" dist/try.html
       - name: Public glass does not leak lab-diary or zero-users
         run: |
           ! grep -F "Paying customers today: zero" dist/index.html dist/try.html

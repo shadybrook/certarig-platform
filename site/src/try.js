@@ -173,6 +173,7 @@ function mountZip(el) {
             (s) => `
               <div class="zip-sheet${s.notes ? " narrative" : ""}" style="--offset:${s.offset}px">
                 <span>${s.name}</span>
+                ${s.notes ? `<span class="hash" data-named></span>` : ""}
               </div>`,
           ).join("")}
         </div>
@@ -230,6 +231,24 @@ const kernel = mountKernel(document.querySelector("#try-kernel"), {
   },
 });
 const zip = mountZip(document.querySelector("#try-zip"));
+const nameField = document.getElementById("try-name");
+const proof = document.querySelector("[data-proof]");
+const named = document.querySelector("[data-named]");
+
+function setName(raw) {
+  const clean = String(raw || "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 48);
+  if (proof) {
+    proof.textContent = clean
+      ? `${clean}. Proof from this classroom bench.`
+      : "Proof you can take with you. This station stays here.";
+  }
+  if (named) named.textContent = clean;
+}
+
+nameField?.addEventListener("input", () => setName(nameField.value));
 
 function syncRail() {
   document.querySelectorAll(".try-rail button").forEach((btn) => {

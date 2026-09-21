@@ -145,15 +145,26 @@
 
         <div class="try-pane" data-pane="zip" hidden>
           <h2>The zip is the proof.</h2>
-          <p class="try-line">Proof you can take with you. This station stays here.</p>
+          <p class="try-line" data-proof>Proof you can take with you. This station stays here.</p>
+          <label class="try-name">
+            Your name
+            <input
+              id="try-name"
+              type="text"
+              maxlength="48"
+              autocomplete="name"
+              placeholder="optional"
+            />
+          </label>
           <div id="try-zip" class="instrument-slot"></div>
           <p class="later-door">
             <span>Bring a real bench</span>
-            — Studio or a Pi, later, when you have a station.
-            <a href="https://github.com/shadybrook/certarig-platform/blob/master/studio/index.html"
-              >Studio</a
-            >
-            is that door.
+            Studio or a Pi, later, when you have a station.
+          </p>
+          <p class="later-door github-door">
+            <span>Your own station</span>
+            Want this work under your name? Open the repo.
+            <a href="https://github.com/shadybrook/certarig-platform">GitHub</a>
           </p>
         </div>
       </section>
