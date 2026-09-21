@@ -8,7 +8,7 @@ const SHEETS = [
   { name: "manifest.json", hash: "a2338aa9c3b0ae78…2f98ada5", offset: 10, narrative: false },
   { name: "report.md", hash: "numbers from the kernel", offset: 20, narrative: false },
   { name: "events.jsonl", hash: "procedure · checks · latch", offset: 30, narrative: false },
-  { name: "narrative.md", hash: "labelled NARRATIVE · never the measurement", offset: 48, narrative: true },
+  { name: "narrative.md", hash: "labelled NARRATIVE", offset: 48, narrative: true },
 ];
 
 function hexWalk(target, step) {
@@ -37,31 +37,54 @@ export function renderZip(el) {
         <span class="spacer">auditor · read-only</span>
       </div>
       <div class="instrument-face zip-face">
-        <p class="face-label">12 Sep pulled zip · run_20260912T162352_6515a9</p>
+        <p class="face-label">12 Sep · run_20260912T162352_6515a9</p>
         <div class="zip-stack">${sheets}</div>
         <div class="zip-actions">
           <button type="button" data-rehash>Rehash as a stranger</button>
-          <span class="rehash-out" aria-live="polite">No CertaRig install required. Open the sums file. Hash one file by hand.</span>
+          <span class="rehash-out" aria-live="polite">CSV waveforms are not in this export yet. That is a defect.</span>
         </div>
       </div>
     </div>
   `;
 
+  const nodes = [...el.querySelectorAll(".zip-sheet")];
   const out = el.querySelector(".rehash-out");
   const btn = el.querySelector("[data-rehash]");
   let timer = 0;
-  btn.addEventListener("click", () => {
+  let done = false;
+
+  function rehash() {
     window.clearInterval(timer);
     let step = 0;
     btn.disabled = true;
     timer = window.setInterval(() => {
-      step += 2;
+      step += 3;
       out.textContent = `sha256(archive)  ${hexWalk(ARCHIVE, step)}`;
       if (step >= 64) {
         window.clearInterval(timer);
-        out.innerHTML = `sha256(archive)&nbsp;&nbsp;${ARCHIVE}<br>sha256(manifest)&nbsp;${MANIFEST}<br>CSV waveforms are not yet inside this export. That is a defect.`;
+        out.innerHTML = `sha256(archive)&nbsp;&nbsp;${ARCHIVE}<br>sha256(manifest)&nbsp;${MANIFEST}`;
         btn.disabled = false;
+        done = true;
       }
-    }, 28);
+    }, 24);
+  }
+
+  btn.addEventListener("click", () => {
+    done = false;
+    rehash();
   });
+
+  return {
+    setProgress(p) {
+      nodes.forEach((node, i) => {
+        const edge = (i + 0.15) / (nodes.length + 0.4);
+        const on = p > edge;
+        node.classList.toggle("in", on);
+        const local = Math.min(1, Math.max(0, (p - edge) / 0.12));
+        node.style.transform = on ? `translateY(${(1 - local) * 16}px)` : "translateY(18px)";
+      });
+      if (p > 0.72 && !done && !btn.disabled) rehash();
+    },
+    rehash,
+  };
 }

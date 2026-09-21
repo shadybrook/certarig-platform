@@ -1,77 +1,86 @@
+import { tickCopy } from "../scroll.js";
+
 const STEPS = ["observe", "twin", "arm", "actuate", "restore"];
+
+const COPY = {
+  observe: ["Observe.", "Data quality before authority."],
+  twin: ["Twin.", "Same hash. Then metal."],
+  arm: ["Arm.", "Bypass is not a tool."],
+  actuate: ["Actuate.", "Only the kernel says yes."],
+  restore: ["Restore.", "Leaving is part of the proof."],
+};
 
 const FACES = {
   observe: {
     led: "bad",
     title: "observe · actuation 0",
     html: `
-      <p class="face-label">Gate 2 · data quality before authority</p>
+      <p class="face-label">Before output authority</p>
       <div class="traces">
         <div class="trace-card">
           <span>P1 · pressure</span>
           <svg viewBox="0 0 200 64" aria-hidden="true">
-            <path d="M0 48 C 20 48, 28 12, 50 12 S 80 52, 110 40 S 160 8, 200 18" fill="none" stroke="#0071e3" stroke-width="2"/>
+            <path class="wave" d="M0 48 C 20 48, 28 12, 50 12 S 80 52, 110 40 S 160 8, 200 18" fill="none" stroke="#0071e3" stroke-width="2"/>
             <line x1="0" y1="22" x2="200" y2="22" stroke="#c41e3a" stroke-dasharray="3 4" stroke-width="1"/>
           </svg>
           <strong>invalid once</strong>
-          <span>envelope 10 bar · trip later 4.2</span>
+          <span>kept the failure</span>
         </div>
         <div class="trace-card">
           <span>P2 · flow</span>
           <svg viewBox="0 0 200 64" aria-hidden="true">
-            <path d="M0 50 C 30 50, 40 20, 70 22 S 120 54, 150 36 S 180 16, 200 20" fill="none" stroke="#64d2ff" stroke-width="2"/>
+            <path class="wave" d="M0 50 C 30 50, 40 20, 70 22 S 120 54, 150 36 S 180 16, 200 20" fill="none" stroke="#64d2ff" stroke-width="2"/>
             <line x1="0" y1="18" x2="200" y2="18" stroke="#c41e3a" stroke-dasharray="3 4" stroke-width="1"/>
           </svg>
           <strong>sweep required</strong>
-          <span>envelope 20 L/min · trip 15.0</span>
+          <span>not a permit</span>
         </div>
       </div>
-      <p class="lock"><b>Output authority locked.</b> First ADC run failed and was kept. Second pass: 1,291 samples, 129 s. Crossing a future trip while observing is not a permit.</p>
+      <p class="lock">Output locked.</p>
     `,
   },
   twin: {
     led: "gold",
     title: "twin · same procedure hash",
     html: `
-      <p class="face-label">Gate 3 · do not improvise on metal</p>
-      <div class="hash-row"><span>sim</span><span>adc_validation · relay · pressure · flow · dual · estop</span><em>pass</em></div>
-      <div class="hash-row"><span>hw</span><span>same six hashes · 24 h stamp</span><em>match</em></div>
-      <div class="hash-row"><span>map</span><span>rig.json applied by a human · never auto-energize</span><em>fence</em></div>
-      <p class="stamp">twin-gate · procedure hash is the ticket, not a vibe</p>
+      <p class="face-label">Do not improvise on metal</p>
+      <div class="hash-row"><span>sim</span><span>six procedures</span><em>pass</em></div>
+      <div class="hash-row"><span>hw</span><span>same hashes · 24 h</span><em>match</em></div>
+      <div class="hash-row"><span>map</span><span>human applies rig.json</span><em>fence</em></div>
+      <p class="stamp">a guessed map never auto-energizes</p>
     `,
   },
   arm: {
     led: "gold",
     title: "arm · capability fence",
     html: `
-      <p class="face-label">Manifest is policy. Policy is never.</p>
+      <p class="face-label">Policy is never</p>
       <div class="fence">
         <div class="col">
           <strong>Agent may</strong>
           <ul>
             <li>choose an approved procedure</li>
-            <li>force_safe on its own</li>
-            <li>write a transcript labelled narrative</li>
+            <li>write narrative</li>
           </ul>
         </div>
         <div class="gap" aria-hidden="true"></div>
         <div class="col">
           <strong>Agent may not</strong>
           <ul>
-            <li>bypass_interlock — not a tool</li>
-            <li>override_limits — not a tool</li>
-            <li>ack_operator_step, reset_trip, shutdown</li>
+            <li>bypass_interlock</li>
+            <li>override_limits</li>
+            <li>reset_trip · shutdown</li>
           </ul>
         </div>
       </div>
-      <p class="never">428 from the agent deep-links to Approvals. A person owns the irreversible act.</p>
+      <p class="never">428 → a human on Approvals.</p>
     `,
   },
   actuate: {
     led: "ok",
     title: "actuate · kernel owns GPIO",
     html: `
-      <p class="face-label">Gate 4 · Fake selected procedures. Fake did not compare numbers.</p>
+      <p class="face-label">Fake selected. Fake did not compare.</p>
       <div class="and-bus">
         <div class="and-term" data-ok="true"><span>actuation enabled</span><i></i></div>
         <div class="and-term" data-ok="true"><span>permit requested</span><i></i></div>
@@ -79,77 +88,103 @@ const FACES = {
         <div class="and-term" data-ok="true"><span>e-stop closed</span><i></i></div>
         <div class="and-term" data-ok="true"><span>process healthy</span><i></i></div>
       </div>
-      <div class="out-lamp" data-on="true"><span class="bulb"></span> Commanded output high — not contact motion, not load current.</div>
+      <div class="out-lamp" data-on="true"><span class="bulb"></span> Commanded output — not contact motion.</div>
     `,
   },
   restore: {
     led: "ok",
     title: "restore · proof includes leaving",
     html: `
-      <p class="face-label">Gate 5 · success is the previous system, intact</p>
+      <p class="face-label">Success is the previous system, intact</p>
       <div class="restore-grid">
-        <div>
-          <strong>Returned</strong>
-          Phase 3 dashboard on :8080, observe-only. Sidecar stopped. Actuation held at 0. Pi halted.
-        </div>
-        <div>
-          <strong>Written</strong>
-          Checksummed bundle. Ledger row. Restoration is in the evidence, not a slide.
-        </div>
+        <div><strong>Returned</strong>Observe-only. Actuation 0. Halted.</div>
+        <div><strong>Written</strong>Checksummed bundle. Ledger row.</div>
       </div>
       <p class="stamp">if you cannot leave the bench, the run is not finished</p>
     `,
   },
 };
 
-function face(step) {
-  const spec = FACES[step];
-  return `
-    <div class="instrument" data-step="${step}">
-      <div class="instrument-chrome">
-        <span class="led" data-tone="${spec.led}"></span>
-        <span>CertaRig · mapped rig</span>
-        <span class="spacer">${spec.title}</span>
-      </div>
-      <div class="instrument-face">${spec.html}</div>
+export function renderLoop(el) {
+  el.innerHTML = `
+    <div class="faces">
+      ${STEPS.map((step) => {
+        const spec = FACES[step];
+        return `
+          <div class="face" data-step="${step}">
+            <div class="instrument">
+              <div class="instrument-chrome">
+                <span class="led" data-tone="${spec.led}"></span>
+                <span>CertaRig · mapped rig</span>
+                <span class="spacer">${spec.title}</span>
+              </div>
+              <div class="instrument-face">${spec.html}</div>
+            </div>
+          </div>`;
+      }).join("")}
     </div>
   `;
-}
 
-export function renderLoop(el) {
+  const title = document.getElementById("loop-title");
+  const line = document.getElementById("loop-line");
+  const buttons = document.querySelectorAll(".loop-rail button");
+  const bar = document.querySelector(".loop-scrub i");
+  const faces = [...el.querySelectorAll(".face")];
+  let current = "";
   let holdUntil = 0;
-  const setStep = (step, fromClick = false) => {
-    if (fromClick) holdUntil = Date.now() + 1500;
-    else if (Date.now() < holdUntil) return;
-    el.dataset.step = step;
-    el.innerHTML = face(step);
-    document.querySelectorAll(".loop-rail button").forEach((btn) => {
-      btn.setAttribute("aria-current", btn.dataset.step === step ? "true" : "false");
+
+  function paint(step, x) {
+    faces.forEach((n, idx) => {
+      const d = Math.abs(x - idx);
+      const o = Math.max(0, 1 - d * 0.92);
+      n.style.opacity = String(o);
+      n.style.visibility = o > 0.04 ? "visible" : "hidden";
+      n.style.transform = `translateY(${(1 - o) * 14}px) scale(${0.985 + o * 0.015})`;
+      n.classList.toggle("is-on", n.dataset.step === step);
     });
-  };
+  }
+
+  function setStep(step, fromClick = false) {
+    if (!STEPS.includes(step)) return;
+    if (fromClick) holdUntil = Date.now() + 1800;
+    else if (Date.now() < holdUntil) return;
+    const idx = STEPS.indexOf(step);
+    if (fromClick) {
+      faces.forEach((n) => {
+        n.style.opacity = "";
+        n.style.visibility = "";
+        n.style.transform = "";
+      });
+      if (bar) bar.style.transform = `scaleX(${idx / (STEPS.length - 1)})`;
+    }
+    if (step !== current) {
+      current = step;
+      el.dataset.step = step;
+      faces.forEach((n) => n.classList.toggle("is-on", n.dataset.step === step));
+      buttons.forEach((btn) => {
+        btn.setAttribute("aria-current", btn.dataset.step === step ? "true" : "false");
+      });
+      tickCopy(title, COPY[step][0]);
+      if (line) line.textContent = COPY[step][1];
+    }
+  }
+
+  buttons.forEach((btn) => {
+    btn.addEventListener("click", () => setStep(btn.dataset.step, true));
+  });
 
   setStep("observe");
 
-  document.querySelectorAll(".loop-rail button").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      setStep(btn.dataset.step, true);
-      document.getElementById(`step-${btn.dataset.step}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
-    });
-  });
-
-  const chapters = document.querySelectorAll(".loop-chapters article");
-  if (!("IntersectionObserver" in window) || matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    return;
-  }
-  const io = new IntersectionObserver(
-    (entries) => {
-      const visible = entries
-        .filter((e) => e.isIntersecting)
-        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-      if (visible) setStep(visible.target.dataset.step);
+  return {
+    setStep,
+    stepFromProgress(p) {
+      if (Date.now() < holdUntil) return;
+      const x = p * (STEPS.length - 1);
+      const i = Math.min(STEPS.length - 1, Math.round(x));
+      setStep(STEPS[i]);
+      paint(STEPS[i], x);
+      if (bar) bar.style.transform = `scaleX(${p})`;
     },
-    { rootMargin: "-30% 0px -40% 0px", threshold: [0.25, 0.5, 0.75] },
-  );
-  chapters.forEach((n) => io.observe(n));
-  return STEPS;
+    holding: () => Date.now() < holdUntil,
+  };
 }

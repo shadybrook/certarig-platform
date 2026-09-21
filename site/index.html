@@ -6,13 +6,13 @@
     <title>CertaRig — The kernel is the only yes</title>
     <meta
       name="description"
-      content="Evidence-first commissioning for mapped rigs. Language interprets. Numbers decide. The agent may ask; only the kernel may say yes. Paying customers: zero."
+      content="The agent may ask; only the kernel may say yes. Evidence-first commissioning for mapped rigs. Paying customers: zero."
     />
     <meta name="theme-color" content="#f5f5f7" />
     <meta property="og:title" content="CertaRig — The kernel is the only yes" />
     <meta
       property="og:description"
-      content="An agent may choose an approved procedure. A deterministic kernel owns measurements, interlocks, outputs, and the evidence zip. Zero paying customers."
+      content="Language interprets. Numbers decide. Zero paying customers. Not AI that drives GPIO."
     />
     <meta property="og:type" content="website" />
     <meta property="og:image" content="/og.svg" />
@@ -31,19 +31,13 @@
 
     <header class="nav">
       <a class="wordmark" href="#top">
-        <span class="mark" aria-hidden="true">
-          <i></i><i></i><i></i>
-          <b></b>
-          <u></u>
-        </span>
+        <span class="mark" aria-hidden="true"><i></i><i></i><i></i><b></b><u></u></span>
         CertaRig
       </a>
       <nav aria-label="Page">
         <a href="#loop">Loop</a>
         <a href="#kernel">Kernel</a>
         <a href="#zip">Zip</a>
-        <a href="#proof">Proof</a>
-        <a href="#honest">Honest</a>
       </nav>
       <p class="customers" title="No invoices. Not a ceiling.">Customers 0</p>
       <a class="nav-cta" href="https://github.com/shadybrook/certarig-platform">GitHub</a>
@@ -51,62 +45,32 @@
 
     <main id="main">
       <section id="top" class="hero">
-        <div class="hero-copy">
-          <p class="eyebrow">
-            <span>certarig 0.4.0 · MIT</span>
-            <span class="dot" aria-hidden="true"></span>
-            <span>Mapped rigs, not photo-to-control</span>
-          </p>
-          <h1>
-            The agent may ask.<br />
-            Only the kernel may say yes.
-          </h1>
-          <p class="lede">
-            CertaRig is an evidence-first commissioning and test-operations layer for a
-            <em>mapped</em> rig. People speak English. Rigs speak numbers. 4.2&nbsp;bar is not a vibe.
-            15&nbsp;L/min is not “about that high.”
-          </p>
-          <p class="lede muted">
-            An agent may choose an approved procedure. A deterministic kernel owns measurements,
-            interlocks, outputs, and the evidence zip. The model never evaluates a measurement.
-          </p>
-          <div class="hero-actions">
-            <a class="btn solid" href="#kernel">See the only yes</a>
-            <a class="btn ghost" href="#proof">What actually ran</a>
+        <h1>
+          The agent may ask.<br />
+          Only the kernel may say yes.
+        </h1>
+        <p class="lede">Language interprets. Numbers decide.</p>
+      </section>
+
+      <section class="scene" id="gap">
+        <div class="scene-track" data-scene="gap">
+          <div class="scene-pin">
+            <div id="hero-graphic" class="gap-slot" aria-label="Language isolated from the kernel AND-chain"></div>
           </div>
         </div>
-        <figure class="hero-figure" id="hero-graphic" aria-label="Language isolated from the kernel AND-chain"></figure>
-        <p class="caption">
-          The useful question is not whether a model can operate a bench. It is who is allowed to
-          say yes when a physical output may be energized.
-        </p>
       </section>
 
-      <section class="band" id="question">
-        <p class="kicker">The split of jobs</p>
-        <h2>Language interprets.<br />Numbers decide.</h2>
-        <p class="measure">
-          Putting a language model in the middle and letting it decide whether a relay may energize
-          is the wrong product. Speech is interpretation. Energising an output is a conjunction the
-          model cannot edit. That split is the company. The rest is execution.
-        </p>
+      <section class="statement" id="question">
+        <h2>Who is allowed to say yes<br />when a physical output may be energized?</h2>
       </section>
 
-      <section class="loop-section" id="loop">
-        <header class="section-head">
-          <p class="kicker">The current loop</p>
-          <h2>Observe. Twin. Arm.<br />Then — and only then — actuate. Restore.</h2>
-          <p class="measure">
-            Observation and data quality come before output authority. A hardware procedure does not
-            start unless the same procedure hash already passed on the twin. Restoration of the
-            previous system is part of the proof, not an afterthought. The 24-hour window and the
-            Pi-only gate in today’s code are tactics. The order is not.
-          </p>
-        </header>
-
-        <div class="loop-layout">
-          <div class="loop-pin">
-            <div id="loop-graphic" class="instrument-slot" data-step="observe"></div>
+      <section class="scene" id="loop">
+        <div class="scene-track" data-scene="loop">
+          <div class="scene-pin">
+            <h2 class="scene-title" id="loop-title">Observe.</h2>
+            <p class="scene-line" id="loop-line">Data quality before authority.</p>
+            <div id="loop-graphic" class="instrument-slot"></div>
+            <div class="loop-scrub" aria-hidden="true"><i></i></div>
             <ol class="loop-rail" aria-label="Commissioning sequence">
               <li><button type="button" data-step="observe" aria-current="true">Observe</button></li>
               <li><button type="button" data-step="twin">Twin</button></li>
@@ -115,218 +79,52 @@
               <li><button type="button" data-step="restore">Restore</button></li>
             </ol>
           </div>
-          <div class="loop-chapters">
-            <article id="step-observe" data-step="observe">
-              <p class="idx">01</p>
-              <h3>Observe</h3>
-              <p>
-                Read and record. Sit beside LabVIEW if that is the bench you inherit. Do not command
-                the output until an engineer flips policy. The first 12&nbsp;Sep ADC run failed
-                because the sweep was incomplete and a channel went invalid. That failure was kept.
-                Quality people buy systems that refuse.
-              </p>
-            </article>
-            <article id="step-twin" data-step="twin">
-              <p class="idx">02</p>
-              <h3>Twin</h3>
-              <p>
-                The same procedure hash must pass in simulation before it is allowed on hardware.
-                You do not improvise a hardware procedure that never crossed the twin. A guessed map
-                never auto-energizes. A successful fieldbus browse is not permission to write.
-              </p>
-            </article>
-            <article id="step-arm" data-step="arm">
-              <p class="idx">03</p>
-              <h3>Arm</h3>
-              <p>
-                The capability manifest is a fence, not a suggestion.
-                <code>bypass_interlock</code> and <code>override_limits</code> do not exist as
-                callable tools. Policy is never. Humans own irreversible acts:
-                <code>reset_trip</code> and <code>shutdown</code> need a person.
-                <code>ack_operator_step</code> is never an agent tool.
-              </p>
-            </article>
-            <article id="step-actuate" data-step="actuate">
-              <p class="idx">04</p>
-              <h3>Actuate</h3>
-              <p>
-                The kernel is the only thing that may energize an output. Two kernels must not both
-                own the same pin. The agent reaches the rig only through the Edge API, filtered by
-                that manifest. Commanded GPIO is not relay-contact latency — Wave&nbsp;1 has no
-                contact feedback. We say so.
-              </p>
-            </article>
-            <article id="step-restore" data-step="restore">
-              <p class="idx">05</p>
-              <h3>Restore</h3>
-              <p>
-                Gate&nbsp;5 on the sidecar bench was not a victory lap. The previous system was
-                returned, actuation held disabled, the Pi halted. If you cannot leave the bench as
-                you found it, the run is not finished — and the zip must still say so.
-              </p>
-            </article>
+        </div>
+      </section>
+
+      <section class="scene scene-dark" id="kernel">
+        <div class="scene-track" data-scene="kernel">
+          <div class="scene-pin">
+            <h2 class="scene-title" id="kernel-title">The model does not get a vote.</h2>
+            <p class="scene-line" id="kernel-line">Five terms. One output.</p>
+            <div id="kernel-graphic" class="instrument-slot"></div>
           </div>
         </div>
       </section>
 
-      <section class="kernel-section" id="kernel">
-        <header class="section-head invert">
-          <p class="kicker">ProcessGuardrail.drive_high</p>
-          <h2>Five terms. One output.<br />The model does not get a vote.</h2>
-          <p class="measure">
-            Break any term and the output is false. After a trip, returning the plant to normal does
-            not restart it. Releasing the emergency stop does not restore a previous permit.
-            Recovery is healthy observation, then an explicit reset, then a new permit.
-          </p>
-        </header>
-        <div id="kernel-graphic" class="instrument-slot invert-slot"></div>
-        <pre class="formula" aria-label="Output conjunction"><code>output = actuation enabled
-      AND permit requested
-      AND trip not latched
-      AND emergency stop closed
-      AND process healthy</code></pre>
-      </section>
-
-      <section class="zip-section" id="zip">
-        <header class="section-head">
-          <p class="kicker">The product is the bundle</p>
-          <h2>If a stranger cannot rehash the zip, the run did not happen.</h2>
-          <p class="measure">
-            Every consequential run writes procedure, kernel events, checks, and a checksummed
-            bundle. Agent text is labelled <strong>narrative</strong>. Numbers come from the kernel.
-            An auditor key is read-only. The buyer is the name on the evidence pack — not the person
-            who likes demos.
-          </p>
-        </header>
-        <div id="zip-graphic" class="instrument-slot"></div>
-        <p class="caption defect">
-          Honesty about the exporter: pulled zips today record hashes and reports; they do not yet
-          contain the raw physical CSV. That is a known defect. An auditor who cannot replay the
-          waveform will not renew. We would rather say it here than dress a log file up as a pack.
-        </p>
-      </section>
-
-      <section class="proof-section" id="proof">
-        <header class="section-head">
-          <p class="kicker">12 September 2026 · sidecar bench</p>
-          <h2>This already ran on metal.<br />Fake ran it. Say so.</h2>
-          <p class="measure">
-            After one failed observe, six hardware procedures passed. Live Anthropic and OpenAI
-            adapters exist in the tree and are unproven. Never claim a simulated trace is hardware.
-            Never claim an LLM tripped the relay. WatchdogSec=30 is a supervisor heartbeat, not a
-            SIL loop.
-          </p>
-        </header>
-        <ul class="stats">
-          <li>
-            <span class="num">6</span>
-            <span class="lbl">hardware procedures passed</span>
-          </li>
-          <li>
-            <span class="num">3,422</span>
-            <span class="lbl">samples recorded</span>
-          </li>
-          <li>
-            <span class="num">34/34</span>
-            <span class="lbl">checks evaluated</span>
-          </li>
-        </ul>
-        <div class="peaks">
-          <article>
-            <h3>Pressure</h3>
-            <p>Trips at recorded peaks <strong>4.83</strong> / <strong>4.34 bar</strong> against <strong>4.2</strong>.</p>
-          </article>
-          <article>
-            <h3>Flow</h3>
-            <p>Trips at <strong>15.41</strong> / <strong>15.21 L/min</strong> against <strong>15.0</strong>.</p>
-          </article>
-          <article>
-            <h3>E-stop</h3>
-            <p>Forced safe. Did not restart itself. Rejected permit before reset.</p>
-          </article>
+      <section class="scene" id="zip">
+        <div class="scene-track" data-scene="zip">
+          <div class="scene-pin">
+            <h2 class="scene-title">If a stranger cannot rehash the zip,<br />the run did not happen.</h2>
+            <div id="zip-graphic" class="instrument-slot"></div>
+          </div>
         </div>
-        <p class="caption">
-          Transition times on that bench are kernel-observed changes to commanded GPIO. They are not
-          measurements of relay contact motion or load removal.
-        </p>
       </section>
 
-      <section class="buyers" id="buyers">
-        <header class="section-head">
-          <p class="kicker">Who writes the cheque</p>
-          <h2>The name on the evidence pack.</h2>
-          <p class="measure">
-            Walk away from anyone who wants the kernel removed. That demand is not a pricing
-            objection. University film and the founder’s Pi are not customers.
-          </p>
-        </header>
-        <ul class="buyer-grid">
-          <li>
-            <h3>Lab engineer</h3>
-            <p>A procedure they can re-run whose output is the pack, not a memory of a screenshot.</p>
-          </li>
-          <li>
-            <h3>Validation / DV</h3>
-            <p>Procedure hash, twin-gate stamp, kernel events. Today that is CSV folders and a Word file.</p>
-          </li>
-          <li>
-            <h3>Quality / RA</h3>
-            <p>Narrative labelled narrative. Auditor path read-only. Something they can defend.</p>
-          </li>
-          <li>
-            <h3>Commissioning lead</h3>
-            <p>Observe → twin → arm → actuate → restore matches how they want to leave a site.</p>
-          </li>
-          <li>
-            <h3>Safety officer</h3>
-            <p>Will not sign an LLM driving a relay. Bypass and override are not tools.</p>
-          </li>
-          <li>
-            <h3>Contract test house</h3>
-            <p>They sell the report. The zip is the report substrate a stranger can still rehash.</p>
-          </li>
+      <section class="proof" id="proof">
+        <h2>This already ran on metal.</h2>
+        <ul class="stats">
+          <li><span class="num">6</span><span class="lbl">hardware procedures</span></li>
+          <li><span class="num">3,422</span><span class="lbl">samples</span></li>
+          <li><span class="num">34/34</span><span class="lbl">checks</span></li>
         </ul>
+        <p class="scene-line">Fake ran it. 4.83 bar against 4.2. E-stop did not restart itself.</p>
       </section>
 
-      <section class="not-this" id="not-this">
-        <p class="kicker">Not this</p>
-        <ul>
-          <li>Not “AI that drives GPIO.”</li>
-          <li>Not an agent that discovers any unknown bench from a picture.</li>
-          <li>Not SIL. Not a live PLC. Not billing. Not design partners who already signed.</li>
-        </ul>
+      <section class="statement" id="not-this">
+        <h2>Not “AI that drives GPIO.”</h2>
       </section>
 
       <section class="honest" id="honest">
-        <p class="kicker">Present tense</p>
         <h2>Paying customers today: zero.</h2>
-        <p class="measure wide">
-          The “customer” on the film is us, on a university dry bench. That is a starting condition,
-          not a ceiling. The first mile is three paid mapped rigs — their map, applied by their
-          human, at least one procedure hash on their station, a zip they rehashed, a quality title
-          on a read-only auditor path. Capital is for demand that already exists. We will not invent
-          logos, ARR, or early design partners to make this page feel further along than the
-          invoices.
-        </p>
-        <p class="world">
-          The world-changing version of the same idea: every time an AI is allowed near a physical
-          output, a deterministic kernel is the only thing that can say yes, and the proof is a
-          checksummed bundle a stranger can rehash without CertaRig installed.
-        </p>
-        <div class="hero-actions">
-          <a class="btn solid" href="https://github.com/shadybrook/certarig-platform">Open the platform</a>
-          <a class="btn ghost" href="#kernel">Run the conjunction</a>
-        </div>
+        <p class="scene-line">The first mile is three paid mapped rigs.</p>
+        <a class="btn solid" href="https://github.com/shadybrook/certarig-platform">Open the platform</a>
       </section>
     </main>
 
     <footer class="foot">
       <p>CertaRig. Ideology is sacred. Execution is not.</p>
-      <p>
-        <a href="https://github.com/shadybrook/certarig-platform">GitHub</a>
-        · MIT
-        · certarig 0.4.0
-      </p>
+      <p><a href="https://github.com/shadybrook/certarig-platform">GitHub</a> · MIT · 0.4.0</p>
     </footer>
 
     <script type="module" src="/src/main.js"></script>
