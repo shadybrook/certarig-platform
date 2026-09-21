@@ -1,94 +1,94 @@
 import { tickCopy } from "../scroll.js";
 
-const STEPS = ["observe", "twin", "arm", "actuate", "restore"];
+const STEPS = ["watch", "match", "allow", "run", "leave"];
 
 const COPY = {
-  observe: "Observe.",
-  twin: "Twin.",
-  arm: "Arm.",
-  actuate: "Actuate.",
-  restore: "Restore.",
+  watch: "Watch.",
+  match: "Match.",
+  allow: "Allow.",
+  run: "Run.",
+  leave: "Leave.",
 };
 
 const FACES = {
-  observe: {
+  watch: {
     led: "bad",
-    title: "observe",
+    title: "watch",
     html: `
       <div class="traces">
         <div class="trace-card">
-          <span>P1</span>
+          <span>Pressure</span>
           <svg viewBox="0 0 200 64" aria-hidden="true">
             <path class="wave" d="M0 48 C 20 48, 28 12, 50 12 S 80 52, 110 40 S 160 8, 200 18" fill="none" stroke="#0071e3" stroke-width="2"/>
             <line x1="0" y1="22" x2="200" y2="22" stroke="#c41e3a" stroke-dasharray="3 4" stroke-width="1"/>
           </svg>
-          <strong>invalid</strong>
+          <strong>high</strong>
         </div>
         <div class="trace-card">
-          <span>P2</span>
+          <span>Flow</span>
           <svg viewBox="0 0 200 64" aria-hidden="true">
             <path class="wave" d="M0 50 C 30 50, 40 20, 70 22 S 120 54, 150 36 S 180 16, 200 20" fill="none" stroke="#64d2ff" stroke-width="2"/>
             <line x1="0" y1="18" x2="200" y2="18" stroke="#c41e3a" stroke-dasharray="3 4" stroke-width="1"/>
           </svg>
-          <strong>locked</strong>
+          <strong>held</strong>
         </div>
       </div>
     `,
   },
-  twin: {
+  match: {
     led: "gold",
-    title: "twin",
+    title: "match",
     html: `
-      <div class="hash-row"><span>sim</span><span>six procedures</span><em>pass</em></div>
-      <div class="hash-row"><span>hw</span><span>same hashes</span><em>match</em></div>
-      <div class="hash-row"><span>map</span><span>rig.json</span><em>fence</em></div>
+      <div class="hash-row"><span>model</span><span>the procedure</span><em>match</em></div>
+      <div class="hash-row"><span>rig</span><span>this machine</span><em>match</em></div>
+      <div class="hash-row"><span>map</span><span>you applied it</span><em>ok</em></div>
     `,
   },
-  arm: {
+  allow: {
     led: "gold",
-    title: "arm",
+    title: "allow",
     html: `
       <div class="fence">
         <div class="col">
-          <strong>May</strong>
+          <strong>Agent may</strong>
           <ul>
-            <li>approved procedure</li>
-            <li>narrative</li>
+            <li>pick a procedure</li>
+            <li>write notes</li>
           </ul>
         </div>
         <div class="gap" aria-hidden="true"></div>
         <div class="col">
-          <strong>May not</strong>
+          <strong>Agent may not</strong>
           <ul>
-            <li>bypass_interlock</li>
-            <li>override_limits</li>
-            <li>reset_trip</li>
+            <li>bypass a lock</li>
+            <li>raise a limit</li>
+            <li>reset a trip</li>
           </ul>
         </div>
       </div>
     `,
   },
-  actuate: {
+  run: {
     led: "ok",
-    title: "actuate",
+    title: "run",
     html: `
       <div class="and-bus">
-        <div class="and-term" data-ok="true"><span>actuation enabled</span><i></i></div>
-        <div class="and-term" data-ok="true"><span>permit requested</span><i></i></div>
-        <div class="and-term" data-ok="true"><span>trip not latched</span><i></i></div>
+        <div class="and-term" data-ok="true"><span>output allowed</span><i></i></div>
+        <div class="and-term" data-ok="true"><span>permit on</span><i></i></div>
+        <div class="and-term" data-ok="true"><span>not tripped</span><i></i></div>
         <div class="and-term" data-ok="true"><span>e-stop closed</span><i></i></div>
         <div class="and-term" data-ok="true"><span>process healthy</span><i></i></div>
       </div>
       <div class="out-lamp" data-on="true"><span class="bulb"></span></div>
     `,
   },
-  restore: {
+  leave: {
     led: "ok",
-    title: "restore",
+    title: "leave",
     html: `
       <div class="restore-grid">
-        <div><strong>Returned</strong>Actuation 0</div>
-        <div><strong>Written</strong>The zip</div>
+        <div><strong>Left</strong>As found</div>
+        <div><strong>Took</strong>The zip</div>
       </div>
     `,
   },
@@ -104,7 +104,7 @@ export function renderLoop(el) {
             <div class="instrument">
               <div class="instrument-chrome">
                 <span class="led" data-tone="${spec.led}"></span>
-                <span>CertaRig</span>
+                <span>mapped rig</span>
                 <span class="spacer">${spec.title}</span>
               </div>
               <div class="instrument-face">${spec.html}</div>
@@ -142,7 +142,7 @@ export function renderLoop(el) {
     btn.addEventListener("click", () => setStep(btn.dataset.step, true));
   });
 
-  setStep("observe");
+  setStep("watch");
 
   return {
     setStep,

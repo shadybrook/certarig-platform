@@ -1,7 +1,7 @@
 const TERMS = [
-  "actuation enabled",
-  "permit requested",
-  "trip not latched",
+  "output allowed",
+  "permit on",
+  "not tripped",
   "e-stop closed",
   "process healthy",
 ];
@@ -21,7 +21,7 @@ export function renderHero(el) {
         </div>
         <div class="out-lamp" data-on="false">
           <span class="bulb"></span>
-          <span class="lamp-copy">0</span>
+          <span class="lamp-copy">off</span>
         </div>
       </div>
     </div>
@@ -50,7 +50,7 @@ export function renderHero(el) {
       });
       const out = p > 0.82;
       lamp.dataset.on = String(out);
-      copy.textContent = out ? "1" : "0";
+      copy.textContent = out ? "on" : "off";
     },
   };
 }

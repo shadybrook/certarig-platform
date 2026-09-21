@@ -65,7 +65,7 @@ if (!quiet) {
     },
     { threshold: 0.28 },
   );
-  document.querySelectorAll(".statement, .proof, .honest").forEach((n) => {
+  document.querySelectorAll(".statement, .honest").forEach((n) => {
     n.classList.add("reveal");
     io.observe(n);
   });

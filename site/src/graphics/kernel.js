@@ -1,13 +1,13 @@
 import { tickCopy } from "../scroll.js";
 
 function outputOf(s) {
-  return s.actuationEnabled && s.permit && !s.tripLatched && s.estopClosed && s.healthy;
+  return s.outputAllowed && s.permit && !s.tripLatched && s.estopClosed && s.healthy;
 }
 
 const BEATS = [
   {
     at: 0,
-    actuationEnabled: true,
+    outputAllowed: true,
     permit: true,
     tripLatched: false,
     estopClosed: true,
@@ -17,17 +17,17 @@ const BEATS = [
   },
   {
     at: 0.22,
-    actuationEnabled: true,
+    outputAllowed: true,
     permit: false,
     tripLatched: true,
     estopClosed: true,
     healthy: false,
     note: "Latched.",
-    title: "Break one term.",
+    title: "Break one check.",
   },
   {
     at: 0.44,
-    actuationEnabled: true,
+    outputAllowed: true,
     permit: false,
     tripLatched: true,
     estopClosed: true,
@@ -37,7 +37,7 @@ const BEATS = [
   },
   {
     at: 0.64,
-    actuationEnabled: true,
+    outputAllowed: true,
     permit: false,
     tripLatched: false,
     estopClosed: true,
@@ -47,7 +47,7 @@ const BEATS = [
   },
   {
     at: 0.84,
-    actuationEnabled: true,
+    outputAllowed: true,
     permit: true,
     tripLatched: false,
     estopClosed: true,
@@ -65,7 +65,7 @@ function beatAt(p) {
 
 export function renderKernel(el) {
   const state = {
-    actuationEnabled: true,
+    outputAllowed: true,
     permit: true,
     tripLatched: false,
     estopClosed: true,
@@ -87,21 +87,21 @@ export function renderKernel(el) {
     const on = outputOf(state);
     const resetOk = state.tripLatched && state.healthy && state.estopClosed;
     const permitOk =
-      !state.tripLatched && state.healthy && state.estopClosed && state.actuationEnabled && !state.permit;
+      !state.tripLatched && state.healthy && state.estopClosed && state.outputAllowed && !state.permit;
     el.querySelector(".led").dataset.tone = on ? "ok" : "bad";
-    el.querySelector(".chrome-out").textContent = on ? "OUTPUT 1" : "OUTPUT 0";
+    el.querySelector(".chrome-out").textContent = on ? "ON" : "OFF";
     const rows = el.querySelectorAll(".and-term");
-    const oks = [state.actuationEnabled, state.permit, !state.tripLatched, state.estopClosed, state.healthy];
+    const oks = [state.outputAllowed, state.permit, !state.tripLatched, state.estopClosed, state.healthy];
     rows.forEach((row, i) => row.setAttribute("data-ok", String(oks[i])));
     const lamp = el.querySelector(".out-lamp");
     lamp.dataset.on = String(on);
-    el.querySelector(".lamp-copy").textContent = on ? "1" : "0";
+    el.querySelector(".lamp-copy").textContent = on ? "on" : "off";
     const bit = el.querySelector(".kernel-bit");
     bit.textContent = on ? "1" : "0";
     bit.parentElement.dataset.on = String(on);
-    el.querySelector('[data-act="actuation"]').textContent = `Actuation: ${state.actuationEnabled ? "enabled" : "held at 0"}`;
-    el.querySelector('[data-act="actuation"]').setAttribute("aria-pressed", String(state.actuationEnabled));
-    el.querySelector('[data-act="healthy"]').textContent = `Process: ${state.healthy ? "healthy" : "over-limit"}`;
+    el.querySelector('[data-act="output"]').textContent = `Output: ${state.outputAllowed ? "allowed" : "held"}`;
+    el.querySelector('[data-act="output"]').setAttribute("aria-pressed", String(state.outputAllowed));
+    el.querySelector('[data-act="healthy"]').textContent = `Process: ${state.healthy ? "healthy" : "over limit"}`;
     el.querySelector('[data-act="healthy"]').setAttribute("aria-pressed", String(state.healthy));
     el.querySelector('[data-act="estop"]').textContent = `E-stop: ${state.estopClosed ? "closed" : "open"}`;
     el.querySelector('[data-act="estop"]').setAttribute("aria-pressed", String(state.estopClosed));
@@ -114,21 +114,21 @@ export function renderKernel(el) {
     <div class="instrument">
       <div class="instrument-chrome">
         <span class="led" data-tone="ok"></span>
-        <span>kernel · drive_high</span>
-        <span class="spacer chrome-out">OUTPUT 1</span>
+        <span>kernel</span>
+        <span class="spacer chrome-out">ON</span>
       </div>
       <div class="instrument-face kernel-face">
-        <div class="kernel-bit-wrap" data-on="true"><span class="kernel-bit">1</span><span>drive_high</span></div>
+        <div class="kernel-bit-wrap" data-on="true"><span class="kernel-bit">1</span><span>output</span></div>
         <div class="and-bus">
-          <div class="and-term" data-ok="true"><span>actuation enabled</span><i></i></div>
-          <div class="and-term" data-ok="true"><span>permit requested</span><i></i></div>
-          <div class="and-term" data-ok="true"><span>trip not latched</span><i></i></div>
-          <div class="and-term" data-ok="true"><span>emergency stop closed</span><i></i></div>
+          <div class="and-term" data-ok="true"><span>output allowed</span><i></i></div>
+          <div class="and-term" data-ok="true"><span>permit on</span><i></i></div>
+          <div class="and-term" data-ok="true"><span>not tripped</span><i></i></div>
+          <div class="and-term" data-ok="true"><span>e-stop closed</span><i></i></div>
           <div class="and-term" data-ok="true"><span>process healthy</span><i></i></div>
         </div>
-        <div class="out-lamp" data-on="true"><span class="bulb"></span><span class="lamp-copy">1</span></div>
+        <div class="out-lamp" data-on="true"><span class="bulb"></span><span class="lamp-copy">on</span></div>
         <div class="kernel-controls">
-          <button class="term-toggle" type="button" data-act="actuation" aria-pressed="true">Actuation: enabled</button>
+          <button class="term-toggle" type="button" data-act="output" aria-pressed="true">Output: allowed</button>
           <button class="term-toggle" type="button" data-act="healthy" aria-pressed="true">Process: healthy</button>
           <button class="term-toggle" type="button" data-act="estop" aria-pressed="true">E-stop: closed</button>
           <button type="button" data-act="reset" disabled>Reset trip</button>
@@ -144,11 +144,11 @@ export function renderKernel(el) {
     if (!btn || btn.disabled) return;
     holdUntil = Date.now() + 1600;
     const act = btn.dataset.act;
-    if (act === "actuation") {
-      state.actuationEnabled = !state.actuationEnabled;
-      if (!state.actuationEnabled) {
+    if (act === "output") {
+      state.outputAllowed = !state.outputAllowed;
+      if (!state.outputAllowed) {
         state.permit = false;
-        state.note = "Held at 0.";
+        state.note = "Held off.";
       } else {
         state.note = "Need permit.";
       }
@@ -188,7 +188,7 @@ export function renderKernel(el) {
       if (b === lastBeat) return;
       lastBeat = b;
       apply({
-        actuationEnabled: b.actuationEnabled,
+        outputAllowed: b.outputAllowed,
         permit: b.permit,
         tripLatched: b.tripLatched,
         estopClosed: b.estopClosed,

@@ -1,14 +1,12 @@
-const ARCHIVE =
-  "b73426a1eb01eeb29a58c34d3fbbdbc51321660b7a804361650f440afd8346df";
-const MANIFEST =
-  "a2338aa9c3b0ae78ee29426fbfbd79bbb68e91750f815624dc140d912f98ada5";
+const DEMO =
+  "c1e0a94b7d2f18e6a0c35b91d47e82f0b6a19c4d8e27f53a10b8c6d4e9f20173";
 
 const SHEETS = [
-  { name: "SHA256SUMS", hash: "", offset: 0, narrative: false },
-  { name: "manifest.json", hash: "", offset: 10, narrative: false },
-  { name: "report.md", hash: "", offset: 20, narrative: false },
-  { name: "events.jsonl", hash: "", offset: 30, narrative: false },
-  { name: "narrative.md", hash: "narrative", offset: 48, narrative: true },
+  { name: "checksums", offset: 0, notes: false },
+  { name: "manifest", offset: 10, notes: false },
+  { name: "report", offset: 20, notes: false },
+  { name: "log", offset: 30, notes: false },
+  { name: "notes", offset: 48, notes: true },
 ];
 
 function hexWalk(target, step) {
@@ -22,9 +20,8 @@ function hexWalk(target, step) {
 export function renderZip(el) {
   const sheets = SHEETS.map(
     (s) => `
-      <div class="zip-sheet${s.narrative ? " narrative" : ""}" style="--offset:${s.offset}px">
+      <div class="zip-sheet${s.notes ? " narrative" : ""}" style="--offset:${s.offset}px">
         <span>${s.name}</span>
-        <span class="hash">${s.hash}</span>
       </div>
     `,
   ).join("");
@@ -33,14 +30,14 @@ export function renderZip(el) {
     <div class="instrument">
       <div class="instrument-chrome">
         <span class="led" data-tone="gold"></span>
-        <span>zip</span>
+        <span>evidence zip</span>
         <span class="spacer">rehash</span>
       </div>
       <div class="instrument-face zip-face">
         <div class="zip-stack">${sheets}</div>
         <div class="zip-actions">
           <button type="button" data-rehash>Rehash</button>
-          <span class="rehash-out" aria-live="polite">CSV missing. Defect.</span>
+          <span class="rehash-out" aria-live="polite"></span>
         </div>
       </div>
     </div>
@@ -57,11 +54,11 @@ export function renderZip(el) {
     let step = 0;
     btn.disabled = true;
     timer = window.setInterval(() => {
-      step += 3;
-      out.textContent = `sha256(archive)  ${hexWalk(ARCHIVE, step)}`;
+      step += 4;
+      out.textContent = hexWalk(DEMO, step);
       if (step >= 64) {
         window.clearInterval(timer);
-        out.innerHTML = `sha256(archive)&nbsp;&nbsp;${ARCHIVE}<br>sha256(manifest)&nbsp;${MANIFEST}`;
+        out.textContent = "Match.";
         btn.disabled = false;
         done = true;
       }
