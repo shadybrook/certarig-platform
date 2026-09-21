@@ -242,6 +242,7 @@ function syncRail() {
 function show(beat) {
   if (!BEATS.includes(beat) || !unlocked.has(beat)) return;
   current = beat;
+  document.body.dataset.beat = beat;
   document.querySelectorAll(".try-pane").forEach((pane) => {
     const on = pane.dataset.pane === beat;
     pane.classList.toggle("is-on", on);
