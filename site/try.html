@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CertaRig — Try the bench</title>
+    <meta
+      name="description"
+      content="A small test station with pressure and flow. Ask in English. A separate checker owns the on-switch."
+    />
+    <meta name="theme-color" content="#f5f5f7" />
+    <meta property="og:title" content="CertaRig — Try the bench" />
+    <meta
+      property="og:description"
+      content="Watch numbers, ask in English, see the checker refuse or allow, take the zip."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/og.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter+Tight:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body class="try-page">
+    <a class="skip" href="#main">Skip to content</a>
+
+    <header class="nav">
+      <a class="wordmark" href="/">
+        <span class="mark" aria-hidden="true"><i></i><i></i><i></i><b></b><u></u></span>
+        CertaRig
+      </a>
+      <a class="nav-quiet" href="/">Film</a>
+    </header>
+
+    <main id="main" class="try-main">
+      <header class="try-lede">
+        <p class="try-kicker">Classroom bench</p>
+        <h1>A small test station.</h1>
+        <p>
+          Pressure and flow. You are sitting with a teaching rig, not a live machine. Talk in English.
+          A separate checker owns the on-switch.
+        </p>
+      </header>
+
+      <ol class="try-rail" aria-label="Bench sequence">
+        <li><button type="button" data-beat="watch" aria-current="true">Watch</button></li>
+        <li><button type="button" data-beat="ask" disabled>Ask</button></li>
+        <li><button type="button" data-beat="checker" disabled>Checker</button></li>
+        <li><button type="button" data-beat="zip" disabled>Zip</button></li>
+      </ol>
+
+      <section class="try-stage" aria-live="polite">
+        <div class="try-pane is-on" data-pane="watch">
+          <h2>Watch.</h2>
+          <p class="try-line">Pressure is high. Flow is held.</p>
+          <div class="instrument">
+            <div class="instrument-chrome">
+              <span class="led" data-tone="bad"></span>
+              <span>test station</span>
+              <span class="spacer">watch</span>
+            </div>
+            <div class="instrument-face">
+              <div class="traces">
+                <div class="trace-card">
+                  <span>Pressure</span>
+                  <svg viewBox="0 0 200 64" aria-hidden="true">
+                    <path
+                      class="wave is-live"
+                      d="M0 48 C 20 48, 28 12, 50 12 S 80 52, 110 40 S 160 8, 200 18"
+                      fill="none"
+                      stroke="#0071e3"
+                      stroke-width="2"
+                    />
+                    <line
+                      x1="0"
+                      y1="22"
+                      x2="200"
+                      y2="22"
+                      stroke="#c41e3a"
+                      stroke-dasharray="3 4"
+                      stroke-width="1"
+                    />
+                  </svg>
+                  <strong id="try-pressure">1.16 bar</strong>
+                </div>
+                <div class="trace-card">
+                  <span>Flow</span>
+                  <svg viewBox="0 0 200 64" aria-hidden="true">
+                    <path
+                      class="wave is-live"
+                      d="M0 50 C 30 50, 40 20, 70 22 S 120 54, 150 36 S 180 16, 200 20"
+                      fill="none"
+                      stroke="#64d2ff"
+                      stroke-width="2"
+                    />
+                    <line
+                      x1="0"
+                      y1="18"
+                      x2="200"
+                      y2="18"
+                      stroke="#c41e3a"
+                      stroke-dasharray="3 4"
+                      stroke-width="1"
+                    />
+                  </svg>
+                  <strong id="try-flow">0.21 L/min</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+          <button class="btn solid" type="button" data-next="ask">Ask in English</button>
+        </div>
+
+        <div class="try-pane" data-pane="ask" hidden>
+          <h2>Ask.</h2>
+          <p class="try-line">The agent may suggest. It cannot turn the switch.</p>
+          <div class="instrument">
+            <div class="instrument-chrome">
+              <span class="led" data-tone="gold"></span>
+              <span>agent</span>
+              <span class="spacer">ask</span>
+            </div>
+            <div class="instrument-face try-ask">
+              <p class="bubble in">“Run the pressure test.”</p>
+              <button class="btn solid try-ask-btn" type="button" data-ask>Ask</button>
+              <p class="bubble agent" data-reply hidden>
+                I suggest a pressure hold. I cannot turn the on-switch.
+              </p>
+            </div>
+          </div>
+          <button class="btn solid" type="button" data-next="checker" disabled>Give it to the checker</button>
+        </div>
+
+        <div class="try-pane" data-pane="checker" hidden>
+          <h2 id="try-kernel-title">The checker said no.</h2>
+          <p class="scene-gloss is-on" id="try-kernel-gloss">The model does not get a vote.</p>
+          <div id="try-kernel" class="instrument-slot"></div>
+          <button class="btn solid" type="button" data-next="zip" disabled>Take the zip</button>
+        </div>
+
+        <div class="try-pane" data-pane="zip" hidden>
+          <h2>The zip is the proof.</h2>
+          <p class="try-line">Proof you can take with you. This station stays here.</p>
+          <div id="try-zip" class="instrument-slot"></div>
+          <p class="later-door">
+            <span>Bring a real bench</span>
+            — Studio or a Pi, later, when you have a station.
+            <a href="https://github.com/shadybrook/certarig-platform/blob/master/studio/index.html"
+              >Studio</a
+            >
+            is that door.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="/src/try.js"></script>
+  </body>
+</html>

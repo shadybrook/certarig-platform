@@ -4,6 +4,15 @@ function outputOf(s) {
   return s.outputAllowed && s.permit && !s.tripLatched && s.estopClosed && s.healthy;
 }
 
+function glossOf(s) {
+  if (s.tripLatched && (!s.healthy || !s.estopClosed)) return "The model does not get a vote.";
+  if (s.tripLatched && s.healthy && s.estopClosed) return "Health does not restart it.";
+  if (!s.tripLatched && !s.permit && s.healthy && s.estopClosed && s.outputAllowed) {
+    return "Reset, then permit.";
+  }
+  return "";
+}
+
 const BEATS = [
   {
     at: 0,
@@ -75,6 +84,7 @@ export function renderKernel(el) {
   let holdUntil = 0;
   let lastBeat = null;
   const title = document.getElementById("kernel-title");
+  const gloss = document.getElementById("kernel-gloss");
 
   function trip(why) {
     state.tripLatched = true;
@@ -108,6 +118,18 @@ export function renderKernel(el) {
     el.querySelector('[data-act="reset"]').disabled = !resetOk;
     el.querySelector('[data-act="permit"]').disabled = !permitOk;
     el.querySelector(".status-line").textContent = state.note;
+    if (gloss) {
+      const line = glossOf(state);
+      if (gloss.textContent !== line) {
+        gloss.textContent = line;
+        gloss.classList.toggle("is-on", Boolean(line));
+        if (line) {
+          gloss.classList.remove("tick");
+          void gloss.offsetWidth;
+          gloss.classList.add("tick");
+        }
+      }
+    }
   }
 
   el.innerHTML = `

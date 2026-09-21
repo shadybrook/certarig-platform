@@ -55,8 +55,20 @@ jobs:
       - name: Ideology copy still present
         run: |
           grep -F "kernel may say yes" dist/index.html
-          grep -F "Paying customers today: zero" dist/index.html
-          grep -F "AI that drives GPIO" dist/index.html
+          grep -F "A rig is a real setup" dist/index.html
+          grep -F "on-switch" dist/index.html
+          grep -F 'href="/try"' dist/index.html
+          grep -F "small test station" dist/try.html
+          grep -F "Bring a real bench" dist/try.html
+      - name: Public glass does not leak lab-diary or zero-users
+        run: |
+          ! grep -F "Paying customers today: zero" dist/index.html dist/try.html
+          ! grep -Fi "gpio" dist/index.html dist/try.html
+          ! grep -F "ProcessGuardrail" dist/index.html dist/try.html
+          ! grep -F "12 Sep" dist/index.html dist/try.html
+          ! grep -F "we are not raising" dist/index.html dist/try.html
+          ! grep -Fi "no users" dist/index.html dist/try.html
+          ! grep -F "github.com/shadybrook/certarig-platform\"" dist/index.html
 
   studio-e2e:
     runs-on: ubuntu-latest
