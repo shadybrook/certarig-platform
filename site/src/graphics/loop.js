@@ -133,30 +133,12 @@ export function renderLoop(el) {
   let current = "";
   let holdUntil = 0;
 
-  function paint(step, x) {
-    faces.forEach((n, idx) => {
-      const d = Math.abs(x - idx);
-      const o = Math.max(0, 1 - d * 0.92);
-      n.style.opacity = String(o);
-      n.style.visibility = o > 0.04 ? "visible" : "hidden";
-      n.style.transform = `translateY(${(1 - o) * 14}px) scale(${0.985 + o * 0.015})`;
-      n.classList.toggle("is-on", n.dataset.step === step);
-    });
-  }
-
   function setStep(step, fromClick = false) {
     if (!STEPS.includes(step)) return;
-    if (fromClick) holdUntil = Date.now() + 1800;
+    if (fromClick) holdUntil = Date.now() + 1600;
     else if (Date.now() < holdUntil) return;
     const idx = STEPS.indexOf(step);
-    if (fromClick) {
-      faces.forEach((n) => {
-        n.style.opacity = "";
-        n.style.visibility = "";
-        n.style.transform = "";
-      });
-      if (bar) bar.style.transform = `scaleX(${idx / (STEPS.length - 1)})`;
-    }
+    if (fromClick && bar) bar.style.transform = `scaleX(${idx / (STEPS.length - 1)})`;
     if (step !== current) {
       current = step;
       el.dataset.step = step;
@@ -179,10 +161,8 @@ export function renderLoop(el) {
     setStep,
     stepFromProgress(p) {
       if (Date.now() < holdUntil) return;
-      const x = p * (STEPS.length - 1);
-      const i = Math.min(STEPS.length - 1, Math.round(x));
+      const i = Math.min(STEPS.length - 1, Math.round(p * (STEPS.length - 1)));
       setStep(STEPS[i]);
-      paint(STEPS[i], x);
       if (bar) bar.style.transform = `scaleX(${p})`;
     },
     holding: () => Date.now() < holdUntil,

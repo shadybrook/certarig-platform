@@ -155,7 +155,7 @@ h2 { font-size: clamp(2.6rem, 6.4vw, 5.6rem); }
   text-align: center;
   padding: 8vh 24px 12vh;
 }
-.hero h1 { max-width: 13ch; }
+.hero h1 { max-width: 22ch; }
 .hero .lede { animation-delay: 0.12s; }
 
 @keyframes rise {
@@ -345,15 +345,17 @@ h2 { font-size: clamp(2.6rem, 6.4vw, 5.6rem); }
   grid-area: 1 / 1;
   opacity: 0;
   visibility: hidden;
-  transform: translateY(16px);
-  transition: opacity 0.55s var(--ease), transform 0.55s var(--ease), visibility 0.55s;
+  transform: translateY(10px);
+  transition: opacity 0.45s var(--ease), transform 0.45s var(--ease), visibility 0.45s;
   pointer-events: none;
+  z-index: 0;
 }
 .face.is-on {
   opacity: 1;
   visibility: visible;
   transform: none;
   pointer-events: auto;
+  z-index: 1;
 }
 
 .instrument {
@@ -744,8 +746,8 @@ body.on-dark .customers { border-color: rgba(255, 255, 255, 0.18); }
   .foot { flex-direction: column; }
   .scene-pin { justify-content: flex-start; padding-top: 16px; overflow: auto; }
   .gap-stage { grid-template-columns: 1fr; min-height: 0; gap: 16px; }
-  .gap-bar { height: 10px; }
-  .gap-bar span { display: none; }
+  .gap-bar { height: 4px; background: var(--observe); }
+  .gap-bar::before, .gap-bar span { display: none; }
   .kernel-face {
     grid-template-columns: 1fr;
     grid-template-areas: "bit" "bus" "lamp" "ctrl" "status";

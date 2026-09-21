@@ -150,7 +150,7 @@ export function renderKernel(el) {
   el.addEventListener("click", (e) => {
     const btn = e.target.closest("[data-act]");
     if (!btn || btn.disabled) return;
-    holdUntil = Date.now() + 2500;
+    holdUntil = Date.now() + 1600;
     const act = btn.dataset.act;
     if (act === "actuation") {
       state.actuationEnabled = !state.actuationEnabled;
