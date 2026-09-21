@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" fill="none">
+  <rect width="1200" height="630" fill="#f5f5f7"/>
+  <text x="88" y="120" font-family="ui-sans-serif, system-ui, -apple-system" font-size="28" font-weight="600" fill="#6e6e73">CertaRig</text>
+  <text x="88" y="220" font-family="ui-sans-serif, system-ui, -apple-system" font-size="64" font-weight="600" fill="#1d1d1f">The agent may ask.</text>
+  <text x="88" y="292" font-family="ui-sans-serif, system-ui, -apple-system" font-size="64" font-weight="600" fill="#1d1d1f">Only the kernel may say yes.</text>
+  <text x="88" y="380" font-family="ui-sans-serif, system-ui, -apple-system" font-size="28" fill="#6e6e73">Language interprets. Numbers decide. Paying customers: 0.</text>
+  <g transform="translate(88 460)">
+    <rect width="70" height="22" rx="4" fill="#1d1d1f"/>
+    <rect y="28" width="70" height="22" rx="4" fill="#1d1d1f"/>
+    <rect y="56" width="70" height="22" rx="4" fill="#1d1d1f"/>
+    <rect x="86" y="8" width="36" height="84" fill="#0071e3"/>
+    <circle cx="162" cy="50" r="22" fill="#1d7a46"/>
+  </g>
+</svg>

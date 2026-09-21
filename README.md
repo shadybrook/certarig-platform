@@ -14,6 +14,8 @@ Studio (browser)  ──►  Edge node  ──►  ProcessGuardrail  ──►  
 
 The Phase 3 PoC that this was imported from is frozen. This repo is the platform.
 
+Public ideology page (not the Edge node): `site/`. Build with `make site`, then open `site/dist`. Vercel and Netlify both publish that folder. Paying customers: **zero**. Do not read the page as traction.
+
 ## Gate 0–5 evidence review and visual explainer
 
 The 12 September dry-bench progression is analysed as six gates, numbered Gate 0 through Gate 5. The review distinguishes measured evidence from interpretation and documents the product direction that follows from the lab.
@@ -97,6 +99,7 @@ PY
 | `certarig/schemas/` | Rig, procedure, capability, scenario, evidence contracts |
 | `skills/` | Documented procedures (`SKILL.md` + `procedure.yaml` + scenarios) |
 | `studio/` | Operator console (vanilla ESM, served by the Edge node) |
+| `site/` | Public marketing page (Vite). Language interprets; numbers decide. Not Studio. |
 | `deploy/` | systemd unit, sudoers rule, `install_pi.sh` |
 | `config/` | Example rig / capability documents — **no secrets** |
 

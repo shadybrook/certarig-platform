@@ -3,7 +3,7 @@ VENV ?= .venv
 BIN := $(VENV)/bin
 COV_FAIL_UNDER ?= 90
 
-.PHONY: venv install lint typecheck test test-fast property scenario contract agent e2e soak coverage check clean
+.PHONY: venv install lint typecheck test test-fast property scenario contract agent e2e soak coverage check clean site
 
 venv:
 	uv venv $(VENV) --python $(PYTHON) --seed --quiet || $(PYTHON) -m venv $(VENV)
@@ -42,5 +42,8 @@ e2e:
 
 check: lint typecheck coverage
 
+site:
+	cd site && npm ci && npm run build
+
 clean:
-	rm -rf .venv .mypy_cache .ruff_cache coverage.xml htmlcov dist build *.egg-info
+	rm -rf .venv .mypy_cache .ruff_cache coverage.xml htmlcov dist build *.egg-info site/dist
