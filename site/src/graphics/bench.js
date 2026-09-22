@@ -1,83 +1,170 @@
-export function gaugeMarkup({
-  kind,
-  label,
-  value,
-  unit,
-  state,
-  tone,
-  deg,
-  valueId,
-  needle,
-  hot = false,
-  maxLabel = "high",
-}) {
-  const valueHtml = valueId
-    ? `<strong id="${valueId}">${value}</strong><span>${unit}</span>`
-    : `<strong>${value}</strong><span>${unit}</span>`;
-  const needleAttrs = needle
-    ? `class="gauge-needle" data-needle="${needle}" transform="rotate(${deg} 70 78)"`
-    : `class="gauge-needle" transform="rotate(${deg} 70 78)"`;
+export const GAUGE = {
+  cx: 70,
+  cy: 66,
+  start: -135,
+  sweep: 270,
+};
+
+export const PRESSURE = {
+  kind: "pressure",
+  label: "Pressure",
+  unit: "bar",
+  min: 0,
+  max: 2,
+  major: 0.5,
+  minor: 0.1,
+  zoneFrom: 1,
+  zoneTo: 2,
+  zoneTone: "high",
+  inWord: "high",
+  outWord: "ok",
+};
+
+export const FLOW = {
+  kind: "flow",
+  label: "Flow",
+  unit: "L/min",
+  min: 0,
+  max: 1,
+  major: 0.2,
+  minor: 0.05,
+  zoneFrom: 0,
+  zoneTo: 0.35,
+  zoneTone: "held",
+  inWord: "held",
+  outWord: "open",
+};
+
+export function needleDeg(value, min, max) {
+  const t = Math.min(1, Math.max(0, (Number(value) - min) / (max - min)));
+  return GAUGE.start + t * GAUGE.sweep;
+}
+
+export function gaugeState(spec, value) {
+  const v = Number(value);
+  const inZone = v >= spec.zoneFrom && v <= spec.zoneTo;
+  return {
+    word: inZone ? spec.inWord : spec.outWord,
+    tone: inZone ? spec.zoneTone : "ok",
+  };
+}
+
+function polar(deg, radius) {
+  const a = (deg * Math.PI) / 180;
+  return {
+    x: GAUGE.cx + radius * Math.sin(a),
+    y: GAUGE.cy - radius * Math.cos(a),
+  };
+}
+
+function arcPath(radius, fromDeg, toDeg) {
+  const a = polar(fromDeg, radius);
+  const b = polar(toDeg, radius);
+  const delta = toDeg - fromDeg;
+  const large = Math.abs(delta) > 180 ? 1 : 0;
+  const sweep = delta >= 0 ? 1 : 0;
+  return `M${a.x.toFixed(2)} ${a.y.toFixed(2)} A${radius} ${radius} 0 ${large} ${sweep} ${b.x.toFixed(2)} ${b.y.toFixed(2)}`;
+}
+
+function ticksMarkup(spec) {
+  const steps = Math.round((spec.max - spec.min) / spec.minor);
+  let svg = "";
+  for (let i = 0; i <= steps; i += 1) {
+    const value = spec.min + i * spec.minor;
+    const major = Math.abs(value / spec.major - Math.round(value / spec.major)) < 1e-6;
+    const deg = needleDeg(value, spec.min, spec.max);
+    const inner = polar(deg, major ? 42 : 46);
+    const outer = polar(deg, 52);
+    svg += `<line class="${major ? "tick-major" : "tick-minor"}" x1="${inner.x.toFixed(2)}" y1="${inner.y.toFixed(2)}" x2="${outer.x.toFixed(2)}" y2="${outer.y.toFixed(2)}" />`;
+    if (major) {
+      const n = polar(deg, 34);
+      const label = Math.abs(value - Math.round(value)) < 1e-6 ? String(Math.round(value)) : value.toFixed(1);
+      svg += `<text class="gauge-num" x="${n.x.toFixed(2)}" y="${n.y.toFixed(2)}" text-anchor="middle" dominant-baseline="middle">${label}</text>`;
+    }
+  }
+  return svg;
+}
+
+export function gaugeMarkup(spec, rawValue, opts = {}) {
+  const value = Number(rawValue);
+  const shown = value.toFixed(2);
+  const { word, tone } = gaugeState(spec, value);
+  const deg = needleDeg(value, spec.min, spec.max);
+  const zoneFrom = needleDeg(spec.zoneFrom, spec.min, spec.max);
+  const zoneTo = needleDeg(spec.zoneTo, spec.min, spec.max);
+  const readAttrs = opts.valueId ? `id="${opts.valueId}"` : "";
   return `
-    <article class="gauge" data-kind="${kind}" data-tone="${tone}">
-      <svg viewBox="0 0 140 108" aria-hidden="true">
-        <path class="gauge-track" d="M20 78 A 50 50 0 0 1 120 78" fill="none" />
-        ${
-          hot
-            ? `<path class="gauge-hot" d="M98 32 A 50 50 0 0 1 120 78" fill="none" />`
-            : ""
-        }
-        <g ${needleAttrs}>
-          <line x1="70" y1="78" x2="70" y2="32" />
-          <circle cx="70" cy="78" r="5" />
+    <article class="gauge" data-kind="${spec.kind}" data-tone="${tone}">
+      <p class="gauge-name">${spec.label}</p>
+      <svg class="gauge-face" viewBox="0 0 140 168" aria-hidden="true">
+        <circle class="gauge-ring" cx="${GAUGE.cx}" cy="${GAUGE.cy}" r="64" />
+        <circle class="gauge-dial" cx="${GAUGE.cx}" cy="${GAUGE.cy}" r="56" />
+        <circle class="gauge-lip" cx="${GAUGE.cx}" cy="${GAUGE.cy}" r="56.5" />
+        <path class="gauge-track" d="${arcPath(51, GAUGE.start, GAUGE.start + GAUGE.sweep)}" fill="none" />
+        <path class="gauge-zone" data-zone="${spec.zoneTone}" d="${arcPath(51, zoneFrom, zoneTo)}" fill="none" />
+        ${ticksMarkup(spec)}
+        <g class="gauge-needle" data-needle="${spec.kind}" transform="rotate(${deg.toFixed(2)} ${GAUGE.cx} ${GAUGE.cy})">
+          <polygon points="${GAUGE.cx},${GAUGE.cy - 46} ${GAUGE.cx + 2.8},${GAUGE.cy + 9} ${GAUGE.cx},${GAUGE.cy + 14} ${GAUGE.cx - 2.8},${GAUGE.cy + 9}" />
+          <circle class="gauge-hub" cx="${GAUGE.cx}" cy="${GAUGE.cy}" r="5.5" />
+          <circle class="gauge-hub-pin" cx="${GAUGE.cx}" cy="${GAUGE.cy}" r="2.2" />
         </g>
-        <text class="gauge-tick" x="16" y="100">0</text>
-        <text class="gauge-tick" x="124" y="100" text-anchor="end">${maxLabel}</text>
+        <text class="gauge-read" ${readAttrs} x="${GAUGE.cx}" y="100" text-anchor="middle">${shown}</text>
+        <text class="gauge-unit" x="${GAUGE.cx}" y="111" text-anchor="middle">${spec.unit}</text>
+        <text class="gauge-state" x="${GAUGE.cx}" y="122" text-anchor="middle">${word}</text>
+        <rect class="gauge-nut" x="61" y="128" width="18" height="8" rx="1.2" />
+        <rect class="gauge-stem" x="66" y="136" width="8" height="32" rx="1.2" />
       </svg>
-      <p class="gauge-value">${valueHtml}</p>
-      <p class="gauge-name">${label}</p>
-      <p class="gauge-state">${state}</p>
     </article>
   `;
 }
 
+export function paintGauge(article, spec, value) {
+  if (!article) return;
+  const v = Number(value);
+  const { word, tone } = gaugeState(spec, v);
+  article.dataset.tone = tone;
+  const read = article.querySelector(".gauge-read");
+  if (read) read.textContent = v.toFixed(2);
+  const state = article.querySelector(".gauge-state");
+  if (state) state.textContent = word;
+  const needle = article.querySelector(".gauge-needle");
+  if (needle) {
+    needle.setAttribute(
+      "transform",
+      `rotate(${needleDeg(v, spec.min, spec.max).toFixed(2)} ${GAUGE.cx} ${GAUGE.cy})`,
+    );
+  }
+}
+
+function plumbingMarkup() {
+  return `
+    <svg class="station-rig" viewBox="0 0 420 96" aria-hidden="true">
+      <rect class="fitting" x="98" y="0" width="14" height="7" rx="1" />
+      <rect class="fitting" x="308" y="0" width="14" height="7" rx="1" />
+      <path class="pipe" d="M105 7 V30 H210 V50" />
+      <path class="pipe" d="M315 7 V30 H210" />
+      <circle class="fitting-tee" cx="210" cy="30" r="4" />
+      <ellipse class="vessel-cap" cx="210" cy="58" rx="46" ry="9" />
+      <rect class="vessel" x="164" y="58" width="92" height="22" />
+      <ellipse class="vessel-cap" cx="210" cy="80" rx="46" ry="9" />
+      <text x="210" y="73" text-anchor="middle">test vessel</text>
+    </svg>
+  `;
+}
+
 export function stationMarkup(opts = {}) {
-  const pressure = gaugeMarkup({
-    kind: "pressure",
-    label: "Pressure",
-    value: opts.pressure ?? "1.16",
-    unit: "bar",
-    state: "high",
-    tone: "high",
-    deg: 42,
-    valueId: opts.pressureId,
-    needle: opts.needles ? "pressure" : undefined,
-    hot: true,
-    maxLabel: "high",
-  });
-  const flow = gaugeMarkup({
-    kind: "flow",
-    label: "Flow",
-    value: opts.flow ?? "0.21",
-    unit: "L/min",
-    state: "held",
-    tone: "held",
-    deg: -38,
-    valueId: opts.flowId,
-    needle: opts.needles ? "flow" : undefined,
-    hot: false,
-    maxLabel: "max",
-  });
+  const pressure = opts.pressure ?? 1.16;
+  const flow = opts.flow ?? 0.21;
   return `
     <div class="station-card">
-      <p class="station-kicker">Small test station</p>
-      <div class="gauges">${pressure}${flow}</div>
-      <svg class="station-rig" viewBox="0 0 360 86" aria-hidden="true">
-        <path class="pipe" d="M90 0 v26 H180 v12" />
-        <path class="pipe" d="M270 0 v26 H180" />
-        <rect class="vessel" x="148" y="38" width="64" height="30" rx="12" />
-        <text x="180" y="57" text-anchor="middle">test vessel</text>
-        <rect class="bench" x="36" y="76" width="288" height="6" rx="2" />
-      </svg>
+      <p class="station-caption">This is the station. These are the numbers.</p>
+      <div class="station-body">
+        <div class="gauges">
+          ${gaugeMarkup(PRESSURE, pressure, { valueId: opts.pressureId })}
+          ${gaugeMarkup(FLOW, flow, { valueId: opts.flowId })}
+        </div>
+        ${plumbingMarkup()}
+      </div>
     </div>
   `;
 }

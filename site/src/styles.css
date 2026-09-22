@@ -456,7 +456,7 @@ h2 { font-size: clamp(2.6rem, 6.4vw, 5.6rem); }
 .station-card {
   background: #fff;
   border-radius: 28px;
-  padding: 20px 18px 22px;
+  padding: 16px 16px 12px;
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.08);
   text-align: center;
   width: 100%;
@@ -469,85 +469,141 @@ h2 { font-size: clamp(2.6rem, 6.4vw, 5.6rem); }
   text-transform: uppercase;
   color: var(--muted);
 }
+.station-caption {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--muted);
+}
+.station-body {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
 .gauges {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 4px 12px;
+  position: relative;
+  z-index: 1;
 }
 .gauge {
-  background: var(--paper);
-  border-radius: 20px;
-  padding: 8px 8px 14px;
+  background: transparent;
+  padding: 0;
+  min-width: 0;
+}
+.gauge-face {
+  display: block;
+  width: min(100%, 168px);
+  margin: 0 auto;
+  overflow: visible;
+}
+.gauge-ring { fill: #d8d8de; stroke: #b4b4bb; stroke-width: 1.25; }
+.gauge-dial { fill: #fbfbfd; }
+.gauge-lip {
+  fill: none;
+  stroke: rgba(29, 29, 31, 0.1);
+  stroke-width: 1;
 }
 .gauge-track {
-  stroke: rgba(29, 29, 31, 0.12);
-  stroke-width: 10;
-  stroke-linecap: round;
+  stroke: rgba(29, 29, 31, 0.16);
+  stroke-width: 4.5;
+  stroke-linecap: butt;
 }
-.gauge-hot {
-  stroke: var(--trip);
-  stroke-width: 10;
-  stroke-linecap: round;
-  opacity: 0.85;
+.gauge-zone {
+  stroke-width: 4.5;
+  stroke-linecap: butt;
 }
-.gauge-needle line {
+.gauge-zone[data-zone="high"] { stroke: var(--trip); }
+.gauge-zone[data-zone="held"] { stroke: var(--observe); }
+.tick-major {
   stroke: var(--ink);
-  stroke-width: 3;
-  stroke-linecap: round;
+  stroke-width: 1.5;
+  stroke-linecap: butt;
 }
-.gauge-needle circle { fill: var(--ink); }
-.gauge-tick {
-  font-size: 11px;
+.tick-minor {
+  stroke: rgba(29, 29, 31, 0.38);
+  stroke-width: 1;
+}
+.gauge-num {
+  font-size: 8px;
+  font-weight: 600;
+  fill: var(--ink);
+  font-family: var(--sans);
+}
+.gauge-needle polygon { fill: var(--ink); }
+.gauge-hub { fill: var(--ink); }
+.gauge-hub-pin { fill: #fbfbfd; }
+.gauge-read {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  fill: var(--ink);
+  font-family: var(--sans);
+}
+.gauge-unit {
+  font-size: 6.5px;
+  font-weight: 500;
   fill: var(--muted);
   font-family: var(--sans);
 }
-.gauge-value {
-  margin: 0;
-  font-size: 28px;
-  font-weight: 600;
-  letter-spacing: -0.05em;
-  line-height: 1;
-}
-.gauge-value span {
-  margin-left: 4px;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--muted);
-}
 .gauge-name {
-  margin: 6px 0 0;
-  font-size: 15px;
+  margin: 0 0 2px;
+  font-size: 13px;
   font-weight: 600;
 }
 .gauge-state {
-  margin: 2px 0 0;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--trip);
+  font-size: 7.5px;
+  font-weight: 700;
+  font-family: var(--sans);
+  fill: var(--trip);
 }
 .gauge[data-tone="held"] .gauge-state,
-.gauge[data-tone="ok"] .gauge-state { color: var(--observe); }
+.gauge[data-tone="ok"] .gauge-state { fill: var(--observe); }
+.gauge-nut,
+.fitting {
+  fill: #c5c5cb;
+  stroke: rgba(29, 29, 31, 0.22);
+  stroke-width: 0.8;
+}
+.gauge-stem {
+  fill: #b7b7bd;
+  stroke: rgba(29, 29, 31, 0.2);
+  stroke-width: 0.7;
+}
+.fitting-tee {
+  fill: #c5c5cb;
+  stroke: rgba(29, 29, 31, 0.22);
+  stroke-width: 0.8;
+}
 .station-rig {
   display: block;
   width: 100%;
   height: auto;
-  margin-top: 4px;
+  margin: -6px auto 0;
+  overflow: visible;
 }
 .station-rig .pipe {
   fill: none;
-  stroke: rgba(29, 29, 31, 0.22);
-  stroke-width: 4;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+  stroke: #b7b7bd;
+  stroke-width: 5;
+  stroke-linecap: square;
+  stroke-linejoin: miter;
 }
 .station-rig .vessel {
   fill: #ececef;
-  stroke: rgba(29, 29, 31, 0.16);
+  stroke: rgba(29, 29, 31, 0.2);
+  stroke-width: 1.5;
+}
+.station-rig .vessel-cap {
+  fill: #e3e3e7;
+  stroke: rgba(29, 29, 31, 0.2);
   stroke-width: 1.5;
 }
 .station-rig .bench { fill: rgba(29, 29, 31, 0.18); }
 .station-rig text {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
   fill: var(--muted);
   font-family: var(--sans);
@@ -1215,10 +1271,9 @@ button.btn:disabled {
 .try-page:not([data-beat="watch"]) .try-lede h1,
 .try-page:not([data-beat="watch"]) .try-lede p { display: none; }
 .try-page[data-beat="watch"] .try-pane[data-pane="watch"] h2 { display: none; }
-.try-page[data-beat="watch"] .station-card { margin-top: 8px; padding: 12px 12px 10px; }
-.try-page[data-beat="watch"] .gauge { padding: 2px 6px 8px; }
-.try-page[data-beat="watch"] .gauge-value { font-size: 24px; }
-.try-page[data-beat="watch"] .station-rig { max-height: 58px; }
+.try-page[data-beat="watch"] .station-card { margin-top: 8px; padding: 10px 10px 6px; }
+.try-page[data-beat="watch"] .gauge-face { width: min(100%, 148px); }
+.try-page[data-beat="watch"] .station-rig { margin-top: -4px; }
 .try-page[data-beat="watch"] .btn { margin-top: 12px; }
 
 body.on-dark .nav {
@@ -1248,7 +1303,10 @@ body.on-dark .nav-cta { background: #f5f5f7; color: #000; }
   .scene-pin .instrument-slot,
   .scene-pin .gap-slot { margin-top: 10px; }
   .scene-dock { padding-top: 6px; padding-bottom: 2px; }
-  .station-rig { max-height: 52px; }
+  .scene-pin .gauge-face { width: min(100%, 128px); }
+  .scene-pin .station-card { padding: 10px 12px 6px; }
+  .scene-pin .station-caption { margin-bottom: 4px; font-size: 12px; }
+  .scene-pin .instrument-slot { width: min(560px, 100%); }
   .out-switch { min-height: 88px; }
   .checker-panel { padding: 12px 12px 14px; }
   .loop-rail { padding-top: 8px; }
@@ -1257,7 +1315,8 @@ body.on-dark .nav-cta { background: #f5f5f7; color: #000; }
   .try-page[data-beat="watch"] .try-lede p { margin-top: 6px; }
   .try-page[data-beat="watch"] .try-rail { padding: 10px 0 4px; }
   .try-page[data-beat="watch"] .try-line { margin-top: 4px; }
-  .try-page[data-beat="watch"] .station-rig { max-height: 36px; }
+  .try-page[data-beat="watch"] .gauge-face { width: min(100%, 118px); }
+  .try-page[data-beat="watch"] .station-caption { font-size: 12px; margin-bottom: 2px; }
   .try-page[data-beat="watch"] .btn { margin-top: 8px; }
 }
 

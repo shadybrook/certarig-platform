@@ -291,19 +291,55 @@ function show(beat) {
   if (beat === "zip") zip.play();
 }
 
-const pressure = document.getElementById("try-pressure");
-const flow = document.getElementById("try-flow");
-const pNeedle = document.querySelector('[data-needle="pressure"]');
-const fNeedle = document.querySelector('[data-needle="flow"]');
-let t = 0;
+const CX = 70;
+const CY = 66;
+const START = -135;
+const SWEEP = 270;
+
+function needleDeg(value, min, max) {
+  const t = Math.min(1, Math.max(0, (Number(value) - min) / (max - min)));
+  return START + t * SWEEP;
+}
+
+function paintTryGauge(kind, value, spec) {
+  const article = document.querySelector(`.gauge[data-kind="${kind}"]`);
+  if (!article) return;
+  const inZone = value >= spec.zoneFrom && value <= spec.zoneTo;
+  article.dataset.tone = inZone ? spec.zoneTone : "ok";
+  const read = article.querySelector(".gauge-read");
+  if (read) read.textContent = value.toFixed(2);
+  const state = article.querySelector(".gauge-state");
+  if (state) state.textContent = inZone ? spec.inWord : spec.outWord;
+  const needle = article.querySelector(".gauge-needle");
+  if (needle) {
+    needle.setAttribute(
+      "transform",
+      `rotate(${needleDeg(value, spec.min, spec.max).toFixed(2)} ${CX} ${CY})`,
+    );
+  }
+}
+
+let liveT = 0;
 window.setInterval(() => {
-  t += 1;
-  const p = 1.14 + Math.sin(t / 7) * 0.05;
-  const f = 0.2 + Math.sin(t / 11) * 0.03;
-  if (pressure) pressure.textContent = p.toFixed(2);
-  if (flow) flow.textContent = f.toFixed(2);
-  if (pNeedle) pNeedle.setAttribute("transform", `rotate(${-20 + (p - 0.9) * 180} 70 78)`);
-  if (fNeedle) fNeedle.setAttribute("transform", `rotate(${-50 + f * 80} 70 78)`);
+  liveT += 1;
+  paintTryGauge("pressure", 1.14 + Math.sin(liveT / 7) * 0.05, {
+    min: 0,
+    max: 2,
+    zoneFrom: 1,
+    zoneTo: 2,
+    zoneTone: "high",
+    inWord: "high",
+    outWord: "ok",
+  });
+  paintTryGauge("flow", 0.2 + Math.sin(liveT / 11) * 0.03, {
+    min: 0,
+    max: 1,
+    zoneFrom: 0,
+    zoneTo: 0.35,
+    zoneTone: "held",
+    inWord: "held",
+    outWord: "open",
+  });
 }, 280);
 
 document.querySelectorAll("[data-next]").forEach((btn) => {

@@ -1,5 +1,5 @@
 import { tickCopy } from "../scroll.js";
-import { checkerMarkup, stationMarkup } from "./bench.js";
+import { checkerMarkup, FLOW, paintGauge, PRESSURE, stationMarkup } from "./bench.js";
 
 const STEPS = ["watch", "match", "allow", "run", "leave"];
 
@@ -116,6 +116,16 @@ export function renderLoop(el) {
   });
 
   setStep("watch");
+
+  let liveT = 0;
+  window.setInterval(() => {
+    if (el.dataset.step !== "watch") return;
+    liveT += 1;
+    const p = 1.14 + Math.sin(liveT / 7) * 0.05;
+    const f = 0.2 + Math.sin(liveT / 11) * 0.03;
+    paintGauge(el.querySelector('.gauge[data-kind="pressure"]'), PRESSURE, p);
+    paintGauge(el.querySelector('.gauge[data-kind="flow"]'), FLOW, f);
+  }, 280);
 
   return {
     setStep,
