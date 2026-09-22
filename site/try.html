@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CertaRig — Try the bench</title>
+    <meta
+      name="description"
+      content="A small test station with pressure and flow. Ask in English. A separate checker owns the on-switch."
+    />
+    <meta name="theme-color" content="#f5f5f7" />
+    <meta property="og:title" content="CertaRig — Try the bench" />
+    <meta
+      property="og:description"
+      content="Watch numbers, ask in English, see the checker refuse or allow, take the zip."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/og.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter+Tight:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body class="try-page" data-beat="watch">
+    <a class="skip" href="#main">Skip to content</a>
+
+    <header class="nav">
+      <a class="wordmark" href="/">
+        <span class="mark" aria-hidden="true"><i></i><i></i><i></i><b></b><u></u></span>
+        CertaRig
+      </a>
+      <a class="nav-quiet" href="/">Film</a>
+    </header>
+
+    <main id="main" class="try-main">
+      <header class="try-lede">
+        <p class="try-kicker">Classroom bench</p>
+        <h1>A small test station.</h1>
+        <p>
+          Pressure and flow. A classroom view of a mapped bench. Talk in English.
+          A separate checker owns the on-switch.
+        </p>
+      </header>
+
+      <ol class="try-rail" aria-label="Bench sequence">
+        <li><button type="button" data-beat="watch" aria-current="true">Watch</button></li>
+        <li><button type="button" data-beat="ask" disabled>Ask</button></li>
+        <li><button type="button" data-beat="checker" disabled>Checker</button></li>
+        <li><button type="button" data-beat="zip" disabled>Zip</button></li>
+      </ol>
+
+      <section class="try-stage" aria-live="polite">
+        <div class="try-pane is-on" data-pane="watch">
+          <h2>Watch.</h2>
+          <p class="try-line">Pressure is high. Flow is held.</p>
+          <div class="station-card">
+      <p class="station-caption">This is the station. These are the numbers.</p>
+      <div class="station-body">
+        <div class="gauges">
+          
+    <article class="gauge" data-kind="pressure" data-tone="high">
+      <p class="gauge-name">Pressure</p>
+      <svg class="gauge-face" viewBox="0 0 140 136" aria-hidden="true">
+        <circle class="gauge-ring" cx="70" cy="66" r="64" />
+        <circle class="gauge-dial" cx="70" cy="66" r="56" />
+        <circle class="gauge-lip" cx="70" cy="66" r="56.5" />
+        <path class="gauge-track" d="M33.94 102.06 A51 51 0 1 1 106.06 102.06" fill="none" />
+        <path class="gauge-zone" data-zone="high" d="M70.00 15.00 A51 51 0 0 1 106.06 102.06" fill="none" />
+        <line class="tick-major" x1="40.30" y1="95.70" x2="33.23" y2="102.77" /><text class="gauge-num" x="45.96" y="90.04" text-anchor="middle" dominant-baseline="middle">0</text><line class="tick-minor" x1="30.78" y1="90.03" x2="25.66" y2="93.17" /><line class="tick-minor" x1="26.25" y1="80.21" x2="20.55" y2="82.07" /><line class="tick-minor" x1="24.14" y1="69.61" x2="18.16" y2="70.08" /><line class="tick-minor" x1="24.57" y1="58.80" x2="18.64" y2="57.87" /><line class="tick-major" x1="31.20" y1="49.93" x2="21.96" y2="46.10" /><text class="gauge-num" x="38.59" y="52.99" text-anchor="middle" dominant-baseline="middle">0.5</text><line class="tick-minor" x1="32.79" y1="38.96" x2="27.93" y2="35.44" /><line class="tick-minor" x1="40.13" y1="31.02" x2="36.23" y2="26.46" /><line class="tick-minor" x1="49.12" y1="25.01" x2="46.39" y2="19.67" /><line class="tick-minor" x1="59.26" y1="21.27" x2="57.86" y2="15.44" /><line class="tick-major" x1="70.00" y1="24.00" x2="70.00" y2="14.00" /><text class="gauge-num" x="70.00" y="32.00" text-anchor="middle" dominant-baseline="middle">1</text><line class="tick-minor" x1="80.74" y1="21.27" x2="82.14" y2="15.44" /><line class="tick-minor" x1="90.88" y1="25.01" x2="93.61" y2="19.67" /><line class="tick-minor" x1="99.87" y1="31.02" x2="103.77" y2="26.46" /><line class="tick-minor" x1="107.21" y1="38.96" x2="112.07" y2="35.44" /><line class="tick-major" x1="108.80" y1="49.93" x2="118.04" y2="46.10" /><text class="gauge-num" x="101.41" y="52.99" text-anchor="middle" dominant-baseline="middle">1.5</text><line class="tick-minor" x1="115.43" y1="58.80" x2="121.36" y2="57.87" /><line class="tick-minor" x1="115.86" y1="69.61" x2="121.84" y2="70.08" /><line class="tick-minor" x1="113.75" y1="80.21" x2="119.45" y2="82.07" /><line class="tick-minor" x1="109.22" y1="90.03" x2="114.34" y2="93.17" /><line class="tick-major" x1="99.70" y1="95.70" x2="106.77" y2="102.77" /><text class="gauge-num" x="94.04" y="90.04" text-anchor="middle" dominant-baseline="middle">2</text>
+        <g class="gauge-needle" data-needle="pressure" transform="rotate(21.60 70 66)">
+          <polygon points="70,20 72.8,75 70,80 67.2,75" />
+          <circle class="gauge-hub" cx="70" cy="66" r="5.5" />
+          <circle class="gauge-hub-pin" cx="70" cy="66" r="2.2" />
+        </g>
+        <text class="gauge-read" id="try-pressure" x="70" y="100" text-anchor="middle">1.16</text>
+        <text class="gauge-unit" x="70" y="111" text-anchor="middle">bar</text>
+        <text class="gauge-state" x="70" y="122" text-anchor="middle">high</text>
+        <rect class="gauge-nut" x="61" y="128" width="18" height="8" rx="1.2" />
+      </svg>
+    </article>
+  
+          
+    <article class="gauge" data-kind="flow" data-tone="held">
+      <p class="gauge-name">Flow</p>
+      <svg class="gauge-face" viewBox="0 0 140 136" aria-hidden="true">
+        <circle class="gauge-ring" cx="70" cy="66" r="64" />
+        <circle class="gauge-dial" cx="70" cy="66" r="56" />
+        <circle class="gauge-lip" cx="70" cy="66" r="56.5" />
+        <path class="gauge-track" d="M33.94 102.06 A51 51 0 1 1 106.06 102.06" fill="none" />
+        <path class="gauge-zone" data-zone="held" d="M33.94 102.06 A51 51 0 0 1 36.88 27.22" fill="none" />
+        <line class="tick-major" x1="40.30" y1="95.70" x2="33.23" y2="102.77" /><text class="gauge-num" x="45.96" y="90.04" text-anchor="middle" dominant-baseline="middle">0</text><line class="tick-minor" x1="30.78" y1="90.03" x2="25.66" y2="93.17" /><line class="tick-minor" x1="26.25" y1="80.21" x2="20.55" y2="82.07" /><line class="tick-minor" x1="24.14" y1="69.61" x2="18.16" y2="70.08" /><line class="tick-major" x1="28.52" y1="59.43" x2="18.64" y2="57.87" /><text class="gauge-num" x="36.42" y="60.68" text-anchor="middle" dominant-baseline="middle">0.2</text><line class="tick-minor" x1="27.50" y1="48.40" x2="21.96" y2="46.10" /><line class="tick-minor" x1="32.79" y1="38.96" x2="27.93" y2="35.44" /><line class="tick-minor" x1="40.13" y1="31.02" x2="36.23" y2="26.46" /><line class="tick-major" x1="50.93" y1="28.58" x2="46.39" y2="19.67" /><text class="gauge-num" x="54.56" y="35.71" text-anchor="middle" dominant-baseline="middle">0.4</text><line class="tick-minor" x1="59.26" y1="21.27" x2="57.86" y2="15.44" /><line class="tick-minor" x1="70.00" y1="20.00" x2="70.00" y2="14.00" /><line class="tick-minor" x1="80.74" y1="21.27" x2="82.14" y2="15.44" /><line class="tick-major" x1="89.07" y1="28.58" x2="93.61" y2="19.67" /><text class="gauge-num" x="85.44" y="35.71" text-anchor="middle" dominant-baseline="middle">0.6</text><line class="tick-minor" x1="99.87" y1="31.02" x2="103.77" y2="26.46" /><line class="tick-minor" x1="107.21" y1="38.96" x2="112.07" y2="35.44" /><line class="tick-minor" x1="112.50" y1="48.40" x2="118.04" y2="46.10" /><line class="tick-major" x1="111.48" y1="59.43" x2="121.36" y2="57.87" /><text class="gauge-num" x="103.58" y="60.68" text-anchor="middle" dominant-baseline="middle">0.8</text><line class="tick-minor" x1="115.86" y1="69.61" x2="121.84" y2="70.08" /><line class="tick-minor" x1="113.75" y1="80.21" x2="119.45" y2="82.07" /><line class="tick-minor" x1="109.22" y1="90.03" x2="114.34" y2="93.17" /><line class="tick-major" x1="99.70" y1="95.70" x2="106.77" y2="102.77" /><text class="gauge-num" x="94.04" y="90.04" text-anchor="middle" dominant-baseline="middle">1</text>
+        <g class="gauge-needle" data-needle="flow" transform="rotate(-78.30 70 66)">
+          <polygon points="70,20 72.8,75 70,80 67.2,75" />
+          <circle class="gauge-hub" cx="70" cy="66" r="5.5" />
+          <circle class="gauge-hub-pin" cx="70" cy="66" r="2.2" />
+        </g>
+        <text class="gauge-read" id="try-flow" x="70" y="100" text-anchor="middle">0.21</text>
+        <text class="gauge-unit" x="70" y="111" text-anchor="middle">L/min</text>
+        <text class="gauge-state" x="70" y="122" text-anchor="middle">held</text>
+        <rect class="gauge-nut" x="61" y="128" width="18" height="8" rx="1.2" />
+      </svg>
+    </article>
+  
+        </div>
+        
+    <svg class="station-rig" viewBox="0 0 420 108" aria-hidden="true">
+      <rect class="gauge-stem" x="101" y="0" width="8" height="18" rx="1" />
+      <rect class="gauge-stem" x="311" y="0" width="8" height="18" rx="1" />
+      <rect class="fitting" x="97" y="16" width="16" height="8" rx="1" />
+      <rect class="fitting" x="307" y="16" width="16" height="8" rx="1" />
+      <path class="pipe" d="M105 24 V38 H210 V56" />
+      <path class="pipe" d="M315 24 V38 H210" />
+      <circle class="fitting-tee" cx="210" cy="38" r="4.5" />
+      <ellipse class="vessel-cap" cx="210" cy="64" rx="48" ry="10" />
+      <rect class="vessel" x="162" y="64" width="96" height="24" />
+      <ellipse class="vessel-cap" cx="210" cy="88" rx="48" ry="10" />
+      <text x="210" y="80" text-anchor="middle">test vessel</text>
+    </svg>
+  
+      </div>
+    </div>
+          
+          <button class="btn solid" type="button" data-next="ask">Ask in English</button>
+        </div>
+
+        <div class="try-pane" data-pane="ask" hidden>
+          <h2>Ask.</h2>
+          <p class="try-line">The agent may suggest. It cannot turn the switch.</p>
+          <div class="station-card ask-card">
+            <p class="station-kicker">Ask in English</p>
+            <p class="bubble in">“Run the pressure test.”</p>
+            <button class="btn solid try-ask-btn" type="button" data-ask>Ask</button>
+            <p class="bubble agent" data-reply hidden>
+              I suggest a pressure hold. I cannot turn the on-switch.
+            </p>
+          </div>
+          <button class="btn solid" type="button" data-next="checker" disabled>Give it to the checker</button>
+        </div>
+
+        <div class="try-pane" data-pane="checker" hidden>
+          <h2 id="try-kernel-title">The checker said no.</h2>
+          <p class="scene-gloss is-on" id="try-kernel-gloss">The model does not get a vote.</p>
+          <div id="try-kernel" class="instrument-slot">
+            <div class="checker-panel">
+              <div class="checker-top">
+                <span>Checker</span>
+                <span class="chrome-out">Off</span>
+              </div>
+              <div class="checker-board">
+                <div class="out-switch" data-on="false" data-lock="true">
+                  <span class="bulb" aria-hidden="true"></span>
+                  <strong class="out-word">Off</strong>
+                  <span class="out-label">Output</span>
+                  <em class="out-note"></em>
+                </div>
+                <ul class="checks">
+                  <li data-check="permit" data-ok="false"><span>Permit</span><b>off</b></li>
+                  <li data-check="estop" data-ok="true"><span>E-stop</span><b>closed</b></li>
+                  <li data-check="reading" data-ok="false"><span>Reading</span><b>high</b></li>
+                </ul>
+                <ol class="latch-story">
+                  <li data-story="run">Output on</li>
+                  <li data-story="trip" aria-current="true">Output off</li>
+                  <li data-story="healthy">Healthy, still off</li>
+                  <li data-story="reset">Reset</li>
+                  <li data-story="permit">Permit → on</li>
+                </ol>
+                <div class="kernel-controls">
+                  <button class="term-toggle" type="button" data-act="healthy" aria-pressed="false">Reading: high</button>
+                  <button class="term-toggle" type="button" data-act="estop" aria-pressed="true">E-stop: closed</button>
+                  <button type="button" data-act="reset" disabled>Reset</button>
+                  <button class="primary" type="button" data-act="permit" disabled>Permit</button>
+                </div>
+                <p class="status-line" aria-live="polite">Latched.</p>
+              </div>
+            </div>
+          </div>
+          <button class="btn solid" type="button" data-next="zip" disabled>Take the zip</button>
+        </div>
+
+        <div class="try-pane" data-pane="zip" hidden>
+          <h2>The zip is the proof.</h2>
+          <p class="try-line" data-proof>Proof you can take with you. This station stays here.</p>
+          <label class="try-name">
+            Your name
+            <input
+              id="try-name"
+              type="text"
+              maxlength="48"
+              autocomplete="name"
+              placeholder="optional"
+            />
+          </label>
+          <div id="try-zip" class="instrument-slot"></div>
+          <p class="later-door">
+            <span>Bring a real bench</span>
+            Studio or a Pi, later, when you have a station.
+          </p>
+          <p class="later-door github-door">
+            <span>Your own station</span>
+            Want this work under your name? Open the repo.
+            <a href="https://github.com/shadybrook/certarig-platform">GitHub</a>
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="/src/try.js"></script>
+  </body>
+</html>

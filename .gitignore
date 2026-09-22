@@ -21,6 +21,7 @@ studio/playwright-report/
 *.db-shm
 .env
 .netlify
+.vercel
 evidence/runs/
 evidence/sim/
 evidence/sim-library/
