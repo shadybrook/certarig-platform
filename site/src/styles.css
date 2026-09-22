@@ -527,7 +527,7 @@ h2 { font-size: clamp(2.6rem, 6.4vw, 5.6rem); }
   stroke-width: 1;
 }
 .gauge-num {
-  font-size: 8px;
+  font-size: 9px;
   font-weight: 600;
   fill: var(--ink);
   font-family: var(--sans);
@@ -581,7 +581,7 @@ h2 { font-size: clamp(2.6rem, 6.4vw, 5.6rem); }
   display: block;
   width: 100%;
   height: auto;
-  margin: -6px auto 0;
+  margin: 0 auto;
   overflow: visible;
 }
 .station-rig .pipe {
@@ -1273,7 +1273,7 @@ button.btn:disabled {
 .try-page[data-beat="watch"] .try-pane[data-pane="watch"] h2 { display: none; }
 .try-page[data-beat="watch"] .station-card { margin-top: 8px; padding: 10px 10px 6px; }
 .try-page[data-beat="watch"] .gauge-face { width: min(100%, 148px); }
-.try-page[data-beat="watch"] .station-rig { margin-top: -4px; }
+.try-page[data-beat="watch"] .station-rig { margin-top: 0; }
 .try-page[data-beat="watch"] .btn { margin-top: 12px; }
 
 body.on-dark .nav {
@@ -1303,7 +1303,7 @@ body.on-dark .nav-cta { background: #f5f5f7; color: #000; }
   .scene-pin .instrument-slot,
   .scene-pin .gap-slot { margin-top: 10px; }
   .scene-dock { padding-top: 6px; padding-bottom: 2px; }
-  .scene-pin .gauge-face { width: min(100%, 128px); }
+  .scene-pin .gauge-face { width: min(100%, 150px); }
   .scene-pin .station-card { padding: 10px 12px 6px; }
   .scene-pin .station-caption { margin-bottom: 4px; font-size: 12px; }
   .scene-pin .instrument-slot { width: min(560px, 100%); }
@@ -1315,7 +1315,7 @@ body.on-dark .nav-cta { background: #f5f5f7; color: #000; }
   .try-page[data-beat="watch"] .try-lede p { margin-top: 6px; }
   .try-page[data-beat="watch"] .try-rail { padding: 10px 0 4px; }
   .try-page[data-beat="watch"] .try-line { margin-top: 4px; }
-  .try-page[data-beat="watch"] .gauge-face { width: min(100%, 118px); }
+  .try-page[data-beat="watch"] .gauge-face { width: min(100%, 132px); }
   .try-page[data-beat="watch"] .station-caption { font-size: 12px; margin-bottom: 2px; }
   .try-page[data-beat="watch"] .btn { margin-top: 8px; }
 }

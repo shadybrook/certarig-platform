@@ -96,7 +96,7 @@ export function gaugeMarkup(spec, rawValue, opts = {}) {
   return `
     <article class="gauge" data-kind="${spec.kind}" data-tone="${tone}">
       <p class="gauge-name">${spec.label}</p>
-      <svg class="gauge-face" viewBox="0 0 140 168" aria-hidden="true">
+      <svg class="gauge-face" viewBox="0 0 140 136" aria-hidden="true">
         <circle class="gauge-ring" cx="${GAUGE.cx}" cy="${GAUGE.cy}" r="64" />
         <circle class="gauge-dial" cx="${GAUGE.cx}" cy="${GAUGE.cy}" r="56" />
         <circle class="gauge-lip" cx="${GAUGE.cx}" cy="${GAUGE.cy}" r="56.5" />
@@ -112,7 +112,6 @@ export function gaugeMarkup(spec, rawValue, opts = {}) {
         <text class="gauge-unit" x="${GAUGE.cx}" y="111" text-anchor="middle">${spec.unit}</text>
         <text class="gauge-state" x="${GAUGE.cx}" y="122" text-anchor="middle">${word}</text>
         <rect class="gauge-nut" x="61" y="128" width="18" height="8" rx="1.2" />
-        <rect class="gauge-stem" x="66" y="136" width="8" height="32" rx="1.2" />
       </svg>
     </article>
   `;
@@ -138,16 +137,18 @@ export function paintGauge(article, spec, value) {
 
 function plumbingMarkup() {
   return `
-    <svg class="station-rig" viewBox="0 0 420 96" aria-hidden="true">
-      <rect class="fitting" x="98" y="0" width="14" height="7" rx="1" />
-      <rect class="fitting" x="308" y="0" width="14" height="7" rx="1" />
-      <path class="pipe" d="M105 7 V30 H210 V50" />
-      <path class="pipe" d="M315 7 V30 H210" />
-      <circle class="fitting-tee" cx="210" cy="30" r="4" />
-      <ellipse class="vessel-cap" cx="210" cy="58" rx="46" ry="9" />
-      <rect class="vessel" x="164" y="58" width="92" height="22" />
-      <ellipse class="vessel-cap" cx="210" cy="80" rx="46" ry="9" />
-      <text x="210" y="73" text-anchor="middle">test vessel</text>
+    <svg class="station-rig" viewBox="0 0 420 108" aria-hidden="true">
+      <rect class="gauge-stem" x="101" y="0" width="8" height="18" rx="1" />
+      <rect class="gauge-stem" x="311" y="0" width="8" height="18" rx="1" />
+      <rect class="fitting" x="97" y="16" width="16" height="8" rx="1" />
+      <rect class="fitting" x="307" y="16" width="16" height="8" rx="1" />
+      <path class="pipe" d="M105 24 V38 H210 V56" />
+      <path class="pipe" d="M315 24 V38 H210" />
+      <circle class="fitting-tee" cx="210" cy="38" r="4.5" />
+      <ellipse class="vessel-cap" cx="210" cy="64" rx="48" ry="10" />
+      <rect class="vessel" x="162" y="64" width="96" height="24" />
+      <ellipse class="vessel-cap" cx="210" cy="88" rx="48" ry="10" />
+      <text x="210" y="80" text-anchor="middle">test vessel</text>
     </svg>
   `;
 }
