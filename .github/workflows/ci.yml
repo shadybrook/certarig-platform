@@ -54,9 +54,10 @@ jobs:
         run: npm ci && npm run build
       - name: Ideology copy still present
         run: |
+          grep -F "People speak English" dist/index.html
+          grep -F "Rigs speak numbers" dist/index.html
+          grep -F "mapped test bench" dist/index.html
           grep -F "kernel may say yes" dist/index.html
-          grep -F "A rig is a real setup" dist/index.html
-          grep -F "on-switch" dist/index.html
           grep -F 'href="/try"' dist/index.html
           grep -F "small test station" dist/try.html
           grep -F "Bring a real bench" dist/try.html

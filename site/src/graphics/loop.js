@@ -20,10 +20,10 @@ const FACES = {
     shell: "station",
     html: `
       <div class="station-card">
-        <p class="station-kicker">This machine</p>
+        <p class="station-kicker">Mapped bench</p>
         <div class="match-cards">
           <div><span>The procedure</span><strong>match</strong></div>
-          <div><span>This machine</span><strong>match</strong></div>
+          <div><span>This bench</span><strong>match</strong></div>
           <div><span>You applied the map</span><strong>ok</strong></div>
         </div>
       </div>
