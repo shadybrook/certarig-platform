@@ -1253,6 +1253,12 @@ body.on-dark .nav-cta { background: #f5f5f7; color: #000; }
   .checker-panel { padding: 12px 12px 14px; }
   .loop-rail { padding-top: 8px; }
   .gap-stage { gap: 16px; }
+  .try-page[data-beat="watch"] .try-main { padding: 6px 20px 28px; }
+  .try-page[data-beat="watch"] .try-lede p { margin-top: 6px; }
+  .try-page[data-beat="watch"] .try-rail { padding: 10px 0 4px; }
+  .try-page[data-beat="watch"] .try-line { margin-top: 4px; }
+  .try-page[data-beat="watch"] .station-rig { max-height: 36px; }
+  .try-page[data-beat="watch"] .btn { margin-top: 8px; }
 }
 
 @media (max-width: 900px) {
