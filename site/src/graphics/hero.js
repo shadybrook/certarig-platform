@@ -1,10 +1,4 @@
-const TERMS = [
-  "output allowed",
-  "permit on",
-  "not tripped",
-  "e-stop closed",
-  "process healthy",
-];
+import { checkerMarkup, paintChecker } from "./bench.js";
 
 export function renderHero(el) {
   el.innerHTML = `
@@ -16,21 +10,12 @@ export function renderHero(el) {
       </div>
       <div class="gap-bar" aria-hidden="true"></div>
       <div class="gap-kernel">
-        <div class="and-bus">
-          ${TERMS.map((t) => `<div class="and-term" data-ok="false"><span>${t}</span><i></i></div>`).join("")}
-        </div>
-        <div class="out-lamp" data-on="false">
-          <span class="bulb"></span>
-          <span class="lamp-copy">off</span>
-        </div>
+        ${checkerMarkup({ on: false, permit: false, estop: true, healthy: false, latched: true })}
       </div>
     </div>
   `;
 
   const stage = el.querySelector(".gap-stage");
-  const terms = [...el.querySelectorAll(".and-term")];
-  const lamp = el.querySelector(".out-lamp");
-  const copy = el.querySelector(".lamp-copy");
   const bubbles = [...el.querySelectorAll(".bubble")];
   let last = -1;
 
@@ -45,12 +30,15 @@ export function renderHero(el) {
         b.classList.toggle("in", p > 0.04 + i * 0.12);
       });
       stage.classList.toggle("stopped", p > 0.32);
-      terms.forEach((t, i) => {
-        t.setAttribute("data-ok", String(p > 0.42 + i * 0.07));
+      paintChecker(el, {
+        outputAllowed: true,
+        permit: p > 0.78,
+        tripLatched: p < 0.62,
+        estopClosed: true,
+        healthy: p > 0.38,
+        note: "",
+        story: p < 0.38 ? "trip" : p < 0.62 ? "healthy" : p < 0.78 ? "reset" : "permit",
       });
-      const out = p > 0.82;
-      lamp.dataset.on = String(out);
-      copy.textContent = out ? "on" : "off";
     },
   };
 }

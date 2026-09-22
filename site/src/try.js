@@ -2,6 +2,15 @@ function outputOf(s) {
   return s.outputAllowed && s.permit && !s.tripLatched && s.estopClosed && s.healthy;
 }
 
+function storyOf(s) {
+  if (s.story) return s.story;
+  if (s.tripLatched && !s.healthy) return "trip";
+  if (s.tripLatched) return "healthy";
+  if (!outputOf(s) && !s.permit) return "reset";
+  if (outputOf(s)) return "permit";
+  return "run";
+}
+
 function glossOf(s) {
   if (s.tripLatched && (!s.healthy || !s.estopClosed)) return "The model does not get a vote.";
   if (s.tripLatched && s.healthy && s.estopClosed) return "Health does not restart it.";
@@ -9,6 +18,63 @@ function glossOf(s) {
     return "Reset, then permit.";
   }
   return "";
+}
+
+function paintChecker(root, s) {
+  const on = outputOf(s);
+  const story = storyOf(s);
+  const lamp = root.querySelector(".out-switch");
+  if (lamp) {
+    lamp.dataset.on = String(on);
+    lamp.dataset.lock = String(Boolean(s.tripLatched));
+    lamp.dataset.story = story;
+  }
+  const word = root.querySelector(".out-word");
+  if (word) word.textContent = on ? "On" : "Off";
+  const chrome = root.querySelector(".chrome-out");
+  if (chrome) chrome.textContent = on ? "On" : "Off";
+  const note = root.querySelector(".out-note");
+  if (note) {
+    note.textContent =
+      s.tripLatched && s.healthy ? "Stays off" : !on && !s.tripLatched && s.healthy ? "Needs permit" : "";
+  }
+  const permit = root.querySelector('[data-check="permit"]');
+  if (permit) {
+    permit.dataset.ok = String(s.permit);
+    permit.querySelector("b").textContent = s.permit ? "on" : "off";
+  }
+  const estop = root.querySelector('[data-check="estop"]');
+  if (estop) {
+    estop.dataset.ok = String(s.estopClosed);
+    estop.querySelector("b").textContent = s.estopClosed ? "closed" : "open";
+  }
+  const reading = root.querySelector('[data-check="reading"]');
+  if (reading) {
+    reading.dataset.ok = String(s.healthy);
+    reading.querySelector("b").textContent = s.healthy ? "healthy" : "high";
+  }
+  root.querySelectorAll(".latch-story [data-story]").forEach((li) => {
+    li.setAttribute("aria-current", li.dataset.story === story ? "true" : "false");
+  });
+  const healthyBtn = root.querySelector('[data-act="healthy"]');
+  if (healthyBtn) {
+    healthyBtn.textContent = `Reading: ${s.healthy ? "healthy" : "high"}`;
+    healthyBtn.setAttribute("aria-pressed", String(s.healthy));
+  }
+  const estopBtn = root.querySelector('[data-act="estop"]');
+  if (estopBtn) {
+    estopBtn.textContent = `E-stop: ${s.estopClosed ? "closed" : "open"}`;
+    estopBtn.setAttribute("aria-pressed", String(s.estopClosed));
+  }
+  const resetOk = s.tripLatched && s.healthy && s.estopClosed;
+  const permitOk = !s.tripLatched && s.healthy && s.estopClosed && s.outputAllowed && !s.permit;
+  const reset = root.querySelector('[data-act="reset"]');
+  const permitBtn = root.querySelector('[data-act="permit"]');
+  if (reset) reset.disabled = !resetOk;
+  if (permitBtn) permitBtn.disabled = !permitOk;
+  const status = root.querySelector(".status-line");
+  if (status && s.note != null) status.textContent = s.note;
+  return on;
 }
 
 const DEMO = "c1e0a94b7d2f18e6a0c35b91d47e82f0b6a19c4d8e27f53a10b8c6d4e9f20173";
@@ -37,31 +103,12 @@ function mountKernel(el, { title, gloss, onChange }) {
     estopClosed: true,
     healthy: false,
     note: "Latched.",
+    story: "trip",
   };
 
   function apply(extra = {}) {
     Object.assign(state, extra);
-    const on = outputOf(state);
-    const resetOk = state.tripLatched && state.healthy && state.estopClosed;
-    const permitOk =
-      !state.tripLatched && state.healthy && state.estopClosed && state.outputAllowed && !state.permit;
-    el.querySelector(".led").dataset.tone = on ? "ok" : "bad";
-    el.querySelector(".chrome-out").textContent = on ? "ON" : "OFF";
-    const oks = [state.outputAllowed, state.permit, !state.tripLatched, state.estopClosed, state.healthy];
-    el.querySelectorAll(".and-term").forEach((row, i) => row.setAttribute("data-ok", String(oks[i])));
-    el.querySelector(".out-lamp").dataset.on = String(on);
-    const bit = el.querySelector(".kernel-bit");
-    bit.textContent = on ? "1" : "0";
-    bit.parentElement.dataset.on = String(on);
-    el.querySelector('[data-act="output"]').textContent = `Output: ${state.outputAllowed ? "allowed" : "held"}`;
-    el.querySelector('[data-act="output"]').setAttribute("aria-pressed", String(state.outputAllowed));
-    el.querySelector('[data-act="healthy"]').textContent = `Process: ${state.healthy ? "healthy" : "over limit"}`;
-    el.querySelector('[data-act="healthy"]').setAttribute("aria-pressed", String(state.healthy));
-    el.querySelector('[data-act="estop"]').textContent = `E-stop: ${state.estopClosed ? "closed" : "open"}`;
-    el.querySelector('[data-act="estop"]').setAttribute("aria-pressed", String(state.estopClosed));
-    el.querySelector('[data-act="reset"]').disabled = !resetOk;
-    el.querySelector('[data-act="permit"]').disabled = !permitOk;
-    el.querySelector(".status-line").textContent = state.note;
+    const on = paintChecker(el, state);
     const line = glossOf(state);
     if (gloss) {
       gloss.textContent = line;
@@ -77,56 +124,21 @@ function mountKernel(el, { title, gloss, onChange }) {
     state.tripLatched = true;
     state.permit = false;
     state.note = why;
+    state.story = "";
   }
-
-  el.innerHTML = `
-    <div class="instrument">
-      <div class="instrument-chrome">
-        <span class="led" data-tone="bad"></span>
-        <span>checker</span>
-        <span class="spacer chrome-out">OFF</span>
-      </div>
-      <div class="instrument-face kernel-face">
-        <div class="kernel-bit-wrap" data-on="false"><span class="kernel-bit">0</span><span>output</span></div>
-        <div class="and-bus">
-          <div class="and-term" data-ok="true"><span>output allowed</span><i></i></div>
-          <div class="and-term" data-ok="false"><span>permit on</span><i></i></div>
-          <div class="and-term" data-ok="false"><span>not tripped</span><i></i></div>
-          <div class="and-term" data-ok="true"><span>e-stop closed</span><i></i></div>
-          <div class="and-term" data-ok="false"><span>process healthy</span><i></i></div>
-        </div>
-        <div class="out-lamp" data-on="false"><span class="bulb"></span><span class="lamp-copy">off</span></div>
-        <div class="kernel-controls">
-          <button class="term-toggle" type="button" data-act="output" aria-pressed="true">Output: allowed</button>
-          <button class="term-toggle" type="button" data-act="healthy" aria-pressed="false">Process: over limit</button>
-          <button class="term-toggle" type="button" data-act="estop" aria-pressed="true">E-stop: closed</button>
-          <button type="button" data-act="reset" disabled>Reset trip</button>
-          <button class="primary" type="button" data-act="permit" disabled>Request permit</button>
-        </div>
-        <p class="status-line" aria-live="polite">${state.note}</p>
-      </div>
-    </div>
-  `;
 
   el.addEventListener("click", (e) => {
     const btn = e.target.closest("[data-act]");
     if (!btn || btn.disabled) return;
     const act = btn.dataset.act;
-    if (act === "output") {
-      state.outputAllowed = !state.outputAllowed;
-      if (!state.outputAllowed) {
-        state.permit = false;
-        state.note = "Held off.";
-      } else {
-        state.note = "Need permit.";
-      }
-    } else if (act === "healthy") {
+    if (act === "healthy") {
       if (state.healthy) {
         state.healthy = false;
         trip("Latched.");
       } else {
         state.healthy = true;
         state.note = "Still latched.";
+        state.story = "healthy";
       }
     } else if (act === "estop") {
       if (state.estopClosed) {
@@ -135,14 +147,17 @@ function mountKernel(el, { title, gloss, onChange }) {
       } else {
         state.estopClosed = true;
         state.note = "Still latched.";
+        state.story = "";
       }
     } else if (act === "reset") {
       state.tripLatched = false;
       state.permit = false;
       state.note = "Need permit.";
+      state.story = "reset";
     } else if (act === "permit") {
       state.permit = true;
       state.note = "Yes.";
+      state.story = "permit";
     }
     apply();
   });
@@ -153,6 +168,7 @@ function mountKernel(el, { title, gloss, onChange }) {
       if (!state.healthy) {
         state.healthy = true;
         state.note = "Still latched.";
+        state.story = "healthy";
         apply();
       }
     },
@@ -277,11 +293,17 @@ function show(beat) {
 
 const pressure = document.getElementById("try-pressure");
 const flow = document.getElementById("try-flow");
+const pNeedle = document.querySelector('[data-needle="pressure"]');
+const fNeedle = document.querySelector('[data-needle="flow"]');
 let t = 0;
 window.setInterval(() => {
   t += 1;
-  if (pressure) pressure.textContent = `${(1.14 + Math.sin(t / 7) * 0.05).toFixed(2)} bar`;
-  if (flow) flow.textContent = `${(0.2 + Math.sin(t / 11) * 0.03).toFixed(2)} L/min`;
+  const p = 1.14 + Math.sin(t / 7) * 0.05;
+  const f = 0.2 + Math.sin(t / 11) * 0.03;
+  if (pressure) pressure.textContent = p.toFixed(2);
+  if (flow) flow.textContent = f.toFixed(2);
+  if (pNeedle) pNeedle.setAttribute("transform", `rotate(${-20 + (p - 0.9) * 180} 70 78)`);
+  if (fNeedle) fNeedle.setAttribute("transform", `rotate(${-50 + f * 80} 70 78)`);
 }, 280);
 
 document.querySelectorAll("[data-next]").forEach((btn) => {

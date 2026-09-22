@@ -1,8 +1,5 @@
 import { tickCopy } from "../scroll.js";
-
-function outputOf(s) {
-  return s.outputAllowed && s.permit && !s.tripLatched && s.estopClosed && s.healthy;
-}
+import { checkerMarkup, paintChecker, outputOf } from "./bench.js";
 
 function glossOf(s) {
   if (s.tripLatched && (!s.healthy || !s.estopClosed)) return "The model does not get a vote.";
@@ -22,6 +19,7 @@ const BEATS = [
     estopClosed: true,
     healthy: true,
     note: "Yes.",
+    story: "run",
     title: "The model does not get a vote.",
   },
   {
@@ -32,6 +30,7 @@ const BEATS = [
     estopClosed: true,
     healthy: false,
     note: "Latched.",
+    story: "trip",
     title: "Break one check.",
   },
   {
@@ -42,6 +41,7 @@ const BEATS = [
     estopClosed: true,
     healthy: true,
     note: "Still latched.",
+    story: "healthy",
     title: "Healthy is not a restart.",
   },
   {
@@ -52,6 +52,7 @@ const BEATS = [
     estopClosed: true,
     healthy: true,
     note: "Need permit.",
+    story: "reset",
     title: "Reset. Then permit.",
   },
   {
@@ -62,6 +63,7 @@ const BEATS = [
     estopClosed: true,
     healthy: true,
     note: "Yes.",
+    story: "permit",
     title: "Only the kernel said yes.",
   },
 ];
@@ -80,6 +82,7 @@ export function renderKernel(el) {
     estopClosed: true,
     healthy: true,
     note: BEATS[0].note,
+    story: BEATS[0].story,
   };
   let holdUntil = 0;
   let lastBeat = null;
@@ -94,30 +97,7 @@ export function renderKernel(el) {
 
   function apply(extra = {}) {
     Object.assign(state, extra);
-    const on = outputOf(state);
-    const resetOk = state.tripLatched && state.healthy && state.estopClosed;
-    const permitOk =
-      !state.tripLatched && state.healthy && state.estopClosed && state.outputAllowed && !state.permit;
-    el.querySelector(".led").dataset.tone = on ? "ok" : "bad";
-    el.querySelector(".chrome-out").textContent = on ? "ON" : "OFF";
-    const rows = el.querySelectorAll(".and-term");
-    const oks = [state.outputAllowed, state.permit, !state.tripLatched, state.estopClosed, state.healthy];
-    rows.forEach((row, i) => row.setAttribute("data-ok", String(oks[i])));
-    const lamp = el.querySelector(".out-lamp");
-    lamp.dataset.on = String(on);
-    el.querySelector(".lamp-copy").textContent = on ? "on" : "off";
-    const bit = el.querySelector(".kernel-bit");
-    bit.textContent = on ? "1" : "0";
-    bit.parentElement.dataset.on = String(on);
-    el.querySelector('[data-act="output"]').textContent = `Output: ${state.outputAllowed ? "allowed" : "held"}`;
-    el.querySelector('[data-act="output"]').setAttribute("aria-pressed", String(state.outputAllowed));
-    el.querySelector('[data-act="healthy"]').textContent = `Process: ${state.healthy ? "healthy" : "over limit"}`;
-    el.querySelector('[data-act="healthy"]').setAttribute("aria-pressed", String(state.healthy));
-    el.querySelector('[data-act="estop"]').textContent = `E-stop: ${state.estopClosed ? "closed" : "open"}`;
-    el.querySelector('[data-act="estop"]').setAttribute("aria-pressed", String(state.estopClosed));
-    el.querySelector('[data-act="reset"]').disabled = !resetOk;
-    el.querySelector('[data-act="permit"]').disabled = !permitOk;
-    el.querySelector(".status-line").textContent = state.note;
+    paintChecker(el, state);
     if (gloss) {
       const line = glossOf(state);
       if (gloss.textContent !== line) {
@@ -132,49 +112,22 @@ export function renderKernel(el) {
     }
   }
 
-  el.innerHTML = `
-    <div class="instrument">
-      <div class="instrument-chrome">
-        <span class="led" data-tone="ok"></span>
-        <span>kernel</span>
-        <span class="spacer chrome-out">ON</span>
-      </div>
-      <div class="instrument-face kernel-face">
-        <div class="kernel-bit-wrap" data-on="true"><span class="kernel-bit">1</span><span>output</span></div>
-        <div class="and-bus">
-          <div class="and-term" data-ok="true"><span>output allowed</span><i></i></div>
-          <div class="and-term" data-ok="true"><span>permit on</span><i></i></div>
-          <div class="and-term" data-ok="true"><span>not tripped</span><i></i></div>
-          <div class="and-term" data-ok="true"><span>e-stop closed</span><i></i></div>
-          <div class="and-term" data-ok="true"><span>process healthy</span><i></i></div>
-        </div>
-        <div class="out-lamp" data-on="true"><span class="bulb"></span><span class="lamp-copy">on</span></div>
-        <div class="kernel-controls">
-          <button class="term-toggle" type="button" data-act="output" aria-pressed="true">Output: allowed</button>
-          <button class="term-toggle" type="button" data-act="healthy" aria-pressed="true">Process: healthy</button>
-          <button class="term-toggle" type="button" data-act="estop" aria-pressed="true">E-stop: closed</button>
-          <button type="button" data-act="reset" disabled>Reset trip</button>
-          <button class="primary" type="button" data-act="permit" disabled>Request permit</button>
-        </div>
-        <p class="status-line" aria-live="polite">${state.note}</p>
-      </div>
-    </div>
-  `;
+  el.innerHTML = checkerMarkup({
+    on: true,
+    permit: true,
+    estop: true,
+    healthy: true,
+    latched: false,
+    controls: true,
+    story: true,
+  });
 
   el.addEventListener("click", (e) => {
     const btn = e.target.closest("[data-act]");
     if (!btn || btn.disabled) return;
     holdUntil = Date.now() + 1600;
     const act = btn.dataset.act;
-    if (act === "output") {
-      state.outputAllowed = !state.outputAllowed;
-      if (!state.outputAllowed) {
-        state.permit = false;
-        state.note = "Held off.";
-      } else {
-        state.note = "Need permit.";
-      }
-    } else if (act === "healthy") {
+    if (act === "healthy") {
       if (state.healthy) {
         state.healthy = false;
         trip("Latched.");
@@ -182,6 +135,7 @@ export function renderKernel(el) {
         state.healthy = true;
         state.note = "Still latched.";
       }
+      state.story = "";
     } else if (act === "estop") {
       if (state.estopClosed) {
         state.estopClosed = false;
@@ -190,13 +144,16 @@ export function renderKernel(el) {
         state.estopClosed = true;
         state.note = "Still latched.";
       }
+      state.story = "";
     } else if (act === "reset") {
       state.tripLatched = false;
       state.permit = false;
       state.note = "Need permit.";
+      state.story = "reset";
     } else if (act === "permit") {
       state.permit = true;
       state.note = "Yes.";
+      state.story = "permit";
     }
     apply();
   });
@@ -216,9 +173,11 @@ export function renderKernel(el) {
         estopClosed: b.estopClosed,
         healthy: b.healthy,
         note: b.note,
+        story: b.story,
       });
       tickCopy(title, b.title);
     },
     holding: () => Date.now() < holdUntil,
+    output: () => outputOf(state),
   };
 }
