@@ -1,0 +1,10 @@
+{
+  "files": {
+    "certarig/machines/__init__.py": "7c8ab69b57be818d4329daf41be13bbf48bcb36a9cd3544b2e4596e68983d366",
+    "certarig/machines/agent_tools.py": "b8198eb103625fc86cfcf0ef1b56b1593cef7ee7c3852be25762d323094fb41d",
+    "certarig/machines/gateway.py": "30fc3c1dfbec003e8803cf26990ffdb58ebbc679dc881f7983f7811d0fb72f94",
+    "certarig/machines/protocols.py": "0393919e2000f4edf278def138bbecf9264fa63e90301fd1e12d1240886e28fa",
+    "tools/run_machine_virtual_lab.py": "4450d177c2519f8fa347fb8f7c14ff1d4db3224bc63a01b079bc19be8e424a79",
+    "tests/unit/test_machine_gateway.py": "3236c8dbea78f68739268a9f6d4e252af3850c7298621186a95d9e6fa3a7412f"
+  }
+}

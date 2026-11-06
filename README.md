@@ -14,6 +14,10 @@ Studio (browser)  ──►  Edge node  ──►  ProcessGuardrail  ──►  
 
 The Phase 3 PoC that this was imported from is frozen. This repo is the platform.
 
+## Experimental CNC and printer integration
+
+The [machine control feasibility study](docs/research/2026-11-07-machine-control-feasibility.md) maps supported integration routes for CNC, filament and resin machines. The [reproducible machine lab](docs/research/MACHINE_CONTROL_LAB.md) exercises the existing agent tool loop against real OctoPrint 1.11.8 and its bundled VIRTUAL printer. It verifies 12 controller integration checks, including job completion and approval refusals. The gateway remains restricted to the virtual printer; physical machines and live model inference are separate validation milestones.
+
 **Phase 3 evidence, CSVs, graphs, circuit, BOM, and lab bundles:** start at [docs/phase3-submission/README.md](docs/phase3-submission/README.md). Frozen source: https://github.com/shadybrook/certarig-phase-2-poc
 
 ## Gate 0–5 evidence review and visual explainer
