@@ -1,0 +1,14 @@
+name: rc steady
+description: Distinct first-order thermal physics, deterministic software fixture
+  only.
+seed: 31
+rig: rig.thermal.capstone.json
+procedure: thermal_soak
+duration_s: 5
+events: []
+expect:
+  outcome: passed
+  kernel_events_include: []
+  final_output_high: false
+  invariants:
+  - ends_safe

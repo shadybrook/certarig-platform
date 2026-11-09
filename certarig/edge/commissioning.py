@@ -188,7 +188,7 @@ class ProcessGuardrail:
             else:
                 value = float(sample.value)
                 quality = sample.quality
-                freshness = max(1.0, self.config.sample_interval_ms / 1000 * 3)
+                freshness = channel.max_age_ms / 1000 if channel.max_age_ms else max(1.0, self.config.sample_interval_ms / 1000 * 3)
                 try:
                     sample_time = datetime.fromisoformat(sample.captured_at)
                     snapshot_time = datetime.fromisoformat(snapshot.captured_at)

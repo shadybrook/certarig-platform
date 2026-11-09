@@ -456,6 +456,33 @@ async function renderAuthor() {
     ${draftCards || "<p>No drafts. Validate and save one.</p>"}`;
 }
 
+async function renderInterview() {
+  const {interviews} = await get("/v1/commissioning/interviews");
+  const saved = sessionStorage.getItem("commissioning-interview");
+  const active = interviews.find(i => i.interview_id === saved) || interviews.at(-1);
+  const root = $("#interview-ui");
+  root._interview = active;
+  const answers = active?.answers || {};
+  root.innerHTML = `<h2>Guided commissioning interview</h2>
+    <p>Deterministic bounded fixture · proposals cannot energize equipment. Unknown facts remain blockers.</p>
+    <button id="iv-create">New interview</button>
+    <label>Resume saved interview<select id="iv-resume">${interviews.map(i => `<option value="${esc(i.interview_id)}" ${i === active ? "selected" : ""}>${esc(i.interview_id)} · ${esc(i.status)}</option>`).join("")}</select></label>
+    ${active ? `<p>Revision ${active.revision} · ${esc(active.status)}</p>
+    <label>Equipment<input id="iv-equipment" value="${esc(answers.equipment || "")}" /></label>
+    <label>Safe state<select id="iv-safe"><option value="">Unknown</option><option value="deenergized" ${answers.safe_state === "deenergized" ? "selected" : ""}>Deenergized / output off</option></select></label>
+    <label>Supported procedure IDs, comma separated<input id="iv-procedures" value="${esc((answers.procedures || []).join(", "))}" /></label>
+    <label>Source reference for these answers<input id="iv-source" value="${esc(active.sources.document || "")}" placeholder="Operator mapping record / fixture specification" /></label>
+    <label>Optional bounded text (equipment:, safe_state:, procedures:)<textarea id="iv-text">${esc(active.source_text || "")}</textarea></label>
+    <label>Simulator reference template<select id="iv-template"><option value="thermal">Thermal RC plant</option><option value="pressure_flow">Pressure / flow simulator</option></select></label>
+    <button id="iv-template-load">Load simulator template into draft</button>
+    <label>Proposed signal map, units, scaling and limits (JSON)<textarea id="iv-document" rows="12">${esc(JSON.stringify(answers.document || {}, null, 2))}</textarea></label>
+    <label>Calibration evidence (JSON list of calibration_id and reference)<textarea id="iv-calibrations" rows="4">${esc(JSON.stringify(answers.calibration_records || [], null, 2))}</textarea></label>
+    <button id="iv-save">Save answers</button><button id="iv-propose">Check and propose</button>
+    <button id="iv-apply" ${active.status !== "proposed" ? "disabled" : ""}>Review and apply proposed map</button>
+    <ul id="iv-blockers">${(active.blockers || []).map(b => `<li>${esc(b)}</li>`).join("")}</ul>
+    <pre id="iv-preview">${esc(active.proposal ? JSON.stringify(active.proposal.revalidation, null, 2) : "")}</pre>` : "<p>Create an interview to begin.</p>"}`;
+}
+
 async function renderOnboard() {
   $("#view-onboard").innerHTML = "<p>Loading rig configuration…</p>";
   const [rig, caps, commissioning, library] = await Promise.all([get("/v1/rig"), get("/v1/capabilities"), get("/v1/commissioning"), get("/v1/procedures")]);
@@ -473,7 +500,7 @@ async function renderOnboard() {
     )
     .join("");
   $("#view-onboard").innerHTML = `
-    <h1>Onboard this rig</h1>
+    <h1>Onboard this rig</h1><div class="card" id="interview-ui"></div>
     <div class="card">
       <p class="eyebrow">1 · Connect</p>
       <p>Node ${esc(rig.rig.rig_id)} revision ${esc(rig.rig.revision)}</p>
@@ -488,7 +515,7 @@ async function renderOnboard() {
             }</span>`
         )
         .join("")}</div>
-      <p class="muted">MQTT and Modbus are local observe-mode scaffolds; broker/device integration is not qualified. OPC-UA is planned.</p>
+      <p class="muted">MQTT supports explicit broker observation and a separate in-process fixture. Modbus remains a local scaffold. OPC-UA is planned.</p>
     </div>
     <div class="card">
       <p class="eyebrow">3 · Signals (writes a preview, then apply)</p>
@@ -528,6 +555,7 @@ async function renderOnboard() {
       <p id="brief-status" class="muted" data-testid="brief-status"></p>
     </div>`;
   $("#view-onboard").dataset.hash = rig.config_hash;
+  await renderInterview();
   $("#view-onboard")._document = rig.document;
   try {
     const saved = await get("/v1/ops/briefing");
@@ -630,6 +658,31 @@ document.body.addEventListener("click", async (event) => {
       const link = document.createElement("a"); link.href = url; link.download = bundle.filename; link.click();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
       showToast(`Exported ${bundle.filename}`);
+    }
+    if (t.id === "iv-create") {
+      const value = await post("/v1/commissioning/interviews", {});
+      sessionStorage.setItem("commissioning-interview", value.interview_id); await renderInterview();
+    }
+    if (t.id === "iv-template-load") {
+      const {templates} = await get("/v1/commissioning/templates");
+      const doc = templates[$("#iv-template").value];
+      $("#iv-document").value = JSON.stringify(doc, null, 2);
+      $("#iv-calibrations").value = JSON.stringify(doc.channels.map(c => ({calibration_id:c.calibration_id, reference:"SIMULATION_FIXTURE: template values, not physical calibration"})), null, 2);
+    }
+    if (["iv-save", "iv-propose", "iv-apply"].includes(t.id)) {
+      const current = $("#interview-ui")._interview;
+      const base = `/v1/commissioning/interviews/${current.interview_id}`;
+      if (t.id === "iv-save") {
+        const source = $("#iv-source").value.trim();
+        const answers = {equipment:$("#iv-equipment").value.trim(), safe_state:$("#iv-safe").value, procedures:$("#iv-procedures").value.split(",").map(s => s.trim()).filter(Boolean), document:JSON.parse($("#iv-document").value), calibration_records:JSON.parse($("#iv-calibrations").value)};
+        await post(base + "/answers", {expected_revision:current.revision, answers, sources:source ? Object.fromEntries(Object.keys(answers).map(k => [k, source])) : {}, text:$("#iv-text").value});
+        await renderInterview();
+      } else if (t.id === "iv-propose") {
+        await post(base + "/propose", {}); await renderInterview();
+      } else {
+        await post("/v1/rig/apply", {document:current.proposal.document, expected_current_hash:current.proposal.current_hash, interview_id:current.interview_id, interview_revision:current.revision});
+        await refreshContract(); await renderOnboard();
+      }
     }
     if (t.id === "commission-review") {
       await post("/v1/commissioning/review", {expected_config_hash: $("#view-onboard").dataset.hash, procedure_ids: [$("#commission-procedure").value]});
@@ -767,3 +820,10 @@ window.addEventListener("hashchange", () => {
     gate(true);
   }
 })();
+
+document.body.addEventListener("change", async event => {
+  if (event.target.id === "iv-resume") {
+    sessionStorage.setItem("commissioning-interview", event.target.value);
+    try { await renderInterview(); } catch (error) { fail(error); }
+  }
+});

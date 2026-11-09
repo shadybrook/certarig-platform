@@ -132,4 +132,7 @@ def build_node(settings: NodeSettings, hardware: HardwareAdapter | None = None) 
     from .commissioning_records import install_commissioning
 
     install_commissioning(node)
+    from .interviews import install_interviews
+
+    install_interviews(node)
     return node

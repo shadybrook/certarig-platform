@@ -1,0 +1,18 @@
+name: rc cooling
+description: Distinct first-order thermal physics, deterministic software fixture
+  only.
+seed: 31
+rig: rig.thermal.capstone.json
+procedure: thermal_soak
+duration_s: 5
+events:
+- at_s: 0.1
+  action: set_target
+  channel: temperature
+  value: 25
+expect:
+  outcome: passed
+  kernel_events_include: []
+  final_output_high: false
+  invariants:
+  - ends_safe

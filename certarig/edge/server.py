@@ -267,6 +267,8 @@ class EdgeNode:
             )
         if route.tool in {"reset_trip", "request_permit"} and "commissioning" in self.extensions:
             self.extensions["commissioning"].require()
+            if self.config.commissioning_required and self.config.hardware.mode == "raspberry_pi":
+                raise HttpError(409, "Use an approved named procedure for physical reset/permit; direct commands are unavailable")
         milestone_run = route.tool == "run_procedure" and self.config.commissioning_required
         if milestone_run:
             self.extensions["commissioning"].require(str(ctx.body.get("procedure_id", "")))
@@ -421,6 +423,9 @@ class EdgeNode:
         raw = self._current_rig_raw()
         preview = propose_rig(raw, incoming)
         proposed = load_config_dict(preview["document"])
+        interview = None
+        if ctx.body.get("interview_id"):
+            interview = self.extensions["interviews"].application(str(ctx.body["interview_id"]), preview["document"], ctx.body.get("interview_revision"))
         simulated_reload = isinstance(self.runtime.hardware, SimulatedRig) and proposed.hardware.mode == "simulator"
         if preview["restart_required"] and not simulated_reload:
             # Refused changes never rewrite the active config on disk.
@@ -447,6 +452,12 @@ class EdgeNode:
                     service.load_library(service.skills_root)
                 service.runner.config = proposed
                 self.runtime.sample_once()
+                from .atomic import write_json_atomic
+
+                history = {"before": raw, "after": preview["document"], "revalidation": preview["revalidation"], "applied_by": ctx.principal_name}
+                write_json_atomic(self.runtime.evidence_dir / "configuration_history" / f"{proposed.config_hash}.json", history)
+                if interview:
+                    self.extensions["interviews"].bind(interview, proposed.config_hash)
         except ValueError as exc:
             raise HttpError(409, {"error": str(exc), "code": "stale_contract"}) from exc
         return 200, {**preview, "restart_required": False, "contract_hash": self.contract_hash}
@@ -757,6 +768,9 @@ def make_edge_handler(node: EdgeNode) -> type[BaseHTTPRequestHandler]:
 
         def do_POST(self) -> None:
             self._dispatch("POST")
+
+        def do_PATCH(self) -> None:
+            self._dispatch("PATCH")
 
         def do_DELETE(self) -> None:
             self._dispatch("DELETE")

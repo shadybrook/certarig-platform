@@ -122,6 +122,23 @@ class EdgeClient:
         self._contract_hash = str(document["contract_hash"])
         return document
 
+    def create_interview(self) -> dict[str, Any]:
+        return self.post("/v1/commissioning/interviews", {})
+
+    def interview(self, interview_id: str) -> dict[str, Any]:
+        return self.get(f"/v1/commissioning/interviews/{interview_id}")
+
+    def answer_interview(
+        self, interview_id: str, expected_revision: int, answers: dict[str, Any], sources: dict[str, str]
+    ) -> dict[str, Any]:
+        return self.post(
+            f"/v1/commissioning/interviews/{interview_id}/answers",
+            {"expected_revision": expected_revision, "answers": answers, "sources": sources},
+        )
+
+    def propose_interview(self, interview_id: str) -> dict[str, Any]:
+        return self.post(f"/v1/commissioning/interviews/{interview_id}/propose", {})
+
     def signals(self) -> dict[str, Any]:
         return self.get("/v1/signals")
 
@@ -197,7 +214,9 @@ class EdgeClient:
     def procedures(self) -> dict[str, Any]:
         return self.get("/v1/procedures")
 
-    def run_procedure(self, procedure_id: str, label: str | None = None, approval_id: str | None = None) -> dict[str, Any]:
+    def run_procedure(
+        self, procedure_id: str, label: str | None = None, approval_id: str | None = None
+    ) -> dict[str, Any]:
         payload: dict[str, Any] = {"procedure_id": procedure_id}
         if label:
             payload["label"] = label

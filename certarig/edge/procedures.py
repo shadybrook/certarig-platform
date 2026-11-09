@@ -128,7 +128,7 @@ class ProcedureService:
             return
         if self.node.config.hardware.mode != "simulator":
             return
-        record_sim_pass(self.node.runtime.evidence_dir, run.procedure_id, run.procedure_hash, run.run_id)
+        record_sim_pass(self.node.runtime.evidence_dir, run.procedure_id, run.procedure_hash, run.run_id, self.node.config)
 
     def start_run(self, ctx: RequestContext) -> tuple[int, dict[str, Any]]:
         procedure_id = str(ctx.body.get("procedure_id", ""))
@@ -142,17 +142,22 @@ class ProcedureService:
         # The gate is about the physical adapter, not the config document. Tests inject a
         # ControllableRig under rig.wave1.json (mode raspberry_pi) and must not be blocked.
         mode = "raspberry_pi" if isinstance(self.node.runtime.hardware, RaspberryPiHardware) else "mock"
-        refusal = check_gate(self.node.runtime.evidence_dir, procedure.procedure_hash, mode)
+        refusal = check_gate(self.node.runtime.evidence_dir, procedure.procedure_hash, mode, config=self.node.config if self.node.config.commissioning_required else None)
         if refusal is not None:
             raise HttpError(409, refusal)
         label = str(ctx.body.get("label") or procedure_id)
         approval = self.node.approvals.get(ctx.approval_id) if ctx.approval_id else None
+        import json
+
+        gate_path = self.node.runtime.evidence_dir / "twin_gate" / f"{procedure.procedure_hash}.json"
         try:
             run = self.runner.start(procedure, label, ctx.principal_name, evidence_context={
                 "config": self.node.rig_document()["document"] or self.node.config.public_dict(),
                 "commissioning": self.node.extensions["commissioning"].current() if "commissioning" in self.node.extensions else None,
                 "approval": approval.to_dict() if approval else None,
                 "provider": __import__("os").environ.get("CERTARIG_AGENT_PROVIDER", "fake"),
+                **(self.node.extensions["interviews"].evidence() if "interviews" in self.node.extensions else {}),
+                "rehearsal": json.loads(gate_path.read_text()) if gate_path.is_file() else {"kind": "no_previous_rehearsal", "hardware_mode": self.node.config.hardware.mode},
             })
         except RunnerError as exc:
             raise HttpError(409, str(exc)) from exc

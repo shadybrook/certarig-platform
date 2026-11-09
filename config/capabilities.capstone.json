@@ -72,6 +72,9 @@
     },
     "override_limits": {
       "policy": "never"
+    },
+    "commissioning_interview": {
+      "policy": "allowed"
     }
   }
 }

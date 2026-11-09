@@ -8,8 +8,9 @@ import time
 from pathlib import Path
 
 from certarig.edge.bootstrap import DEFAULT_SKILLS_ROOT, NodeSettings, build_node
-from certarig.edge.client import InProcessClient
+from certarig.edge.client import EdgeApiError, InProcessClient
 from certarig.edge.evidence_cli import verify_zip
+from certarig.edge.revalidation import model_revision
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -33,7 +34,36 @@ def main() -> None:
         deadline = time.monotonic() + 5
         while node.runtime.state()['status'] != 'ok' and time.monotonic() < deadline:
             time.sleep(.01)
+        interview = op.create_interview()
+        blocked_draft = op.propose_interview(interview['interview_id'])
+        assert blocked_draft['status'] == 'needs_evidence'
+        document = op.get('/v1/commissioning/templates')['templates']['thermal']
+        document['rig_id'] = 'capstone-interview-thermal-demo'
+        answers = {'equipment': 'Deterministic thermal simulator fixture', 'safe_state': 'deenergized',
+                   'procedures': ['thermal_soak'], 'document': document,
+                   'calibration_records': [{'calibration_id': c['calibration_id'], 'reference': 'SIMULATION_FIXTURE: synthetic scaling'} for c in document['channels']]}
+        op.answer_interview(interview['interview_id'], 0, answers, {k: 'Automated fixture specification; not physical evidence' for k in answers})
+        proposal = op.propose_interview(interview['interview_id'])
+        if proposal['status'] != 'proposed':
+            raise RuntimeError(proposal)
+        op.post('/v1/rig/apply', {'document': document, 'expected_current_hash': proposal['proposal']['current_hash'],
+                                'interview_id': interview['interview_id'], 'interview_revision': 1})
+        op.refresh_contract()
+        readiness_refused = False
+        try:
+            op.run_procedure('thermal_soak')
+        except EdgeApiError:
+            readiness_refused = True
+        assert readiness_refused
         op.post('/v1/commissioning/review', {'expected_config_hash': op.rig()['config_hash'], 'procedure_ids':['thermal_soak']})
+        denied = op.request_approval('run_procedure', {'procedure_id':'thermal_soak'}, 'Automated deliberate denial fixture')
+        op.deny(denied['approval_id'])
+        denial_refused = False
+        try:
+            op.run_procedure('thermal_soak', approval_id=denied['approval_id'])
+        except EdgeApiError:
+            denial_refused = True
+        assert denial_refused
         grant = op.request_approval('run_procedure', {'procedure_id':'thermal_soak'}, 'Automated fixture; not a real human approval')
         op.grant(grant['approval_id'])
         run = op.run_procedure('thermal_soak', approval_id=grant['approval_id'])
@@ -43,6 +73,16 @@ def main() -> None:
         result = op.procedure_run(run['run_id'])
         if result['status'] != 'passed':
             raise RuntimeError(f"demo run did not pass: {result['status']}")
+        rehearsal_id = run['run_id']
+        grant = op.request_approval('run_procedure', {'procedure_id':'thermal_soak'}, 'Automated execution after exact-profile rehearsal')
+        op.grant(grant['approval_id'])
+        run = op.run_procedure('thermal_soak', approval_id=grant['approval_id'])
+        deadline = time.monotonic() + 15
+        while not op.procedure_run(run['run_id'])['terminal'] and time.monotonic() < deadline:
+            time.sleep(.02)
+        result = op.procedure_run(run['run_id'])
+        if result['status'] != 'passed':
+            raise RuntimeError(f"execution did not pass: {result['status']}")
         exported = op.export_evidence(run['run_id'])
         archive = args.out / 'CertaRig_thermal_simulator_evidence.zip'
         archive.write_bytes(op.download(exported['path']))
@@ -56,6 +96,9 @@ def main() -> None:
             'run_id':run['run_id'], 'status':result['status'], 'config_hash':result['config_hash'],
             'procedure_hash':result['procedure_hash'], 'raw_analysis':record,
             'archive_sha256':exported['sha256'], 'offline_verified':True,
+            'interview_id': interview['interview_id'], 'incomplete_interview_blocked': True,
+            'unreviewed_start_blocked': readiness_refused, 'denied_approval_blocked': denial_refused,
+            'model_revision': model_revision(node.config), 'rehearsal_run_id': rehearsal_id,
         }
         (args.out / 'demo-receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')
         print(json.dumps(receipt,indent=2))

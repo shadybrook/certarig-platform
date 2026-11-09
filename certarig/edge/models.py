@@ -45,6 +45,7 @@ class ChannelConfig:
     stuck_samples: int | None = None
     stuck_epsilon: float | None = None
     source: dict[str, Any] | None = None
+    max_age_ms: int | None = None
 
 
 CONCEPT_BY_UNIT = {
@@ -76,6 +77,9 @@ class HardwareConfig:
     simulator: dict[str, Any] | None = None
     mqtt: dict[str, Any] | None = None
     modbus: dict[str, Any] | None = None
+    feedback_required: bool = False
+    feedback_settle_ms: int = 250
+    feedback_active_high: bool = True
 
 
 @dataclass(frozen=True)
@@ -89,6 +93,7 @@ class RigConfig:
     channels: tuple[ChannelConfig, ...]
     config_hash: str
     commissioning_required: bool = False
+    wiring_revision: str | None = None
 
     def abort_for(self, concept: str) -> float | None:
         return self.abort_limits.get(concept)
@@ -181,6 +186,8 @@ class RigSnapshot:
     output_safe: bool
     samples: tuple[Sample, ...]
     captured_at: str
+    output_feedback: bool | None = None
+    feedback_source: str = "command_derived"
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -190,6 +197,8 @@ class RigSnapshot:
             "output_safe": self.output_safe,
             "samples": [asdict(sample) for sample in self.samples],
             "captured_at": self.captured_at,
+            "output_feedback": self.output_feedback,
+            "feedback_source": self.feedback_source,
         }
 
 

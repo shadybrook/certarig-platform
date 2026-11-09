@@ -516,16 +516,17 @@ class ProcedureRunner:
             from certarig.edge.bundle import write_run_bundle
 
             from ..atomic import write_bytes_atomic, write_json_atomic
-            from ..recording_analysis import analyze_csv
+            from ..recording_analysis import analyze_csv, reproduce_checks
 
             context = self._contexts.get(run.run_id, {})
-            for key in ("config", "commissioning", "approval"):
+            for key in ("config", "commissioning", "approval", "interview", "calibration_records", "configuration_history", "revalidation", "test_profile", "rehearsal"):
                 if key in context:
                     write_json_atomic(target / f"{key}.json", context[key])
             write_json_atomic(target / "provenance.json", {
                 "evidence_kind": "simulated" if self.config.hardware.mode in {"simulator", "mock"} else "physical",
                 "provider": context.get("provider", "not_recorded"),
                 "approval_required": self.config.commissioning_required,
+                "interview_required": "interview" in context,
                 "adapter_identity": f"{type(self.runtime.hardware).__module__}.{type(self.runtime.hardware).__name__}",
             })
             if run.recording:
@@ -539,6 +540,7 @@ class ProcedureRunner:
                 write_bytes_atomic(target / filename, data)
                 if context.get("config"):
                     write_json_atomic(target / "sample_analysis.json", analyze_csv(data, context["config"]))
+                    write_json_atomic(target / "check_analysis.json", reproduce_checks(data, context["config"], document))
             seed = getattr(getattr(self.runtime.hardware, "settings", None), "seed", None)
             write_run_bundle(
                 target,

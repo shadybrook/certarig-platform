@@ -36,10 +36,13 @@
       "type": "string"
     },
     "evidence_kind": {
-      "const": "simulated"
+      "enum": [
+        "simulated",
+        "physical_review_attestation"
+      ]
     },
     "physical_commissioned": {
-      "const": false
+      "type": "boolean"
     },
     "procedures": {
       "type": "object",
@@ -48,6 +51,61 @@
         "type": "string",
         "pattern": "^[a-f0-9]{64}$"
       }
+    },
+    "stage": {
+      "enum": [
+        "observation",
+        "trial",
+        "accepted"
+      ]
+    },
+    "wiring_revision": {
+      "type": "string"
+    },
+    "session_id": {
+      "type": "string"
+    },
+    "expires_at_unix": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "checks": {
+      "type": "object"
+    },
+    "qualification_evidence": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "evidence_kind": {
+            "const": "simulated"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "physical_commissioned": {
+            "const": false
+          }
+        }
+      },
+      "else": {
+        "required": [
+          "stage",
+          "wiring_revision",
+          "session_id",
+          "checks",
+          "qualification_evidence"
+        ]
+      }
+    }
+  ]
 }

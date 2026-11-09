@@ -179,3 +179,24 @@ def test_powerdown_sequence_follows_the_skill() -> None:
     )
     text = _text(done)
     assert "Shutdown accepted" in text and "Poweroff: scheduled" in text
+
+
+def test_deterministic_commissioning_conversation() -> None:
+    from certarig.agent.providers.base import ToolSpec
+    tools = [ToolSpec("commissioning_interview", "", {})]
+    def invoke(history):
+        return POLICY("s", history, tools)
+    assert invoke(_turn("onboard a new rig")).tool_calls[0].arguments == {"action": "create"}
+    iv = {"interview_id": "iv_0123456789012345", "revision": 2, "status": "draft", "answers": {"equipment": "fixture"}}
+    history = _turn("onboard", ("commissioning_interview", iv))
+    assert "Deterministic commissioning fixture" in (invoke(history).text or "")
+    for request, action in [("resume commissioning", "read"), ("propose map", "propose"), ("equipment: pump\nsafe_state: off", "update"), ('{"answers":{"equipment":"safe pump"},"sources":{}}', "update")]:
+        response = invoke(history + [Message("user", request)])
+        assert response.tool_calls[0].arguments["action"] == action
+        assert response.tool_calls[0].arguments["interview_id"] == iv["interview_id"]
+    assert "cannot apply" in (invoke(history + [Message("user", "apply it")]).text or "")
+    assert "valid JSON" in (invoke(history + [Message("user", "{broken")]).text or "")
+    proposed = _turn("propose", ("commissioning_interview", {**iv, "status": "proposed"}))
+    assert "No execution authority" in (invoke(proposed).text or "")
+    blocked = _turn("propose", ("commissioning_interview", {**iv, "blockers": ["calibration missing"]}))
+    assert "calibration missing" in (invoke(blocked).text or "")

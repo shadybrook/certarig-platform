@@ -1,0 +1,19 @@
+name: rc stale source
+description: Distinct first-order thermal physics, deterministic software fixture
+  only.
+seed: 31
+rig: rig.thermal.capstone.json
+procedure: thermal_soak
+duration_s: 5
+events:
+- at_s: 0.1
+  action: fault
+  channel: temperature
+  kind: stale
+expect:
+  outcome: failed
+  kernel_events_include:
+  - sensor_invalid_forced_safe
+  final_output_high: false
+  invariants:
+  - ends_safe

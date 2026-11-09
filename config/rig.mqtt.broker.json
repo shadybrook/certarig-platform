@@ -1,0 +1,68 @@
+{
+  "rig_id": "certarig-mqtt-broker-observe",
+  "revision": "mqtt-observe-twin",
+  "sample_interval_ms": 20,
+  "abort_limits": {
+    "pressure": 4.2
+  },
+  "hardware": {
+    "mode": "mqtt",
+    "observe_only": true,
+    "emergency_stop_active_high": true,
+    "output_active_high": true,
+    "valve_output_gpio": 23,
+    "emergency_stop_gpio": 24,
+    "relay_feedback_gpio": null,
+    "mqtt": {
+      "broker": "127.0.0.1",
+      "port": 18883,
+      "max_age_s": 1
+    },
+    "simulator": {
+      "seed": 11,
+      "time_scale": 1.0,
+      "noise": {
+        "pressure": 0.005,
+        "flow": 0.02
+      },
+      "lag_s": 0.12
+    }
+  },
+  "channels": [
+    {
+      "channel_id": "pressure_emulator",
+      "kind": "analog",
+      "concept": "pressure",
+      "unit": "bar",
+      "valid_min": 0.0,
+      "valid_max": 10.0,
+      "safe_min": 0.0,
+      "safe_max": 4.2,
+      "warning_max": 3.8,
+      "calibration_id": "MQTT-P1-20260912",
+      "required": true,
+      "source": {
+        "kind": "mqtt",
+        "topic": "rig/pressure"
+      }
+    },
+    {
+      "channel_id": "flow_emulator",
+      "kind": "analog",
+      "concept": "flow",
+      "unit": "L/min",
+      "valid_min": 0.0,
+      "valid_max": 20.0,
+      "safe_min": 0.0,
+      "safe_max": 15.0,
+      "warning_max": 13.0,
+      "calibration_id": "MQTT-P2-20260912",
+      "required": true,
+      "source": {
+        "kind": "mqtt",
+        "topic": "rig/flow"
+      }
+    }
+  ],
+  "description": "Actual MQTT broker observation, no remote control. Send timestamped JSON {value, unit, captured_at} on mapped topics."
+}

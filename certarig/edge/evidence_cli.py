@@ -38,7 +38,14 @@ def parse_sums(text: str) -> dict[str, str]:
 
 def _safe_member(name: str) -> bool:
     path = PurePosixPath(name)
-    return bool(name) and not path.is_absolute() and ".." not in path.parts and "\\" not in name and ":" not in name and str(path) == name
+    return (
+        bool(name)
+        and not path.is_absolute()
+        and ".." not in path.parts
+        and "\\" not in name
+        and ":" not in name
+        and str(path) == name
+    )
 
 
 def _verify_payload(files: dict[str, bytes]) -> dict[str, Any]:
@@ -47,52 +54,133 @@ def _verify_payload(files: dict[str, bytes]) -> dict[str, Any]:
     errors: list[str] = []
     try:
         expected = parse_sums(files[SUMS_FILE].decode("utf-8"))
-        if not expected or any(not _safe_member(name) or len(digest) != 64 for name, digest in expected.items()):
+        if not expected or any(
+            not _safe_member(name) or len(digest) != 64 for name, digest in expected.items()
+        ):
             raise ValueError("invalid or empty checksum listing")
         missing = sorted(set(expected) - set(files))
-        mismatched = sorted(name for name, digest in expected.items() if name in files and hashlib.sha256(files[name]).hexdigest() != digest)
+        mismatched = sorted(
+            name
+            for name, digest in expected.items()
+            if name in files and hashlib.sha256(files[name]).hexdigest() != digest
+        )
         # Verify manifests too: omitted requirements are not a complete bundle.
         for name, data in files.items():
             if name.endswith("/manifest.json") or name == "manifest.json":
                 manifest = json.loads(data)
                 if manifest.get("kind") == "certarig_run_bundle":
-                    prefix = name[:-len("manifest.json")]
+                    prefix = name[: -len("manifest.json")]
                     for row in manifest["files"]:
                         target = prefix + row["path"]
-                        if not _safe_member(target) or target not in files or hashlib.sha256(files[target]).hexdigest() != row["sha256"]:
+                        if (
+                            not _safe_member(target)
+                            or target not in files
+                            or hashlib.sha256(files[target]).hexdigest() != row["sha256"]
+                        ):
                             errors.append(f"missing or corrupt manifest artifact: {target}")
             if name.endswith("/run.json") or name == "run.json":
                 run = json.loads(data)
-                prefix = name[:-len("run.json")]
+                prefix = name[: -len("run.json")]
                 recording = run.get("recording")
-                procedure = json.loads(files[prefix + "procedure.json"]) if prefix + "procedure.json" in files else {}
+                procedure = (
+                    json.loads(files[prefix + "procedure.json"]) if prefix + "procedure.json" in files else {}
+                )
                 if procedure.get("record", True) and run.get("status") == "passed" and not recording:
                     errors.append(f"passing run lacks required recording: {name}")
                 if recording:
                     target = prefix + str(recording["filename"])
-                    if not _safe_member(target) or target not in files or hashlib.sha256(files[target]).hexdigest() != recording["sha256"]:
+                    if (
+                        not _safe_member(target)
+                        or target not in files
+                        or hashlib.sha256(files[target]).hexdigest() != recording["sha256"]
+                    ):
                         errors.append(f"missing or corrupt raw recording: {target}")
                     elif prefix + "sample_analysis.json" in files:
-                        from .recording_analysis import analyze_csv
+                        from .recording_analysis import analyze_csv, reproduce_checks
 
                         config = json.loads(files[prefix + "config.json"])
                         actual = analyze_csv(files[target], config)
-                        if actual != json.loads(files[prefix + "sample_analysis.json"]):
+                        recorded_analysis = json.loads(files[prefix + "sample_analysis.json"])
+                        if any(
+                            key not in actual or actual[key] != value
+                            for key, value in recorded_analysis.items()
+                        ):
                             errors.append(f"raw sample analysis does not reproduce: {name}")
                         if actual["rows"] != recording["samples"] or actual["unsafe_command_rows"]:
                             errors.append(f"recording count or command invariant mismatch: {name}")
+                        if prefix + "check_analysis.json" in files:
+                            check_analysis = reproduce_checks(files[target], config, run)
+                            if (
+                                check_analysis != json.loads(files[prefix + "check_analysis.json"])
+                                or not check_analysis["consistent"]
+                            ):
+                                errors.append(f"recorded checks do not reproduce: {name}")
+                        if run.get("status") == "passed" and len(run.get("checks", [])) != len(
+                            procedure.get("evaluate", [])
+                        ):
+                            errors.append(f"passing run has incomplete evaluation: {name}")
                 provenance_name = prefix + "provenance.json"
+                if provenance_name in files and json.loads(files[provenance_name]).get("interview_required"):
+                    for required_name in (
+                        "interview.json",
+                        "calibration_records.json",
+                        "configuration_history.json",
+                        "revalidation.json",
+                        "test_profile.json",
+                        "check_analysis.json",
+                    ):
+                        if prefix + required_name not in files:
+                            errors.append(f"missing commissioning provenance: {prefix + required_name}")
+                    interview = json.loads(files.get(prefix + "interview.json", b"{}"))
+                    if interview.get("applied_config_hash") != run.get("config_hash"):
+                        errors.append("interview configuration mismatch")
+                commissioning = json.loads(files.get(prefix + "commissioning.json", b"null"))
+                if commissioning and commissioning.get("evidence_kind") == "physical_review_attestation":
+                    import base64
+
+                    for artifact in commissioning["qualification_evidence"]:
+                        if (
+                            hashlib.sha256(
+                                base64.b64decode(artifact["data_base64"], validate=True)
+                            ).hexdigest()
+                            != artifact["sha256"]
+                        ):
+                            errors.append("physical qualification artifact checksum mismatch")
                 if provenance_name in files and json.loads(files[provenance_name]).get("approval_required"):
-                    required = ["config.json", "procedure.json", "commissioning.json", "approval.json", "events.jsonl", "sample_analysis.json"]
-                    errors.extend(f"required run artifact missing: {prefix + item}" for item in required if prefix + item not in files)
+                    required = [
+                        "config.json",
+                        "procedure.json",
+                        "commissioning.json",
+                        "approval.json",
+                        "events.jsonl",
+                        "sample_analysis.json",
+                    ]
+                    errors.extend(
+                        f"required run artifact missing: {prefix + item}"
+                        for item in required
+                        if prefix + item not in files
+                    )
                     approval = json.loads(files.get(prefix + "approval.json", b"null"))
-                    if not approval or approval.get("status") != "consumed" or approval.get("contract_hash") != run.get("contract_hash"):
+                    if (
+                        not approval
+                        or approval.get("status") != "consumed"
+                        or approval.get("contract_hash") != run.get("contract_hash")
+                    ):
                         errors.append(f"missing or mismatched consumed approval: {name}")
     except (ValueError, KeyError, TypeError, UnicodeError) as exc:
-        return {"ok": False, "error": f"malformed evidence: {exc}"}
+        return {
+            "ok": False,
+            "missing": locals().get("missing", []),
+            "mismatched": locals().get("mismatched", []),
+            "errors": errors + [f"malformed evidence: {exc}"],
+            "error": f"malformed evidence: {exc}",
+        }
     return {
-        "ok": not missing and not mismatched and not errors, "files": len(expected),
-        "missing": missing, "mismatched": mismatched, "errors": errors,
+        "ok": not missing and not mismatched and not errors,
+        "files": len(expected),
+        "missing": missing,
+        "mismatched": mismatched,
+        "errors": errors,
         "unlisted": sorted(set(files) - set(expected) - {SUMS_FILE, EXPORT_MANIFEST, "manifest.json"}),
     }
 

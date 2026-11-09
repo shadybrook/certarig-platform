@@ -19,7 +19,15 @@
       "noise": {
         "temperature": 0.05
       },
-      "lag_s": 0.2
+      "lag_s": 0.2,
+      "plant": "thermal_rc",
+      "thermal": {
+        "capacity_j_per_c": 100,
+        "loss_w_per_c": 2,
+        "ambient_c": 25,
+        "initial_c": 45,
+        "heat_input_w": 40
+      }
     }
   },
   "channels": [
@@ -36,7 +44,11 @@
       "calibration_id": "TH-JKT-20260912",
       "required": true,
       "stuck_samples": 50,
-      "stuck_epsilon": 0.01
+      "stuck_epsilon": 0.01,
+      "source": {
+        "kind": "virtual",
+        "address": "thermal_rc.temperature"
+      }
     }
   ],
   "description": "Digital twin for a jacket-temperature soak. Proves abort_limits and stuck-good without a pressure channel.",

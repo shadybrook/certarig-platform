@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import json
 import threading
+import time
+import uuid
 from datetime import UTC, datetime
 from typing import Any
 
@@ -20,6 +22,7 @@ class CommissioningService:
         self.node = node
         self.root = node.runtime.evidence_dir / "commissioning"
         self._lock = threading.RLock()
+        self.session_id = uuid.uuid4().hex
 
     def identity(self) -> str:
         adapter = self.node.runtime.hardware
@@ -75,8 +78,23 @@ class CommissioningService:
                 blockers.append(f"Procedure requires commissioning review: {pid}")
         if reviewed and (not record or record.get("adapter_identity") != self.identity()):
             blockers.append("Current configuration and adapter require human review")
+        physical_stage = (record or {}).get("stage")
         if not simulated:
-            blockers.append("Physical commissioning has not been accepted")
+            if not record or physical_stage not in {"observation", "trial", "accepted"}:
+                blockers.append("Physical commissioning has not been accepted")
+            elif reviewed:
+                if record.get("wiring_revision") != config.wiring_revision:
+                    blockers.append("Physical wiring revision changed")
+                if physical_stage == "trial" and (record.get("session_id") != self.session_id or record.get("expires_at_unix", 0) < time.time()):
+                    blockers.append("Attended trial acceptance expired")
+                from .physical_review import inspect_evidence
+
+                try:
+                    inspect_evidence(node.runtime.evidence_dir, record["checks"], config.config_hash, str(config.wiring_revision), physical_stage)
+                except (ValueError, KeyError, OSError):
+                    blockers.append("Physical qualification evidence is missing or changed")
+                if physical_stage == "observation" and any((library.get(pid) and library.get(pid).requires_output) for pid in ids):
+                    blockers.append("Observation acceptance cannot authorize output")
         if procedure_id:
             procedure = library.get(procedure_id)
             if procedure and procedure.requires_output and (config.hardware.observe_only or not node.runtime.allow_output):
@@ -84,9 +102,9 @@ class CommissioningService:
         return {
             "required": config.commissioning_required,
             "ready": not blockers,
-            "status": "simulation_ready" if not blockers else "review_required" if simulated else "control_verification_required",
+            "status": ("simulation_ready" if simulated else f"{physical_stage}_ready") if not blockers else "review_required" if simulated else "control_verification_required",
             "evidence_kind": "simulated" if simulated else "software_observation_only",
-            "physical_commissioned": False,
+            "physical_commissioned": bool(record and record.get("physical_commissioned") and not blockers),
             "config_hash": config.config_hash,
             "adapter_identity": self.identity(),
             "procedure_id": procedure_id,
@@ -100,6 +118,8 @@ class CommissioningService:
 
     def review(self, ctx: RequestContext) -> tuple[int, dict[str, Any]]:
         self.node._require_operator(ctx)
+        if self.node.config.hardware.mode not in {"simulator", "mock"}:
+            raise HttpError(409, "Software review cannot accept physical equipment; use the staged physical review")
         if ctx.body.get("expected_config_hash") != self.node.config.config_hash:
             raise HttpError(409, {"error": "Re-read the current configuration before review", "code": "stale_contract"})
         ids = ctx.body.get("procedure_ids")
@@ -143,4 +163,7 @@ def install_commissioning(node: EdgeNode) -> CommissioningService:
     node.extensions["commissioning"] = service
     node.add_route("GET", "/v1/commissioning", service.get, "read_rig")
     node.add_route("POST", "/v1/commissioning/review", service.review)
+    from .physical_review import review_physical
+
+    node.add_route("POST", "/v1/commissioning/physical", lambda ctx: review_physical(service, ctx))
     return service

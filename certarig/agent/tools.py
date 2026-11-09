@@ -153,6 +153,25 @@ class ToolRegistry:
                 result = self._local(name, arguments)
             else:
                 result = self._edge(name, arguments)
+            if name == "commissioning_interview":
+                result = {
+                    k: result[k]
+                    for k in (
+                        "interview_id",
+                        "revision",
+                        "status",
+                        "blockers",
+                        "unresolved",
+                        "interpretation",
+                    )
+                    if k in result
+                } | {
+                    "answers": {
+                        k: bool(v) if k in {"document", "calibration_records"} else v
+                        for k, v in result.get("answers", {}).items()
+                    },
+                    "review_location": "Onboard: review complete source document and diff",
+                }
             return ToolResult(name, arguments, True, result, _ms(started))
         except EdgeApiError as exc:
             payload = dict(exc.payload)
@@ -179,6 +198,21 @@ class ToolRegistry:
     def _edge(self, name: str, args: dict[str, Any]) -> dict[str, Any]:
         client = self.client
         approval = args.get("approval_id")
+        if name == "commissioning_interview":
+            action = args["action"]
+            base = "/v1/commissioning/interviews"
+            if action == "create":
+                return client.post(base, {})
+            base += "/" + str(args["interview_id"])
+            if action == "read":
+                return client.get(base)
+            if action == "propose":
+                return client.post(base + "/propose", {})
+            if action == "update":
+                return client.post(
+                    base + "/answers", {k: v for k, v in args.items() if k not in {"action", "interview_id"}}
+                )
+            raise ValueError("unsupported interview action")
         if name == "read_rig":
             return client.rig()
         if name == "read_capabilities":

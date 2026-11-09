@@ -35,12 +35,18 @@ paths:
       responses:
         '200':
           description: Success
+      description: Validate proposed configuration and return semantic revalidation
+        requirements. Rig-level/unclassified changes require full qualification.
   /v1/rig/apply:
     post:
       summary: POST /v1/rig/apply
       responses:
         '200':
           description: Success
+      description: Operator-only application with expected_current_hash. When supplying
+        interview_id also supply interview_revision; the proposed document must match
+        exactly. Material changes invalidate approvals/reviews and preserve configuration
+        history.
   /v1/capabilities/propose:
     post:
       summary: POST /v1/capabilities/propose
@@ -375,3 +381,121 @@ paths:
                   minItems: 1
                   items:
                     type: string
+  /v1/commissioning/physical:
+    post:
+      summary: POST /v1/commissioning/physical
+      responses:
+        '201':
+          description: Review retained with readiness
+        '403':
+          description: Human operator required
+        '409':
+          description: Missing, stale or incompatible qualification
+      description: Operator-attested observation, attended trial or acceptance of
+        a specific Pi configuration/wiring revision. Requires hashed physical qualification
+        records and their raw artifacts. Trials expire after 30 minutes and on restart.
+        Accepted procedures require passing physical trials. Not safety certification.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - stage
+              - expected_config_hash
+              - wiring_revision
+              - procedure_ids
+              - attest_reviewed
+              - checks
+              properties:
+                stage:
+                  enum:
+                  - observation
+                  - trial
+                  - accepted
+                expected_config_hash:
+                  type: string
+                wiring_revision:
+                  type: string
+                procedure_ids:
+                  type: array
+                  items:
+                    type: string
+                attest_reviewed:
+                  type: boolean
+                checks:
+                  type: object
+                  description: Named checks mapped to local path and SHA-256. JSON
+                    records must include exact config/wiring identity, passed=true,
+                    evidence_kind=physical and raw artifact references.
+  /v1/commissioning/templates:
+    get:
+      summary: GET /v1/commissioning/templates
+      responses:
+        '200':
+          description: Success
+  /v1/commissioning/interviews:
+    get:
+      summary: GET /v1/commissioning/interviews
+      responses:
+        '200':
+          description: Success
+      description: List persisted drafts. Sources are operator-provided references;
+        fixture interpretation is deterministic.
+    post:
+      summary: POST /v1/commissioning/interviews
+      responses:
+        '201':
+          description: Inert interview draft created
+  /v1/commissioning/interviews/{interview_id}:
+    get:
+      summary: GET /v1/commissioning/interviews/{interview_id}
+      responses:
+        '200':
+          description: Success
+    patch:
+      summary: PATCH /v1/commissioning/interviews/{interview_id}
+      responses: &id001
+        '200':
+          description: Draft saved
+        '409':
+          description: Stale interview revision
+      description: Save answers with optimistic revision matching. Unrecognized text
+        remains unresolved. Does not change active configuration.
+      requestBody: &id002
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - expected_revision
+              properties:
+                expected_revision:
+                  type: integer
+                answers:
+                  type: object
+                sources:
+                  type: object
+                  additionalProperties:
+                    type: string
+                    minLength: 1
+                text:
+                  type: string
+  /v1/commissioning/interviews/{interview_id}/answers:
+    post:
+      summary: POST /v1/commissioning/interviews/{interview_id}/answers
+      responses: *id001
+      description: Save answers with optimistic revision matching. Unrecognized text
+        remains unresolved. Does not change active configuration.
+      requestBody: *id002
+  /v1/commissioning/interviews/{interview_id}/propose:
+    post:
+      summary: POST /v1/commissioning/interviews/{interview_id}/propose
+      responses:
+        '200':
+          description: Success
+      description: Validate sources, units, calibration and supported procedures.
+        Returns needs_evidence with blockers or proposed with a configuration diff
+        and revalidation checklist. Never applies configuration.

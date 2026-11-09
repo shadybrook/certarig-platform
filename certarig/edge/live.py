@@ -35,6 +35,9 @@ KERNEL_FIELDS = (
     "green_indicator_expected",
     "record_kind",
     "sample_gap",
+    "output_feedback",
+    "feedback_source",
+    "feedback_settle_ms",
 )
 
 
@@ -44,7 +47,7 @@ def csv_fields_for(config: RigConfig) -> tuple[str, ...]:
     concepts: dict[str, str] = {}
     for channel in config.channels:
         cid = channel.channel_id
-        per_channel.extend((f"{cid}_raw", f"{cid}_value", f"{cid}_state", f"{cid}_quality"))
+        per_channel.extend((f"{cid}_raw", f"{cid}_value", f"{cid}_state", f"{cid}_quality", f"{cid}_captured_at"))
         concepts.setdefault(channel.concept, cid)
     legacy: list[str] = []
     if "pressure" in concepts:
@@ -92,6 +95,8 @@ class LiveBenchRuntime:
         self._last_elapsed_s: float | None = None
         self._csv_fields = csv_fields_for(config)
         self.hardware.force_safe_state()
+        self._last_command = False
+        self._command_changed_at = time.monotonic()
 
     def _empty_state(self) -> dict[str, Any]:
         return {
@@ -162,6 +167,9 @@ class LiveBenchRuntime:
                 self.hardware.set_valve(True)
             else:
                 self.hardware.force_safe_state()
+            if result.drive_high != self._last_command:
+                self._last_command = result.drive_high
+                self._command_changed_at = time.monotonic()
             return result
         except Exception:
             self.hardware.force_safe_state()
@@ -201,7 +209,10 @@ class LiveBenchRuntime:
             "outputs": {
                 "gpio23_command_high": result.drive_high,
                 "relay_energized_expected": relay_energized,
-                "relay_state_source": "commanded_not_feedback",
+                "relay_state_source": snapshot.feedback_source if snapshot.output_feedback is not None else "commanded_not_feedback",
+                "output_feedback": snapshot.output_feedback,
+                "feedback_source": snapshot.feedback_source,
+                "feedback_settle_ms": self.config.hardware.feedback_settle_ms,
                 "relay_board_power_expected": not result.estop_active,
                 "red_indicator_expected": not relay_energized,
                 "green_indicator_expected": relay_energized,
@@ -213,7 +224,8 @@ class LiveBenchRuntime:
                 "filename": self._record_path.name if self._record_path else None,
                 "samples": self._record_samples,
             },
-            "warning": "Relay and panel-light states are expected from the command/contact model; no feedback sensor is fitted.",
+            "warning": "Measured electrical feedback is distinct from mechanical valve position." if snapshot.output_feedback is not None else "Relay and panel-light states are expected from the command/contact model; no feedback sensor is fitted.",
+            "adapter_status": self.hardware.status() if hasattr(self.hardware, "status") else {},
         }
 
     def _csv_row(self, state: dict[str, Any], record_kind: str, sample_gap: int = 0) -> dict[str, object]:
@@ -239,6 +251,9 @@ class LiveBenchRuntime:
             "green_indicator_expected": str(outputs.get("green_indicator_expected")).lower(),
             "record_kind": record_kind,
             "sample_gap": sample_gap,
+            "output_feedback": str(outputs.get("output_feedback")).lower() if outputs.get("output_feedback") is not None else "",
+            "feedback_source": outputs.get("feedback_source", "command_derived"),
+            "feedback_settle_ms": outputs.get("feedback_settle_ms", self.config.hardware.feedback_settle_ms),
         }
         for channel in self.config.channels:
             status = statuses.get(channel.channel_id, {})
@@ -247,6 +262,7 @@ class LiveBenchRuntime:
             row[f"{channel.channel_id}_value"] = status.get("value", raw.get("value", ""))
             row[f"{channel.channel_id}_state"] = status.get("state", "missing")
             row[f"{channel.channel_id}_quality"] = status.get("quality", raw.get("quality", ""))
+            row[f"{channel.channel_id}_captured_at"] = raw.get("captured_at", "")
             if channel.concept == "pressure":
                 row["pressure_voltage_v"] = raw.get("raw_value", "")
                 row["pressure_bar"] = status.get("value", "")
@@ -274,6 +290,11 @@ class LiveBenchRuntime:
                 if snapshot.rig_id != self.config.rig_id or snapshot.config_hash != self.config.config_hash:
                     raise ValueError("observation belongs to a different rig configuration")
                 result = self.guardrail.observe(snapshot)
+                if self.config.hardware.feedback_required:
+                    if snapshot.output_feedback is None or snapshot.feedback_source != "electrical_gpio":
+                        result = self.guardrail.fail_safe("output_feedback_unknown")
+                    elif snapshot.output_feedback != self._last_command and time.monotonic() - self._command_changed_at >= self.config.hardware.feedback_settle_ms / 1000:
+                        result = self.guardrail.fail_safe("output_feedback_mismatch")
                 result = self._apply_output(result)
                 state = self._compose_state(snapshot, result, result.event)
             except Exception as exc:

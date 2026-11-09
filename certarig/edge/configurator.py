@@ -53,6 +53,8 @@ def restart_required(current: RigConfig, proposed: RigConfig) -> bool:
 
 
 def propose_rig(current_raw: dict[str, Any], incoming: dict[str, Any]) -> dict[str, Any]:
+    from .revalidation import revalidation
+
     proposed_raw = merge_document(current_raw, incoming)
     proposed = load_config_dict(proposed_raw)
     current = load_config_dict(current_raw)
@@ -62,6 +64,7 @@ def propose_rig(current_raw: dict[str, Any], incoming: dict[str, Any]) -> dict[s
         "next_hash": proposed.config_hash,
         "restart_required": restart_required(current, proposed),
         "document": proposed_raw,
+        "revalidation": revalidation(current_raw, proposed_raw),
     }
 
 

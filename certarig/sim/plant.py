@@ -105,6 +105,13 @@ class SimulatedRig(HardwareAdapter):
         self._snapshot_failures_remaining = 0
         self.log: list[dict[str, Any]] = []
         self.set_valve_calls = 0
+        raw = config.hardware.simulator or {}
+        self.thermal = dict(raw.get("thermal") or {}) if raw.get("plant") == "thermal_rc" else None
+        self.heat_input_w = float((self.thermal or {}).get("heat_input_w", 40.0))
+        if self.thermal is not None:
+            for ch in self._channels.values():
+                if ch.config.concept == "temperature":
+                    ch.actual = ch.target = float(self.thermal.get("initial_c", 45.0))
 
     def reconfigure(self, config: RigConfig) -> None:
         """Replace a simulator mapping while preserving the adapter referenced by HTTP routes."""
@@ -139,6 +146,10 @@ class SimulatedRig(HardwareAdapter):
             channel = self._resolve(name)
             channel.ramp = None
             channel.target = float(value)
+            if self.thermal is not None and channel.config.concept == "temperature":
+                # On a thermal plant the slider specifies an equilibrium boundary,
+                # not an instantaneous sensor reading or a physical heater command.
+                self.heat_input_w = (float(value) - float(self.thermal.get("ambient_c", 25))) * float(self.thermal.get("loss_w_per_c", 2))
             self._record("set_target", channel=channel.config.channel_id, value=float(value))
 
     def ramp(self, name: str, to: float, over_s: float) -> None:
@@ -203,11 +214,19 @@ class SimulatedRig(HardwareAdapter):
         for channel in self._channels.values():
             if channel.ramp is not None:
                 channel.target = channel.ramp.value_at(self._t)
+                if self.thermal is not None and channel.config.concept == "temperature":
+                    self.heat_input_w = (channel.target - float(self.thermal.get("ambient_c", 25))) * float(self.thermal.get("loss_w_per_c", 2))
                 if self._t >= channel.ramp.start_t + channel.ramp.duration_s:
                     channel.ramp = None
             if "stuck" in channel.faults:
                 continue
-            channel.actual += (channel.target - channel.actual) * alpha
+            if self.thermal is not None and channel.config.concept == "temperature":
+                capacity = float(self.thermal.get("capacity_j_per_c", 100))
+                loss = float(self.thermal.get("loss_w_per_c", 2))
+                equilibrium = float(self.thermal.get("ambient_c", 25)) + self.heat_input_w / loss
+                channel.actual = equilibrium + (channel.actual - equilibrium) * math.exp(-loss * dt / capacity)
+            else:
+                channel.actual += (channel.target - channel.actual) * alpha
             if "drift" in channel.faults:
                 channel.drift_offset += float(channel.faults["drift"].get("rate", 0.01)) * dt
 
@@ -255,7 +274,7 @@ class SimulatedRig(HardwareAdapter):
                         unit=channel.config.unit,
                         raw_value=raw,
                         quality=quality,
-                        captured_at=now,
+                        captured_at=(self._now_timestamp_stale() if "stale" in channel.faults else now),
                     )
                 )
             estop_active = self.estop_pressed or "estop_wire_break" in self._global_faults
@@ -283,6 +302,9 @@ class SimulatedRig(HardwareAdapter):
             if self.output != bool(open_state):
                 self._record("output", high=bool(open_state))
             self.output = bool(open_state)
+
+    def _now_timestamp_stale(self) -> str:
+        return (datetime.fromisoformat(self._now()) - timedelta(seconds=10)).isoformat()
 
     def force_safe_state(self) -> None:
         with self._lock:
