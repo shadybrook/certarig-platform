@@ -23,6 +23,7 @@ import threading
 import time
 from collections import deque
 from collections.abc import Callable
+from contextlib import nullcontext
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -132,7 +133,8 @@ class EdgeNode:
         self.capabilities_path = Path(capabilities_path) if capabilities_path else None
         self.sessions = SessionRegistry()
         self.static_root = Path(static_root).resolve() if static_root else None
-        self.approvals = ApprovalRegistry(ttl_s=manifest.approval_ttl_s)
+        self.approvals = ApprovalRegistry(ttl_s=manifest.approval_ttl_s, path=runtime.evidence_dir / "approvals.json")
+        self.mutation_lock = threading.RLock()
         self.router = Router()
         self.started_at = utc_now()
         self._audit: deque[dict[str, Any]] = deque(maxlen=audit_size)
@@ -263,7 +265,12 @@ class EdgeNode:
                     "expected_contract_hash": self.contract_hash,
                 },
             )
-        if policy is Policy.HUMAN_APPROVAL and ctx.principal is Principal.AGENT:
+        if route.tool in {"reset_trip", "request_permit"} and "commissioning" in self.extensions:
+            self.extensions["commissioning"].require()
+        milestone_run = route.tool == "run_procedure" and self.config.commissioning_required
+        if milestone_run:
+            self.extensions["commissioning"].require(str(ctx.body.get("procedure_id", "")))
+        if (policy is Policy.HUMAN_APPROVAL and ctx.principal is Principal.AGENT) or milestone_run:
             approval_id = ctx.body.get("approval_id")
             if not approval_id:
                 raise HttpError(
@@ -279,10 +286,28 @@ class EdgeNode:
                 )
             args = {k: v for k, v in ctx.body.items() if k not in {"approval_id", "contract_hash"}}
             try:
-                self.approvals.consume(str(approval_id), route.tool, args, self.contract_hash)
+                self.approvals.consume(
+                    str(approval_id), route.tool, args, self.contract_hash,
+                    requested_by=ctx.principal_name, requested_role=ctx.principal.value,
+                    binding_hash=self.approval_binding(route.tool, args),
+                )
             except ApprovalError as exc:
                 raise HttpError(403, {"error": str(exc), "code": "approval_invalid"}) from exc
             ctx.approval_id = str(approval_id)
+
+    def approval_binding(self, tool: str, args: dict[str, Any]) -> str:
+        if tool != "run_procedure":
+            return ""
+        from .config import canonical_hash
+
+        procedure = self.extensions["procedures"].library.get(str(args.get("procedure_id", "")))
+        if procedure is None:
+            raise HttpError(404, "procedure not found or not approved")
+        return canonical_hash({
+            "procedure_hash": procedure.procedure_hash,
+            "config_hash": self.config.config_hash,
+            "adapter": f"{type(self.runtime.hardware).__module__}.{type(self.runtime.hardware).__name__}",
+        })
 
     # ------------------------------------------------------------------- routes
     def add_route(self, method: str, path: str, handler: Handler, tool: str | None = None) -> None:
@@ -379,37 +404,52 @@ class EdgeNode:
 
     def _apply_rig(self, ctx: RequestContext) -> tuple[int, dict[str, Any]]:
         self._require_operator(ctx)
-        from .commissioning import ProcessGuardrail
-        from .config import load_config
-        from .configurator import apply_rig
+        from certarig.sim.plant import SimulatedRig
 
+        from .commissioning import ProcessGuardrail
+        from .config import load_config_dict
+        from .configurator import apply_rig, propose_rig
+        from .live import csv_fields_for
+        from .runtime import ProcedureLibrary
+
+        if self.extensions["procedures"].runner.active or self.runtime.state()["recording"]["active"]:
+            raise HttpError(409, "Stop the run and recording before changing configuration")
         expected = str(ctx.body.get("expected_current_hash") or "")
         incoming = ctx.body.get("document") or {}
         if not isinstance(incoming, dict):
             raise HttpError(400, "document must be an object")
+        raw = self._current_rig_raw()
+        preview = propose_rig(raw, incoming)
+        proposed = load_config_dict(preview["document"])
+        simulated_reload = isinstance(self.runtime.hardware, SimulatedRig) and proposed.hardware.mode == "simulator"
+        if preview["restart_required"] and not simulated_reload:
+            # Refused changes never rewrite the active config on disk.
+            raise HttpError(409, {"error": "Hardware identity change requires a separate restart", "code": "restart_required", **preview})
+        if self.config.commissioning_required and not proposed.commissioning_required:
+            raise HttpError(409, "Commissioning cannot be disabled through the running workspace")
         try:
-            preview = apply_rig(self.config_path, self._current_rig_raw(), incoming, expected)  # type: ignore[arg-type]
+            with self.runtime._lock:
+                preview = apply_rig(self.config_path, raw, incoming, expected)  # type: ignore[arg-type]
+                self.runtime.command("safe")
+                if simulated_reload and isinstance(self.runtime.hardware, SimulatedRig):
+                    self.runtime.hardware.reconfigure(proposed)
+                elif hasattr(self.runtime.hardware, "config"):
+                    self.runtime.hardware.config = proposed
+                self.config = proposed
+                self.runtime.config = proposed
+                self.runtime.guardrail = ProcessGuardrail(proposed, allow_output=self.runtime.allow_output)
+                self.runtime._csv_fields = csv_fields_for(proposed)
+                self.runtime._history.clear()
+                self.approvals.invalidate("configuration_changed")
+                service = self.extensions["procedures"]
+                service.library = ProcedureLibrary(proposed, drafts_dir=self.runtime.evidence_dir / "procedure_drafts")
+                if service.skills_root:
+                    service.load_library(service.skills_root)
+                service.runner.config = proposed
+                self.runtime.sample_once()
         except ValueError as exc:
             raise HttpError(409, {"error": str(exc), "code": "stale_contract"}) from exc
-        if preview["restart_required"]:
-            raise HttpError(
-                409,
-                {
-                    "error": "hardware identity changed; restart the Edge process",
-                    "code": "restart_required",
-                    **preview,
-                },
-            )
-        self.runtime.command("safe")
-        if self.config_path is None:
-            raise HttpError(409, {"error": "this node has no writable rig file", "code": "restart_required"})
-        self.config = load_config(self.config_path)
-        self.runtime.config = self.config
-        self.runtime.guardrail = ProcessGuardrail(self.config, allow_output=self.runtime.allow_output)
-        self.runtime._csv_fields = __import__("certarig.edge.live", fromlist=["csv_fields_for"]).csv_fields_for(
-            self.config
-        )
-        return 200, {**preview, "contract_hash": self.contract_hash}
+        return 200, {**preview, "restart_required": False, "contract_hash": self.contract_hash}
 
     def _propose_capabilities(self, ctx: RequestContext) -> tuple[int, dict[str, Any]]:
         self._require_operator(ctx)
@@ -435,6 +475,7 @@ class EdgeNode:
         except ValueError as exc:
             raise HttpError(409, {"error": str(exc), "code": "stale_contract"}) from exc
         self.manifest = CapabilityManifest.load(self.capabilities_path)
+        self.approvals.invalidate("capabilities_changed")
         return 200, {**preview, "contract_hash": self.contract_hash}
 
     def _ledger(self, ctx: RequestContext) -> tuple[int, dict[str, Any]]:
@@ -503,17 +544,21 @@ class EdgeNode:
             raise HttpError(401, "authentication required")
         tool = str(ctx.body.get("tool", ""))
         ctx.tool = tool
+        if ctx.principal not in {Principal.OPERATOR, Principal.AGENT}:
+            raise HttpError(403, "read-only principals cannot request execution authority")
         try:
             policy = self.manifest.authorize(tool, Principal.AGENT)
         except CapabilityError as exc:
             raise HttpError(403, exc.to_dict()) from exc
-        if policy is not Policy.HUMAN_APPROVAL:
+        if policy is not Policy.HUMAN_APPROVAL and not (tool == "run_procedure" and self.config.commissioning_required):
             raise HttpError(400, {"error": f"{tool} does not require human approval", "policy": policy.value})
         args = ctx.body.get("args", {})
         if not isinstance(args, dict):
             raise HttpError(400, "args must be an object")
         approval = self.approvals.request(
-            tool, args, str(ctx.body.get("reason", "")), self.contract_hash, requested_by=ctx.principal_name
+            tool, args, str(ctx.body.get("reason", "")), self.contract_hash,
+            requested_by=ctx.principal_name, requested_role=ctx.principal.value,
+            binding_hash=self.approval_binding(tool, args),
         )
         return 201, approval.to_dict()
 
@@ -565,6 +610,9 @@ class EdgeNode:
     ) -> tuple[int, dict[str, Any] | bytes, str]:
         """Dispatch a request in-process (used by the Studio agent session)."""
         headers = headers or {}
+        parsed = urlparse(path)
+        path = parsed.path
+        query = query or parse_qs(parsed.query)
         route, params, path_matched = self.router.match(method, path)
         if route is None:
             raise HttpError(
@@ -584,8 +632,9 @@ class EdgeNode:
             policy=None,
         )
         try:
-            self.enforce(ctx, route, headers)
-            result = route.handler(ctx)
+            with nullcontext() if route.path == "/v1/agent/chat" else self.mutation_lock:
+                self.enforce(ctx, route, headers)
+                result = route.handler(ctx)
         except HttpError as exc:
             if route.mutating:
                 self.audit(ctx, exc.status, exc.payload)
@@ -677,8 +726,9 @@ def make_edge_handler(node: EdgeNode) -> type[BaseHTTPRequestHandler]:
                     tool=route.tool,
                     policy=None,
                 )
-                node.enforce(ctx, route, self.headers)
-                result = route.handler(ctx)
+                with nullcontext() if route.path == "/v1/agent/chat" else node.mutation_lock:
+                    node.enforce(ctx, route, self.headers)
+                    result = route.handler(ctx)
                 if len(result) == 3:
                     status, raw, content_type = result
                     self._send_bytes(status, raw, content_type)

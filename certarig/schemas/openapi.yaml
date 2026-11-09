@@ -223,8 +223,31 @@ paths:
     post:
       summary: POST /v1/procedure_runs
       responses:
-        '200':
-          description: Success
+        '201':
+          description: Run started
+        '403':
+          description: Invalid, expired, mismatched or reused approval
+        '409':
+          description: Readiness or contract prevents start
+        '428':
+          description: Request human approval, then retry with approval_id
+      description: Start a named approved procedure. commissioning_required profiles
+        require a single-use approval for every principal. Approval binds requester
+        role/name, exact args, contract, adapter and procedure hash.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - procedure_id
+              properties:
+                procedure_id:
+                  type: string
+                label:
+                  type: string
+                approval_id:
+                  type: string
   /v1/procedure_runs/{run_id}:
     get:
       summary: GET /v1/procedure_runs/{run_id}
@@ -314,3 +337,41 @@ paths:
       responses:
         '200':
           description: Success
+  /v1/commissioning:
+    get:
+      summary: GET /v1/commissioning
+      responses:
+        '200':
+          description: Success
+      description: Read readiness, blockers, evidence kind and current versioned commissioning
+        record; optional procedure_id query selects one procedure.
+  /v1/commissioning/review:
+    post:
+      summary: POST /v1/commissioning/review
+      responses:
+        '201':
+          description: Reviewed simulator configuration
+        '403':
+          description: Operator required
+        '409':
+          description: Stale configuration, invalid observations or physical acceptance
+            required
+      description: Operator-only review bound to current config, adapter and approved
+        procedure revisions. Simulator readiness does not accept physical commissioning.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - expected_config_hash
+              - procedure_ids
+              properties:
+                expected_config_hash:
+                  type: string
+                procedure_ids:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: string

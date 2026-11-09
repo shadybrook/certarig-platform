@@ -166,4 +166,5 @@ def load_config_dict(raw: Any) -> RigConfig:
         hardware=hardware,
         channels=tuple(channels),
         config_hash=canonical_hash(raw),
+        commissioning_required=bool(raw.get("commissioning_required", False)),
     )

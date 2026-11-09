@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CertaRig simulator commissioning review",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "rig_id",
+    "config_hash",
+    "adapter_identity",
+    "reviewed_by",
+    "reviewed_at",
+    "evidence_kind",
+    "physical_commissioned",
+    "procedures"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "rig_id": {
+      "type": "string"
+    },
+    "config_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "adapter_identity": {
+      "type": "string"
+    },
+    "reviewed_by": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reviewed_at": {
+      "type": "string"
+    },
+    "evidence_kind": {
+      "const": "simulated"
+    },
+    "physical_commissioned": {
+      "const": false
+    },
+    "procedures": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[a-f0-9]{64}$"
+      }
+    }
+  }
+}

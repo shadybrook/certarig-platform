@@ -106,6 +106,14 @@ class SimulatedRig(HardwareAdapter):
         self.log: list[dict[str, Any]] = []
         self.set_valve_calls = 0
 
+    def reconfigure(self, config: RigConfig) -> None:
+        """Replace a simulator mapping while preserving the adapter referenced by HTTP routes."""
+        with self._lock:
+            replacement = SimulatedRig(config)
+            for key, value in vars(replacement).items():
+                if key != "_lock":
+                    setattr(self, key, value)
+
     # ----------------------------------------------------------------- helpers
     def _resolve(self, name: str) -> _Channel:
         channel_id = self._concepts.get(name, name)

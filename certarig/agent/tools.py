@@ -205,7 +205,7 @@ class ToolRegistry:
         if name == "stop_recording":
             return client.stop_recording()
         if name == "run_procedure":
-            return client.run_procedure(str(args["procedure_id"]), args.get("label"))
+            return client.run_procedure(str(args["procedure_id"]), args.get("label"), approval_id=approval)
         if name == "ack_operator_step":
             return client.ack(str(args["run_id"]), str(args["step_id"]))
         if name == "abort_procedure":

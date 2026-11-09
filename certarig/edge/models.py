@@ -88,6 +88,7 @@ class RigConfig:
     hardware: HardwareConfig
     channels: tuple[ChannelConfig, ...]
     config_hash: str
+    commissioning_required: bool = False
 
     def abort_for(self, concept: str) -> float | None:
         return self.abort_limits.get(concept)

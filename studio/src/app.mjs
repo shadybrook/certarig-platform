@@ -1,4 +1,4 @@
-import { get, post, refreshContract, store, toastText } from "./api.mjs";
+import { get, post, refreshContract, store, toastText, headers } from "./api.mjs";
 
 const $ = (sel) => document.querySelector(sel);
 const views = [...document.querySelectorAll(".view")];
@@ -7,6 +7,9 @@ let health = {};
 let state = {};
 let sessionId = store.agentSession || null;
 let poll = null;
+let pendingRun = null;
+let startingRun = false;
+let procedureRenderVersion = 0;
 
 function showToast(message, bad = false) {
   toast.textContent = message;
@@ -23,6 +26,8 @@ function fail(error) {
 function esc(value) {
   return String(value ?? "")
     .replaceAll("&", "&amp;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;");
 }
@@ -284,11 +289,16 @@ function renderTelemetry() {
 }
 
 async function renderProcedures() {
+  if (startingRun) return;
+  const version = ++procedureRenderVersion;
+  const storedAtStart = store.runId;
+  const selected = $("#proc-id")?.value;
   const [library, runs] = await Promise.all([get("/v1/procedures"), get("/v1/procedure_runs")]);
   const stored = store.runId;
   const match = (runs.runs || []).find((r) => r.run_id === stored);
   const active = match || (runs.runs || []).find((r) => !r.terminal) || (runs.runs || [])[0];
   const detail = active ? await get(`/v1/procedure_runs/${active.run_id}`) : null;
+  if (startingRun || version !== procedureRenderVersion || store.runId !== storedAtStart) return;
   if (detail?.run_id) store.setRunId(detail.run_id);
   const list = (library.procedures || []).map((p) => `<option value="${esc(p.id)}">${esc(p.title || p.id)}</option>`).join("");
   const steps = (detail?.steps || [])
@@ -317,6 +327,7 @@ async function renderProcedures() {
           </div>`
         : "<p>No active run.</p>"
     }`;
+  if (selected && [...$("#proc-id").options].some(o => o.value === selected)) $("#proc-id").value = selected;
 }
 
 async function renderApprovals() {
@@ -327,7 +338,7 @@ async function renderApprovals() {
       .map(
         (a) => `<article class="card" data-approval="${esc(a.approval_id)}">
           <strong>${esc(a.tool)}</strong> · ${esc(a.status)}
-          <p>${esc(a.reason)}</p>
+          <p>${esc(a.reason)}</p><p>Requested by ${esc(a.requested_by)} (${esc(a.requested_role)})</p><pre>${esc(JSON.stringify(a.args, null, 2))}</pre><p>Configuration contract ${esc(a.contract_hash).slice(0,16)}…</p>
           ${
             a.status === "pending"
               ? `<button data-grant="${esc(a.approval_id)}" class="primary">Grant</button>
@@ -372,7 +383,7 @@ async function renderEvidence() {
     <tbody>${(listing.runs || [])
       .map(
         (r) => `<tr><td>${esc(r.run_id)}</td><td>${esc(r.procedure_id)}</td><td>${esc(r.status)}</td>
-        <td><a href="/v1/evidence/runs/${esc(r.run_id)}" data-run="${esc(r.run_id)}">open</a></td></tr>`
+        <td><button data-export-run="${esc(r.run_id)}">Export this run</button></td></tr>`
       )
       .join("")}</tbody></table>
     <h2>Recordings</h2>
@@ -446,7 +457,8 @@ async function renderAuthor() {
 }
 
 async function renderOnboard() {
-  const [rig, caps] = await Promise.all([get("/v1/rig"), get("/v1/capabilities")]);
+  $("#view-onboard").innerHTML = "<p>Loading rig configuration…</p>";
+  const [rig, caps, commissioning, library] = await Promise.all([get("/v1/rig"), get("/v1/capabilities"), get("/v1/commissioning"), get("/v1/procedures")]);
   const mode = rig.rig.hardware.mode;
   const adapters = ["mock", "simulator", "raspberry_pi", "mqtt", "modbus_tcp", "opcua"];
   const real = new Set(["mock", "simulator", "raspberry_pi", "mqtt", "modbus_tcp"]);
@@ -476,7 +488,7 @@ async function renderOnboard() {
             }</span>`
         )
         .join("")}</div>
-      <p class="muted">MQTT and Modbus TCP are observe-mode adapters today. OPC-UA is still a roadmap label.</p>
+      <p class="muted">MQTT and Modbus are local observe-mode scaffolds; broker/device integration is not qualified. OPC-UA is planned.</p>
     </div>
     <div class="card">
       <p class="eyebrow">3 · Signals (writes a preview, then apply)</p>
@@ -485,6 +497,20 @@ async function renderOnboard() {
       <button id="onboard-propose" type="button">Preview apply</button>
       <button id="onboard-apply" class="primary" type="button">Apply</button>
       <pre id="onboard-diff" data-testid="onboard-diff"></pre>
+    </div>
+    <details class="card"><summary>Full rig configuration</summary>
+      <p>Edit channel mappings, units and limits. Preview before applying. Simulator mappings reload locally; physical adapter changes require restart.</p>
+      <label>Configuration JSON<textarea id="onboard-document" rows="16">${esc(JSON.stringify(rig.document, null, 2))}</textarea></label>
+      <button id="onboard-json-propose" type="button">Preview configuration</button>
+      <button id="onboard-json-apply" type="button">Apply configuration</button>
+    </details>
+    <div class="card" id="commissioning-state" data-status="${esc(commissioning.status)}">
+      <h2>Commissioning review</h2>
+      <p>${esc(commissioning.evidence_kind)} · ${esc(commissioning.status)}</p>
+      <p>Physical commissioning: not accepted by this software review</p>
+      <ul>${commissioning.blockers.map(b => `<li>${esc(b)}</li>`).join("")}</ul>
+      <label>Procedure to review<select id="commission-procedure">${library.procedures.map(p => `<option value="${esc(p.id)}">${esc(p.title)}</option>`).join("")}</select></label>
+      <button id="commission-review" type="button">Review configuration for this procedure</button>
     </div>
     <div class="card">
       <p class="eyebrow">4 · Capabilities</p>
@@ -557,9 +583,26 @@ document.body.addEventListener("click", async (event) => {
     if (t.id === "sim-estop") await post("/v1/sim/estop", { pressed: !state.guardrail?.estop_active });
     if (t.id === "proc-start") {
       const id = $("#proc-id").value;
-      const started = await post("/v1/procedure_runs", { procedure_id: id });
-      store.setRunId(started.run_id || started.run?.run_id);
-      activate("procedures");
+      startingRun = true;
+      procedureRenderVersion++;
+      $("#active-run")?.remove();
+      store.setRunId("");
+      try {
+        let started;
+        try {
+          started = await post("/v1/procedure_runs", {procedure_id: id});
+        } catch (error) {
+          if (error.status !== 428) throw error;
+          const approval = await post("/v1/approvals/request", {tool: "run_procedure", args: {procedure_id: id}, reason: "Operator requested this named procedure from Studio"});
+          pendingRun = {procedure_id: id, approval_id: approval.approval_id};
+          activate("approvals");
+          return;
+        }
+        store.setRunId(started.run_id || started.run?.run_id);
+      } finally {
+        startingRun = false;
+      }
+      await renderProcedures();
     }
     if (t.id === "proc-abort") {
       const run = $("#active-run")?.dataset.run;
@@ -569,8 +612,38 @@ document.body.addEventListener("click", async (event) => {
       const run = $("#active-run").dataset.run;
       await post(`/v1/procedure_runs/${run}/ack`, { step_id: t.dataset.ack });
     }
-    if (t.dataset.grant) await post(`/v1/approvals/${t.dataset.grant}/grant`, {});
-    if (t.dataset.deny) await post(`/v1/approvals/${t.dataset.deny}/deny`, {});
+    if (t.dataset.grant) {
+      await post(`/v1/approvals/${t.dataset.grant}/grant`, {});
+      if (pendingRun?.approval_id === t.dataset.grant) {
+        const started = await post("/v1/procedure_runs", pendingRun);
+        pendingRun = null;
+        store.setRunId(started.run_id);
+        activate("procedures");
+      }
+    }
+    if (t.dataset.deny) { await post(`/v1/approvals/${t.dataset.deny}/deny`, {}); if (pendingRun?.approval_id === t.dataset.deny) pendingRun = null; }
+    if (t.dataset.exportRun) {
+      const bundle = await post("/v1/ops/evidence/export", {run_id: t.dataset.exportRun});
+      const response = await fetch(bundle.path, {headers: headers()});
+      if (!response.ok) throw new Error("Evidence download failed");
+      const url = URL.createObjectURL(await response.blob());
+      const link = document.createElement("a"); link.href = url; link.download = bundle.filename; link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      showToast(`Exported ${bundle.filename}`);
+    }
+    if (t.id === "commission-review") {
+      await post("/v1/commissioning/review", {expected_config_hash: $("#view-onboard").dataset.hash, procedure_ids: [$("#commission-procedure").value]});
+      await renderOnboard();
+    }
+    if (t.id === "onboard-json-propose" || t.id === "onboard-json-apply") {
+      const document = JSON.parse($("#onboard-document").value);
+      const preview = await post("/v1/rig/propose", {document});
+      $("#onboard-diff").textContent = `${preview.diff.join("\n")}\nnext ${preview.next_hash}`;
+      if (t.id === "onboard-json-apply") {
+        await post("/v1/rig/apply", {document, expected_current_hash: preview.current_hash});
+        await refreshContract(); await renderOnboard();
+      }
+    }
     if (t.id === "export-all") {
       const bundle = await post("/v1/ops/evidence/export", {});
       showToast(`Exported ${bundle.filename}`);
@@ -673,7 +746,8 @@ $("#nav").addEventListener("click", (event) => {
 });
 window.addEventListener("hashchange", () => {
   const name = location.hash.replace("#", "") || store.view || "telemetry";
-  activate(name);
+  const current = document.querySelector(".view:not(.hidden)")?.dataset.view;
+  if (name !== current) activate(name);
 });
 
 (async function boot() {

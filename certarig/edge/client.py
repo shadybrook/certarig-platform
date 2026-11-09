@@ -118,7 +118,9 @@ class EdgeClient:
         return self.get("/health")
 
     def rig(self) -> dict[str, Any]:
-        return self.get("/v1/rig")
+        document = self.get("/v1/rig")
+        self._contract_hash = str(document["contract_hash"])
+        return document
 
     def signals(self) -> dict[str, Any]:
         return self.get("/v1/signals")
@@ -195,10 +197,12 @@ class EdgeClient:
     def procedures(self) -> dict[str, Any]:
         return self.get("/v1/procedures")
 
-    def run_procedure(self, procedure_id: str, label: str | None = None) -> dict[str, Any]:
+    def run_procedure(self, procedure_id: str, label: str | None = None, approval_id: str | None = None) -> dict[str, Any]:
         payload: dict[str, Any] = {"procedure_id": procedure_id}
         if label:
             payload["label"] = label
+        if approval_id:
+            payload["approval_id"] = approval_id
         return self.post("/v1/procedure_runs", payload)
 
     def procedure_run(self, run_id: str) -> dict[str, Any]:

@@ -94,7 +94,8 @@ export async function api(method, path, body, { retry = true } = {}) {
     }
     throw asError(response, data);
   }
-  if (data.contract_hash) contractHash = data.contract_hash;
+  // Historical runs carry historical contracts; they must never replace current authority.
+  if (data.contract_hash && ["/v1/rig", "/v1/capabilities", "/v1/rig/apply", "/v1/capabilities/apply"].includes(path)) contractHash = data.contract_hash;
   return data;
 }
 

@@ -79,6 +79,7 @@ class LiveBenchRuntime:
         self._thread: threading.Thread | None = None
         self._started = time.monotonic()
         self._sample_index = 0
+        self._last_sample_monotonic: float | None = None
         self._history: deque[dict[str, Any]] = deque(maxlen=history_size)
         self._latest: dict[str, Any] = self._empty_state()
         self._last_event = "runtime_started_output_safe"
@@ -140,9 +141,9 @@ class LiveBenchRuntime:
             self._thread.start()
 
     def _loop(self) -> None:
-        interval = self.config.sample_interval_ms / 1000.0
         next_sample = time.monotonic()
         while not self._stop.is_set():
+            interval = self.config.sample_interval_ms / 1000.0
             self.sample_once()
             next_sample += interval
             self._stop.wait(max(0.0, next_sample - time.monotonic()))
@@ -192,6 +193,7 @@ class LiveBenchRuntime:
                     "unit": sample.unit,
                     "raw_value": self._finite(sample.raw_value),
                     "quality": sample.quality,
+                    "captured_at": sample.captured_at,
                 }
                 for sample in snapshot.samples
             ],
@@ -262,10 +264,15 @@ class LiveBenchRuntime:
         self._record_handle.flush()
         self._record_samples += 1
 
+    def sample_age_s(self) -> float:
+        return float("inf") if self._last_sample_monotonic is None else time.monotonic() - self._last_sample_monotonic
+
     def sample_once(self) -> dict[str, Any]:
         with self._lock:
             try:
                 snapshot = self.hardware.snapshot()
+                if snapshot.rig_id != self.config.rig_id or snapshot.config_hash != self.config.config_hash:
+                    raise ValueError("observation belongs to a different rig configuration")
                 result = self.guardrail.observe(snapshot)
                 result = self._apply_output(result)
                 state = self._compose_state(snapshot, result, result.event)
@@ -318,6 +325,7 @@ class LiveBenchRuntime:
                 point["flow_l_min"] = row["flow_l_min"]
             self._history.append(point)
             self._latest = state
+            self._last_sample_monotonic = time.monotonic()
             self._write_record(state, sample_gap=sample_gap)
             event = str(state["guardrail"].get("event") or "")
             if event.endswith("_forced_safe") or event in {"sensor_runtime_error_forced_safe"}:

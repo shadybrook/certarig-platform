@@ -16,6 +16,7 @@ DEFAULT_SKILLS_ROOT = Path(__file__).resolve().parents[2] / "skills"
 class ProcedureService:
     def __init__(self, node: EdgeNode) -> None:
         self.node = node
+        self.skills_root: Path | None = None
         self.library = ProcedureLibrary(
             node.config, drafts_dir=node.runtime.evidence_dir / "procedure_drafts"
         )
@@ -37,6 +38,7 @@ class ProcedureService:
         )
 
     def load_library(self, root: str | Path) -> list[str]:
+        self.skills_root = Path(root)
         return [procedure.id for procedure in self.library.load_directory(root)]
 
     def close(self) -> None:
@@ -144,8 +146,14 @@ class ProcedureService:
         if refusal is not None:
             raise HttpError(409, refusal)
         label = str(ctx.body.get("label") or procedure_id)
+        approval = self.node.approvals.get(ctx.approval_id) if ctx.approval_id else None
         try:
-            run = self.runner.start(procedure, label, ctx.principal_name)
+            run = self.runner.start(procedure, label, ctx.principal_name, evidence_context={
+                "config": self.node.rig_document()["document"] or self.node.config.public_dict(),
+                "commissioning": self.node.extensions["commissioning"].current() if "commissioning" in self.node.extensions else None,
+                "approval": approval.to_dict() if approval else None,
+                "provider": __import__("os").environ.get("CERTARIG_AGENT_PROVIDER", "fake"),
+            })
         except RunnerError as exc:
             raise HttpError(409, str(exc)) from exc
         return 201, run.to_dict()
