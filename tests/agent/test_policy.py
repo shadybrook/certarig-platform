@@ -190,7 +190,7 @@ def test_deterministic_commissioning_conversation() -> None:
     iv = {"interview_id": "iv_0123456789012345", "revision": 2, "status": "draft", "answers": {"equipment": "fixture"}}
     history = _turn("onboard", ("commissioning_interview", iv))
     assert "Deterministic commissioning fixture" in (invoke(history).text or "")
-    for request, action in [("resume commissioning", "read"), ("propose map", "propose"), ("equipment: pump\nsafe_state: off", "update"), ('{"answers":{"equipment":"safe pump"},"sources":{}}', "update")]:
+    for request, action in [("resume commissioning", "read"), ("propose commissioning mapping", "propose"), ('{"answers":{"document":{"commissioning_required":true,"description":"review, propose and apply"}},"sources":{}}', "update"), ("propose map", "propose"), ("equipment: pump\nsafe_state: off", "update"), ('{"answers":{"equipment":"safe pump"},"sources":{}}', "update")]:
         response = invoke(history + [Message("user", request)])
         assert response.tool_calls[0].arguments["action"] == action
         assert response.tool_calls[0].arguments["interview_id"] == iv["interview_id"]

@@ -82,7 +82,15 @@ class RuleBasedPolicy:
     ) -> ProviderResponse:
         if self._tool_available(tools, "commissioning_interview"):
             previous = self._interview(messages)
-            if "commission" in request or "onboard" in request:
+            text = self._last_user(messages)
+            structured_answer = text.lstrip().startswith("{") or any(
+                text.lower().startswith(k + ":") for k in ("equipment", "safe_state", "procedures")
+            )
+            if (
+                not structured_answer
+                and ("commission" in request or "onboard" in request)
+                and not any(word in request for word in ("propose", "check mapping", "apply"))
+            ):
                 if previous and "new" not in request:
                     return call(
                         tool_call(
@@ -93,11 +101,11 @@ class RuleBasedPolicy:
                 return call(tool_call("commissioning_interview", {"action": "create"}))
             if previous and previous.get("status") != "applied":
                 base = {"interview_id": previous["interview_id"]}
-                if "apply" in request:
+                if not structured_answer and "apply" in request:
                     return say(
                         "Apply the reviewed proposal yourself in Onboard. The agent cannot apply mappings, accept physical commissioning or grant authority."
                     )
-                if "propose" in request or "check mapping" in request:
+                if not structured_answer and ("propose" in request or "check mapping" in request):
                     return call(tool_call("commissioning_interview", {**base, "action": "propose"}))
                 text = self._last_user(messages)
                 if text.lstrip().startswith("{"):
