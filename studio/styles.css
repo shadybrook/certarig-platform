@@ -91,3 +91,16 @@ svg.chart-dual { min-height: 280px; }
 #onboard-diff, #author-errors { white-space: pre-wrap; min-height: 2em; }
 #view-onboard label { display: block; margin: 8px 0; }
 #view-onboard textarea { width: 100%; }
+
+@media (max-width: 800px) {
+  .top { flex-wrap: wrap; gap: 10px; padding: 10px 12px; }
+  .brand { flex: 1; }
+  .session { min-width: 0; }
+  .session .pill { max-width: 160px; overflow-wrap: anywhere; }
+  #nav { order: 3; flex: 1 1 100%; overflow-x: auto; padding-bottom: 4px; }
+  #nav a { flex-shrink: 0; }
+  main { padding: 12px; min-width: 0; overflow-wrap: anywhere; }
+  table { display: block; max-width: 100%; overflow-x: auto; }
+  .row { flex-wrap: wrap; }
+  .gate .card { width: calc(100% - 24px); max-height: calc(100vh - 24px); overflow-y: auto; }
+}

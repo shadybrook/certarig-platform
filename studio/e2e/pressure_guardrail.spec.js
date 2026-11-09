@@ -74,15 +74,19 @@ test("pressure_guardrail trips from Studio and then passes after the operator lo
 
 test("operator can grant an approval from the inbox", async ({ page, request }) => {
   await login(page);
-  await request.post("/v1/approvals/request", {
+  const response = await request.post("/v1/approvals/request", {
     headers: {
       "X-CertaRig-Agent-Key": "sim-agent-key-0000000001",
       "X-CertaRig-Contract": (await (await request.get("/v1/rig")).json()).contract_hash,
     },
     data: { tool: "reset_trip", args: {}, reason: "e2e inbox" },
   });
+  expect(response.ok()).toBeTruthy();
+  const approval = await response.json();
   await page.locator('#nav a[data-view="approvals"]').click();
-  await expect(page.locator("[data-approval]")).toBeVisible();
-  await page.getByRole("button", { name: "Grant" }).click();
-  await expect(page.getByText("granted")).toBeVisible({ timeout: 10_000 });
+  // Durable audit history can contain approvals from previous server sessions.
+  const card = page.locator(`[data-approval="${approval.approval_id}"]`);
+  await expect(card).toBeVisible();
+  await card.getByRole("button", { name: "Grant", exact: true }).click();
+  await expect(card).toContainText("granted", { timeout: 10_000 });
 });
