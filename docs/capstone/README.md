@@ -1,3 +1,7 @@
+# CertaRig capstone checkpoint
+
+The current extension is documented in [EXTENSION.md](EXTENSION.md), with [signed mission/rubric mapping](REQUIREMENTS.md) and [hardware design/procurement holds](HARDWARE_REVIEW.md). Start there. The older workflow notes below describe the initial baseline; current results are in the release validation receipt.
+
 # CertaRig capstone connected workflow
 
 Working milestone: 20 November 2026. This increment delivers configuration-only thermal simulator onboarding, reviewed readiness, human-approved execution and a portable raw-data evidence bundle. The final university submission date is unconfirmed.

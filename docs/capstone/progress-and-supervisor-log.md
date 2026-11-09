@@ -19,6 +19,9 @@ The first implementation was completed early in the working schedule. Remaining 
 | --- | --- | --- | --- |
 | 7 September 2026 | Prior Phase 3 report | Dry electronic bench accepted for Phase 3; hydraulic hardware deferred | Historical report record, not a new capstone meeting |
 | 16 September 2026 | Prior Phase 3 report | Explain customer, AI selection/benchmark, real PoC and capstone direction | Historical report record |
+| 19 September 2026 | Signed Phase 3 report, page 21 | Approved for submission | Verified historical signed baseline; user confirms supervisor approval |
 | Current capstone | No new supervisor communication verified | | Awaiting actual review |
 
-Current reviewer assignment and capstone scope approval must be confirmed. Preserve genuine emailed feedback and meeting minutes when received; never infer attendance or remarks from code activity.
+The signed Phase 3 baseline was approved on 19 September 2026. Current capstone reviewer assignment, deadline and submission process still require confirmation. Preserve genuine emailed feedback and meeting minutes when received; never infer attendance or remarks from code activity.
+
+9 November extension: persisted source-bound commissioning interviews, separate thermal RC plant, semantic revalidation/profile-bound rehearsal, observe-only broker MQTT, mixed-sensing/feedback foundations and staged physical review implemented. Local software checks accompany the release. Hardware procurement is on hold pending corrected specifications, matched delivered quote and current wiring review; no parts ordered or physical tests claimed.

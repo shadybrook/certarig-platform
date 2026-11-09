@@ -1,0 +1,25 @@
+{
+  "date": "2026-11-09",
+  "baseline_commit": "2f25d66",
+  "branch": "capstone/connected-workflow-2026-11-09",
+  "scope": "local software, deterministic fixtures and simulated plants; no new physical qualification",
+  "checks": {
+    "selected software tests": "283 passed; 1 opt-in broker test skipped in default suite",
+    "lint and typing": "pass; 80 Python source files checked",
+    "coverage": "90.40% (unchanged gate 90%)",
+    "browser": "8 passed",
+    "local broker": "2 passed with CERTARIG_MQTT_TEST_PORT=18883",
+    "accelerated simulator soak": "1 passed; not attended physical uptime",
+    "clean editable install": "pass; isolated new environment; CLI help works",
+    "portable interview/rehearsal/run bundle": "pass; offline verified"
+  },
+  "excluded": [
+    "hardware-in-the-loop",
+    "live providers",
+    "slow soak run separately"
+  ],
+  "physical_complete": false,
+  "live_provider_qualified": false,
+  "procurement_ready": false,
+  "validated_source_commit": "0f00140"
+}

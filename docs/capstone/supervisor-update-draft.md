@@ -1,15 +1,14 @@
-Subject: CertaRig capstone progress and 20 November milestone
+# Draft supervisor update — not sent
 
-Dear Professor Raj Kumar,
+Dear Professor,
 
-I have started the capstone extension of CertaRig. I am focusing this milestone on one complete workflow: configure a second simulated rig, review its readiness, approve a test, execute it and export evidence that can be checked offline.
+Following the approved Phase 3 report, I have extended CertaRig with resumable reviewed commissioning, a distinct thermal simulator, configuration-specific revalidation, an observe-only MQTT connector and portable raw-data evidence. Local tests and a success/refusal demonstration accompany the software checkpoint. Agent responses are labelled deterministic fixtures; live-model comparison is deferred.
 
-The implementation adds configuration-bound commissioning reviews, approval history that survives restart without restoring permission, and exports containing the raw recording. The thermal simulator demonstrates reuse beyond the earlier pressure/flow bench. The AI path currently uses deterministic fixtures; live-model and new physical-equipment validation remain separate work.
+The proposed physical increment adds electrical feedback and a low-energy water loop within ₹15,000. No new physical results are claimed. I am holding procurement until pressure-sensor specifications, a zero-differential NC valve, pressure protection, reference methods and the current wiring design are reviewed together.
 
-I have prepared the implementation and test evidence, a report draft in the supplied format, and a ten-slide demo deck. I would appreciate your feedback on this scope for the 20 November checkpoint and confirmation of the final submission schedule.
+Please review the mission/evidence mapping and proposed physical sequence. I also need confirmation of the final capstone deadline, current reviewer assignment and submission process. My working software checkpoint is 20 November 2026.
 
 Regards,
 Chintan Dedhia
-2023EB03005
 
-Draft only. Not sent. Supervisor name is carried forward from the Study Project and should be confirmed for the current capstone.
+Supervisor response / meeting remarks:
