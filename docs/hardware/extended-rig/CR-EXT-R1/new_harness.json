@@ -1,0 +1,60 @@
+{
+  "status": "Proposed new harness; verify board header and actual supplier terminal drawing before wiring; frozen Phase3 harness unchanged",
+  "pins": [
+    {
+      "signal": "3.3V",
+      "physical_pin": "1",
+      "function": "Host pullups only"
+    },
+    {
+      "signal": "GND",
+      "physical_pin": "6",
+      "function": "Host logic only; no field-ground tie"
+    },
+    {
+      "signal": "BCM2 SDA",
+      "physical_pin": "3",
+      "function": "Isolated host I2C"
+    },
+    {
+      "signal": "BCM3 SCL",
+      "physical_pin": "5",
+      "function": "Isolated host I2C"
+    },
+    {
+      "signal": "BCM4",
+      "physical_pin": "7",
+      "function": "Two powered1-Wire probes;4.7k pullup"
+    },
+    {
+      "signal": "BCM23",
+      "physical_pin": "16",
+      "function": "Isolated EXECUTION_PERMIT;47k physical pulldown"
+    },
+    {
+      "signal": "BCM12",
+      "physical_pin": "32",
+      "function": "Isolated10Hz heartbeat;47k pulldown"
+    },
+    {
+      "signal": "BCM24",
+      "physical_pin": "18",
+      "function": "Panel healthy status, activeLOW; new harness role"
+    },
+    {
+      "signal": "BCM17",
+      "physical_pin": "11",
+      "function": "Valve CLOSED contact, isolated activeLOW"
+    },
+    {
+      "signal": "BCM27",
+      "physical_pin": "13",
+      "function": "Cutoff EDM status, isolated activeLOW"
+    },
+    {
+      "signal": "BCM22",
+      "physical_pin": "15",
+      "function": "Acquisition healthy, isolated activeLOW"
+    }
+  ]
+}
