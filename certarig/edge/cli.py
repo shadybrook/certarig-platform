@@ -110,6 +110,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="certarig", description="CertaRig agentic test-operations platform")
     subparsers = parser.add_subparsers(dest="command", required=True)
     add_edge_parser(subparsers)
+    from certarig.sandbox.cli import add_parser as add_sandbox_parser
+
+    add_sandbox_parser(subparsers)
     try:
         from certarig.sim.cli import add_sim_parser
 

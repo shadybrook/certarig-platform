@@ -47,6 +47,7 @@ certarig = ["py.typed"]
 testpaths = ["tests"]
 addopts = "-q -p no:cacheprovider"
 markers = [
+  "sandbox_runtime: real-container isolation/fault release qualification (explicit opt-in)",
   "hil: hardware-in-the-loop tests that need the real Raspberry Pi bench",
   "live_llm: tests that call a real LLM provider (opt-in, need an API key)",
   "slow: long-running soak or property tests",
