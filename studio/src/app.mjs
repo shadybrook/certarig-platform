@@ -1,5 +1,7 @@
 import { get, post, refreshContract, store, toastText, headers } from "./api.mjs";
 
+import { renderSandbox } from "./sandbox.mjs";
+
 const $ = (sel) => document.querySelector(sel);
 const views = [...document.querySelectorAll(".view")];
 const toast = $("#toast");
@@ -582,6 +584,7 @@ async function render() {
     else if (name === "capabilities") await renderCapabilities();
     else if (name === "author") await renderAuthor();
     else if (name === "onboard") await renderOnboard();
+    else if (name === "sandbox") await renderSandbox();
   } catch (error) {
     fail(error);
   }
