@@ -1,0 +1,113 @@
+{
+  "budget_target_INR": 14500,
+  "known_allowance_range_excluding_pressure_protection_INR": [
+    11750,
+    20300
+  ],
+  "pressure_protection_quote": null,
+  "hydraulic_cases": [
+    {
+      "name": "c200_close0.02_dt1e-05",
+      "parameters": {
+        "source_bar": 0.3,
+        "flow_L_min": 0.5,
+        "hose_length_m": 0.5,
+        "hose_ID_m": 0.012,
+        "wave_m_s": 200,
+        "closing_s": 0.02,
+        "dt_s": 1e-05
+      },
+      "peak_bar": 0.31942930726881996,
+      "min_bar": 0.27,
+      "within_0_5bar_measurement": true,
+      "below_1bar_proof": true,
+      "single_phase": true
+    },
+    {
+      "name": "c400_close0.02_dt1e-05",
+      "parameters": {
+        "source_bar": 0.3,
+        "flow_L_min": 0.5,
+        "hose_length_m": 0.5,
+        "hose_ID_m": 0.012,
+        "wave_m_s": 400,
+        "closing_s": 0.02,
+        "dt_s": 1e-05
+      },
+      "peak_bar": 0.32120939353055855,
+      "min_bar": 0.27,
+      "within_0_5bar_measurement": true,
+      "below_1bar_proof": true,
+      "single_phase": true
+    },
+    {
+      "name": "c1000_close0.02_dt1e-05",
+      "parameters": {
+        "source_bar": 0.3,
+        "flow_L_min": 0.5,
+        "hose_length_m": 0.5,
+        "hose_ID_m": 0.012,
+        "wave_m_s": 1000,
+        "closing_s": 0.02,
+        "dt_s": 1e-05
+      },
+      "peak_bar": 0.3201066255702259,
+      "min_bar": 0.27,
+      "within_0_5bar_measurement": true,
+      "below_1bar_proof": true,
+      "single_phase": true
+    },
+    {
+      "name": "c1000_close0.005_dt1e-05",
+      "parameters": {
+        "source_bar": 0.3,
+        "flow_L_min": 0.5,
+        "hose_length_m": 0.5,
+        "hose_ID_m": 0.012,
+        "wave_m_s": 1000,
+        "closing_s": 0.005,
+        "dt_s": 1e-05
+      },
+      "peak_bar": 0.391369971450844,
+      "min_bar": 0.20925727438889247,
+      "within_0_5bar_measurement": true,
+      "below_1bar_proof": true,
+      "single_phase": true
+    },
+    {
+      "name": "c1000_close0.005_dt5e-06",
+      "parameters": {
+        "source_bar": 0.3,
+        "flow_L_min": 0.5,
+        "hose_length_m": 0.5,
+        "hose_ID_m": 0.012,
+        "wave_m_s": 1000,
+        "closing_s": 0.005,
+        "dt_s": 5e-06
+      },
+      "peak_bar": 0.3913731392580441,
+      "min_bar": 0.20925557401601833,
+      "within_0_5bar_measurement": true,
+      "below_1bar_proof": true,
+      "single_phase": true
+    },
+    {
+      "name": "c1000_close0.001_dt2e-06",
+      "parameters": {
+        "source_bar": 0.3,
+        "flow_L_min": 0.5,
+        "hose_length_m": 0.5,
+        "hose_ID_m": 0.012,
+        "wave_m_s": 1000,
+        "closing_s": 0.001,
+        "dt_s": 2e-06
+      },
+      "peak_bar": 0.9006319265652875,
+      "min_bar": -0.2750169888552291,
+      "within_0_5bar_measurement": false,
+      "below_1bar_proof": true,
+      "single_phase": true
+    }
+  ],
+  "qualification": "Conditional reduced-model experiments only; exact hardware is not selected or physically verified. No R3 header-tank or industrial-panel results are transferred to this proposal."
+}
