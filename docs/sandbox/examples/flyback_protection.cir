@@ -1,0 +1,19 @@
+Inductive flyback protection exploration - behavioral model only
+* 12 V source, 20 mH / 12 ohm load, ideal controlled switch, ordinary flyback diode.
+* Does not model component SOA, wiring inductance, thermal rise or physical release time.
+Vbus bus 0 12
+Lload bus load 20m
+Rload load drain 12
+Spermit drain 0 gate 0 SWPERMIT
+Vgate gate 0 PULSE(0 5 1m 1u 1u 10m 30m)
+Dflyback drain bus DCLAMP
+.model SWPERMIT SW(Ron=0.05 Roff=1e9 Vt=2.5 Vh=0.1)
+.model DCLAMP D(Is=1e-14 N=1 Rs=0.2 Tt=20n)
+.control
+set wr_singlescale
+set wr_vecnames
+tran 10u 40m
+wrdata /out/protection-trace.txt v(drain) i(Lload) v(gate)
+quit
+.endc
+.end
