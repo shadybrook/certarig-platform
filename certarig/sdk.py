@@ -48,6 +48,26 @@ class CertaRig:
     def propose_interview(self, interview_id: str) -> dict[str, Any]:
         return self.client.propose_interview(interview_id)
 
+    def sandbox_preflight(self) -> dict[str, Any]:
+        return self.client.sandbox_preflight()
+
+    def create_sandbox(self, source: str = "active", procedure_id: str | None = None) -> dict[str, Any]:
+        return self.client.create_sandbox(source, procedure_id)
+
+    def sandbox(self, sandbox_id: str) -> dict[str, Any]:
+        return self.client.sandbox(sandbox_id)
+
+    def run_sandbox(self, sandbox_id: str, kind: str, source: str = "") -> dict[str, Any]:
+        return self.client.run_sandbox(sandbox_id, kind, source)
+
+    def propose_sandbox(self, sandbox_id: str, job_id: str, kind: str = "configuration") -> dict[str, Any]:
+        return self.client.propose_sandbox(sandbox_id, job_id, kind)
+
+    def export_sandbox(self, sandbox_id: str, out_file: str | Path) -> Path:
+        target = Path(out_file)
+        target.write_bytes(self.client.export_sandbox(sandbox_id))
+        return target
+
     def pull_evidence(self, out_dir: str | Path | None = None, run_id: str | None = None) -> dict[str, Any]:
         export = self.client.export_evidence(run_id=run_id)
         if out_dir is None:

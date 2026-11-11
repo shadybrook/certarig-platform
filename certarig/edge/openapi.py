@@ -46,7 +46,20 @@ def generate_openapi(node: EdgeNode) -> dict[str, Any]:
         paths["/v1/rig/apply"]["post"]["description"] = "Operator-only application with expected_current_hash. When supplying interview_id also supply interview_revision; the proposed document must match exactly. Material changes invalidate approvals/reviews and preserve configuration history."
         paths["/v1/rig/propose"]["post"]["description"] = "Validate proposed configuration and return semantic revalidation requirements. Rig-level/unclassified changes require full qualification."
         paths["/v1/commissioning/physical"]["post"].update({"description": "Operator-attested observation, attended trial or acceptance of a specific Pi configuration/wiring revision. Requires hashed physical qualification records and their raw artifacts. Trials expire after 30 minutes and on restart. Accepted procedures require passing physical trials. Not safety certification.", "requestBody": {"required": True, "content": {"application/json": {"schema": {"type": "object", "required": ["stage", "expected_config_hash", "wiring_revision", "procedure_ids", "attest_reviewed", "checks"], "properties": {"stage": {"enum": ["observation", "trial", "accepted"]}, "expected_config_hash": {"type": "string"}, "wiring_revision": {"type": "string"}, "procedure_ids": {"type": "array", "items": {"type": "string"}}, "attest_reviewed": {"type": "boolean"}, "checks": {"type": "object", "description": "Named checks mapped to local path and SHA-256. JSON records must include exact config/wiring identity, passed=true, evidence_kind=physical and raw artifact references."}}}}}}, "responses": {"201": {"description": "Review retained with readiness"}, "403": {"description": "Human operator required"}, "409": {"description": "Missing, stale or incompatible qualification"}}})
+    if "/v1/sandboxes" in paths:
+        for path, operations in paths.items():
+            if path.startswith("/v1/sandboxes"):
+                for operation in operations.values():
+                    operation.update(description="Authenticated local sandbox broker operation. No physical authority. Disabled/unavailable isolation returns503; invalid or stale experiment returns409. Generated code never runs on the host.", security=[{"operatorKey": []}, {"agentKey": []}, {"session": []}])
+        requests = {"/v1/sandboxes": {"source": {"enum": ["active", "thermal", "pressure_flow", "interview"]}, "procedure_id": {"type": "string"}, "interview_id": {"type": "string"}, "recording_id": {"enum": ["latest"]}, "seed": {"type": "integer"}},
+                    "/v1/sandboxes/{sandbox_id}/jobs": {"kind": {"enum": ["python", "spice", "rehearsal"]}, "source": {"type": "string", "maxLength": 256000}},
+                    "/v1/sandboxes/{sandbox_id}/revisions": {"expected_revision": {"type": "integer"}, "document": {"type": "object"}, "procedure": {"type": "object"}},
+                    "/v1/sandboxes/{sandbox_id}/proposals": {"job_id": {"type": "string"}, "kind": {"enum": ["configuration", "procedure"]}}}
+        for path, properties in requests.items():
+            paths[path]["post"]["requestBody"] = {"required": True, "content": {"application/json": {"schema": {"type": "object", "properties": properties, "additionalProperties": False}}}}
+        paths["/v1/sandboxes/{sandbox_id}/export"]["get"]["responses"] = {"200": {"description": "Checksummed sandbox ZIP; numerical replay does not authenticate origin without local broker"}, "409": {"description": "Active job or missing/corrupt evidence"}}
     return {
+        "components": {"securitySchemes": {"operatorKey": {"type": "apiKey", "in": "header", "name": "X-CertaRig-Operator-Key"}, "agentKey": {"type": "apiKey", "in": "header", "name": "X-CertaRig-Agent-Key"}, "session": {"type": "apiKey", "in": "header", "name": "X-CertaRig-Session"}}},
         "openapi": "3.0.3",
         "info": {
             "title": "CertaRig Edge API",

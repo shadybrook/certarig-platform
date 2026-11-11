@@ -418,6 +418,8 @@ class EdgeNode:
             raise HttpError(409, "Stop the run and recording before changing configuration")
         expected = str(ctx.body.get("expected_current_hash") or "")
         incoming = ctx.body.get("document") or {}
+        if "sandboxes" in self.extensions:
+            self.extensions["sandboxes"].handoff(ctx, "configuration", incoming)
         if not isinstance(incoming, dict):
             raise HttpError(400, "document must be an object")
         raw = self._current_rig_raw()
@@ -643,7 +645,7 @@ class EdgeNode:
             policy=None,
         )
         try:
-            with nullcontext() if route.path == "/v1/agent/chat" else self.mutation_lock:
+            with nullcontext() if route.path == "/v1/agent/chat" or route.path.startswith("/v1/sandboxes") else self.mutation_lock:
                 self.enforce(ctx, route, headers)
                 result = route.handler(ctx)
         except HttpError as exc:
@@ -737,7 +739,7 @@ def make_edge_handler(node: EdgeNode) -> type[BaseHTTPRequestHandler]:
                     tool=route.tool,
                     policy=None,
                 )
-                with nullcontext() if route.path == "/v1/agent/chat" else node.mutation_lock:
+                with nullcontext() if route.path == "/v1/agent/chat" or route.path.startswith("/v1/sandboxes") else node.mutation_lock:
                     node.enforce(ctx, route, self.headers)
                     result = route.handler(ctx)
                 if len(result) == 3:
@@ -779,6 +781,8 @@ def make_edge_handler(node: EdgeNode) -> type[BaseHTTPRequestHandler]:
 
 
 def make_edge_server(node: EdgeNode, host: str = "127.0.0.1", port: int = 0) -> ThreadingHTTPServer:
+    if node.flags.get("sandbox_local_only") and host not in {"127.0.0.1", "localhost", "::1"}:
+        raise ValueError("Sandbox-enabled Edge must bind loopback only")
     server = ThreadingHTTPServer((host, port), make_edge_handler(node))
     server.daemon_threads = True
     return server

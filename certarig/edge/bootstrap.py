@@ -57,6 +57,7 @@ class NodeSettings:
     allow_output: bool
     skills_root: Path | None = None
     poweroff_command: str | None = None
+    sandbox_socket: Path | None = None
 
     @classmethod
     def from_env(
@@ -83,6 +84,7 @@ class NodeSettings:
             allow_output=os.environ.get("CERTARIG_ENABLE_ACTUATION") == "1",
             skills_root=Path(skills_root) if skills_root else None,
             poweroff_command=os.environ.get("CERTARIG_POWEROFF_CMD") or None,
+            sandbox_socket=Path(os.environ["CERTARIG_SANDBOX_SOCKET"]) if os.environ.get("CERTARIG_SANDBOX_SOCKET") else None,
         )
 
 
@@ -135,4 +137,7 @@ def build_node(settings: NodeSettings, hardware: HardwareAdapter | None = None) 
     from .interviews import install_interviews
 
     install_interviews(node)
+    from certarig.sandbox.api import install as install_sandboxes
+
+    install_sandboxes(node, settings.sandbox_socket)
     return node
