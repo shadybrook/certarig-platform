@@ -1,0 +1,46 @@
+{"at": "2026-09-12T12:00:23.430912+00:00", "kind": "preflight"}
+{"at": "2026-09-12T12:00:23.431348+00:00", "filename": "20260912T120023430975Z_sim-dual-pot.csv", "kind": "recording_started"}
+{"at": "2026-09-12T12:00:23.431367+00:00", "kind": "step_started", "step": "safe_start", "type": "command"}
+{"at": "2026-09-12T12:00:23.431442+00:00", "command": "safe", "kernel_event": "operator_safe", "kind": "command", "step": "safe_start"}
+{"at": "2026-09-12T12:00:23.431499+00:00", "elapsed_ms": 0.131, "kind": "step_passed", "step": "safe_start"}
+{"at": "2026-09-12T12:00:23.431503+00:00", "kind": "step_started", "step": "reset", "type": "command"}
+{"at": "2026-09-12T12:00:23.431564+00:00", "command": "reset", "kernel_event": "trip_reset_output_safe", "kind": "command", "step": "reset"}
+{"at": "2026-09-12T12:00:23.431610+00:00", "elapsed_ms": 0.107, "kind": "step_passed", "step": "reset"}
+{"at": "2026-09-12T12:00:23.431614+00:00", "kind": "step_started", "step": "permit", "type": "command"}
+{"at": "2026-09-12T12:00:23.431674+00:00", "command": "permit", "kernel_event": "permit_accepted", "kind": "command", "step": "permit"}
+{"at": "2026-09-12T12:00:23.431724+00:00", "elapsed_ms": 0.11, "kind": "step_passed", "step": "permit"}
+{"at": "2026-09-12T12:00:23.431728+00:00", "kind": "step_started", "step": "stable_permit", "type": "expect"}
+{"at": "2026-09-12T12:00:24.436664+00:00", "elapsed_ms": 1004.924, "kind": "step_passed", "step": "stable_permit"}
+{"at": "2026-09-12T12:00:24.436672+00:00", "kind": "step_started", "step": "raise_pressure", "type": "trigger"}
+{"at": "2026-09-12T12:00:24.436675+00:00", "instruction": "Turn P1 up slowly until the dashboard shows more than 4.2 bar. Leave P2 in the safe band. Do not touch the E-stop.\n", "kind": "instruction", "step": "raise_pressure"}
+{"at": "2026-09-12T12:00:25.575052+00:00", "elapsed_ms": 1138.368, "kind": "step_passed", "step": "raise_pressure"}
+{"at": "2026-09-12T12:00:25.575064+00:00", "kind": "step_started", "step": "pressure_output_removed", "type": "expect"}
+{"at": "2026-09-12T12:00:25.575192+00:00", "elapsed_ms": 0.127, "kind": "step_passed", "step": "pressure_output_removed"}
+{"at": "2026-09-12T12:00:25.575199+00:00", "kind": "step_started", "step": "lower_pressure", "type": "trigger"}
+{"at": "2026-09-12T12:00:25.575205+00:00", "instruction": "Turn P1 back down below 3.5 bar. Leave P2 untouched.", "kind": "instruction", "step": "lower_pressure"}
+{"at": "2026-09-12T12:00:26.077871+00:00", "elapsed_ms": 502.665, "kind": "step_passed", "step": "lower_pressure"}
+{"at": "2026-09-12T12:00:26.077884+00:00", "kind": "step_started", "step": "reset_after_pressure", "type": "command"}
+{"at": "2026-09-12T12:00:26.078254+00:00", "command": "reset", "kernel_event": "trip_reset_output_safe", "kind": "command", "step": "reset_after_pressure"}
+{"at": "2026-09-12T12:00:26.078376+00:00", "elapsed_ms": 0.492, "kind": "step_passed", "step": "reset_after_pressure"}
+{"at": "2026-09-12T12:00:26.078385+00:00", "kind": "step_started", "step": "permit_after_pressure", "type": "command"}
+{"at": "2026-09-12T12:00:26.078541+00:00", "command": "permit", "kernel_event": "permit_accepted", "kind": "command", "step": "permit_after_pressure"}
+{"at": "2026-09-12T12:00:26.078662+00:00", "elapsed_ms": 0.277, "kind": "step_passed", "step": "permit_after_pressure"}
+{"at": "2026-09-12T12:00:26.078667+00:00", "kind": "step_started", "step": "raise_flow", "type": "trigger"}
+{"at": "2026-09-12T12:00:26.078670+00:00", "instruction": "Turn P2 up slowly until the dashboard shows more than 15.0 L/min. Leave P1 in the safe band.\n", "kind": "instruction", "step": "raise_flow"}
+{"at": "2026-09-12T12:00:27.460897+00:00", "elapsed_ms": 1382.215, "kind": "step_passed", "step": "raise_flow"}
+{"at": "2026-09-12T12:00:27.460908+00:00", "kind": "step_started", "step": "flow_output_removed", "type": "expect"}
+{"at": "2026-09-12T12:00:27.461034+00:00", "elapsed_ms": 0.125, "kind": "step_passed", "step": "flow_output_removed"}
+{"at": "2026-09-12T12:00:27.461042+00:00", "kind": "step_started", "step": "lower_flow", "type": "trigger"}
+{"at": "2026-09-12T12:00:27.461047+00:00", "instruction": "Turn P2 back down below 10 L/min.", "kind": "instruction", "step": "lower_flow"}
+{"at": "2026-09-12T12:00:28.321761+00:00", "elapsed_ms": 860.709, "kind": "step_passed", "step": "lower_flow"}
+{"at": "2026-09-12T12:00:28.321771+00:00", "kind": "step_started", "step": "no_auto_restart", "type": "expect"}
+{"at": "2026-09-12T12:00:29.827642+00:00", "elapsed_ms": 1505.851, "kind": "step_passed", "step": "no_auto_restart"}
+{"at": "2026-09-12T12:00:29.827657+00:00", "kind": "step_started", "step": "permit_rejected", "type": "command"}
+{"at": "2026-09-12T12:00:29.827966+00:00", "command": "permit", "kernel_event": "permit_rejected_reset_required", "kind": "command", "step": "permit_rejected"}
+{"at": "2026-09-12T12:00:29.828145+00:00", "elapsed_ms": 0.486, "kind": "step_passed", "step": "permit_rejected"}
+{"at": "2026-09-12T12:00:29.828155+00:00", "kind": "step_started", "step": "end_safe", "type": "command"}
+{"at": "2026-09-12T12:00:29.828325+00:00", "command": "safe", "kernel_event": "operator_safe", "kind": "command", "step": "end_safe"}
+{"at": "2026-09-12T12:00:29.828451+00:00", "elapsed_ms": 0.295, "kind": "step_passed", "step": "end_safe"}
+{"at": "2026-09-12T12:00:29.828645+00:00", "kernel_event": "operator_safe", "kind": "kernel_forced_safe"}
+{"at": "2026-09-12T12:00:29.829558+00:00", "filename": "20260912T120023430975Z_sim-dual-pot.csv", "kind": "recording_stopped", "samples": 327, "sha256": "2791904c677e0b1cc12d3caeb221c0bc065d6683d58482b39d7383d469b55e37"}
+{"at": "2026-09-12T12:00:29.829578+00:00", "kind": "finished", "reason": "all steps and checks passed", "status": "passed"}

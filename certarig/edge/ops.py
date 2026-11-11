@@ -61,11 +61,23 @@ def _file_row(path: Path, base: Path) -> dict[str, Any]:
 def evidence_files(evidence_dir: Path, run_id: str | None = None) -> list[Path]:
     """Files that belong in an evidence export: run folders, recordings, shutdown records."""
     if run_id is not None:
+        _safe_name(run_id)
         target = evidence_dir / "procedure_runs" / run_id
-        return sorted(p for p in target.rglob("*") if p.is_file()) if target.is_dir() else []
+        if target.is_symlink() or not target.resolve().is_relative_to(evidence_dir.resolve()):
+            raise HttpError(409, {"error": "Unsafe run evidence path", "code": "incomplete_evidence"})
+        if not target.is_dir():
+            return []
+        from .evidence_cli import verify_directory
+
+        verification = verify_directory(target)
+        if not verification["ok"]:
+            raise HttpError(409, {"error": "Run evidence is missing or corrupt", "code": "incomplete_evidence", "verification": verification})
+        return sorted(p for p in target.rglob("*") if p.is_file())
+    for run in (evidence_dir / "procedure_runs").glob("*/run.json"):
+        evidence_files(evidence_dir, run.parent.name)
     out: list[Path] = []
     for path in sorted(evidence_dir.rglob("*")):
-        if not path.is_file():
+        if not path.is_file() or any(part.startswith(".") for part in path.relative_to(evidence_dir).parts):
             continue
         relative = path.relative_to(evidence_dir)
         if relative.parts[0] == EXPORTS_DIR:
@@ -88,6 +100,9 @@ def export_bundle(
     files = evidence_files(evidence_dir, run_id)
     if not files:
         raise HttpError(404, {"error": "nothing to export", "code": "no_evidence"})
+    for path in files:
+        if path.is_symlink() or not path.resolve().is_relative_to(evidence_dir.resolve()):
+            raise HttpError(409, {"error": "Unsafe evidence path", "code": "incomplete_evidence"})
     out_dir = evidence_dir / EXPORTS_DIR
     out_dir.mkdir(parents=True, exist_ok=True)
     suffix = run_id or label or "all"
@@ -97,9 +112,11 @@ def export_bundle(
     rows: list[dict[str, Any]] = []
     with zipfile.ZipFile(tmp, "w", compression=zipfile.ZIP_DEFLATED) as archive:
         for path in files:
+            data = path.read_bytes()
             row = _file_row(path, evidence_dir)
+            row.update(sha256=hashlib.sha256(data).hexdigest(), size=len(data))
             rows.append(row)
-            archive.write(path, row["path"])
+            archive.writestr(row["path"], data)
         archive.writestr(SUMS_FILE, write_sums([(row["path"], row["sha256"]) for row in rows]))
         manifest = {
             "kind": "certarig_evidence_export",
@@ -108,7 +125,7 @@ def export_bundle(
             "run_id": run_id,
             "label": label,
             "files": rows,
-            **context,
+            **{k: v for k, v in context.items() if k != "evidence_root"},
         }
         archive.writestr(EXPORT_MANIFEST, json.dumps(manifest, indent=2, sort_keys=True))
     tmp.replace(target)

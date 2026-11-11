@@ -1,0 +1,87 @@
+diff --git a/studio/e2e/pressure_guardrail.spec.js b/studio/e2e/pressure_guardrail.spec.js
+index b17f10c..b3da704 100644
+--- a/studio/e2e/pressure_guardrail.spec.js
++++ b/studio/e2e/pressure_guardrail.spec.js
+@@ -74,15 +74,19 @@ test("pressure_guardrail trips from Studio and then passes after the operator lo
+ 
+ test("operator can grant an approval from the inbox", async ({ page, request }) => {
+   await login(page);
+-  await request.post("/v1/approvals/request", {
++  const response = await request.post("/v1/approvals/request", {
+     headers: {
+       "X-CertaRig-Agent-Key": "sim-agent-key-0000000001",
+       "X-CertaRig-Contract": (await (await request.get("/v1/rig")).json()).contract_hash,
+     },
+     data: { tool: "reset_trip", args: {}, reason: "e2e inbox" },
+   });
++  expect(response.ok()).toBeTruthy();
++  const approval = await response.json();
+   await page.locator('#nav a[data-view="approvals"]').click();
+-  await expect(page.locator("[data-approval]")).toBeVisible();
+-  await page.getByRole("button", { name: "Grant" }).click();
+-  await expect(page.getByText("granted")).toBeVisible({ timeout: 10_000 });
++  // Durable audit history can contain approvals from previous server sessions.
++  const card = page.locator(`[data-approval="${approval.approval_id}"]`);
++  await expect(card).toBeVisible();
++  await card.getByRole("button", { name: "Grant", exact: true }).click();
++  await expect(card).toContainText("granted", { timeout: 10_000 });
+ });
+diff --git a/studio/playwright.config.mjs b/studio/playwright.config.mjs
+index b8cb155..a4f1e34 100644
+--- a/studio/playwright.config.mjs
++++ b/studio/playwright.config.mjs
+@@ -1,6 +1,20 @@
+ import { defineConfig } from "@playwright/test";
++import { copyFileSync, existsSync, mkdtempSync } from "node:fs";
++import { tmpdir } from "node:os";
++import path from "node:path";
++import { fileURLToPath } from "node:url";
+ 
+ const PORT = Number(process.env.CERTARIG_E2E_PORT || 18080);
++const ROOT = fileURLToPath(new URL("../", import.meta.url));
++// Reviews and approvals intentionally survive restarts. Each suite needs its
++// own state so a previous accepted configuration cannot satisfy this run.
++const runtime = mkdtempSync(path.join(tmpdir(), "certarig-e2e-"));
++for (const file of ["rig.sim.json", "capabilities.wave1.json"]) {
++  copyFileSync(path.join(ROOT, "config", file), path.join(runtime, file));
++}
++const python = existsSync(path.join(ROOT, ".venv/bin/python"))
++  ? path.join(ROOT, ".venv/bin/python") : "python3";
++const quote = (value) => `'${String(value).replaceAll("'", "'\\''")}'`;
+ 
+ export default defineConfig({
+   testDir: "./e2e",
+@@ -14,9 +28,10 @@ export default defineConfig({
+     trace: "retain-on-failure",
+   },
+   webServer: {
+-    command: `cd .. && mkdir -p /tmp/certarig-e2e-${PORT}-cfg && cp config/rig.sim.json config/capabilities.wave1.json /tmp/certarig-e2e-${PORT}-cfg && $(test -x .venv/bin/python && echo .venv/bin/python || echo python3) -m certarig sim serve --port ${PORT} --config /tmp/certarig-e2e-${PORT}-cfg/rig.sim.json --capabilities /tmp/certarig-e2e-${PORT}-cfg/capabilities.wave1.json --evidence-dir /tmp/certarig-e2e-${PORT}`,
++    cwd: ROOT,
++    command: `${quote(python)} -m certarig sim serve --port ${PORT} --config ${quote(path.join(runtime, "rig.sim.json"))} --capabilities ${quote(path.join(runtime, "capabilities.wave1.json"))} --evidence-dir ${quote(path.join(runtime, "evidence"))}`,
+     url: `http://127.0.0.1:${PORT}/health`,
+-    reuseExistingServer: !process.env.CI,
++    reuseExistingServer: false,
+     timeout: 30_000,
+   },
+ });
+diff --git a/studio/styles.css b/studio/styles.css
+index a0a4947..b739b17 100644
+--- a/studio/styles.css
++++ b/studio/styles.css
+@@ -91,3 +91,16 @@ svg.chart-dual { min-height: 280px; }
+ #onboard-diff, #author-errors { white-space: pre-wrap; min-height: 2em; }
+ #view-onboard label { display: block; margin: 8px 0; }
+ #view-onboard textarea { width: 100%; }
++
++@media (max-width: 800px) {
++  .top { flex-wrap: wrap; gap: 10px; padding: 10px 12px; }
++  .brand { flex: 1; }
++  .session { min-width: 0; }
++  .session .pill { max-width: 160px; overflow-wrap: anywhere; }
++  #nav { order: 3; flex: 1 1 100%; overflow-x: auto; padding-bottom: 4px; }
++  #nav a { flex-shrink: 0; }
++  main { padding: 12px; min-width: 0; overflow-wrap: anywhere; }
++  table { display: block; max-width: 100%; overflow-x: auto; }
++  .row { flex-wrap: wrap; }
++  .gate .card { width: calc(100% - 24px); max-height: calc(100vh - 24px); overflow-y: auto; }
++}

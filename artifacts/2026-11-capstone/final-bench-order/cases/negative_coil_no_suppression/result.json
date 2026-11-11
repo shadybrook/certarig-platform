@@ -1,0 +1,27 @@
+{
+  "case": {
+    "name": "negative_coil_no_suppression",
+    "family": "coil",
+    "params": {
+      "L": 10,
+      "unclamped": true
+    },
+    "unsafe": true
+  },
+  "assessment": {
+    "checks": {
+      "drain_below_80V_design_limit": false,
+      "coil_current_removed_by_one_second": true,
+      "energy_within_5J_suppressor_requirement": true
+    },
+    "metrics": {
+      "drain_peak_V": 100.2356837007,
+      "stored_energy_J": 1.7874658426447727
+    },
+    "criteria_pass": false
+  },
+  "samples": 65991,
+  "horizon": 1,
+  "netlist_sha256": "85224497e601de2cb7a3dc5d5f57de7b71a668373be594f335a8c375803929af",
+  "experiment_ok": true
+}

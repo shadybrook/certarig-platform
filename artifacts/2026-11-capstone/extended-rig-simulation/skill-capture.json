@@ -1,0 +1,8 @@
+{
+  "name": "validate-bounded-spice-circuits",
+  "purpose": "Reproducible bounded electrical simulation, negative controls and saved-sample verification",
+  "location": "/Users/chintandedhia/.agents/skills/validate-bounded-spice-circuits",
+  "validation": "skill-creator quick_validate passed; representative fresh receiver simulation and replay passed",
+  "authority": "User AGENTS.md skill reuse and lifecycle guidance",
+  "memory_registry_modified": false
+}

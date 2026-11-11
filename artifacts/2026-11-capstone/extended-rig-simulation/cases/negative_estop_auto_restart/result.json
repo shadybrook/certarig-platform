@@ -1,0 +1,47 @@
+{
+  "name": "negative_estop_auto_restart",
+  "family": "power",
+  "revision": "UNPROTECTED",
+  "params": {
+    "fault": "estop"
+  },
+  "diagnostic": true,
+  "process_exit": 0,
+  "samples": 45791,
+  "wall_seconds": 3.148,
+  "netlist_sha256": "6f2e5eddacd224ea5fd32b5c64d95fe68e22809ec186f0355906f4ebfbe9bb70",
+  "checks": [
+    {
+      "check": "startup_no_drive",
+      "passed": true
+    },
+    {
+      "check": "run_has_expected_load_response",
+      "passed": true
+    },
+    {
+      "check": "drain_voltage_below_70V_model_design_limit",
+      "passed": true
+    },
+    {
+      "check": "fault_removes_current",
+      "passed": true
+    },
+    {
+      "check": "release_does_not_restart",
+      "passed": false
+    },
+    {
+      "check": "feedback_is_3V3_bounded",
+      "passed": true
+    }
+  ],
+  "metrics": {
+    "peak_drain_v": 33.06188029285,
+    "min_bus_v": -0.3064619303939,
+    "peak_pump_a": 0.5830138629254,
+    "peak_valve_a": 0.482273611207,
+    "peak_shunt_v": 0.1769205348218
+  },
+  "criteria_pass": false
+}

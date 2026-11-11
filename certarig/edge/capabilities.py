@@ -83,6 +83,8 @@ TOOL_CATALOGUE: dict[str, ToolSpec] = {
             _params({"run_id": {"type": "string"}}, ["run_id"]),
         ),
         ToolSpec("read_evidence", "List evidence bundles and their checksums.", False, _params()),
+        ToolSpec("commissioning_interview", "Create, read, answer or propose an inert commissioning interview. Cannot apply a map or approve physical work.", True,
+                 _params({"action": {"enum": ["create", "read", "update", "propose"]}, "interview_id": {"type": "string"}, "expected_revision": {"type": "integer"}, "answers": {"type": "object"}, "sources": {"type": "object"}, "text": {"type": "string"}}, ["action"])),
         ToolSpec(
             "force_safe",
             "Command the kernel to the safe state: output off, permit cleared, trip latched.",

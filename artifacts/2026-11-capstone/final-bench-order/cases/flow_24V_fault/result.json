@@ -1,0 +1,26 @@
+{
+  "case": {
+    "name": "flow_24V_fault",
+    "family": "flow",
+    "params": {
+      "level": "24V_fault"
+    },
+    "unsafe": false
+  },
+  "assessment": {
+    "checks": {
+      "healthy_low_or_high_is_valid_zero_or_pulse": true,
+      "conditioned_field_input_bounded": true
+    },
+    "metrics": {
+      "line_V": 23.91624038598,
+      "ratio": 4.783248077196,
+      "valid": false
+    },
+    "criteria_pass": true
+  },
+  "samples": 1008,
+  "horizon": 0.01,
+  "netlist_sha256": "6b474f0cb96fe40dffcedb5f75a57df19bd0e40ae0dccec2b45e1e6536bec7a8",
+  "experiment_ok": true
+}

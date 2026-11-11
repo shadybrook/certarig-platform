@@ -1,0 +1,30 @@
+{
+  "case": {
+    "name": "supply_10.8V_0.3ohm_3x_start",
+    "family": "pump_input",
+    "params": {
+      "supply": 10.8,
+      "startup": 3,
+      "source_r": 0.3
+    },
+    "original": "pump_weak_supply_startup",
+    "outcome": "normal"
+  },
+  "original_control": false,
+  "assessment": {
+    "checks": {
+      "input_6_to_18V": true,
+      "steady_startup_demand_below_5A": true
+    },
+    "metrics": {
+      "operating_input_min_V": 9.4514268461,
+      "operating_source_max_A": 4.495243846332,
+      "connection_inrush_peak_A": 4.495243846332
+    },
+    "passed": true
+  },
+  "samples": 15018,
+  "horizon_s": 0.15,
+  "netlist_sha256": "bda00d71fb41fa742c570e8dbd4b15d23c3af15ec62159a1c081d3f57733d1f5",
+  "experiment_ok": true
+}

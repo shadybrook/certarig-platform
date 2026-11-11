@@ -1,0 +1,24 @@
+{
+  "name": "pump_input_10.8V_start2x",
+  "family": "pump_input",
+  "params": {
+    "supply": 10.8,
+    "startup": 2
+  },
+  "expected": "within_envelope",
+  "reason": "",
+  "checks": {
+    "input_6_to_18V": true,
+    "steady_startup_demand_below_5A": true
+  },
+  "metrics": {
+    "operating_input_min_V": 9.900908078878,
+    "operating_source_max_A": 2.996973070407,
+    "connection_inrush_peak_A": 2.996973070407
+  },
+  "criteria_pass": true,
+  "samples": 15017,
+  "horizon_s": 0.15,
+  "netlist_sha256": "59bf8f11f2261fae1ac3e03a89c42f08a0ccb6f47240109894062eb71f1b0622",
+  "matched_expectation": true
+}

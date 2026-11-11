@@ -1,0 +1,36 @@
+{
+  "case": {
+    "name": "unprotected_receiver_pi_off",
+    "family": "loop",
+    "params": {
+      "burden": 120,
+      "isolated": false,
+      "off": true
+    },
+    "expected": "reject",
+    "reason": "Burden connected to unpowered ADC injects current; not a full SEN0262 board model"
+  },
+  "original_control": true,
+  "assessment": {
+    "checks": {
+      "ADC_or_120R_input_within_rail_plus_0.3V": false,
+      "burden_input_within_3.6V": true,
+      "burden_below_half_watt": true,
+      "transmitter_reaches_requested_current": true,
+      "off_ADC_discharged": false,
+      "off_injection_below_1uA": false
+    },
+    "metrics": {
+      "raw_max_V": 2.39995200158,
+      "pin_max_V": 2.399912002897,
+      "final_current_mA": 20.0,
+      "burden_max_W": 0.0479980800824,
+      "off_injection_A": 0.007118128113732
+    },
+    "criteria_pass": false
+  },
+  "samples": 20068,
+  "horizon_s": 0.04,
+  "netlist_sha256": "dbac46f4c624fe6064e8f00a781f2b18919ff99560080757dfebea486a1d2ad1",
+  "experiment_ok": true
+}

@@ -1,0 +1,26 @@
+[
+  {
+    "name": "unmodified_bundle_offline_replay",
+    "passed": true
+  },
+  {
+    "name": "missing_required_trace",
+    "passed": true,
+    "rejected_by": "Missing/corrupt cases/afe_21.6_0.004/trace.csv.gz"
+  },
+  {
+    "name": "corrupted_trace",
+    "passed": true,
+    "rejected_by": "Missing/corrupt cases/afe_21.6_0.004/trace.csv.gz"
+  },
+  {
+    "name": "partial_trace_with_updated_hashes",
+    "passed": true,
+    "rejected_by": "Incomplete/nonfinite trace"
+  },
+  {
+    "name": "reversed_time_with_updated_hashes",
+    "passed": true,
+    "rejected_by": "Incomplete/nonfinite trace"
+  }
+]

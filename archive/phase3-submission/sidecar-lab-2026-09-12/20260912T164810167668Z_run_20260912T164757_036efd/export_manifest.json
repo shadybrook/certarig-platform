@@ -1,0 +1,64 @@
+{
+  "certarig_version": "0.4.0",
+  "config_hash": "e9922ec2e77b1006a336b4739b200d6c5372b02b457446b1b44b9c45bfed29ed",
+  "contract_hash": "9e144a0f814cb0726daa25d675af6993ce183b9e3e3db58fc8a621dcc23db1f7",
+  "created_at": "2026-09-12T16:48:10.192820+00:00",
+  "files": [
+    {
+      "modified_at": "2026-09-12T16:47:59.116111+00:00",
+      "name": "SHA256SUMS.txt",
+      "path": "procedure_runs/run_20260912T164757_036efd/SHA256SUMS.txt",
+      "sha256": "ac5970dbb86efffed34046338e676e775a03382e64c6101a7b18d08a88bd07c5",
+      "size": 391
+    },
+    {
+      "modified_at": "2026-09-12T16:47:59.022356+00:00",
+      "name": "briefing.json",
+      "path": "procedure_runs/run_20260912T164757_036efd/briefing.json",
+      "sha256": "e4a381534d6efabb390d4d5f0178ee9eafb00bf5cbf3e8c3086fb7267590016c",
+      "size": 310
+    },
+    {
+      "modified_at": "2026-09-12T16:47:59.020507+00:00",
+      "name": "events.jsonl",
+      "path": "procedure_runs/run_20260912T164757_036efd/events.jsonl",
+      "sha256": "f5abc08dbf1269eb9802a38291b2c5352ce506fbdc9cc0bae34c63e265ec28a3",
+      "size": 5193
+    },
+    {
+      "modified_at": "2026-09-12T16:47:59.115521+00:00",
+      "name": "manifest.json",
+      "path": "procedure_runs/run_20260912T164757_036efd/manifest.json",
+      "sha256": "198f28d14140992c2eddf796027c0142661b940c5697d76f67de9cb24b4c9db5",
+      "size": 1531
+    },
+    {
+      "modified_at": "2026-09-12T16:47:59.007024+00:00",
+      "name": "procedure.json",
+      "path": "procedure_runs/run_20260912T164757_036efd/procedure.json",
+      "sha256": "ef6365fd5be32ffa222c538a1c2266c285c01064042b92f2cf7308bc5b414dc7",
+      "size": 3976
+    },
+    {
+      "modified_at": "2026-09-12T16:47:59.029027+00:00",
+      "name": "report.md",
+      "path": "procedure_runs/run_20260912T164757_036efd/report.md",
+      "sha256": "62269818acb41f22b35817c24711107148b4baeb3b99506727d7553f2e1fc669",
+      "size": 2226
+    },
+    {
+      "modified_at": "2026-09-12T16:47:59.013137+00:00",
+      "name": "run.json",
+      "path": "procedure_runs/run_20260912T164757_036efd/run.json",
+      "sha256": "d80ab73652ac8896704bf328eabf052c2606f8e5fc7c224c57c78487b7b478c1",
+      "size": 18304
+    }
+  ],
+  "hardware_mode": "raspberry_pi",
+  "kind": "certarig_evidence_export",
+  "label": null,
+  "manifest_hash": "a2338aa9c3b0ae78ee29426fbfbd79bbb68e91750f815624dc140d912f98ada5",
+  "manifest_id": "certarig-wave1-agent-policy",
+  "rig_id": "certarig-wave1-dry-bench",
+  "run_id": "run_20260912T164757_036efd"
+}

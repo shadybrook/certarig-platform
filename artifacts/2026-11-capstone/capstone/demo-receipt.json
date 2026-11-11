@@ -1,0 +1,28 @@
+{
+  "evidence_kind": "simulated",
+  "provider": "fake/no live inference",
+  "approval_actor": "automated demo fixture, not a human operator",
+  "physical_commissioned": false,
+  "run_id": "run_20261109T073709_fac4e5",
+  "status": "passed",
+  "config_hash": "3f689bdd7a816ed939338f9ade2073ca2947f678ecadd3278cb0e2a9f7cb911d",
+  "procedure_hash": "daf032eea8b5192a3df9098b30d3daba76d68ea0b414d35acad8af9aef452d18",
+  "raw_analysis": {
+    "channels": {
+      "jacket_c": {
+        "maximum": 47.66502,
+        "minimum": 47.41051,
+        "observations": 77,
+        "unit": "degC"
+      }
+    },
+    "command_rows": 2,
+    "kind": "raw_sample_summary",
+    "output_state_source": "command_derived_not_electrical_feedback",
+    "rows": 77,
+    "sample_rows": 75,
+    "unsafe_command_rows": 0
+  },
+  "archive_sha256": "5218d4011e7aceb6250de4bf9d075e0c55222da6213ac83da2a246ec47a3fa50",
+  "offline_verified": true
+}

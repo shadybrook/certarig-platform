@@ -1,0 +1,11 @@
+CertaRig readable review
+
+Open index.html in a normal browser to read the scope audit, view all ten slides, and view all eighteen report pages. No document viewer or internet connection is needed for these images. Keep the assets folder beside index.html.
+
+The working simulator is separate: http://127.0.0.1:18090/ while its local process is running. The simulator key is sim-operator-key-000001.
+
+For the review server while running, use http://127.0.0.1:18091/access-review/.
+
+The original PDF and PPTX links require the sibling capstone folder in the workspace. If using the standalone review ZIP, use the embedded page/slide previews.
+
+Read Capstone-next-build.md for the recommendation and sources.json for retained source paths and hashes. No purchase, Pi deployment, physical test or supervisor message was performed during this review.

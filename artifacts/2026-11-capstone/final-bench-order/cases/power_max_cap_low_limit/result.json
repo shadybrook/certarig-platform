@@ -1,0 +1,33 @@
+{
+  "case": {
+    "name": "power_max_cap_low_limit",
+    "family": "power",
+    "params": {
+      "cap": 0.00047,
+      "limit": 1.752,
+      "power": 12
+    },
+    "unsafe": false
+  },
+  "assessment": {
+    "checks": {
+      "startup_supports_load": true,
+      "no_nuisance_latch": true,
+      "pass_current_bounded": true,
+      "pass_power_bounded": true,
+      "regulated_forward_SOA_rectangle": true
+    },
+    "metrics": {
+      "output_max_V": 12.76744844623,
+      "pass_peak_A": 1.752,
+      "pass_peak_W": 10.93303594199,
+      "tail_voltage_max_V": 12.76744844623,
+      "pass_energy_J": 0.2476086335138615
+    },
+    "criteria_pass": true
+  },
+  "samples": 80564,
+  "horizon": 0.8,
+  "netlist_sha256": "b79327afd181f4b66697eaa8fdf5e7f8f6925c3791a599ba1bff00832f74e69c",
+  "experiment_ok": true
+}

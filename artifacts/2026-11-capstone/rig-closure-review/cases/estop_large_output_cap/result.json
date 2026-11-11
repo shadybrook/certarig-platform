@@ -1,0 +1,37 @@
+{
+  "case": {
+    "name": "estop_large_output_cap",
+    "family": "start_power",
+    "params": {
+      "fault": "estop",
+      "cap_u": 1000
+    },
+    "original": "",
+    "outcome": "fault"
+  },
+  "original_control": false,
+  "assessment": {
+    "checks": {
+      "measured_pump_shunt_in_range": true,
+      "source_within_5A": true,
+      "actuator_voltage_below_18V": true,
+      "peak_current_limited": true,
+      "fault_latches": true,
+      "permit_retry_does_not_restart": true
+    },
+    "metrics": {
+      "supply_peak_A": 4.000106373313,
+      "pump_peak_A": 4.0,
+      "pump_shunt_peak_V": 0.2,
+      "trip_peak_V": 4.9999999995,
+      "start_output_min_V": 10.94616884091,
+      "efuse_energy_J": 0.12993782542709728,
+      "silicon_SOA_qualified": false
+    },
+    "passed": true
+  },
+  "samples": 30413,
+  "horizon_s": 0.3,
+  "netlist_sha256": "f2179fc6a315a239f4a7156a2a151ac9413694383820bf9c84f478e11448b7c2",
+  "experiment_ok": true
+}

@@ -1,0 +1,9 @@
+{
+  "ok": true,
+  "files": 13,
+  "missing": [],
+  "mismatched": [],
+  "errors": [],
+  "unlisted": [],
+  "zip": "../validation/browser/browser-thermal-run.zip"
+}

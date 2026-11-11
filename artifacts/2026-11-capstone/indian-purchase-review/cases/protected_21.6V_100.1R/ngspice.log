@@ -1,0 +1,35 @@
+
+Note: No compatibility mode selected!
+
+
+Circuit: certarig stocked-product loop envelope: protected_21.6v_100.1r
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+loop                                      21.6
+raw                                    1.99733
+rail                                     3.135
+pre                                    1.53093
+inst                                         5
+ref                                    2.59001
+en                                           5
+pin                                    1.53072
+head                                   7.50267
+power                                0.0398535
+bpower#branch                                0
+bhead#branch                                 0
+vloop#branch                             -0.02
+ben#branch                                   0
+vinst#branch                       -0.00240999
+vrail#branch                      -2.60427e-12
+
+
+No. of Data Rows : 20008
+ngspice-47 done

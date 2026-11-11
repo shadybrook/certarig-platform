@@ -1,0 +1,51 @@
+CertaRig revised startup envelope: softstart_low_supply
+* Unidirectional current-limited supply with 10ms target ramp.
+* 4A +/-8% limit, 5A fast veto, 2.5A/80ms sustained-overload timer.
+* 50milliohm pump shunt / recalibration required; stock R100 is not this circuit.
+Vsource source 0 10.8
+* Total source/wiring/contact/shunt impedance, not adapter resistance alone.
+Rsource source vin 0.3
+* Input rail has settled before permit. Hot-plug/supply-rise is not qualified.
+Cinput vin 0 10u IC=10.8
+Vpermit permit 0 PWL(0 0 .02 0 .02001 5 .18 5 .18001 0 .22 0 .22001 5 .30 5)
+Vestop estop 0 5
+Ctrip trip 0 1u IC=0
+Rtrip trip 0 1e12
+Bover over 0 V=(i(Vsense)>2.5 ? 5 : 0)
+Rover over timer 115.416k
+Ctimer timer 0 1u IC=0
+* Persistent low output or excessive supply sag is a hard refusal, not a
+* timer that grants permission. Startup fault-energy/SOA remains a hold.
+Btrip trip 0 I=(v(trip)>2.5 || v(estop)<2.5 || i(Vsense)>5 || v(timer)>2.5 || (v(elapsed)>.03 && v(permit)>2.5 && (v(out)<6 || v(vin)<8)) || (v(elapsed)>.01 && v(out)<1) ? (v(trip)-5)/100 : 0)
+Ben enabled 0 V=(v(permit)>2.5 && v(trip)<2.5 && v(estop)>2.5 ? 5 : 0)
+Belapsed 0 elapsed I=(v(enabled)>2.5 ? .001 : -v(elapsed)/1)
+Celapsed elapsed 0 .001 IC=0
+Relapsed elapsed 0 1e12
+* RC rise is the bounded soft-start equivalent. Fast discharge tracks veto.
+Bramp 0 ramp I=(v(enabled)>2.5 ? min(.001,max(0,(1-v(ramp))/.1)) : -v(ramp)/1)
+Cramp ramp 0 10u IC=0
+Rramp ramp 0 1e12
+Btarget target 0 V=max(0,v(vin))*min(1,max(0,v(ramp)))
+Bpass vin sensed I=(v(enabled)>2.5 ? min(3.68,max(0,(v(target)-v(out))/.05)) : 0)
+Vsense sensed out 0
+Cout out 0 100u IC=0
+Rbleed out 0 1000
+* Actively discharge stored output energy when disabled; requires actual
+* transistor/resistor pulse-energy selection and reverse/backfeed review.
+Bdischarge out 0 I=(v(enabled)<2.5 ? v(out)/47 : 0)
+Bpump out 0 I=(v(elapsed)<.06 ? 3 : 1.5)*(1+tanh((v(out)-5.8)/.25))/2
+* Valve opens after pump startup and uses an independent load stage.
+Bvalve vin 0 I=(v(elapsed)>.08 && v(enabled)>2.5 && v(over)<2.5 ? v(vin)/14.4 : 0)
+Bshunt shunt 0 V=i(Vsense)*.05
+Befusepower stress 0 V=max(0,v(vin,out)*i(Vsense))
+
+.options method=gear reltol=1e-5
+.control
+set wr_singlescale
+set wr_vecnames
+set numdgt=12
+tran 1e-05 0.3 0 1e-05 uic
+wrdata trace.dat v(out) i(Vsource) v(trip) v(enabled) i(Vsense) v(shunt) v(stress) v(timer)
+quit
+.endc
+.end

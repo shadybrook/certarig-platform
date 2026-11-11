@@ -1,0 +1,14 @@
+
+Note: No compatibility mode selected!
+
+
+Circuit: certarig revised startup envelope: persistent_overload_latches
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+Operating point simulation skipped by 'uic',
+  now using transient initial conditions.
+ Reference value :  1.88051e-01
+No. of Data Rows : 30399
+ngspice-47 done

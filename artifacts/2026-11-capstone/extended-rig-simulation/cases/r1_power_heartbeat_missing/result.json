@@ -1,0 +1,39 @@
+{
+  "name": "r1_power_heartbeat_missing",
+  "family": "power",
+  "revision": "R1",
+  "params": {
+    "fault": "heartbeat_missing"
+  },
+  "diagnostic": false,
+  "process_exit": 0,
+  "samples": 14066,
+  "wall_seconds": 0.916,
+  "netlist_sha256": "aacef1e203ba82a3c8a39bd6f8ab889313a2989424473065e9cbd5984c543b00",
+  "checks": [
+    {
+      "check": "startup_no_drive",
+      "passed": true
+    },
+    {
+      "check": "drain_voltage_below_70V_model_design_limit",
+      "passed": true
+    },
+    {
+      "check": "no_heartbeat_no_arm",
+      "passed": true
+    },
+    {
+      "check": "feedback_is_3V3_bounded",
+      "passed": true
+    }
+  ],
+  "metrics": {
+    "peak_drain_v": 5.876627903923e-05,
+    "min_bus_v": 2.999879816654e-09,
+    "peak_pump_a": 2.050458030653e-11,
+    "peak_valve_a": 2.351910908459e-11,
+    "peak_shunt_v": 1.132002960283e-12
+  },
+  "criteria_pass": true
+}

@@ -1,0 +1,8 @@
+{
+  "diagram_notes": "Wave-1 dry bench sidecar lab 2026-09-12. Phase 3 files not used.",
+  "estop": "GPIO24 mushroom head",
+  "p1_role": "Pressure emulator P1, ADS1115 A0",
+  "p2_role": "Flow emulator P2, ADS1115 A1",
+  "relay": "GPIO23 permit / indicator",
+  "updated_at": "2026-09-12T16:23:44.654891+00:00"
+}

@@ -1,0 +1,35 @@
+{
+  "case": {
+    "name": "power_low_limit_fast_timer",
+    "family": "power",
+    "params": {
+      "supply": 10.8,
+      "cap": 0.00047,
+      "limit": 1.752,
+      "power": 12,
+      "timeout": 0.02
+    },
+    "unsafe": false
+  },
+  "assessment": {
+    "checks": {
+      "startup_supports_load": true,
+      "no_nuisance_latch": true,
+      "pass_current_bounded": true,
+      "pass_power_bounded": true,
+      "regulated_forward_SOA_rectangle": true
+    },
+    "metrics": {
+      "output_max_V": 10.36755212175,
+      "pass_peak_A": 1.740073606807,
+      "pass_peak_W": 6.598104270548,
+      "tail_voltage_max_V": 10.36755212175,
+      "pass_energy_J": 0.15355707245481318
+    },
+    "criteria_pass": true
+  },
+  "samples": 80577,
+  "horizon": 0.8,
+  "netlist_sha256": "22e55e8502038ce8e11f79c2cb909bb8d18fff820f11fb9d408d6b39f7ac2dee",
+  "experiment_ok": true
+}

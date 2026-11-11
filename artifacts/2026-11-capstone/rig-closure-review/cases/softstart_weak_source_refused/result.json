@@ -1,0 +1,38 @@
+{
+  "case": {
+    "name": "softstart_weak_source_refused",
+    "family": "start_power",
+    "params": {
+      "supply": 10.8,
+      "source_r": 1.2,
+      "start_A": 4.5
+    },
+    "original": "",
+    "outcome": "fault"
+  },
+  "original_control": false,
+  "assessment": {
+    "checks": {
+      "measured_pump_shunt_in_range": true,
+      "source_within_5A": true,
+      "actuator_voltage_below_18V": true,
+      "peak_current_limited": true,
+      "fault_latches": true,
+      "permit_retry_does_not_restart": true
+    },
+    "metrics": {
+      "supply_peak_A": 3.827660898983,
+      "pump_peak_A": 3.831949849349,
+      "pump_shunt_peak_V": 0.1915974924674,
+      "trip_peak_V": 4.9999999995,
+      "start_output_min_V": 0.02077143814872,
+      "efuse_energy_J": 0.037139116121689866,
+      "silicon_SOA_qualified": false
+    },
+    "passed": true
+  },
+  "samples": 30386,
+  "horizon_s": 0.3,
+  "netlist_sha256": "f51df4118e984258853ff06f9180aae70f91ec69f88bfc38e6cfa3c3141bce01",
+  "experiment_ok": true
+}

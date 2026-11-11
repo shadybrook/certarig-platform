@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1120" viewBox="0 0 1800 1120">
+  <defs>
+    <style>
+      .title{font:700 38px Arial,sans-serif;fill:#102a43}.sub{font:22px Arial,sans-serif;fill:#486581}.h{font:700 23px Arial,sans-serif;fill:#102a43}.t{font:19px Arial,sans-serif;fill:#243b53}.s{font:17px Arial,sans-serif;fill:#334e68}.box{stroke:#486581;stroke-width:3;rx:18;ry:18}.wire5{stroke:#d64545;stroke-width:7;fill:none}.wire3{stroke:#8a4fff;stroke-width:7;fill:none}.gnd{stroke:#202020;stroke-width:7;fill:none}.sig{stroke:#147d64;stroke-width:7;fill:none}.contact{stroke:#d28b00;stroke-width:7;fill:none}.dash{stroke-dasharray:14 10}.node{fill:#fff;stroke:#243b53;stroke-width:3}.warn{font:700 20px Arial,sans-serif;fill:#b42318}
+    </style>
+    <marker id="arrowRed" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#d64545"/></marker>
+    <marker id="arrowGreen" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#147d64"/></marker>
+  </defs>
+
+  <rect width="1800" height="1120" fill="#f7fafc"/>
+  <text x="70" y="65" class="title">CertaRig Phase 3 — single-rail fail-safe relay output</text>
+  <text x="70" y="103" class="sub">Physical-pin wiring • low-voltage dry bench • relay channel K1 only • 1 A fused branch</text>
+
+  <rect x="70" y="150" width="330" height="520" class="box" fill="#e6f0ff"/>
+  <text x="100" y="195" class="h">Raspberry Pi 3 A+</text>
+  <text x="100" y="245" class="t">Pin 2  = 5 V rail</text>
+  <text x="100" y="300" class="t">Pin 16 = GPIO23 command</text>
+  <text x="100" y="355" class="t">Pin 17 = P1/P2 3.3 V only</text>
+  <text x="100" y="410" class="t">Pin 18 = GPIO24 / NC1</text>
+  <text x="100" y="465" class="t">Pin 20 = GND / NC1</text>
+  <text x="100" y="520" class="t">Pin 22 = GPIO25 — EMPTY</text>
+  <text x="100" y="575" class="t">Pin 25 = new common GND</text>
+  <text x="100" y="630" class="warn">Power only through PWR IN</text>
+
+  <rect x="500" y="150" width="360" height="300" class="box" fill="#f3e8ff"/>
+  <text x="530" y="195" class="h">Breadboard control only</text>
+  <text x="530" y="245" class="t">GPIO23 → 1 kΩ → B</text>
+  <text x="530" y="290" class="t">10 kΩ: B → E</text>
+  <text x="530" y="335" class="t">BC547B: C → CH1</text>
+  <text x="530" y="380" class="t">E → common GND</text>
+  <text x="530" y="425" class="s">Face forward: C–B–E; meter-verify</text>
+
+  <rect x="500" y="500" width="450" height="150" class="box" fill="#f3e8ff"/>
+  <text x="530" y="542" class="h">P1/P2 3.3 V splitter</text>
+  <text x="530" y="580" class="t">One input only: Pi physical pin 17</text>
+  <text x="530" y="615" class="s">Parallel outputs: P1 high • P2 high only</text>
+
+  <rect x="1020" y="140" width="500" height="470" class="box" fill="#fff5d6"/>
+  <text x="1050" y="185" class="h">5 V relay module</text>
+  <text x="1050" y="230" class="t">DC+  ← NC2 switched 5 V</text>
+  <text x="1050" y="270" class="t">DC−  ← common GND</text>
+  <text x="1050" y="310" class="t">CH1  ← BC547B collector</text>
+  <text x="1050" y="350" class="t">CH2  ← EMPTY</text>
+  <text x="1050" y="390" class="t">lower COM ← NO EXTERNAL WIRE</text>
+  <text x="1050" y="440" class="t">S1 jumper: LOW–COM</text>
+  <line x1="1050" y1="475" x2="1490" y2="475" stroke="#d28b00" stroke-width="3"/>
+  <text x="1050" y="515" class="t">K1 contacts: NC • NO • COM</text>
+  <text x="1050" y="555" class="s">Confirm K1 and all contacts by continuity</text>
+
+  <path d="M400 235 H455 V760 H500" class="wire5"/>
+  <rect x="500" y="720" width="230" height="85" class="box" fill="#ffe2e2"/>
+  <text x="535" y="758" class="h">1 A fuse</text><text x="535" y="785" class="s">FUSED_5V out</text>
+  <path d="M730 762 H810" class="wire5" marker-end="url(#arrowRed)"/>
+
+  <rect x="810" y="690" width="300" height="145" class="box" fill="#ffe8cc"/>
+  <text x="840" y="735" class="h">E-stop NC2</text>
+  <text x="840" y="775" class="t">reset = closed</text>
+  <text x="840" y="808" class="t">latched = open</text>
+  <path d="M1110 762 H1210 V230 H1020" class="wire5" marker-end="url(#arrowRed)"/>
+
+  <circle cx="770" cy="762" r="12" class="node"/>
+  <path d="M770 762 V900 H1010" class="wire5"/>
+  <rect x="1010" y="850" width="340" height="100" class="box" fill="#fff5d6"/>
+  <text x="1040" y="893" class="h">K1 contact COM</text>
+  <text x="1040" y="925" class="s">Powered before NC2</text>
+
+  <rect x="470" y="850" width="280" height="150" class="box" fill="#ffffff"/>
+  <text x="505" y="892" class="h">100 µF capacitor</text>
+  <text x="505" y="933" class="t">+ → FUSED_5V</text>
+  <text x="505" y="970" class="t">− stripe → GND</text>
+  <path d="M770 762 V860 H750" class="wire5"/>
+  <path d="M610 1000 V1040 H1510" class="gnd"/>
+
+  <path d="M400 300 H500" class="sig" marker-end="url(#arrowGreen)"/>
+  <path d="M860 330 H1020" class="sig" marker-end="url(#arrowGreen)"/>
+  <path d="M400 355 H455 V575 H500" class="wire3"/>
+  <path d="M400 575 H440 V1040" class="gnd"/>
+  <path d="M860 380 H900 V1040" class="gnd"/>
+  <path d="M1520 270 H1580 V1040" class="gnd"/>
+
+  <rect x="1410" y="700" width="320" height="265" class="box" fill="#e9f9ef"/>
+  <text x="1440" y="745" class="h">K1 indicators</text>
+  <text x="1440" y="795" class="t">NC → 1 kΩ → Red +</text>
+  <text x="1440" y="840" class="t">NO → 1 kΩ → Green +</text>
+  <text x="1440" y="885" class="t">Both − → common GND</text>
+  <text x="1440" y="930" class="s">Red = inhibited / safe output</text>
+  <path d="M1350 885 H1410" class="contact"/>
+  <path d="M1570 965 V1040" class="gnd"/>
+
+  <text x="70" y="1085" class="warn">Never connect pin 17 or any 3.3 V source to relay lower COM. No mains or external load. Pin 22 stays empty.</text>
+</svg>

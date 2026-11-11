@@ -1,0 +1,35 @@
+{
+  "case": {
+    "name": "softstart_3A_100uF",
+    "family": "start_power",
+    "params": {},
+    "original": "integrated_unknown_startup_trip",
+    "outcome": "normal"
+  },
+  "original_control": false,
+  "assessment": {
+    "checks": {
+      "measured_pump_shunt_in_range": true,
+      "source_within_5A": true,
+      "actuator_voltage_below_18V": true,
+      "peak_current_limited": true,
+      "startup_above_6V": true,
+      "no_spurious_trip": true,
+      "steady_after_startup": true
+    },
+    "metrics": {
+      "supply_peak_A": 3.121496565021,
+      "pump_peak_A": 3.121499863151,
+      "pump_shunt_peak_V": 0.1560749931576,
+      "trip_peak_V": 2.955397779518e-19,
+      "start_output_min_V": 10.94616884091,
+      "efuse_energy_J": 0.15762505750207054,
+      "silicon_SOA_qualified": false
+    },
+    "passed": true
+  },
+  "samples": 30411,
+  "horizon_s": 0.3,
+  "netlist_sha256": "8fa92a6d218173168fba50a7ade461bd28cf46364b740b74ea91b4aa0e00935a",
+  "experiment_ok": true
+}

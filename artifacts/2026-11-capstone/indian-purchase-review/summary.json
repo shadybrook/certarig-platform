@@ -1,0 +1,1159 @@
+{
+  "engine": "******\n** ngspice-47 : Circuit level simulation program\n** Compiled with KLU Direct Linear Solver\n** The U. C. Berkeley CAD Group\n** Copyright 1985-1994, Regents of the University of California.\n** Copyright 2001-2026, The ngspice team.\n** Please get your ngspice manual from https://ngspice.sourceforge.io/docs.html\n** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html\n******",
+  "scope": "Bounded DC/transient component envelopes; no complete assembly, hydraulic or functional safety qualification",
+  "procurement_release": false,
+  "physical_validation": false,
+  "results": [
+    {
+      "name": "protected_100R_4mA",
+      "family": "loop",
+      "params": {
+        "current": 0.004
+      },
+      "expected": "within_envelope",
+      "reason": "",
+      "checks": {
+        "ADC_or_120R_input_within_rail_plus_0.3V": true,
+        "burden_below_half_watt": true,
+        "transmitter_reaches_requested_current": true
+      },
+      "metrics": {
+        "raw_max_V": 0.3990681279223,
+        "pin_max_V": 0.3058389854702,
+        "final_current_mA": 4.0,
+        "burden_max_W": 0.001592553707234,
+        "off_injection_A": null
+      },
+      "criteria_pass": true,
+      "samples": 20008,
+      "horizon_s": 0.04,
+      "netlist_sha256": "5be6c625698e6d7311a9c34fa4e496455406c66d20caa31106ec36d1f9e0b6d2",
+      "matched_expectation": true
+    },
+    {
+      "name": "protected_100R_12mA",
+      "family": "loop",
+      "params": {
+        "current": 0.012
+      },
+      "expected": "within_envelope",
+      "reason": "",
+      "checks": {
+        "ADC_or_120R_input_within_rail_plus_0.3V": true,
+        "burden_below_half_watt": true,
+        "transmitter_reaches_requested_current": true
+      },
+      "metrics": {
+        "raw_max_V": 1.197204361247,
+        "pin_max_V": 0.9175146822144,
+        "final_current_mA": 12.0,
+        "burden_max_W": 0.0143329828259,
+        "off_injection_A": null
+      },
+      "criteria_pass": true,
+      "samples": 20008,
+      "horizon_s": 0.04,
+      "netlist_sha256": "4f675310d86ea2325e74cb036ba631baa3b4ba63d6870018ed584633a6f763a9",
+      "matched_expectation": true
+    },
+    {
+      "name": "protected_100R_20mA",
+      "family": "loop",
+      "params": {
+        "current": 0.02
+      },
+      "expected": "within_envelope",
+      "reason": "",
+      "checks": {
+        "ADC_or_120R_input_within_rail_plus_0.3V": true,
+        "burden_below_half_watt": true,
+        "transmitter_reaches_requested_current": true
+      },
+      "metrics": {
+        "raw_max_V": 1.995340601079,
+        "pin_max_V": 1.52919103605,
+        "final_current_mA": 20.0,
+        "burden_max_W": 0.03981384114315,
+        "off_injection_A": null
+      },
+      "criteria_pass": true,
+      "samples": 20008,
+      "horizon_s": 0.04,
+      "netlist_sha256": "330f891630bdf4fa4bbeb8a95b7ab2c90149f67c045a7aabb2ef43a8e5a9284d",
+      "matched_expectation": true
+    },
+    {
+      "name": "protected_100R_24mA",
+      "family": "loop",
+      "params": {
+        "current": 0.024
+      },
+      "expected": "within_envelope",
+      "reason": "",
+      "checks": {
+        "ADC_or_120R_input_within_rail_plus_0.3V": true,
+        "burden_below_half_watt": true,
+        "transmitter_reaches_requested_current": true
+      },
+      "metrics": {
+        "raw_max_V": 2.394408720897,
+        "pin_max_V": 1.835029203094,
+        "final_current_mA": 24.0,
+        "burden_max_W": 0.05733193122709,
+        "off_injection_A": null
+      },
+      "criteria_pass": true,
+      "samples": 20008,
+      "horizon_s": 0.04,
+      "netlist_sha256": "69da7a561fb7a671c2214b7d4c7efa32a26d2e250645e6e06003b63ca9aedf33",
+      "matched_expectation": true
+    },
+    {
+      "name": "protected_100R_33mA",
+      "family": "loop",
+      "params": {
+        "current": 0.033
+      },
+      "expected": "within_envelope",
+      "reason": "",
+      "checks": {
+        "ADC_or_120R_input_within_rail_plus_0.3V": true,
+        "burden_below_half_watt": true,
+        "transmitter_reaches_requested_current": true
+      },
+      "metrics": {
+        "raw_max_V": 3.292311332388,
+        "pin_max_V": 2.523098619923,
+        "final_current_mA": 33.0,
+        "burden_max_W": 0.1083931390937,
+        "off_injection_A": null
+      },
+      "criteria_pass": true,
+      "samples": 20008,
+      "horizon_s": 0.04,
+      "netlist_sha256": "fdeb6f83421d5f9d08bfd0fe6cf01ba3c77b96d79b533e1230b3fc1fc36ee28f",
+      "matched_expectation": true
+    },
+    {
+      "name": "protected_21.6V_99.9R",
+      "family": "loop",
+      "params": {
+        "supply": 21.6,
+        "burden": 99.9,
+        "rail": 3.135
+      },
+      "expected": "within_envelope",
+      "reason": "",
+      "checks": {
+        "ADC_or_120R_input_within_rail_plus_0.3V": true,
+        "burden_below_half_watt": true,
+        "transmitter_reaches_requested_current": true
+      },
+      "metrics": {
+        "raw_max_V": 1.993349904373,
+        "pin_max_V": 1.527665402869,
+        "final_current_mA": 20.0,
+        "burden_max_W": 0.03977421262526,
+        "off_injection_A": null
+      },
+      "criteria_pass": true,
+      "samples": 20008,
+      "horizon_s": 0.04,
+      "netlist_sha256": "753c7b34893354de0ee98295fe2d9535ea6f292b12897043d00c4c64bef6fb8d",
+      "matched_expectation": true
+    },
+    {
+      "name": "protected_21.6V_100.1R",
+      "family": "loop",
+      "params": {
+        "supply": 21.6,
+        "burden": 100.1,
+        "rail": 3.135
+      },
+      "expected": "within_envelope",
+      "reason": "",
+      "checks": {
+        "ADC_or_120R_input_within_rail_plus_0.3V": true,
+        "burden_below_half_watt": true,
+        "transmitter_reaches_requested_current": true
+      },
+      "metrics": {
+        "raw_max_V": 1.997331288485,
+        "pin_max_V": 1.530716659577,
+        "final_current_mA": 20.0,
+        "burden_max_W": 0.03985346929031,
+        "off_injection_A": null
+      },
+      "criteria_pass": true,
+      "samples": 20008,
+      "horizon_s": 0.04,
+      "netlist_sha256": "0edac8f56125c91be29ad510f7008dea53b925ae169f96c62e059cbdf6fe33a7",
+      "matched_expectation": true
+    },
+    {
+      "name": "protected_26.4V_99.9R",
+      "family": "loop",
+      "params": {
+        "supply": 26.4,
+        "burden": 99.9,
+        "rail": 3.135
+      },
+      "expected": "within_envelope",
+      "reason": "",
+      "checks": {
+        "ADC_or_120R_input_within_rail_plus_0.3V": true,
+        "burden_below_half_watt": true,
+        "transmitter_reaches_requested_current": true
+      },
+      "metrics": {
+        "raw_max_V": 1.993349904373,
+        "pin_max_V": 1.527665402869,
+        "final_current_mA": 20.0,
+        "burden_max_W": 0.03977421262526,
+        "off_injection_A": null
+      },
+      "criteria_pass": true,
+      "samples": 20008,
+      "horizon_s": 0.04,
+      "netlist_sha256": "d3064c54fe5522729c7cd6e449fe03313bcfe8666634f613f4bbbd3e8b4ed392",
+      "matched_expectation": true
+    },
+    {
+      "name": "protected_26.4V_100.1R",
+      "family": "loop",
+      "params": {
+        "supply": 26.4,
+        "burden": 100.1,
+        "rail": 3.135
+      },
+      "expected": "within_envelope",
+      "reason": "",
+      "checks": {
+        "ADC_or_120R_input_within_rail_plus_0.3V": true,
+        "burden_below_half_watt": true,
+        "transmitter_reaches_requested_current": true
+      },
+      "metrics": {
+        "raw_max_V": 1.997331288485,
+        "pin_max_V": 1.530716659577,
+        "final_current_mA": 20.0,
+        "burden_max_W": 0.03985346929031,
+        "off_injection_A": null
+      },
+      "criteria_pass": true,
+      "samples": 20008,
+      "horizon_s": 0.04,
+      "netlist_sha256": "0d2a0cca200cc29539b86457fa9cbab3205ab15280d83cf4831dca7ae2b266e6",
+      "matched_expectation": true
+    },
+    {
+      "name": "protected_pi_poweroff",
+      "family": "loop",
+      "params": {
+        "off": true
+      },
+      "expected": "within_envelope",
+      "reason": "",
+      "checks": {
+        "ADC_or_120R_input_within_rail_plus_0.3V": true,
+        "burden_below_half_watt": true,
+        "transmitter_reaches_requested_current": true,
+        "off_ADC_discharged": true,
+        "off_injection_below_1uA": true
+      },
+      "metrics": {
+        "raw_max_V": 2.000000029052,
+        "pin_max_V": 1.52919103605,
+        "final_current_mA": 20.0,
+        "burden_max_W": 0.04000000116206,
+        "off_injection_A": 6.109236709269e-12
+      },
+      "criteria_pass": true,
+      "samples": 20081,
+      "horizon_s": 0.04,
+      "netlist_sha256": "1db74cbda158ec8430a5950eb66426840efc9c918b5036ffa57dd451cb28993b",
+      "matched_expectation": true
+    },
+    {
+      "name": "protected_pi_poweroff_refined",
+      "family": "loop",
+      "params": {
+        "off": true,
+        "step": 5e-07
+      },
+      "expected": "within_envelope",
+      "reason": "",
+      "checks": {
+        "ADC_or_120R_input_within_rail_plus_0.3V": true,
+        "burden_below_half_watt": true,
+        "transmitter_reaches_requested_current": true,
+        "off_ADC_discharged": true,
+        "off_injection_below_1uA": true
+      },
+      "metrics": {
+        "raw_max_V": 2.000000026725,
+        "pin_max_V": 1.52919103605,
+        "final_current_mA": 20.0,
+        "burden_max_W": 0.04000000106901,
+        "off_injection_A": 6.109236876946e-12
+      },
+      "criteria_pass": true,
+      "samples": 80074,
+      "horizon_s": 0.04,
+      "netlist_sha256": "93aa52a1724b481d243cd95958047cfcdaaf4d693dc8d4e58b9029ebe2bf195e",
+      "matched_expectation": true
+    },
+    {
+      "name": "sen0262_burden_normal20mA",
+      "family": "loop",
+      "params": {
+        "burden": 120,
+        "isolated": false
+      },
+      "expected": "within_envelope",
+      "reason": "",
+      "checks": {
+        "ADC_or_120R_input_within_rail_plus_0.3V": true,
+        "burden_input_within_3.6V": true,
+        "burden_below_half_watt": true,
+        "transmitter_reaches_requested_current": true
+      },
+      "metrics": {
+        "raw_max_V": 2.39995200158,
+        "pin_max_V": 2.399912002897,
+        "final_current_mA": 20.0,
+        "burden_max_W": 0.0479980800824,
+        "off_injection_A": null
+      },
+      "criteria_pass": true,
+      "samples": 20008,
+      "horizon_s": 0.04,
+      "netlist_sha256": "c3dd0a89e89e6a3e92e82b451b87a40e1c9fe7e0b93a6575e0a0687b7755ed0d",
+      "matched_expectation": true
+    },
+    {
+      "name": "sen0262_burden_33mA_fault",
+      "family": "loop",
+      "params": {
+        "burden": 120,
+        "isolated": false,
+        "current": 0.033
+      },
+      "expected": "reject",
+      "reason": "120ohm input can exceed the 3.3V domain; TP5551 clipping/protection is not modeled",
+      "checks": {
+        "ADC_or_120R_input_within_rail_plus_0.3V": false,
+        "burden_input_within_3.6V": false,
+        "burden_below_half_watt": true,
+        "transmitter_reaches_requested_current": true
+      },
+      "metrics": {
+        "raw_max_V": 3.943888549795,
+        "pin_max_V": 3.930462341291,
+        "final_current_mA": 33.0,
+        "burden_max_W": 0.1296188074434,
+        "off_injection_A": null
+      },
+      "criteria_pass": false,
+      "samples": 20008,
+      "horizon_s": 0.04,
+      "netlist_sha256": "8426e45fb996f992452cae475c770ed8fd2ea222c753cc3cf97cf29ded51f81a",
+      "matched_expectation": true
+    },
+    {
+      "name": "unprotected_receiver_pi_off",
+      "family": "loop",
+      "params": {
+        "burden": 120,
+        "isolated": false,
+        "off": true
+      },
+      "expected": "reject",
+      "reason": "Burden connected to unpowered ADC injects current; not a full SEN0262 board model",
+      "checks": {
+        "ADC_or_120R_input_within_rail_plus_0.3V": false,
+        "burden_input_within_3.6V": true,
+        "burden_below_half_watt": true,
+        "transmitter_reaches_requested_current": true,
+        "off_ADC_discharged": false,
+        "off_injection_below_1uA": false
+      },
+      "metrics": {
+        "raw_max_V": 2.39995200158,
+        "pin_max_V": 2.399912002897,
+        "final_current_mA": 20.0,
+        "burden_max_W": 0.0479980800824,
+        "off_injection_A": 0.007118128113732
+      },
+      "criteria_pass": false,
+      "samples": 20068,
+      "horizon_s": 0.04,
+      "netlist_sha256": "dbac46f4c624fe6064e8f00a781f2b18919ff99560080757dfebea486a1d2ad1",
+      "matched_expectation": true
+    },
+    {
+      "name": "nishka_12V_insufficient_compliance",
+      "family": "loop",
+      "params": {
+        "supply": 12
+      },
+      "expected": "reject",
+      "reason": "11V transmitter minimum plus receiver/protector burden prevents 20mA",
+      "checks": {
+        "ADC_or_120R_input_within_rail_plus_0.3V": true,
+        "burden_below_half_watt": true,
+        "transmitter_reaches_requested_current": false
+      },
+      "metrics": {
+        "raw_max_V": 0.6446271543469,
+        "pin_max_V": 0.4940301865698,
+        "final_current_mA": 6.461324467004999,
+        "burden_max_W": 0.004155441681214,
+        "off_injection_A": null
+      },
+      "criteria_pass": false,
+      "samples": 20008,
+      "horizon_s": 0.04,
+      "netlist_sha256": "47a5d185ee852c01ca62f0504ff9338fa7da677ef43bb24eefe9ac62e109a1b1",
+      "matched_expectation": true
+    },
+    {
+      "name": "missing_burden_protected",
+      "family": "loop",
+      "params": {
+        "burden": 1000000000.0
+      },
+      "expected": "reject",
+      "reason": "Input clamp limits voltage but sensor cannot produce the requested full-scale current",
+      "checks": {
+        "ADC_or_120R_input_within_rail_plus_0.3V": true,
+        "burden_below_half_watt": true,
+        "transmitter_reaches_requested_current": false
+      },
+      "metrics": {
+        "raw_max_V": 12.94446582836,
+        "pin_max_V": 2.847082783609,
+        "final_current_mA": 1.009712211553,
+        "burden_max_W": 1.675591955817e-07,
+        "off_injection_A": null
+      },
+      "criteria_pass": false,
+      "samples": 20008,
+      "horizon_s": 0.04,
+      "netlist_sha256": "e8bbd872a030cc761f39d0df4316a3c59d49f379bb9b14c29e5e9efb71a6490c",
+      "matched_expectation": true
+    },
+    {
+      "name": "drv8871_0.84A_TI_testPCB",
+      "family": "thermal_driver",
+      "params": {
+        "amps": 0.84
+      },
+      "expected": "within_envelope",
+      "reason": "",
+      "checks": {
+        "junction_below_125C_conservative_design_limit": true,
+        "load_above_6V": true
+      },
+      "metrics": {
+        "junction_max_C": 56.3850904,
+        "load_min_V": 11.5254
+      },
+      "criteria_pass": true,
+      "samples": 1508,
+      "horizon_s": 15,
+      "netlist_sha256": "0c861cecb892c7218fd02401ad3d3eee399628e24310a6baca678fe86faec002",
+      "matched_expectation": true
+    },
+    {
+      "name": "drv8871_1.38A_TI_testPCB",
+      "family": "thermal_driver",
+      "params": {
+        "amps": 1.38
+      },
+      "expected": "within_envelope",
+      "reason": "",
+      "checks": {
+        "junction_below_125C_conservative_design_limit": true,
+        "load_above_6V": true
+      },
+      "metrics": {
+        "junction_max_C": 84.2230246,
+        "load_min_V": 11.2203
+      },
+      "criteria_pass": true,
+      "samples": 1508,
+      "horizon_s": 15,
+      "netlist_sha256": "d0e7aaeccf913f204a891d5f97cade49712f9603f149b1e13a6e3aa329f17818",
+      "matched_expectation": true
+    },
+    {
+      "name": "drv8871_1.5A_TI_testPCB",
+      "family": "thermal_driver",
+      "params": {
+        "amps": 1.5
+      },
+      "expected": "within_envelope",
+      "reason": "",
+      "checks": {
+        "junction_below_125C_conservative_design_limit": true,
+        "load_above_6V": true
+      },
+      "metrics": {
+        "junction_max_C": 92.248375,
+        "load_min_V": 11.1525
+      },
+      "criteria_pass": true,
+      "samples": 1508,
+      "horizon_s": 15,
+      "netlist_sha256": "1fd702e8712a57d8353dd792f8fb11a22696a561149ac3dda3a8437a6656c279",
+      "matched_expectation": true
+    },
+    {
+      "name": "drv8871_3.6A_continuous_claim",
+      "family": "thermal_driver",
+      "params": {
+        "amps": 3.6
+      },
+      "expected": "reject",
+      "reason": "TI specifies peak current; sustained conduction exceeds recommended junction envelope",
+      "checks": {
+        "junction_below_125C_conservative_design_limit": false,
+        "load_above_6V": true
+      },
+      "metrics": {
+        "junction_max_C": 340.95064,
+        "load_min_V": 9.966
+      },
+      "criteria_pass": false,
+      "samples": 1508,
+      "horizon_s": 15,
+      "netlist_sha256": "7a91a06dc2159da965f527aaad895107e3c1eb50d53cf3f04e635dc325e5f760",
+      "matched_expectation": true
+    },
+    {
+      "name": "drv8871_1.5A_hot_board_bound",
+      "family": "thermal_driver",
+      "params": {
+        "amps": 1.5,
+        "rdson": 0.96,
+        "theta": 65,
+        "ambient": 50
+      },
+      "expected": "reject",
+      "reason": "Assumed hot resistance / poorer PCB thermal path; actual module cooling unqualified",
+      "checks": {
+        "junction_below_125C_conservative_design_limit": false,
+        "load_above_6V": true
+      },
+      "metrics": {
+        "junction_max_C": 190.4,
+        "load_min_V": 10.56
+      },
+      "criteria_pass": false,
+      "samples": 1508,
+      "horizon_s": 15,
+      "netlist_sha256": "b4c5ec144f26cdab95d4e385cee56f9d943ec79771e3dd5a1a0a52c0e3d4488f",
+      "matched_expectation": true
+    },
+    {
+      "name": "pump_input_10.8V_start1x",
+      "family": "pump_input",
+      "params": {
+        "supply": 10.8,
+        "startup": 1
+      },
+      "expected": "within_envelope",
+      "reason": "",
+      "checks": {
+        "input_6_to_18V": true,
+        "steady_startup_demand_below_5A": true
+      },
+      "metrics": {
+        "operating_input_min_V": 10.35043434472,
+        "operating_source_max_A": 1.498552184252,
+        "connection_inrush_peak_A": 1.498552184252
+      },
+      "criteria_pass": true,
+      "samples": 15011,
+      "horizon_s": 0.15,
+      "netlist_sha256": "8df0ba824e7f4f583076a4788c17ba4d1336041e489023d60bc374d3a96d545f",
+      "matched_expectation": true
+    },
+    {
+      "name": "pump_input_10.8V_start2x",
+      "family": "pump_input",
+      "params": {
+        "supply": 10.8,
+        "startup": 2
+      },
+      "expected": "within_envelope",
+      "reason": "",
+      "checks": {
+        "input_6_to_18V": true,
+        "steady_startup_demand_below_5A": true
+      },
+      "metrics": {
+        "operating_input_min_V": 9.900908078878,
+        "operating_source_max_A": 2.996973070407,
+        "connection_inrush_peak_A": 2.996973070407
+      },
+      "criteria_pass": true,
+      "samples": 15017,
+      "horizon_s": 0.15,
+      "netlist_sha256": "59bf8f11f2261fae1ac3e03a89c42f08a0ccb6f47240109894062eb71f1b0622",
+      "matched_expectation": true
+    },
+    {
+      "name": "pump_input_10.8V_start3x",
+      "family": "pump_input",
+      "params": {
+        "supply": 10.8,
+        "startup": 3
+      },
+      "expected": "within_envelope",
+      "reason": "",
+      "checks": {
+        "input_6_to_18V": true,
+        "steady_startup_demand_below_5A": true
+      },
+      "metrics": {
+        "operating_input_min_V": 9.4514268461,
+        "operating_source_max_A": 4.495243846332,
+        "connection_inrush_peak_A": 4.495243846332
+      },
+      "criteria_pass": true,
+      "samples": 15018,
+      "horizon_s": 0.15,
+      "netlist_sha256": "f57a8a58763e9a0374b9568cb00bd48d97073d809ac53ed7ded0a364a7811c18",
+      "matched_expectation": true
+    },
+    {
+      "name": "pump_input_12V_start1x",
+      "family": "pump_input",
+      "params": {
+        "supply": 12,
+        "startup": 1
+      },
+      "expected": "within_envelope",
+      "reason": "",
+      "checks": {
+        "input_6_to_18V": true,
+        "steady_startup_demand_below_5A": true
+      },
+      "metrics": {
+        "operating_input_min_V": 11.55038926025,
+        "operating_source_max_A": 1.498702465837,
+        "connection_inrush_peak_A": 1.498702465837
+      },
+      "criteria_pass": true,
+      "samples": 15011,
+      "horizon_s": 0.15,
+      "netlist_sha256": "cdcfc9afe02cf5ca219a625a429555e73b9cc947379ae3b3411680d7c66ed535",
+      "matched_expectation": true
+    },
+    {
+      "name": "pump_input_12V_start2x",
+      "family": "pump_input",
+      "params": {
+        "supply": 12,
+        "startup": 2
+      },
+      "expected": "within_envelope",
+      "reason": "",
+      "checks": {
+        "input_6_to_18V": true,
+        "steady_startup_demand_below_5A": true
+      },
+      "metrics": {
+        "operating_input_min_V": 11.10081001709,
+        "operating_source_max_A": 2.997299943036,
+        "connection_inrush_peak_A": 2.997299943036
+      },
+      "criteria_pass": true,
+      "samples": 15016,
+      "horizon_s": 0.15,
+      "netlist_sha256": "887b4d8b9209bee93efc2fe4432baed1da75994b0b270f2a961e3ea72746d390",
+      "matched_expectation": true
+    },
+    {
+      "name": "pump_input_12V_start3x",
+      "family": "pump_input",
+      "params": {
+        "supply": 12,
+        "startup": 3
+      },
+      "expected": "within_envelope",
+      "reason": "",
+      "checks": {
+        "input_6_to_18V": true,
+        "steady_startup_demand_below_5A": true
+      },
+      "metrics": {
+        "operating_input_min_V": 10.65126622597,
+        "operating_source_max_A": 4.495779246754,
+        "connection_inrush_peak_A": 4.495779246754
+      },
+      "criteria_pass": true,
+      "samples": 15022,
+      "horizon_s": 0.15,
+      "netlist_sha256": "ee58dcc2a5d92032887fa3ea438b1b3eb435afa61630e33abdeffa31865fcecc",
+      "matched_expectation": true
+    },
+    {
+      "name": "pump_input_13.2V_start1x",
+      "family": "pump_input",
+      "params": {
+        "supply": 13.2,
+        "startup": 1
+      },
+      "expected": "within_envelope",
+      "reason": "",
+      "checks": {
+        "input_6_to_18V": true,
+        "steady_startup_demand_below_5A": true
+      },
+      "metrics": {
+        "operating_input_min_V": 12.75035265483,
+        "operating_source_max_A": 1.498824483899,
+        "connection_inrush_peak_A": 1.498824483899
+      },
+      "criteria_pass": true,
+      "samples": 15011,
+      "horizon_s": 0.15,
+      "netlist_sha256": "963bfa8e423c4caec9b25e7f3feaf024022ddc1fc76014109db5ae29bdcaa778",
+      "matched_expectation": true
+    },
+    {
+      "name": "pump_input_13.2V_start2x",
+      "family": "pump_input",
+      "params": {
+        "supply": 13.2,
+        "startup": 2
+      },
+      "expected": "within_envelope",
+      "reason": "",
+      "checks": {
+        "input_6_to_18V": true,
+        "steady_startup_demand_below_5A": true
+      },
+      "metrics": {
+        "operating_input_min_V": 12.3007310695,
+        "operating_source_max_A": 2.997563101669,
+        "connection_inrush_peak_A": 2.997563101669
+      },
+      "criteria_pass": true,
+      "samples": 15015,
+      "horizon_s": 0.15,
+      "netlist_sha256": "f502015c522c35418fb6d080b9f9d98a433a1d774a4ccccebb0550d72d99c63c",
+      "matched_expectation": true
+    },
+    {
+      "name": "pump_input_13.2V_start3x",
+      "family": "pump_input",
+      "params": {
+        "supply": 13.2,
+        "startup": 3
+      },
+      "expected": "within_envelope",
+      "reason": "",
+      "checks": {
+        "input_6_to_18V": true,
+        "steady_startup_demand_below_5A": true
+      },
+      "metrics": {
+        "operating_input_min_V": 11.85113815198,
+        "operating_source_max_A": 4.496206160075,
+        "connection_inrush_peak_A": 4.496206160075
+      },
+      "criteria_pass": true,
+      "samples": 15019,
+      "horizon_s": 0.15,
+      "netlist_sha256": "bedb0fc8464088d14ca18f11e13d84cd4619d821b06069df8b3c0b3fa222ec01",
+      "matched_expectation": true
+    },
+    {
+      "name": "pump_weak_supply_startup",
+      "family": "pump_input",
+      "params": {
+        "supply": 10.8,
+        "startup": 3,
+        "source_r": 1.2
+      },
+      "expected": "reject",
+      "reason": "Assumed high source impedance / startup demand drops below manufacturer operating minimum",
+      "checks": {
+        "input_6_to_18V": false,
+        "steady_startup_demand_below_5A": true
+      },
+      "metrics": {
+        "operating_input_min_V": 5.409962748761,
+        "operating_source_max_A": 4.491697709365,
+        "connection_inrush_peak_A": 4.491697709365
+      },
+      "criteria_pass": false,
+      "samples": 15023,
+      "horizon_s": 0.15,
+      "netlist_sha256": "083f7d4f2d08b09456363cc2cf61640072bbcd2454fc61b5504e2f90906271a0",
+      "matched_expectation": true
+    },
+    {
+      "name": "pump_input_refined",
+      "family": "pump_input",
+      "params": {
+        "supply": 10.8,
+        "startup": 3,
+        "step": 2e-06
+      },
+      "expected": "within_envelope",
+      "reason": "",
+      "checks": {
+        "input_6_to_18V": true,
+        "steady_startup_demand_below_5A": true
+      },
+      "metrics": {
+        "operating_input_min_V": 9.451426845373,
+        "operating_source_max_A": 4.495243848757,
+        "connection_inrush_peak_A": 4.495243848757
+      },
+      "criteria_pass": true,
+      "samples": 75012,
+      "horizon_s": 0.15,
+      "netlist_sha256": "36c8b89ecd3474314d9b02915d49bb6b291245f269d87f4b1e353570600ffa88",
+      "matched_expectation": true
+    },
+    {
+      "name": "integrated_normal",
+      "family": "integrated",
+      "params": {
+        "fault": "normal"
+      },
+      "expected": "within_envelope",
+      "reason": "",
+      "checks": {
+        "startup_no_drive": true,
+        "run_has_expected_load_response": true,
+        "drain_voltage_below_70V_model_design_limit": true,
+        "permit_off_removes_current": true,
+        "feedback_is_3V3_bounded": true,
+        "BLDC_reverse_above_assumed_minus1V": true
+      },
+      "metrics": {
+        "peak_drain_v": 41.65261654306,
+        "min_bus_v": -1.611972696304e-07,
+        "peak_pump_a": 1.376875337841,
+        "peak_valve_a": 0.7689117164779,
+        "peak_shunt_v": 0.1376877976763,
+        "pump_terminal_min_V": -0.01191109628451,
+        "pump_terminal_max_V": 11.18277453365,
+        "trip_latch_max_V": 0.0
+      },
+      "criteria_pass": true,
+      "samples": 38132,
+      "horizon_s": 1.4,
+      "netlist_sha256": "3cf00fef8716cce297aacea3eccf83945eaad0c19ed1ebf15d86801583526d19",
+      "matched_expectation": true
+    },
+    {
+      "name": "integrated_estop",
+      "family": "integrated",
+      "params": {
+        "fault": "estop"
+      },
+      "expected": "within_envelope",
+      "reason": "",
+      "checks": {
+        "startup_no_drive": true,
+        "run_has_expected_load_response": true,
+        "drain_voltage_below_70V_model_design_limit": true,
+        "fault_removes_current": true,
+        "release_does_not_restart": true,
+        "feedback_is_3V3_bounded": true,
+        "BLDC_reverse_above_assumed_minus1V": true
+      },
+      "metrics": {
+        "peak_drain_v": 41.6526385667,
+        "min_bus_v": -1.611972696304e-07,
+        "peak_pump_a": 1.376875337841,
+        "peak_valve_a": 0.7689116655417,
+        "peak_shunt_v": 0.1376877976763,
+        "pump_terminal_min_V": -0.01191336649451,
+        "pump_terminal_max_V": 11.18277453365,
+        "trip_latch_max_V": 0.0
+      },
+      "criteria_pass": true,
+      "samples": 38361,
+      "horizon_s": 1.4,
+      "netlist_sha256": "48381b20b22a9c8edb4e8b9154d6958ecda0989e31335ee3e6b96fab912171eb",
+      "matched_expectation": true
+    },
+    {
+      "name": "integrated_estop_reset_held",
+      "family": "integrated",
+      "params": {
+        "fault": "estop_reset_held"
+      },
+      "expected": "within_envelope",
+      "reason": "",
+      "checks": {
+        "startup_no_drive": true,
+        "run_has_expected_load_response": true,
+        "drain_voltage_below_70V_model_design_limit": true,
+        "fault_removes_current": true,
+        "release_does_not_restart": true,
+        "feedback_is_3V3_bounded": true,
+        "BLDC_reverse_above_assumed_minus1V": true
+      },
+      "metrics": {
+        "peak_drain_v": 41.65263856668,
+        "min_bus_v": -1.611972695957e-07,
+        "peak_pump_a": 1.376875330476,
+        "peak_valve_a": 0.7689116655417,
+        "peak_shunt_v": 0.1376877971913,
+        "pump_terminal_min_V": -0.01191336398566,
+        "pump_terminal_max_V": 11.18277380488,
+        "trip_latch_max_V": 0.0
+      },
+      "criteria_pass": true,
+      "samples": 38361,
+      "horizon_s": 1.4,
+      "netlist_sha256": "d9fa310761df14a5850263de44fd882e5e4490cfc4fd2acc17f59654f7af3e9c",
+      "matched_expectation": true
+    },
+    {
+      "name": "integrated_heartbeat_loss",
+      "family": "integrated",
+      "params": {
+        "fault": "heartbeat_loss"
+      },
+      "expected": "within_envelope",
+      "reason": "",
+      "checks": {
+        "startup_no_drive": true,
+        "run_has_expected_load_response": true,
+        "drain_voltage_below_70V_model_design_limit": true,
+        "watchdog_removes_current": true,
+        "feedback_is_3V3_bounded": true,
+        "BLDC_reverse_above_assumed_minus1V": true
+      },
+      "metrics": {
+        "peak_drain_v": 41.65263644263,
+        "min_bus_v": -1.611972696304e-07,
+        "peak_pump_a": 1.376875337841,
+        "peak_valve_a": 0.7689117164779,
+        "peak_shunt_v": 0.1376877976763,
+        "pump_terminal_min_V": -0.0119133611557,
+        "pump_terminal_max_V": 11.18277453365,
+        "trip_latch_max_V": 0.0
+      },
+      "criteria_pass": true,
+      "samples": 30330,
+      "horizon_s": 1.4,
+      "netlist_sha256": "ddf570b1d8d7642e02725242aefd4d091555066b1b44463a923b354bc455f073",
+      "matched_expectation": true
+    },
+    {
+      "name": "integrated_estop_refined",
+      "family": "integrated",
+      "params": {
+        "fault": "estop",
+        "step": 2e-05
+      },
+      "expected": "within_envelope",
+      "reason": "",
+      "checks": {
+        "startup_no_drive": true,
+        "run_has_expected_load_response": true,
+        "drain_voltage_below_70V_model_design_limit": true,
+        "fault_removes_current": true,
+        "release_does_not_restart": true,
+        "feedback_is_3V3_bounded": true,
+        "BLDC_reverse_above_assumed_minus1V": true
+      },
+      "metrics": {
+        "peak_drain_v": 41.65263893395,
+        "min_bus_v": -1.559412628513e-07,
+        "peak_pump_a": 1.376875235616,
+        "peak_valve_a": 0.7689116655431,
+        "peak_shunt_v": 0.1376878792543,
+        "pump_terminal_min_V": -0.01191336369409,
+        "pump_terminal_max_V": 11.18276443008,
+        "trip_latch_max_V": 3.680123559092e-51
+      },
+      "criteria_pass": true,
+      "samples": 89205,
+      "horizon_s": 1.4,
+      "netlist_sha256": "62a59413d4eaa652d84c48ec8263469412769b5179588dbe2fbeb00a96f7caf0",
+      "matched_expectation": true
+    },
+    {
+      "name": "integrated_valve_L_corner",
+      "family": "integrated",
+      "params": {
+        "fault": "estop",
+        "valve_l": 0.5,
+        "supply": 13.2
+      },
+      "expected": "within_envelope",
+      "reason": "",
+      "checks": {
+        "startup_no_drive": true,
+        "run_has_expected_load_response": true,
+        "drain_voltage_below_70V_model_design_limit": true,
+        "fault_removes_current": true,
+        "release_does_not_restart": true,
+        "feedback_is_3V3_bounded": true,
+        "BLDC_reverse_above_assumed_minus1V": true
+      },
+      "metrics": {
+        "peak_drain_v": 42.88027790422,
+        "min_bus_v": -3.473321213929e-08,
+        "peak_pump_a": 1.38804024827,
+        "peak_valve_a": 0.8476988050025,
+        "peak_shunt_v": 0.1388041884767,
+        "pump_terminal_min_V": -0.01310088637299,
+        "pump_terminal_max_V": 12.39767172212,
+        "trip_latch_max_V": 0.0
+      },
+      "criteria_pass": true,
+      "samples": 40653,
+      "horizon_s": 1.4,
+      "netlist_sha256": "639c1b9eb388d4d7de7f562ce5afdd57aa884bb4d456981b30e187eb6d62b646",
+      "matched_expectation": true
+    },
+    {
+      "name": "integrated_unknown_startup_trip",
+      "family": "integrated",
+      "params": {
+        "startup_A": 3,
+        "cap_u": 100
+      },
+      "expected": "reject",
+      "reason": "Assumed 2x startup/100uF trips the 2.5A latch before running; actual pump inrush is unknown",
+      "checks": {
+        "startup_no_drive": true,
+        "run_has_expected_load_response": false,
+        "drain_voltage_below_70V_model_design_limit": true,
+        "permit_off_removes_current": true,
+        "feedback_is_3V3_bounded": true,
+        "BLDC_reverse_above_assumed_minus1V": true
+      },
+      "metrics": {
+        "peak_drain_v": 37.22893048175,
+        "min_bus_v": -1.584190287898e-08,
+        "peak_pump_a": 2.024835237529,
+        "peak_valve_a": 0.003315025177675,
+        "peak_shunt_v": 0.292526710081,
+        "pump_terminal_min_V": -0.0001204388507599,
+        "pump_terminal_max_V": 2.076403204315,
+        "trip_latch_max_V": 4.99999995
+      },
+      "criteria_pass": false,
+      "samples": 38627,
+      "horizon_s": 1.4,
+      "netlist_sha256": "1a56a463cedbf5a96185c228616a08cbe3a56ed395027cd164de9fb9da8b5369",
+      "matched_expectation": true
+    }
+  ],
+  "analytical_checks": [
+    {
+      "name": "shutoff_3m",
+      "value": 0.2936699409,
+      "unit": "bar",
+      "within": true,
+      "basis": "Hydrostatic conversion only; 3m original A12, 5m stocked sheet, 6m listing; not water hammer"
+    },
+    {
+      "name": "shutoff_5m",
+      "value": 0.48944990150000006,
+      "unit": "bar",
+      "within": true,
+      "basis": "Hydrostatic conversion only; 3m original A12, 5m stocked sheet, 6m listing; not water hammer"
+    },
+    {
+      "name": "shutoff_6m",
+      "value": 0.5873398818,
+      "unit": "bar",
+      "within": true,
+      "basis": "Hydrostatic conversion only; 3m original A12, 5m stocked sheet, 6m listing; not water hammer"
+    },
+    {
+      "name": "0.2bar_sensor_at_6m",
+      "value": 0.5873398818,
+      "unit": "bar",
+      "within": false,
+      "basis": "A 0-200mbar sensor would overrange before considering transients"
+    },
+    {
+      "name": "INA219_0.1ohm_range",
+      "value": 3.1999999999999997,
+      "unit": "A",
+      "within": true,
+      "basis": "TI +/-320mV range / actual listed board shunt"
+    },
+    {
+      "name": "old_4A_threshold_voltage",
+      "value": 0.4,
+      "unit": "V",
+      "within": false,
+      "basis": "0.4V exceeds +/-0.320V measurement range; replace old threshold or sensor design"
+    },
+    {
+      "name": "candidate_2.5A_threshold_voltage",
+      "value": 0.25,
+      "unit": "V",
+      "within": true,
+      "basis": "0.25V in range; candidate only, INA219/software is not independent fast OC protection"
+    },
+    {
+      "name": "24V_plus10pct_INA219_bus",
+      "value": 26.400000000000002,
+      "unit": "V",
+      "within": false,
+      "basis": "26.4V exceeds TI 26V common-mode recommended limit; do not measure instrument rail with INA219"
+    },
+    {
+      "name": "Nishka_1bar_conservative_accuracy",
+      "value": 0.005,
+      "unit": "bar",
+      "within": true,
+      "basis": "Use 0.5% FS listing claim conservatively; PDF says 0.5% reading, unresolved"
+    },
+    {
+      "name": "Nishka_1bar_0.1bar_relative_error",
+      "value": 5.0,
+      "unit": "%",
+      "within": true,
+      "basis": "5% of 0.1bar signal before ADC/calibration/reference uncertainty; not 0.5% system accuracy"
+    },
+    {
+      "name": "20mA_120ohm",
+      "value": 2.4,
+      "unit": "V",
+      "within": true,
+      "basis": "DFRobot SEN0262 published burden"
+    },
+    {
+      "name": "33mA_120ohm",
+      "value": 3.96,
+      "unit": "V",
+      "within": false,
+      "basis": "3.96V burden exceeds 3.3V-domain budget"
+    },
+    {
+      "name": "assumed_unrestricted_8mm_return",
+      "value": 5.705775552251698,
+      "unit": "L/min",
+      "within": null,
+      "basis": "ASSUMED 6m/9.5Lmin straight-line pump curve, 2m tube, K=6; no selected-valve claim"
+    },
+    {
+      "name": "assumed_unrestricted_12mm_return",
+      "value": 8.22028507300994,
+      "unit": "L/min",
+      "within": null,
+      "basis": "ASSUMED 6m/9.5Lmin straight-line pump curve, 2m tube, K=6; no selected-valve claim"
+    }
+  ],
+  "all_experiments_match_expectation": true
+}

@@ -1,0 +1,27 @@
+{
+  "case": {
+    "name": "flow_5.25_high",
+    "family": "flow",
+    "params": {
+      "level": "high",
+      "supply": 5.25
+    },
+    "unsafe": false
+  },
+  "assessment": {
+    "checks": {
+      "healthy_low_or_high_is_valid_zero_or_pulse": true,
+      "conditioned_field_input_bounded": true
+    },
+    "metrics": {
+      "line_V": 3.571542726158,
+      "ratio": 0.6802938526015238,
+      "valid": true
+    },
+    "criteria_pass": true
+  },
+  "samples": 1008,
+  "horizon": 0.01,
+  "netlist_sha256": "007943915d55832383de067cec15472cc3d104b1a708f3d3c5ade8e9cb0a2d28",
+  "experiment_ok": true
+}

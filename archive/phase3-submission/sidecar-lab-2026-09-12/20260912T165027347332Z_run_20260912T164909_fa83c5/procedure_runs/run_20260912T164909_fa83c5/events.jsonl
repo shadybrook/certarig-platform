@@ -1,0 +1,32 @@
+{"at": "2026-09-12T16:49:09.426604+00:00", "kind": "preflight"}
+{"at": "2026-09-12T16:49:09.430493+00:00", "filename": "20260912T164909427739Z_flow_guardrail.csv", "kind": "recording_started"}
+{"at": "2026-09-12T16:49:09.430803+00:00", "kind": "step_started", "step": "safe_start", "type": "command"}
+{"at": "2026-09-12T16:49:09.432164+00:00", "command": "safe", "kernel_event": "operator_safe", "kind": "command", "step": "safe_start"}
+{"at": "2026-09-12T16:49:09.433123+00:00", "elapsed_ms": 2.307, "kind": "step_passed", "step": "safe_start"}
+{"at": "2026-09-12T16:49:09.433211+00:00", "kind": "step_started", "step": "reset", "type": "command"}
+{"at": "2026-09-12T16:49:09.434328+00:00", "command": "reset", "kernel_event": "trip_reset_output_safe", "kind": "command", "step": "reset"}
+{"at": "2026-09-12T16:49:09.435353+00:00", "elapsed_ms": 1.999, "kind": "step_passed", "step": "reset"}
+{"at": "2026-09-12T16:49:09.435603+00:00", "kind": "step_started", "step": "permit", "type": "command"}
+{"at": "2026-09-12T16:49:09.437188+00:00", "command": "permit", "kernel_event": "permit_accepted", "kind": "command", "step": "permit"}
+{"at": "2026-09-12T16:49:09.438411+00:00", "elapsed_ms": 2.79, "kind": "step_passed", "step": "permit"}
+{"at": "2026-09-12T16:49:09.438502+00:00", "kind": "step_started", "step": "stable_permit", "type": "expect"}
+{"at": "2026-09-12T16:49:10.488078+00:00", "elapsed_ms": 1049.541, "kind": "step_passed", "step": "stable_permit"}
+{"at": "2026-09-12T16:49:10.488168+00:00", "kind": "step_started", "step": "raise_flow", "type": "trigger"}
+{"at": "2026-09-12T16:49:10.488214+00:00", "instruction": "Turn the P2 flow emulator up slowly until the dashboard shows more than 15.0 L/min. Leave P1 in the safe band. Do not touch the E-stop.\n", "kind": "instruction", "step": "raise_flow"}
+{"at": "2026-09-12T16:50:01.587806+00:00", "elapsed_ms": 51099.621, "kind": "step_passed", "step": "raise_flow"}
+{"at": "2026-09-12T16:50:01.587901+00:00", "kind": "step_started", "step": "output_removed", "type": "expect"}
+{"at": "2026-09-12T16:50:01.588893+00:00", "elapsed_ms": 0.981, "kind": "step_passed", "step": "output_removed"}
+{"at": "2026-09-12T16:50:01.588977+00:00", "kind": "step_started", "step": "lower_flow", "type": "trigger"}
+{"at": "2026-09-12T16:50:01.589021+00:00", "instruction": "Turn P2 back down below 10 L/min.", "kind": "instruction", "step": "lower_flow"}
+{"at": "2026-09-12T16:50:12.985526+00:00", "elapsed_ms": 11396.532, "kind": "step_passed", "step": "lower_flow"}
+{"at": "2026-09-12T16:50:12.985620+00:00", "kind": "step_started", "step": "no_auto_restart", "type": "expect"}
+{"at": "2026-09-12T16:50:14.536134+00:00", "elapsed_ms": 1550.491, "kind": "step_passed", "step": "no_auto_restart"}
+{"at": "2026-09-12T16:50:14.536210+00:00", "kind": "step_started", "step": "permit_rejected", "type": "command"}
+{"at": "2026-09-12T16:50:14.537345+00:00", "command": "permit", "kernel_event": "permit_rejected_reset_required", "kind": "command", "step": "permit_rejected"}
+{"at": "2026-09-12T16:50:14.538169+00:00", "elapsed_ms": 1.948, "kind": "step_passed", "step": "permit_rejected"}
+{"at": "2026-09-12T16:50:14.538239+00:00", "kind": "step_started", "step": "end_safe", "type": "command"}
+{"at": "2026-09-12T16:50:14.539179+00:00", "command": "safe", "kernel_event": "operator_safe", "kind": "command", "step": "end_safe"}
+{"at": "2026-09-12T16:50:14.540009+00:00", "elapsed_ms": 1.759, "kind": "step_passed", "step": "end_safe"}
+{"at": "2026-09-12T16:50:14.541143+00:00", "kernel_event": "operator_safe", "kind": "kernel_forced_safe"}
+{"at": "2026-09-12T16:50:14.545356+00:00", "filename": "20260912T164909427739Z_flow_guardrail.csv", "kind": "recording_stopped", "samples": 657, "sha256": "825a779aa0fefdebf87343f64302a7f5ce0bfa2da6314e11c9361bed79a22da3"}
+{"at": "2026-09-12T16:50:14.545452+00:00", "kind": "finished", "reason": "all steps and checks passed", "status": "passed"}

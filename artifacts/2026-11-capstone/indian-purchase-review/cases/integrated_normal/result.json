@@ -1,0 +1,32 @@
+{
+  "name": "integrated_normal",
+  "family": "integrated",
+  "params": {
+    "fault": "normal"
+  },
+  "expected": "within_envelope",
+  "reason": "",
+  "checks": {
+    "startup_no_drive": true,
+    "run_has_expected_load_response": true,
+    "drain_voltage_below_70V_model_design_limit": true,
+    "permit_off_removes_current": true,
+    "feedback_is_3V3_bounded": true,
+    "BLDC_reverse_above_assumed_minus1V": true
+  },
+  "metrics": {
+    "peak_drain_v": 41.65261654306,
+    "min_bus_v": -1.611972696304e-07,
+    "peak_pump_a": 1.376875337841,
+    "peak_valve_a": 0.7689117164779,
+    "peak_shunt_v": 0.1376877976763,
+    "pump_terminal_min_V": -0.01191109628451,
+    "pump_terminal_max_V": 11.18277453365,
+    "trip_latch_max_V": 0.0
+  },
+  "criteria_pass": true,
+  "samples": 38132,
+  "horizon_s": 1.4,
+  "netlist_sha256": "3cf00fef8716cce297aacea3eccf83945eaad0c19ed1ebf15d86801583526d19",
+  "matched_expectation": true
+}

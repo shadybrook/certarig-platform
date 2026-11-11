@@ -1,0 +1,19 @@
+{
+  "as_of": "2026-11-09",
+  "baseline_commit": "d81c3c099b79a9cf86ad1d7ecec7b96e333f84c2",
+  "branch": "capstone/connected-workflow-2026-11-09",
+  "scope": "local simulator; deterministic fixtures; no new physical validation",
+  "checks": {
+    "software_tests": 247,
+    "coverage_percent": 90.03,
+    "browser_tests": 7,
+    "soak_tests": 1,
+    "capstone_acceptance_cases": 14
+  },
+  "excluded_from_make_check": [
+    "hardware-in-the-loop",
+    "live providers",
+    "slow tests"
+  ],
+  "slow_test_run_separately": true
+}

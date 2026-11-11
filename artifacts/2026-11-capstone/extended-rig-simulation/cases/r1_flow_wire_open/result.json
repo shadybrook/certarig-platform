@@ -1,0 +1,30 @@
+{
+  "name": "r1_flow_wire_open",
+  "family": "flow",
+  "revision": "R1",
+  "params": {
+    "fault": "open_signal"
+  },
+  "diagnostic": false,
+  "process_exit": 0,
+  "samples": 10128,
+  "wall_seconds": 0.126,
+  "netlist_sha256": "0778fcabce530ed62748029554985875ba038acc8ef5875d403323f5fcf25851",
+  "checks": [
+    {
+      "check": "logic_voltage_safe",
+      "passed": true
+    },
+    {
+      "check": "LED_current_bounded",
+      "passed": true
+    }
+  ],
+  "metrics": {
+    "logic_max_v": 3.3,
+    "logic_min_v": 3.3,
+    "led_max_a": 3.71238946796e-26
+  },
+  "criteria_pass": true,
+  "reused_trace": true
+}

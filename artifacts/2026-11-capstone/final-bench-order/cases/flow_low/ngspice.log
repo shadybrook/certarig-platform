@@ -1,0 +1,25 @@
+
+Note: No compatibility mode selected!
+
+
+Circuit: cr-ext-r1 supervised flow flow_low
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+field                                        5
+line                                   1.38699
+remote                                 1.38623
+sink                               6.30102e-07
+protected                              1.38699
+vfield#branch                     -0.000768725
+
+
+No. of Data Rows : 1008
+ngspice-47 done

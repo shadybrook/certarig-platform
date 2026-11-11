@@ -1,0 +1,32 @@
+{
+  "name": "integrated_heartbeat_loss",
+  "family": "integrated",
+  "params": {
+    "fault": "heartbeat_loss"
+  },
+  "expected": "within_envelope",
+  "reason": "",
+  "checks": {
+    "startup_no_drive": true,
+    "run_has_expected_load_response": true,
+    "drain_voltage_below_70V_model_design_limit": true,
+    "watchdog_removes_current": true,
+    "feedback_is_3V3_bounded": true,
+    "BLDC_reverse_above_assumed_minus1V": true
+  },
+  "metrics": {
+    "peak_drain_v": 41.65263644263,
+    "min_bus_v": -1.611972696304e-07,
+    "peak_pump_a": 1.376875337841,
+    "peak_valve_a": 0.7689117164779,
+    "peak_shunt_v": 0.1376877976763,
+    "pump_terminal_min_V": -0.0119133611557,
+    "pump_terminal_max_V": 11.18277453365,
+    "trip_latch_max_V": 0.0
+  },
+  "criteria_pass": true,
+  "samples": 30330,
+  "horizon_s": 1.4,
+  "netlist_sha256": "ddf570b1d8d7642e02725242aefd4d091555066b1b44463a923b354bc455f073",
+  "matched_expectation": true
+}

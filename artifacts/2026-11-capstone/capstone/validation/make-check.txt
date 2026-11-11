@@ -1,0 +1,75 @@
+.venv/bin/ruff check certarig tests
+All checks passed!
+.venv/bin/mypy certarig
+Success: no issues found in 76 source files
+.venv/bin/pytest tests -q -m "not hil and not live_llm and not slow" \
+		--cov=certarig --cov-report=term-missing --cov-report=xml \
+		--cov-fail-under=90
+........................................................................ [ 29%]
+........................................................................ [ 58%]
+........................................................................ [ 87%]
+...............................                                          [100%]
+================================ tests coverage ================================
+_______________ coverage: platform darwin, python 3.14.3-final-0 _______________
+
+Name                                     Stmts   Miss Branch BrPart  Cover   Missing
+------------------------------------------------------------------------------------
+certarig/agent/authoring.py                 72      4     18      1    94%   106-107, 150->155, 153-154
+certarig/agent/cli.py                      104     11     12      1    86%   92-107
+certarig/agent/orchestrator.py             124      4     32      4    95%   115, 225, 229, 247
+certarig/agent/policy.py                   156      6     84      5    95%   46, 61-62, 200->198, 201->200, 203, 211-212, 231->236
+certarig/agent/providers/__init__.py        20      1     10      1    93%   25
+certarig/agent/providers/base.py            52      1      0      0    98%   56
+certarig/agent/providers/fake.py            53      1     10      1    97%   85
+certarig/agent/skills.py                    70      2     16      4    93%   55, 60->64, 62->64, 98
+certarig/agent/tools.py                    157     19     68     16    84%   97, 167-168, 183, 185, 187, 193, 197, 204, 206, 212, 214, 218, 224, 239-240, 249, 261, 263
+certarig/agent/transcript.py                27      0      4      1    97%   39->38
+certarig/edge/agent_api.py                  69      4     16      4    91%   41, 48, 84, 87
+certarig/edge/app.py                       160     32     48     15    75%   33, 66, 106, 108, 110, 119, 123, 152, 154, 157, 175-181, 186, 190, 210, 217-231
+certarig/edge/approvals.py                 128      1     36      3    98%   65->68, 80->79, 163
+certarig/edge/bootstrap.py                  76      5     16      4    90%   34-36, 45, 72, 103
+certarig/edge/briefing.py                   33      1      8      1    95%   39
+certarig/edge/bundle.py                     94      4     30      3    94%   84, 90-91, 97, 102->114, 121->123
+certarig/edge/client.py                    197      7     40      2    96%   63->65, 89-90, 126, 248, 275-276, 300
+certarig/edge/commissioning.py             252     17    102      9    91%   55-56, 59, 64-65, 78-80, 86, 162-167, 179, 196, 290->292
+certarig/edge/commissioning_records.py     110      7     50      7    91%   47, 51, 57, 69, 79, 83, 111
+certarig/edge/config.py                     78      9     34      9    84%   23, 29, 41, 46, 52, 55, 62, 76, 140
+certarig/edge/configurator.py               64      4     20      4    90%   26, 37, 71, 93
+certarig/edge/evidence.py                   42      1      2      1    95%   121
+certarig/edge/evidence_cli.py              154      9     60     11    91%   33, 58->64, 70, 75->84, 83, 90, 108, 132, 142, 147, 168
+certarig/edge/executor.py                  104     23     32      9    76%   48, 55, 83-85, 89-92, 97->119, 104-106, 108-110, 116-118, 123-126, 136
+certarig/edge/hardware/base.py              21      5      0      0    76%   15, 19, 23, 27, 31
+certarig/edge/hardware/bus.py               20      2      0      0    90%   28-29
+certarig/edge/hardware/mock.py              48      2     12      2    93%   70, 72
+certarig/edge/hardware/modbus.py            43      4      8      2    88%   46-47, 54, 65
+certarig/edge/ledger.py                     29      4      8      2    84%   31, 34-35, 37
+certarig/edge/live.py                      254     15     48      7    93%   138, 275, 279-304, 319->318, 373->376, 401, 418, 452-454
+certarig/edge/models.py                    157      4     12      3    96%   94, 105, 112, 114
+certarig/edge/openapi.py                    19      2      6      2    84%   22->32, 32->38, 50-52
+certarig/edge/ops.py                       216     11     52      4    94%   67, 105, 191-195, 251, 370-373
+certarig/edge/procedures.py                142      9     28      7    91%   70, 79, 84, 87, 95-96, 101, 106, 147, 193->195
+certarig/edge/recording_analysis.py         21      1      8      2    90%   19->17, 22
+certarig/edge/runtime/facts.py              46      1     12      2    95%   29->27, 51
+certarig/edge/runtime/library.py           157      7     66      7    93%   42-44, 45->39, 46->48, 52->79, 75, 140, 143-144, 163->168
+certarig/edge/runtime/model.py             112      1      0      0    99%   133
+certarig/edge/runtime/predicates.py         76      2     54      2    97%   79, 90
+certarig/edge/runtime/runner.py            399     21    132     18    93%   123, 174->176, 184-185, 209, 211, 213, 294->297, 321, 325, 330->336, 335, 356, 379->383, 479-488, 503->507, 509->512, 513->exit, 534, 538
+certarig/edge/safety.py                     43     15     36     12    61%   15, 19, 21, 23, 25, 30, 33, 35, 39, 41, 43, 45-48
+certarig/edge/schemas.py                    31      2      8      2    90%   23, 26
+certarig/edge/server.py                    501     76    140     31    82%   121, 123, 125, 185->187, 226->228, 245, 305, 376, 390, 396, 420, 429, 436->438, 446->448, 450-451, 455-461, 464-479, 488-490, 493-503, 506-514, 519, 524, 530, 536, 539, 544, 548, 554, 557, 570-573, 596, 598->600, 618, 639->641, 645, 688, 690, 693-694, 696, 744-753, 762
+certarig/edge/sessions.py                   33      1      2      1    94%   49
+certarig/edge/watchdog.py                   27     15      4      2    45%   15-21, 27-36
+certarig/machines/agent_tools.py            26      2      6      1    91%   47, 55
+certarig/machines/gateway.py               155     39     48      7    70%   32, 57, 64, 75, 117-130, 134->exit, 138-141, 150-160, 166-180, 200
+certarig/machines/protocols.py              32      4     18      4    84%   16, 36, 38, 40
+certarig/sdk.py                             23      1      2      1    92%   38
+certarig/sim/api.py                         57      6      6      0    90%   37-38, 56-57, 64-65
+certarig/sim/bus_twin.py                    75      7     18      5    83%   28, 33->39, 36, 44-46, 71->74, 80-81
+certarig/sim/cli.py                         70      5     10      2    89%   67->69, 83, 87-90
+certarig/sim/scenario.py                   253     25    132     28    85%   103, 105->107, 151, 153-155, 157, 160, 189, 194, 214->220, 248, 250-251, 254-255, 263->265, 293, 297->301, 299->298, 306->305, 344->349, 346, 351, 356, 359, 360->368, 363-364, 367, 369, 372, 374
+------------------------------------------------------------------------------------
+TOTAL                                     6123    462   1782    272    90%
+
+18 files skipped due to complete coverage.
+Coverage XML written to file coverage.xml
+Required test coverage of 90% reached. Total coverage: 90.03%

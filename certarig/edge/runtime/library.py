@@ -36,6 +36,8 @@ def _semantic_errors(raw: dict[str, Any], config: RigConfig | None) -> list[str]
         if target and target not in known_steps:
             errors.append(f"evaluate references unknown step {target!r}")
     record_open = False
+    if config is not None and config.commissioning_required and any(step.get("type") == "command" and step.get("command") == "permit" for step in steps) and not raw.get("requires_output", False):
+        errors.append("permit steps must declare requires_output: true")
     for step in steps:
         if step.get("type") == "record":
             if step["action"] == "start":

@@ -1,0 +1,17 @@
+
+Note: No compatibility mode selected!
+
+
+Circuit: cr-ext-r1 protected pump chain power_13.2_2.268
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+Operating point simulation skipped by 'uic',
+  now using transient initial conditions.
+ Reference value :  1.55124e-01
+ Reference value :  3.20843e-01
+ Reference value :  4.91243e-01
+ Reference value :  6.53918e-01
+No. of Data Rows : 80510
+ngspice-47 done

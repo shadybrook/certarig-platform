@@ -1,0 +1,19 @@
+
+> test
+> playwright test --reporter=line
+
+
+Running 7 tests using 1 worker
+
+(node:58100) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1/7] e2e/pressure_guardrail.spec.js:45:1 › pressure_guardrail trips from Studio and then passes after the operator lowers pressure
+[2/7] e2e/pressure_guardrail.spec.js:75:1 › operator can grant an approval from the inbox
+[3/7] e2e/studio_honesty.spec.js:23:1 › onboard briefing persists after reload
+[4/7] e2e/studio_honesty.spec.js:40:1 › stale contract retries once after a hot apply
+[5/7] e2e/studio_honesty.spec.js:54:1 › authoring wizard drafts and approves a soak
+[6/7] e2e/studio_honesty.spec.js:68:1 › procedures reconnect to the stored run after reload
+[7/7] e2e/zz_capstone_workflow.spec.js:5:1 › configure thermal rig, block, review, deny, approve, run and export
+  7 passed (21.0s)

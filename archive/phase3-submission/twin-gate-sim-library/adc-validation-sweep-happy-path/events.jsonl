@@ -1,0 +1,29 @@
+{"at": "2026-09-12T12:00:04.283648+00:00", "kind": "preflight"}
+{"at": "2026-09-12T12:00:04.284169+00:00", "filename": "20260912T120004283733Z_adc_validation.csv", "kind": "recording_started"}
+{"at": "2026-09-12T12:00:04.284188+00:00", "kind": "step_started", "step": "baseline", "type": "expect"}
+{"at": "2026-09-12T12:00:05.292746+00:00", "elapsed_ms": 1008.545, "kind": "step_passed", "step": "baseline"}
+{"at": "2026-09-12T12:00:05.292755+00:00", "kind": "step_started", "step": "pressure_low", "type": "trigger"}
+{"at": "2026-09-12T12:00:05.292762+00:00", "instruction": "Turn P1 fully anticlockwise (minimum pressure).", "kind": "instruction", "step": "pressure_low"}
+{"at": "2026-09-12T12:00:05.806113+00:00", "elapsed_ms": 513.351, "kind": "step_passed", "step": "pressure_low"}
+{"at": "2026-09-12T12:00:05.806126+00:00", "kind": "step_started", "step": "pressure_high", "type": "trigger"}
+{"at": "2026-09-12T12:00:05.806133+00:00", "instruction": "Turn P1 slowly to maximum. Expect the trip indicator; the output is not armed.", "kind": "instruction", "step": "pressure_high"}
+{"at": "2026-09-12T12:00:06.648783+00:00", "elapsed_ms": 842.647, "kind": "step_passed", "step": "pressure_high"}
+{"at": "2026-09-12T12:00:06.648789+00:00", "kind": "step_started", "step": "pressure_mid", "type": "trigger"}
+{"at": "2026-09-12T12:00:06.648793+00:00", "instruction": "Return P1 to roughly the middle of its travel (2 to 3 bar).", "kind": "instruction", "step": "pressure_mid"}
+{"at": "2026-09-12T12:00:07.528179+00:00", "elapsed_ms": 879.379, "kind": "step_passed", "step": "pressure_mid"}
+{"at": "2026-09-12T12:00:07.528187+00:00", "kind": "step_started", "step": "flow_low", "type": "trigger"}
+{"at": "2026-09-12T12:00:07.528191+00:00", "instruction": "Turn P2 fully anticlockwise (minimum flow).", "kind": "instruction", "step": "flow_low"}
+{"at": "2026-09-12T12:00:08.131426+00:00", "elapsed_ms": 603.23, "kind": "step_passed", "step": "flow_low"}
+{"at": "2026-09-12T12:00:08.131440+00:00", "kind": "step_started", "step": "flow_high", "type": "trigger"}
+{"at": "2026-09-12T12:00:08.131457+00:00", "instruction": "Turn P2 slowly to maximum.", "kind": "instruction", "step": "flow_high"}
+{"at": "2026-09-12T12:00:09.003814+00:00", "elapsed_ms": 872.364, "kind": "step_passed", "step": "flow_high"}
+{"at": "2026-09-12T12:00:09.003828+00:00", "kind": "step_started", "step": "flow_mid", "type": "trigger"}
+{"at": "2026-09-12T12:00:09.003834+00:00", "instruction": "Return P2 to roughly the middle of its travel (6 to 10 L/min).", "kind": "instruction", "step": "flow_mid"}
+{"at": "2026-09-12T12:00:09.770628+00:00", "elapsed_ms": 766.792, "kind": "step_passed", "step": "flow_mid"}
+{"at": "2026-09-12T12:00:09.770642+00:00", "kind": "step_started", "step": "settle", "type": "expect"}
+{"at": "2026-09-12T12:00:11.780985+00:00", "elapsed_ms": 2010.31, "kind": "step_passed", "step": "settle"}
+{"at": "2026-09-12T12:00:11.781018+00:00", "kind": "step_started", "step": "output_never_armed", "type": "expect"}
+{"at": "2026-09-12T12:00:11.781210+00:00", "elapsed_ms": 0.191, "kind": "step_passed", "step": "output_never_armed"}
+{"at": "2026-09-12T12:00:11.781556+00:00", "kernel_event": "operator_safe", "kind": "kernel_forced_safe"}
+{"at": "2026-09-12T12:00:11.782952+00:00", "filename": "20260912T120004283733Z_adc_validation.csv", "kind": "recording_stopped", "samples": 375, "sha256": "c43a0abd94602a9883bc29d46178839f6ea3254ab8c48fcdc236fde0e970e371"}
+{"at": "2026-09-12T12:00:11.783015+00:00", "kind": "finished", "reason": "all steps and checks passed", "status": "passed"}

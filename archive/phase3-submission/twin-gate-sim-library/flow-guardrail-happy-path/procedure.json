@@ -1,0 +1,208 @@
+{
+  "applies_to": {
+    "actuators": [
+      "permit_relay"
+    ],
+    "concepts": [
+      "flow",
+      "emergency_stop"
+    ]
+  },
+  "domain": "process",
+  "evaluate": [
+    {
+      "event_observed": "permit_accepted"
+    },
+    {
+      "event_observed": "flow_high_forced_safe"
+    },
+    {
+      "event_observed": "permit_rejected_reset_required"
+    },
+    {
+      "max_elapsed_ms": 500,
+      "step": "output_removed"
+    },
+    {
+      "step_passed": "no_auto_restart"
+    },
+    {
+      "peak_below": 19.5,
+      "signal": "flow"
+    }
+  ],
+  "evidence": {
+    "flight_recorder_s": 30,
+    "report_template": "qualification_report"
+  },
+  "id": "flow_guardrail",
+  "preconditions": [
+    {
+      "op": "<",
+      "signal": "flow",
+      "value": 14.0
+    },
+    {
+      "eq": "safe",
+      "signal_state": "flow"
+    },
+    {
+      "eq": "good",
+      "quality": "flow"
+    },
+    {
+      "eq": "safe",
+      "signal_state": "pressure"
+    },
+    {
+      "eq": false,
+      "state": "estop_active"
+    }
+  ],
+  "record": true,
+  "recovery": "If the output did not drop within the response time, stop: force safe from Studio, remove the external 5 V supply and inspect the GPIO23 transistor stage and relay wiring before retrying.\n",
+  "requires_output": true,
+  "steps": [
+    {
+      "command": "safe",
+      "expect": {
+        "eq": false,
+        "state": "output_high"
+      },
+      "id": "safe_start",
+      "type": "command"
+    },
+    {
+      "command": "reset",
+      "expect": {
+        "eq": false,
+        "state": "trip_latched"
+      },
+      "id": "reset",
+      "type": "command"
+    },
+    {
+      "command": "permit",
+      "expect": {
+        "all": [
+          {
+            "eq": true,
+            "state": "drive_high"
+          },
+          {
+            "eq": true,
+            "state": "output_high"
+          }
+        ]
+      },
+      "id": "permit",
+      "type": "command",
+      "within_ms": 500
+    },
+    {
+      "hold_ms": 1000,
+      "id": "stable_permit",
+      "predicate": {
+        "eq": true,
+        "state": "output_high"
+      },
+      "type": "expect",
+      "within_ms": 500
+    },
+    {
+      "id": "raise_flow",
+      "instruction": "Turn the P2 flow emulator up slowly until the dashboard shows more than 15.0 L/min. Leave P1 in the safe band. Do not touch the E-stop.\n",
+      "predicate": {
+        "op": ">",
+        "signal": "flow",
+        "value": 15.0
+      },
+      "timeout_s": 300,
+      "title": "Operator raises flow above the trip limit",
+      "type": "trigger"
+    },
+    {
+      "id": "output_removed",
+      "predicate": {
+        "all": [
+          {
+            "eq": false,
+            "state": "output_high"
+          },
+          {
+            "eq": true,
+            "state": "trip_latched"
+          }
+        ]
+      },
+      "type": "expect",
+      "within_ms": 500
+    },
+    {
+      "id": "lower_flow",
+      "instruction": "Turn P2 back down below 10 L/min.",
+      "predicate": {
+        "op": "<",
+        "signal": "flow",
+        "value": 10.0
+      },
+      "timeout_s": 300,
+      "title": "Operator returns flow to the safe band",
+      "type": "trigger"
+    },
+    {
+      "hold_ms": 1500,
+      "id": "no_auto_restart",
+      "predicate": {
+        "all": [
+          {
+            "eq": false,
+            "state": "output_high"
+          },
+          {
+            "eq": "reset_required",
+            "state": "reason"
+          }
+        ]
+      },
+      "type": "expect",
+      "within_ms": 1000
+    },
+    {
+      "command": "permit",
+      "expect": {
+        "all": [
+          {
+            "eq": false,
+            "state": "output_high"
+          },
+          {
+            "eq": "permit_rejected_reset_required",
+            "state": "last_event"
+          }
+        ]
+      },
+      "id": "permit_rejected",
+      "type": "command"
+    },
+    {
+      "command": "safe",
+      "expect": {
+        "eq": false,
+        "state": "output_high"
+      },
+      "id": "end_safe",
+      "type": "command"
+    }
+  ],
+  "summary": "Proves that the deterministic kernel removes the permit output when flow exceeds the trip limit, that it does so within the allowed response time, and that the output cannot be restored without an explicit reset. The operator raises the flow emulator (P2) by hand.\n",
+  "tags": [
+    "interlock",
+    "flow",
+    "trip",
+    "anti-restart"
+  ],
+  "timeout_s": 900,
+  "title": "Flow guardrail verification",
+  "version": 1
+}

@@ -1,0 +1,2023 @@
+{
+  "hydraulic_transients": [
+    {
+      "parameters": {
+        "name": "nominal_closure",
+        "C": 2e-10,
+        "closing": 0.1,
+        "dt": 0.0001,
+        "end": 2.0,
+        "unsafe": false
+      },
+      "peak_bar": 0.7546502107570888,
+      "min_bar": 0.4614629929977645,
+      "observation_envelope_pass": true,
+      "experiment_ok": true,
+      "steps": 20001,
+      "saved_samples": 20001,
+      "model": "RK4, source0.60bar upper envelope, I=7.1e7, feed R=2e12, valve Kv chosen at1.5Lmin/0.45bar, compliance as declared; negative window ends at203.2ms before first vacuum/cavitation; it proves initial overpressure only; no post-cavitation prediction"
+    },
+    {
+      "parameters": {
+        "name": "minimum_compliance_fast_valve",
+        "C": 2e-10,
+        "closing": 0.001,
+        "dt": 0.0001,
+        "end": 2.0,
+        "unsafe": false
+      },
+      "peak_bar": 0.7590232498793154,
+      "min_bar": 0.45796504612645017,
+      "observation_envelope_pass": true,
+      "experiment_ok": true,
+      "steps": 20001,
+      "saved_samples": 20001,
+      "model": "RK4, source0.60bar upper envelope, I=7.1e7, feed R=2e12, valve Kv chosen at1.5Lmin/0.45bar, compliance as declared; negative window ends at203.2ms before first vacuum/cavitation; it proves initial overpressure only; no post-cavitation prediction"
+    },
+    {
+      "parameters": {
+        "name": "maximum_inertance_minimum_closing",
+        "C": 2e-10,
+        "closing": 0.05,
+        "dt": 0.0001,
+        "end": 2.0,
+        "unsafe": false
+      },
+      "peak_bar": 0.7579295162042134,
+      "min_bar": 0.45883797326501063,
+      "observation_envelope_pass": true,
+      "experiment_ok": true,
+      "steps": 20001,
+      "saved_samples": 20001,
+      "model": "RK4, source0.60bar upper envelope, I=7.1e7, feed R=2e12, valve Kv chosen at1.5Lmin/0.45bar, compliance as declared; negative window ends at203.2ms before first vacuum/cavitation; it proves initial overpressure only; no post-cavitation prediction"
+    },
+    {
+      "parameters": {
+        "name": "arrestor_failed_slow_valve",
+        "C": 3e-14,
+        "closing": 0.05,
+        "dt": 2e-06,
+        "end": 0.8,
+        "unsafe": false
+      },
+      "peak_bar": 1.1735351742012956,
+      "min_bar": 0.026584356365762313,
+      "observation_envelope_pass": true,
+      "experiment_ok": true,
+      "steps": 400001,
+      "saved_samples": 400001,
+      "model": "RK4, source0.60bar upper envelope, I=7.1e7, feed R=2e12, valve Kv chosen at1.5Lmin/0.45bar, compliance as declared; negative window ends at203.2ms before first vacuum/cavitation; it proves initial overpressure only; no post-cavitation prediction"
+    },
+    {
+      "parameters": {
+        "name": "negative_fast_valve_failed_arrestor",
+        "C": 3e-14,
+        "closing": 0.001,
+        "dt": 2e-06,
+        "end": 0.2032,
+        "unsafe": true
+      },
+      "peak_bar": 14.176712596934939,
+      "min_bar": 0.5837837837837837,
+      "observation_envelope_pass": false,
+      "experiment_ok": true,
+      "steps": 101601,
+      "saved_samples": 101601,
+      "model": "RK4, source0.60bar upper envelope, I=7.1e7, feed R=2e12, valve Kv chosen at1.5Lmin/0.45bar, compliance as declared; negative window ends at203.2ms before first vacuum/cavitation; it proves initial overpressure only; no post-cavitation prediction"
+    },
+    {
+      "parameters": {
+        "name": "minimum_compliance_refined",
+        "C": 2e-10,
+        "closing": 0.001,
+        "dt": 2e-05,
+        "end": 2.0,
+        "unsafe": false
+      },
+      "peak_bar": 0.7590232549503803,
+      "min_bar": 0.45796504428606183,
+      "observation_envelope_pass": true,
+      "experiment_ok": true,
+      "steps": 100001,
+      "saved_samples": 100001,
+      "model": "RK4, source0.60bar upper envelope, I=7.1e7, feed R=2e12, valve Kv chosen at1.5Lmin/0.45bar, compliance as declared; negative window ends at203.2ms before first vacuum/cavitation; it proves initial overpressure only; no post-cavitation prediction"
+    }
+  ],
+  "safety_cases": [
+    {
+      "name": "normal_reset_then_fresh_permit",
+      "passed": true,
+      "negative_control": false,
+      "pre_fault_power": true,
+      "tail_power": true
+    },
+    {
+      "name": "trip_estop_A",
+      "passed": true,
+      "negative_control": false,
+      "pre_fault_power": true,
+      "tail_power": false
+    },
+    {
+      "name": "trip_estop_B",
+      "passed": true,
+      "negative_control": false,
+      "pre_fault_power": true,
+      "tail_power": false
+    },
+    {
+      "name": "trip_stop",
+      "passed": true,
+      "negative_control": false,
+      "pre_fault_power": true,
+      "tail_power": false
+    },
+    {
+      "name": "trip_pressure",
+      "passed": true,
+      "negative_control": false,
+      "pre_fault_power": true,
+      "tail_power": false
+    },
+    {
+      "name": "trip_level",
+      "passed": true,
+      "negative_control": false,
+      "pre_fault_power": true,
+      "tail_power": false
+    },
+    {
+      "name": "trip_leak",
+      "passed": true,
+      "negative_control": false,
+      "pre_fault_power": true,
+      "tail_power": false
+    },
+    {
+      "name": "trip_thermal",
+      "passed": true,
+      "negative_control": false,
+      "pre_fault_power": true,
+      "tail_power": false
+    },
+    {
+      "name": "trip_field_power",
+      "passed": true,
+      "negative_control": false,
+      "pre_fault_power": true,
+      "tail_power": false
+    },
+    {
+      "name": "trip_vacuum_admission",
+      "passed": true,
+      "negative_control": false,
+      "pre_fault_power": true,
+      "tail_power": false
+    },
+    {
+      "name": "heartbeat_missing_or_static",
+      "passed": true,
+      "negative_control": false,
+      "pre_fault_power": true,
+      "tail_power": false
+    },
+    {
+      "name": "held_RESET_refused",
+      "passed": true,
+      "negative_control": false,
+      "pre_fault_power": false,
+      "tail_power": false
+    },
+    {
+      "name": "permit_high_at_RESET_refused",
+      "passed": true,
+      "negative_control": false,
+      "pre_fault_power": false,
+      "tail_power": false
+    },
+    {
+      "name": "one_weld_K1_contained",
+      "passed": true,
+      "negative_control": false,
+      "pre_fault_power": true,
+      "tail_power": false
+    },
+    {
+      "name": "one_weld_K2_contained",
+      "passed": true,
+      "negative_control": false,
+      "pre_fault_power": true,
+      "tail_power": false
+    },
+    {
+      "name": "negative_both_cutoffs_and_command_bypassed",
+      "passed": true,
+      "negative_control": true,
+      "pre_fault_power": true,
+      "tail_power": true
+    },
+    {
+      "name": "welded_EDM_prevents_reset",
+      "passed": true,
+      "negative_control": false
+    },
+    {
+      "name": "delayed_READY_fresh_permit",
+      "passed": true,
+      "negative_control": false
+    },
+    {
+      "name": "early_held_permit_waiting_READY",
+      "passed": true,
+      "negative_control": false
+    },
+    {
+      "name": "READY_loss_no_restart",
+      "passed": true,
+      "negative_control": false
+    },
+    {
+      "name": "READY_never_arrives_timeout",
+      "passed": true,
+      "negative_control": false
+    }
+  ],
+  "revision": "CR-EXT-R1",
+  "spec_sha256": "86c87f5063c0f8a96f6a66a88eb316e3171dc51f682ba8987283f77464dc276e",
+  "engine": "******\n** ngspice-47 : Circuit level simulation program\n** Compiled with KLU Direct Linear Solver\n** The U. C. Berkeley CAD Group\n** Copyright 1985-1994, Regents of the University of California.\n** Copyright 2001-2026, The ngspice team.\n** Please get your ngspice manual from https://ngspice.sourceforge.io/docs.html\n** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html\n******",
+  "results": [
+    {
+      "case": {
+        "name": "afe_21.6_0.004",
+        "family": "afe",
+        "params": {
+          "supply": 21.6,
+          "current": 0.004
+        },
+        "unsafe": false
+      },
+      "assessment": {
+        "checks": {
+          "adc_pin_absolute_budget": true,
+          "burden_below_half_watt": true,
+          "host_poweroff_injection_bounded": true
+        },
+        "metrics": {
+          "pin_max_V": 0.9048732805968,
+          "rail_min_V": 4.600176529444,
+          "host_off_pin_V": 0.033
+        },
+        "criteria_pass": true
+      },
+      "samples": 20069,
+      "horizon": 0.04,
+      "netlist_sha256": "d7fd6ff9637aa702f128e8cb0b7fea471f6e4606d5ae425d0271bd071b0f5835",
+      "experiment_ok": true
+    },
+    {
+      "case": {
+        "name": "afe_21.6_0.02",
+        "family": "afe",
+        "params": {
+          "supply": 21.6,
+          "current": 0.02
+        },
+        "unsafe": false
+      },
+      "assessment": {
+        "checks": {
+          "adc_pin_absolute_budget": true,
+          "burden_below_half_watt": true,
+          "host_poweroff_injection_bounded": true
+        },
+        "metrics": {
+          "pin_max_V": 1.529354751331,
+          "rail_min_V": 4.600176529481,
+          "host_off_pin_V": 0.033
+        },
+        "criteria_pass": true
+      },
+      "samples": 20063,
+      "horizon": 0.04,
+      "netlist_sha256": "ab3410c8305dc335b0c8c502241b33d1fee8c2494ea988fbb65e35b0010702bf",
+      "experiment_ok": true
+    },
+    {
+      "case": {
+        "name": "afe_21.6_0.033",
+        "family": "afe",
+        "params": {
+          "supply": 21.6,
+          "current": 0.033
+        },
+        "unsafe": false
+      },
+      "assessment": {
+        "checks": {
+          "adc_pin_absolute_budget": true,
+          "burden_below_half_watt": true,
+          "host_poweroff_injection_bounded": true,
+          "overrange_is_invalid": true
+        },
+        "metrics": {
+          "pin_max_V": 2.523131070437,
+          "rail_min_V": 4.600176529512,
+          "host_off_pin_V": 0.033
+        },
+        "criteria_pass": true
+      },
+      "samples": 20083,
+      "horizon": 0.04,
+      "netlist_sha256": "1b145d7abccdde8491a8ab7d3a54413384ca8658616e8143b5e0e27661e50cdc",
+      "experiment_ok": true
+    },
+    {
+      "case": {
+        "name": "afe_26.4_0.004",
+        "family": "afe",
+        "params": {
+          "supply": 26.4,
+          "current": 0.004
+        },
+        "unsafe": false
+      },
+      "assessment": {
+        "checks": {
+          "adc_pin_absolute_budget": true,
+          "burden_below_half_watt": true,
+          "host_poweroff_injection_bounded": true
+        },
+        "metrics": {
+          "pin_max_V": 0.9062441840382,
+          "rail_min_V": 4.600176529475,
+          "host_off_pin_V": 0.033
+        },
+        "criteria_pass": true
+      },
+      "samples": 20069,
+      "horizon": 0.04,
+      "netlist_sha256": "732ceb9685bef384a3232643436262740c32975c6e672486b01d17507b430d45",
+      "experiment_ok": true
+    },
+    {
+      "case": {
+        "name": "afe_26.4_0.02",
+        "family": "afe",
+        "params": {
+          "supply": 26.4,
+          "current": 0.02
+        },
+        "unsafe": false
+      },
+      "assessment": {
+        "checks": {
+          "adc_pin_absolute_budget": true,
+          "burden_below_half_watt": true,
+          "host_poweroff_injection_bounded": true
+        },
+        "metrics": {
+          "pin_max_V": 1.529359285287,
+          "rail_min_V": 4.600176529513,
+          "host_off_pin_V": 0.033
+        },
+        "criteria_pass": true
+      },
+      "samples": 20064,
+      "horizon": 0.04,
+      "netlist_sha256": "8706dd26883ae2bb0f35dc3bfde0310e7c67f1e2ac09bf9d595d3fbbf61a6016",
+      "experiment_ok": true
+    },
+    {
+      "case": {
+        "name": "afe_26.4_0.033",
+        "family": "afe",
+        "params": {
+          "supply": 26.4,
+          "current": 0.033
+        },
+        "unsafe": false
+      },
+      "assessment": {
+        "checks": {
+          "adc_pin_absolute_budget": true,
+          "burden_below_half_watt": true,
+          "host_poweroff_injection_bounded": true,
+          "overrange_is_invalid": true
+        },
+        "metrics": {
+          "pin_max_V": 2.523149850341,
+          "rail_min_V": 4.600176529543,
+          "host_off_pin_V": 0.033
+        },
+        "criteria_pass": true
+      },
+      "samples": 20082,
+      "horizon": 0.04,
+      "netlist_sha256": "c88fbe129bd099483a15e7a47c9e23d8310ebe2491840ccad6860b945248a8c6",
+      "experiment_ok": true
+    },
+    {
+      "case": {
+        "name": "afe_rail_loss",
+        "family": "afe",
+        "params": {
+          "fault": "rail_loss"
+        },
+        "unsafe": false
+      },
+      "assessment": {
+        "checks": {
+          "adc_pin_absolute_budget": true,
+          "burden_below_half_watt": true,
+          "host_poweroff_injection_bounded": true,
+          "signal_disconnected_after_loss": true
+        },
+        "metrics": {
+          "pin_max_V": 1.529345112536,
+          "rail_min_V": 1.647236545771e-05,
+          "host_off_pin_V": 0.033
+        },
+        "criteria_pass": true
+      },
+      "samples": 20143,
+      "horizon": 0.04,
+      "netlist_sha256": "cabf589af16cb9c26564b63032b853f9f1904e074f6c5fb14309160561e5dbfc",
+      "experiment_ok": true
+    },
+    {
+      "case": {
+        "name": "afe_open_burden",
+        "family": "afe",
+        "params": {
+          "fault": "open_burden"
+        },
+        "unsafe": false
+      },
+      "assessment": {
+        "checks": {
+          "adc_pin_absolute_budget": true,
+          "burden_below_half_watt": true,
+          "host_poweroff_injection_bounded": true,
+          "fault_is_not_a_valid_observation": true
+        },
+        "metrics": {
+          "pin_max_V": 2.844779069214,
+          "rail_min_V": 4.600176529499,
+          "host_off_pin_V": 0.033
+        },
+        "criteria_pass": true
+      },
+      "samples": 20101,
+      "horizon": 0.04,
+      "netlist_sha256": "158436847b77bcd97ec0d3839793b5192fa3004ad156fbc13029d13cea1d243e",
+      "experiment_ok": true
+    },
+    {
+      "case": {
+        "name": "afe_short_loop",
+        "family": "afe",
+        "params": {
+          "fault": "short_loop"
+        },
+        "unsafe": false
+      },
+      "assessment": {
+        "checks": {
+          "adc_pin_absolute_budget": true,
+          "burden_below_half_watt": true,
+          "host_poweroff_injection_bounded": true,
+          "fault_is_not_a_valid_observation": true
+        },
+        "metrics": {
+          "pin_max_V": 2.523140962478,
+          "rail_min_V": 4.600176529529,
+          "host_off_pin_V": 0.033
+        },
+        "criteria_pass": true
+      },
+      "samples": 20083,
+      "horizon": 0.04,
+      "netlist_sha256": "ebd414f46a221420840f77f02c897cad55baf611fbeb8053531483b65b86dc6f",
+      "experiment_ok": true
+    },
+    {
+      "case": {
+        "name": "afe_short_burden",
+        "family": "afe",
+        "params": {
+          "fault": "short_burden"
+        },
+        "unsafe": false
+      },
+      "assessment": {
+        "checks": {
+          "adc_pin_absolute_budget": true,
+          "burden_below_half_watt": true,
+          "host_poweroff_injection_bounded": true,
+          "fault_is_not_a_valid_observation": true
+        },
+        "metrics": {
+          "pin_max_V": 0.9050836699373,
+          "rail_min_V": 4.600176529451,
+          "host_off_pin_V": 0.033
+        },
+        "criteria_pass": true
+      },
+      "samples": 20100,
+      "horizon": 0.04,
+      "netlist_sha256": "f6de9bd9cd57515d4dea81b4bae844a8f209a53809605602449d013a3689912d",
+      "experiment_ok": true
+    },
+    {
+      "case": {
+        "name": "afe_open_loop",
+        "family": "afe",
+        "params": {
+          "fault": "open_loop"
+        },
+        "unsafe": false
+      },
+      "assessment": {
+        "checks": {
+          "adc_pin_absolute_budget": true,
+          "burden_below_half_watt": true,
+          "host_poweroff_injection_bounded": true,
+          "fault_is_not_a_valid_observation": true
+        },
+        "metrics": {
+          "pin_max_V": 0.9050914514433,
+          "rail_min_V": 4.600176529451,
+          "host_off_pin_V": 0.033
+        },
+        "criteria_pass": true
+      },
+      "samples": 20136,
+      "horizon": 0.04,
+      "netlist_sha256": "49589818f7594c5bc8474e34055632733bb8bc3f82a89a27e23aeb8fe9111c47",
+      "experiment_ok": true
+    },
+    {
+      "case": {
+        "name": "negative_afe_no_hold_no_isolation",
+        "family": "afe",
+        "params": {
+          "fault": "rail_loss",
+          "hold": 1e-08,
+          "isolate": false
+        },
+        "unsafe": true
+      },
+      "assessment": {
+        "checks": {
+          "adc_pin_absolute_budget": false,
+          "burden_below_half_watt": true,
+          "host_poweroff_injection_bounded": true,
+          "signal_disconnected_after_loss": false
+        },
+        "metrics": {
+          "pin_max_V": 1.529307074991,
+          "rail_min_V": 0.0005875456305811,
+          "host_off_pin_V": 0.033
+        },
+        "criteria_pass": false
+      },
+      "samples": 20191,
+      "horizon": 0.04,
+      "netlist_sha256": "b57d3822392bcb2105fe7429a8644b6f33bfc2ba39530e2ea08ad3a5b65bcdd2",
+      "experiment_ok": true
+    },
+    {
+      "case": {
+        "name": "afe_rail_loss_refined",
+        "family": "afe",
+        "params": {
+          "fault": "rail_loss",
+          "step": 2e-07
+        },
+        "unsafe": false
+      },
+      "assessment": {
+        "checks": {
+          "adc_pin_absolute_budget": true,
+          "burden_below_half_watt": true,
+          "host_poweroff_injection_bounded": true,
+          "signal_disconnected_after_loss": true
+        },
+        "metrics": {
+          "pin_max_V": 1.52922722359,
+          "rail_min_V": 1.647308450859e-05,
+          "host_off_pin_V": 0.033
+        },
+        "criteria_pass": true
+      },
+      "samples": 200111,
+      "horizon": 0.04,
+      "netlist_sha256": "be9ef70b459ebfdb45ff6a2d1f81e36781a84469b9944821a8ab78c5057d28a1",
+      "experiment_ok": true
+    },
+    {
+      "case": {
+        "name": "afe_burden_99.9",
+        "family": "afe",
+        "params": {
+          "burden": 99.9
+        },
+        "unsafe": false
+      },
+      "assessment": {
+        "checks": {
+          "adc_pin_absolute_budget": true,
+          "burden_below_half_watt": true,
+          "host_poweroff_injection_bounded": true
+        },
+        "metrics": {
+          "pin_max_V": 1.527818851732,
+          "rail_min_V": 4.600176529498,
+          "host_off_pin_V": 0.033
+        },
+        "criteria_pass": true
+      },
+      "samples": 20063,
+      "horizon": 0.04,
+      "netlist_sha256": "ff052505b733ca49d5b6edad4f4eb564cabf33eaf17e00970eb015ed9f17620d",
+      "experiment_ok": true
+    },
+    {
+      "case": {
+        "name": "afe_burden_100.1",
+        "family": "afe",
+        "params": {
+          "burden": 100.1
+        },
+        "unsafe": false
+      },
+      "assessment": {
+        "checks": {
+          "adc_pin_absolute_budget": true,
+          "burden_below_half_watt": true,
+          "host_poweroff_injection_bounded": true
+        },
+        "metrics": {
+          "pin_max_V": 1.530871347887,
+          "rail_min_V": 4.600176529498,
+          "host_off_pin_V": 0.033
+        },
+        "criteria_pass": true
+      },
+      "samples": 20063,
+      "horizon": 0.04,
+      "netlist_sha256": "e37a0644516aa38a6d23895e3d0c97ef0cef738cfb5a9b53dc2071c7b755b68e",
+      "experiment_ok": true
+    },
+    {
+      "case": {
+        "name": "flow_high",
+        "family": "flow",
+        "params": {
+          "level": "high"
+        },
+        "unsafe": false
+      },
+      "assessment": {
+        "checks": {
+          "healthy_low_or_high_is_valid_zero_or_pulse": true,
+          "conditioned_field_input_bounded": true
+        },
+        "metrics": {
+          "line_V": 3.401469262855,
+          "ratio": 0.6802938525710001,
+          "valid": true
+        },
+        "criteria_pass": true
+      },
+      "samples": 1008,
+      "horizon": 0.01,
+      "netlist_sha256": "7dae167d12f42ba81f60cd58bdcd193d0f0196dd0774ceea07b910b4f1b93e52",
+      "experiment_ok": true
+    },
+    {
+      "case": {
+        "name": "flow_low",
+        "family": "flow",
+        "params": {
+          "level": "low"
+        },
+        "unsafe": false
+      },
+      "assessment": {
+        "checks": {
+          "healthy_low_or_high_is_valid_zero_or_pulse": true,
+          "conditioned_field_input_bounded": true
+        },
+        "metrics": {
+          "line_V": 1.386994051429,
+          "ratio": 0.2773988102858,
+          "valid": true
+        },
+        "criteria_pass": true
+      },
+      "samples": 1008,
+      "horizon": 0.01,
+      "netlist_sha256": "b7fbcbf7afba51fbd9db7097e72098329c2aa7e8f02d66499b6612d15ecacd83",
+      "experiment_ok": true
+    },
+    {
+      "case": {
+        "name": "flow_open",
+        "family": "flow",
+        "params": {
+          "level": "open"
+        },
+        "unsafe": false
+      },
+      "assessment": {
+        "checks": {
+          "healthy_low_or_high_is_valid_zero_or_pulse": true,
+          "conditioned_field_input_bounded": true
+        },
+        "metrics": {
+          "line_V": 4.751869541924,
+          "ratio": 0.9503739083848,
+          "valid": false
+        },
+        "criteria_pass": true
+      },
+      "samples": 1008,
+      "horizon": 0.01,
+      "netlist_sha256": "d910c4f7c6bac1053ad259d2265f9a6cc080405aa2e3a3061f07a509df18bb7c",
+      "experiment_ok": true
+    },
+    {
+      "case": {
+        "name": "flow_short",
+        "family": "flow",
+        "params": {
+          "level": "short"
+        },
+        "unsafe": false
+      },
+      "assessment": {
+        "checks": {
+          "healthy_low_or_high_is_valid_zero_or_pulse": true,
+          "conditioned_field_input_bounded": true
+        },
+        "metrics": {
+          "line_V": 1.063829454515e-06,
+          "ratio": 2.12765890903e-07,
+          "valid": false
+        },
+        "criteria_pass": true
+      },
+      "samples": 1008,
+      "horizon": 0.01,
+      "netlist_sha256": "1a250899bf8739d100851d34d20062b979ad33734c909a94e9c511868e62c09b",
+      "experiment_ok": true
+    },
+    {
+      "case": {
+        "name": "flow_eol_open",
+        "family": "flow",
+        "params": {
+          "level": "eol_open"
+        },
+        "unsafe": false
+      },
+      "assessment": {
+        "checks": {
+          "healthy_low_or_high_is_valid_zero_or_pulse": true,
+          "conditioned_field_input_bounded": true
+        },
+        "metrics": {
+          "line_V": 1.594696907981,
+          "ratio": 0.3189393815962,
+          "valid": false
+        },
+        "criteria_pass": true
+      },
+      "samples": 1008,
+      "horizon": 0.01,
+      "netlist_sha256": "9357e5eaf6d5acb014c98f44cac62265785246bb9df273048a37fa44b653b843",
+      "experiment_ok": true
+    },
+    {
+      "case": {
+        "name": "flow_24V_fault",
+        "family": "flow",
+        "params": {
+          "level": "24V_fault"
+        },
+        "unsafe": false
+      },
+      "assessment": {
+        "checks": {
+          "healthy_low_or_high_is_valid_zero_or_pulse": true,
+          "conditioned_field_input_bounded": true
+        },
+        "metrics": {
+          "line_V": 23.91624038598,
+          "ratio": 4.783248077196,
+          "valid": false
+        },
+        "criteria_pass": true
+      },
+      "samples": 1008,
+      "horizon": 0.01,
+      "netlist_sha256": "6b474f0cb96fe40dffcedb5f75a57df19bd0e40ae0dccec2b45e1e6536bec7a8",
+      "experiment_ok": true
+    },
+    {
+      "case": {
+        "name": "flow_4.75_high",
+        "family": "flow",
+        "params": {
+          "level": "high",
+          "supply": 4.75
+        },
+        "unsafe": false
+      },
+      "assessment": {
+        "checks": {
+          "healthy_low_or_high_is_valid_zero_or_pulse": true,
+          "conditioned_field_input_bounded": true
+        },
+        "metrics": {
+          "line_V": 3.231395799552,
+          "ratio": 0.6802938525372632,
+          "valid": true
+        },
+        "criteria_pass": true
+      },
+      "samples": 1008,
+      "horizon": 0.01,
+      "netlist_sha256": "c44a5cb04e04efaa05899043b84a50b9f23c70d497d01157de783fa2bfdca71f",
+      "experiment_ok": true
+    },
+    {
+      "case": {
+        "name": "flow_4.75_low",
+        "family": "flow",
+        "params": {
+          "level": "low",
+          "supply": 4.75
+        },
+        "unsafe": false
+      },
+      "assessment": {
+        "checks": {
+          "healthy_low_or_high_is_valid_zero_or_pulse": true,
+          "conditioned_field_input_bounded": true
+        },
+        "metrics": {
+          "line_V": 1.317644348793,
+          "ratio": 0.2773988102722105,
+          "valid": true
+        },
+        "criteria_pass": true
+      },
+      "samples": 1008,
+      "horizon": 0.01,
+      "netlist_sha256": "994bf6fffb689741a08363b10ef9071c92b4d067c7152579158f91aae1a31e84",
+      "experiment_ok": true
+    },
+    {
+      "case": {
+        "name": "flow_5.25_high",
+        "family": "flow",
+        "params": {
+          "level": "high",
+          "supply": 5.25
+        },
+        "unsafe": false
+      },
+      "assessment": {
+        "checks": {
+          "healthy_low_or_high_is_valid_zero_or_pulse": true,
+          "conditioned_field_input_bounded": true
+        },
+        "metrics": {
+          "line_V": 3.571542726158,
+          "ratio": 0.6802938526015238,
+          "valid": true
+        },
+        "criteria_pass": true
+      },
+      "samples": 1008,
+      "horizon": 0.01,
+      "netlist_sha256": "007943915d55832383de067cec15472cc3d104b1a708f3d3c5ade8e9cb0a2d28",
+      "experiment_ok": true
+    },
+    {
+      "case": {
+        "name": "flow_5.25_low",
+        "family": "flow",
+        "params": {
+          "level": "low",
+          "supply": 5.25
+        },
+        "unsafe": false
+      },
+      "assessment": {
+        "checks": {
+          "healthy_low_or_high_is_valid_zero_or_pulse": true,
+          "conditioned_field_input_bounded": true
+        },
+        "metrics": {
+          "line_V": 1.456343754066,
+          "ratio": 0.2773988102982857,
+          "valid": true
+        },
+        "criteria_pass": true
+      },
+      "samples": 1008,
+      "horizon": 0.01,
+      "netlist_sha256": "b4a2f47afc73610b893dfb08be8c2cdfbee50359f21fa855463c0d71285f515b",
+      "experiment_ok": true
+    },
+    {
+      "case": {
+        "name": "power_10.8_1.752",
+        "family": "power",
+        "params": {
+          "supply": 10.8,
+          "limit": 1.752
+        },
+        "unsafe": false
+      },
+      "assessment": {
+        "checks": {
+          "startup_supports_load": true,
+          "no_nuisance_latch": true,
+          "pass_current_bounded": true,
+          "pass_power_bounded": true,
+          "regulated_forward_SOA_rectangle": true
+        },
+        "metrics": {
+          "output_max_V": 10.36755212175,
+          "pass_peak_A": 1.740073606807,
+          "pass_peak_W": 6.598104270548,
+          "tail_voltage_max_V": 10.36755212175,
+          "pass_energy_J": 0.15355707245483688
+        },
+        "criteria_pass": true
+      },
+      "samples": 80577,
+      "horizon": 0.8,
+      "netlist_sha256": "aa68767fbd1829f251a022400d0f7750d066c2520fa85ab8d9c5a0f28bbeef4a",
+      "experiment_ok": true
+    },
+    {
+      "case": {
+        "name": "power_10.8_2.268",
+        "family": "power",
+        "params": {
+          "supply": 10.8,
+          "limit": 2.268
+        },
+        "unsafe": false
+      },
+      "assessment": {
+        "checks": {
+          "startup_supports_load": true,
+          "no_nuisance_latch": true,
+          "pass_current_bounded": true,
+          "pass_power_bounded": true,
+          "regulated_forward_SOA_rectangle": true
+        },
+        "metrics": {
+          "output_max_V": 10.36755212175,
+          "pass_peak_A": 1.740073460421,
+          "pass_peak_W": 6.598104270542,
+          "tail_voltage_max_V": 10.36755212175,
+          "pass_energy_J": 0.1535577159405685
+        },
+        "criteria_pass": true
+      },
+      "samples": 80525,
+      "horizon": 0.8,
+      "netlist_sha256": "460f2c0cc3e99feaff1f8a21ca51f76adc4342ce623c6bc13574defc7794ab85",
+      "experiment_ok": true
+    },
+    {
+      "case": {
+        "name": "power_13.2_1.752",
+        "family": "power",
+        "params": {
+          "supply": 13.2,
+          "limit": 1.752
+        },
+        "unsafe": false
+      },
+      "assessment": {
+        "checks": {
+          "startup_supports_load": true,
+          "no_nuisance_latch": true,
+          "pass_current_bounded": true,
+          "pass_power_bounded": true,
+          "regulated_forward_SOA_rectangle": true
+        },
+        "metrics": {
+          "output_max_V": 12.76744844623,
+          "pass_peak_A": 1.752,
+          "pass_peak_W": 10.93303594199,
+          "tail_voltage_max_V": 12.76744844623,
+          "pass_energy_J": 0.24760863352169285
+        },
+        "criteria_pass": true
+      },
+      "samples": 80564,
+      "horizon": 0.8,
+      "netlist_sha256": "e35ec6ab381056d4fbe5d5b9632ee41fa034a55b04a62a3da2d2d68be3736e2c",
+      "experiment_ok": true
+    },
+    {
+      "case": {
+        "name": "power_13.2_2.268",
+        "family": "power",
+        "params": {
+          "supply": 13.2,
+          "limit": 2.268
+        },
+        "unsafe": false
+      },
+      "assessment": {
+        "checks": {
+          "startup_supports_load": true,
+          "no_nuisance_latch": true,
+          "pass_current_bounded": true,
+          "pass_power_bounded": true,
+          "regulated_forward_SOA_rectangle": true
+        },
+        "metrics": {
+          "output_max_V": 12.76744844623,
+          "pass_peak_A": 1.796233671311,
+          "pass_peak_W": 10.93307780846,
+          "tail_voltage_max_V": 12.76744844623,
+          "pass_energy_J": 0.2321251074532968
+        },
+        "criteria_pass": true
+      },
+      "samples": 80510,
+      "horizon": 0.8,
+      "netlist_sha256": "b3c23900daa7bc36f5a175bcd6094bb8a99023a7860f3205668b17c7640afecc",
+      "experiment_ok": true
+    },
+    {
+      "case": {
+        "name": "power_short",
+        "family": "power",
+        "params": {
+          "fault": "short"
+        },
+        "unsafe": false
+      },
+      "assessment": {
+        "checks": {
+          "fault_does_not_restart": true,
+          "fault_was_actually_excited": true,
+          "pass_current_bounded": true,
+          "pass_power_bounded": true,
+          "regulated_forward_SOA_rectangle": true
+        },
+        "metrics": {
+          "output_max_V": 0.1010383181664,
+          "pass_peak_A": 2.02077646716,
+          "pass_peak_W": 25.00000313386,
+          "tail_voltage_max_V": 8.187e-321,
+          "pass_energy_J": 1.5066745231359975
+        },
+        "criteria_pass": true
+      },
+      "samples": 80602,
+      "horizon": 0.8,
+      "netlist_sha256": "843be4e944af87226edb00e3ba527abb24be142293e8bf22e4e1be47b8a5e74b",
+      "experiment_ok": true
+    },
+    {
+      "case": {
+        "name": "power_overload",
+        "family": "power",
+        "params": {
+          "fault": "overload"
+        },
+        "unsafe": false
+      },
+      "assessment": {
+        "checks": {
+          "fault_does_not_restart": true,
+          "fault_was_actually_excited": true,
+          "pass_current_bounded": true,
+          "pass_power_bounded": true,
+          "regulated_forward_SOA_rectangle": true
+        },
+        "metrics": {
+          "output_max_V": 12.55145777702,
+          "pass_peak_A": 2.268,
+          "pass_peak_W": 14.61112510416,
+          "tail_voltage_max_V": 1.916433747863e-08,
+          "pass_energy_J": 0.6573044158820291
+        },
+        "criteria_pass": true
+      },
+      "samples": 80558,
+      "horizon": 0.8,
+      "netlist_sha256": "6a2b3b369960d3cadd9b2ca187f7ecf838107f0070e5dcbdffce151134bc9880",
+      "experiment_ok": true
+    },
+    {
+      "case": {
+        "name": "power_estop",
+        "family": "power",
+        "params": {
+          "fault": "estop"
+        },
+        "unsafe": false
+      },
+      "assessment": {
+        "checks": {
+          "fault_does_not_restart": true,
+          "pre_fault_actuation_was_observed": true,
+          "pass_current_bounded": true,
+          "pass_power_bounded": true,
+          "regulated_forward_SOA_rectangle": true
+        },
+        "metrics": {
+          "output_max_V": 12.76744844623,
+          "pass_peak_A": 1.796233671311,
+          "pass_peak_W": 10.93307780846,
+          "tail_voltage_max_V": 7.993531112275e-07,
+          "pass_energy_J": 0.11173411959642834
+        },
+        "criteria_pass": true
+      },
+      "samples": 80470,
+      "horizon": 0.8,
+      "netlist_sha256": "8451c780b19d6395ef1d6cef3b77a854c6017cfef7f31cee01da5c61612ce138",
+      "experiment_ok": true
+    },
+    {
+      "case": {
+        "name": "power_watchdog",
+        "family": "power",
+        "params": {
+          "fault": "watchdog"
+        },
+        "unsafe": false
+      },
+      "assessment": {
+        "checks": {
+          "fault_does_not_restart": true,
+          "pre_fault_actuation_was_observed": true,
+          "pass_current_bounded": true,
+          "pass_power_bounded": true,
+          "regulated_forward_SOA_rectangle": true
+        },
+        "metrics": {
+          "output_max_V": 12.76744844623,
+          "pass_peak_A": 1.796233671311,
+          "pass_peak_W": 10.93307780846,
+          "tail_voltage_max_V": 7.993531112275e-07,
+          "pass_energy_J": 0.11173411959642834
+        },
+        "criteria_pass": true
+      },
+      "samples": 80470,
+      "horizon": 0.8,
+      "netlist_sha256": "54fce046b513cd9df1e49f7a825abaa1e9b06e9614cd8dd6c0f5bfd6c17050b0",
+      "experiment_ok": true
+    },
+    {
+      "case": {
+        "name": "power_brownout",
+        "family": "power",
+        "params": {
+          "fault": "brownout"
+        },
+        "unsafe": false
+      },
+      "assessment": {
+        "checks": {
+          "fault_does_not_restart": true,
+          "pre_fault_actuation_was_observed": true,
+          "pass_current_bounded": true,
+          "pass_power_bounded": true,
+          "regulated_forward_SOA_rectangle": true
+        },
+        "metrics": {
+          "output_max_V": 12.76744844623,
+          "pass_peak_A": 1.796233671311,
+          "pass_peak_W": 10.93307780846,
+          "tail_voltage_max_V": 7.993531153333e-07,
+          "pass_energy_J": 0.11173411959642834
+        },
+        "criteria_pass": true
+      },
+      "samples": 80527,
+      "horizon": 0.8,
+      "netlist_sha256": "044820d96ec299ec40ecd13975f5651951cd58a2b2518c906aa72e196efbac5b",
+      "experiment_ok": true
+    },
+    {
+      "case": {
+        "name": "power_q_short",
+        "family": "power",
+        "params": {
+          "fault": "q_short"
+        },
+        "unsafe": false
+      },
+      "assessment": {
+        "checks": {
+          "fault_does_not_restart": true,
+          "pre_fault_actuation_was_observed": true,
+          "pass_current_bounded": true,
+          "pass_power_bounded": true,
+          "regulated_forward_SOA_rectangle": true
+        },
+        "metrics": {
+          "output_max_V": 12.81833492465,
+          "pass_peak_A": 1.796233668794,
+          "pass_peak_W": 10.93307760904,
+          "tail_voltage_max_V": 0.0005597671885739,
+          "pass_energy_J": 0.10514047203625466
+        },
+        "criteria_pass": true
+      },
+      "samples": 80532,
+      "horizon": 0.8,
+      "netlist_sha256": "ea2758833b7f0fec4035e35aebb26d9bee1eb3f8af6ae756274f2d091cabdc14",
+      "experiment_ok": true
+    },
+    {
+      "case": {
+        "name": "power_k1_weld",
+        "family": "power",
+        "params": {
+          "fault": "k1_weld"
+        },
+        "unsafe": false
+      },
+      "assessment": {
+        "checks": {
+          "fault_does_not_restart": true,
+          "pre_fault_actuation_was_observed": true,
+          "pass_current_bounded": true,
+          "pass_power_bounded": true,
+          "regulated_forward_SOA_rectangle": true
+        },
+        "metrics": {
+          "output_max_V": 12.78246697113,
+          "pass_peak_A": 1.796233671311,
+          "pass_peak_W": 10.93307780846,
+          "tail_voltage_max_V": 7.994954105928e-07,
+          "pass_energy_J": 0.11173516544448314
+        },
+        "criteria_pass": true
+      },
+      "samples": 80486,
+      "horizon": 0.8,
+      "netlist_sha256": "5443ba19428e18cff24916f8cdf81c3f46f9eda5316d89b1d0e398101e0d48b4",
+      "experiment_ok": true
+    },
+    {
+      "case": {
+        "name": "power_k2_weld",
+        "family": "power",
+        "params": {
+          "fault": "k2_weld"
+        },
+        "unsafe": false
+      },
+      "assessment": {
+        "checks": {
+          "fault_does_not_restart": true,
+          "pre_fault_actuation_was_observed": true,
+          "pass_current_bounded": true,
+          "pass_power_bounded": true,
+          "regulated_forward_SOA_rectangle": true
+        },
+        "metrics": {
+          "output_max_V": 12.78246697113,
+          "pass_peak_A": 1.796233671311,
+          "pass_peak_W": 10.93307780846,
+          "tail_voltage_max_V": 7.994954105928e-07,
+          "pass_energy_J": 0.11173516544448532
+        },
+        "criteria_pass": true
+      },
+      "samples": 80486,
+      "horizon": 0.8,
+      "netlist_sha256": "dfa9f91b23d8d112e8365a4837434ea06a22560791103010bfdb258566f47565",
+      "experiment_ok": true
+    },
+    {
+      "case": {
+        "name": "power_k1_weld_q_short",
+        "family": "power",
+        "params": {
+          "fault": "k1_weld_q_short"
+        },
+        "unsafe": false
+      },
+      "assessment": {
+        "checks": {
+          "fault_does_not_restart": true,
+          "pre_fault_actuation_was_observed": true,
+          "pass_current_bounded": true,
+          "pass_power_bounded": true,
+          "regulated_forward_SOA_rectangle": true
+        },
+        "metrics": {
+          "output_max_V": 12.8333536022,
+          "pass_peak_A": 1.796233450295,
+          "pass_peak_W": 10.93307661944,
+          "tail_voltage_max_V": 2.34579104989e-05,
+          "pass_energy_J": 0.10514070097652445
+        },
+        "criteria_pass": true
+      },
+      "samples": 80509,
+      "horizon": 0.8,
+      "netlist_sha256": "ad83bb30c7b7f6dc852e586b7bb80dcfe08f5b336a7a407d2ab0a6c437168d42",
+      "experiment_ok": true
+    },
+    {
+      "case": {
+        "name": "power_restore",
+        "family": "power",
+        "params": {
+          "fault": "restore"
+        },
+        "unsafe": false
+      },
+      "assessment": {
+        "checks": {
+          "fault_does_not_restart": true,
+          "pre_fault_actuation_was_observed": true,
+          "pass_current_bounded": true,
+          "pass_power_bounded": true,
+          "regulated_forward_SOA_rectangle": true
+        },
+        "metrics": {
+          "output_max_V": 12.76744844623,
+          "pass_peak_A": 1.796233671311,
+          "pass_peak_W": 10.93307780846,
+          "tail_voltage_max_V": 7.993531153333e-07,
+          "pass_energy_J": 0.11173411959642834
+        },
+        "criteria_pass": true
+      },
+      "samples": 80527,
+      "horizon": 0.8,
+      "netlist_sha256": "d84b0243f8c0464581a1dc81b385a7320a13e185c1daa4c254caf41292692a8d",
+      "experiment_ok": true
+    },
+    {
+      "case": {
+        "name": "power_max_cap_low_limit",
+        "family": "power",
+        "params": {
+          "cap": 0.00047,
+          "limit": 1.752,
+          "power": 12
+        },
+        "unsafe": false
+      },
+      "assessment": {
+        "checks": {
+          "startup_supports_load": true,
+          "no_nuisance_latch": true,
+          "pass_current_bounded": true,
+          "pass_power_bounded": true,
+          "regulated_forward_SOA_rectangle": true
+        },
+        "metrics": {
+          "output_max_V": 12.76744844623,
+          "pass_peak_A": 1.752,
+          "pass_peak_W": 10.93303594199,
+          "tail_voltage_max_V": 12.76744844623,
+          "pass_energy_J": 0.2476086335138615
+        },
+        "criteria_pass": true
+      },
+      "samples": 80564,
+      "horizon": 0.8,
+      "netlist_sha256": "b79327afd181f4b66697eaa8fdf5e7f8f6925c3791a599ba1bff00832f74e69c",
+      "experiment_ok": true
+    },
+    {
+      "case": {
+        "name": "power_low_limit_fast_timer",
+        "family": "power",
+        "params": {
+          "supply": 10.8,
+          "cap": 0.00047,
+          "limit": 1.752,
+          "power": 12,
+          "timeout": 0.02
+        },
+        "unsafe": false
+      },
+      "assessment": {
+        "checks": {
+          "startup_supports_load": true,
+          "no_nuisance_latch": true,
+          "pass_current_bounded": true,
+          "pass_power_bounded": true,
+          "regulated_forward_SOA_rectangle": true
+        },
+        "metrics": {
+          "output_max_V": 10.36755212175,
+          "pass_peak_A": 1.740073606807,
+          "pass_peak_W": 6.598104270548,
+          "tail_voltage_max_V": 10.36755212175,
+          "pass_energy_J": 0.15355707245481318
+        },
+        "criteria_pass": true
+      },
+      "samples": 80577,
+      "horizon": 0.8,
+      "netlist_sha256": "22e55e8502038ce8e11f79c2cb909bb8d18fff820f11fb9d408d6b39f7ac2dee",
+      "experiment_ok": true
+    },
+    {
+      "case": {
+        "name": "power_refined",
+        "family": "power",
+        "params": {
+          "step": 2e-06
+        },
+        "unsafe": false
+      },
+      "assessment": {
+        "checks": {
+          "startup_supports_load": true,
+          "no_nuisance_latch": true,
+          "pass_current_bounded": true,
+          "pass_power_bounded": true,
+          "regulated_forward_SOA_rectangle": true
+        },
+        "metrics": {
+          "output_max_V": 12.76744844623,
+          "pass_peak_A": 1.796233698861,
+          "pass_peak_W": 10.93289903821,
+          "tail_voltage_max_V": 12.76744844623,
+          "pass_energy_J": 0.2321237956589031
+        },
+        "criteria_pass": true
+      },
+      "samples": 400338,
+      "horizon": 0.8,
+      "netlist_sha256": "0bdd904eb14bdadffb7c8a8006748fe8e67491fc560eb2423767e05cee216fb3",
+      "experiment_ok": true
+    },
+    {
+      "case": {
+        "name": "negative_power_no_cutoff_no_latch",
+        "family": "power",
+        "params": {
+          "fault": "q_short",
+          "unguarded": true
+        },
+        "unsafe": true
+      },
+      "assessment": {
+        "checks": {
+          "fault_does_not_restart": false,
+          "pre_fault_actuation_was_observed": true,
+          "pass_current_bounded": true,
+          "pass_power_bounded": true,
+          "regulated_forward_SOA_rectangle": true
+        },
+        "metrics": {
+          "output_max_V": 12.84837232481,
+          "pass_peak_A": 1.79623345027,
+          "pass_peak_W": 10.93307662169,
+          "tail_voltage_max_V": 12.84837232481,
+          "pass_energy_J": 0.10720277982869846
+        },
+        "criteria_pass": false
+      },
+      "samples": 80555,
+      "horizon": 0.8,
+      "netlist_sha256": "7de6a7978097b2c707b0bbbad4a3e6e60c6ee5e9703e7b4f91c133aec60fc218",
+      "experiment_ok": true
+    },
+    {
+      "case": {
+        "name": "coil_0.05",
+        "family": "coil",
+        "params": {
+          "L": 0.05
+        },
+        "unsafe": false
+      },
+      "assessment": {
+        "checks": {
+          "drain_below_80V_design_limit": true,
+          "coil_current_removed_by_one_second": true,
+          "energy_within_5J_suppressor_requirement": true
+        },
+        "metrics": {
+          "drain_peak_V": 55.45074868538,
+          "stored_energy_J": 0.008937329213116239
+        },
+        "criteria_pass": true
+      },
+      "samples": 62747,
+      "horizon": 1,
+      "netlist_sha256": "3401b2568af7bd26e529b5858827d99e69d7b1ba4eebd40837495a2818e16cbc",
+      "experiment_ok": true
+    },
+    {
+      "case": {
+        "name": "coil_1",
+        "family": "coil",
+        "params": {
+          "L": 1
+        },
+        "unsafe": false
+      },
+      "assessment": {
+        "checks": {
+          "drain_below_80V_design_limit": true,
+          "coil_current_removed_by_one_second": true,
+          "energy_within_5J_suppressor_requirement": true
+        },
+        "metrics": {
+          "drain_peak_V": 55.45076135779,
+          "stored_energy_J": 0.1787465842623248
+        },
+        "criteria_pass": true
+      },
+      "samples": 154290,
+      "horizon": 1,
+      "netlist_sha256": "2defff77ea071b180c9f89a2aa9b7bf21935b968ff43307f057019b201110f75",
+      "experiment_ok": true
+    },
+    {
+      "case": {
+        "name": "coil_10",
+        "family": "coil",
+        "params": {
+          "L": 10
+        },
+        "unsafe": false
+      },
+      "assessment": {
+        "checks": {
+          "drain_below_80V_design_limit": true,
+          "coil_current_removed_by_one_second": true,
+          "energy_within_5J_suppressor_requirement": true
+        },
+        "metrics": {
+          "drain_peak_V": 55.45076195805,
+          "stored_energy_J": 1.787465842623248
+        },
+        "criteria_pass": true
+      },
+      "samples": 59128,
+      "horizon": 1,
+      "netlist_sha256": "e694ccbe924bf4aba7674e15c99640b39161dc6945e370b9b7ee4927ae274d2f",
+      "experiment_ok": true
+    },
+    {
+      "case": {
+        "name": "negative_coil_no_suppression",
+        "family": "coil",
+        "params": {
+          "L": 10,
+          "unclamped": true
+        },
+        "unsafe": true
+      },
+      "assessment": {
+        "checks": {
+          "drain_below_80V_design_limit": false,
+          "coil_current_removed_by_one_second": true,
+          "energy_within_5J_suppressor_requirement": true
+        },
+        "metrics": {
+          "drain_peak_V": 100.2356837007,
+          "stored_energy_J": 1.7874658426447727
+        },
+        "criteria_pass": false
+      },
+      "samples": 65991,
+      "horizon": 1,
+      "netlist_sha256": "85224497e601de2cb7a3dc5d5f57de7b71a668373be594f335a8c375803929af",
+      "experiment_ok": true
+    }
+  ],
+  "analytical": [
+    {
+      "name": "branch_instant_closure_with_arrestor",
+      "passed": true,
+      "metrics": {
+        "energy_J": 0.03944444444444445,
+        "peak_bound_bar": 0.9972125095937661
+      },
+      "basis": "Stored line kinetic energy into minimum declared compliance; factor 2 pressure margin; 0.60bar head envelope"
+    },
+    {
+      "name": "main_instant_closure_with_arrestor",
+      "passed": true,
+      "metrics": {
+        "energy_J": 0.27777777777777773,
+        "peak_bound_bar": 1.6540925533894595
+      },
+      "basis": "Stored line kinetic energy into minimum declared compliance; factor 2 pressure margin; 0.60bar head envelope"
+    },
+    {
+      "name": "arrestor_unavailable_slow_valve",
+      "passed": true,
+      "metrics": {
+        "peak_bar": 1.5466666666666669
+      },
+      "basis": "Minimum 50ms hydraulic closure and maximum total branch inertance, conservative slow-closure bound"
+    },
+    {
+      "name": "negative_fast_valve_and_no_arrestor_detected",
+      "passed": true,
+      "metrics": {
+        "peak_bar": 18.283882565766152
+      },
+      "basis": "Unsafe simultaneous loss of two transient protections; Joukowsky upper comparison, not permitted procurement substitution"
+    },
+    {
+      "name": "relief_capacity_covers_pump",
+      "passed": true,
+      "metrics": {
+        "pump_Lmin": 10,
+        "relief_Lmin": 10,
+        "full_flow_pressure_bar": 0.45
+      },
+      "basis": "Independent full-flow water relief; return backpressure included in supplier rating"
+    },
+    {
+      "name": "hydraulic_0.3_7_0.5_False",
+      "passed": true,
+      "metrics": {
+        "steady_bar": 0.037411585841363115,
+        "bypass_blocked": false
+      },
+      "basis": "Monotone curve-shape family, fixed return, bounded metering branch and independent full-flow relief; not an identified vendor pump curve"
+    },
+    {
+      "name": "hydraulic_0.3_7_0.5_True",
+      "passed": true,
+      "metrics": {
+        "steady_bar": 0.2910891089108911,
+        "bypass_blocked": true
+      },
+      "basis": "Monotone curve-shape family, fixed return, bounded metering branch and independent full-flow relief; not an identified vendor pump curve"
+    },
+    {
+      "name": "hydraulic_0.3_7_1_False",
+      "passed": true,
+      "metrics": {
+        "steady_bar": 0.03368277204891905,
+        "bypass_blocked": false
+      },
+      "basis": "Monotone curve-shape family, fixed return, bounded metering branch and independent full-flow relief; not an identified vendor pump curve"
+    },
+    {
+      "name": "hydraulic_0.3_7_1_True",
+      "passed": true,
+      "metrics": {
+        "steady_bar": 0.25190230261818825,
+        "bypass_blocked": true
+      },
+      "basis": "Monotone curve-shape family, fixed return, bounded metering branch and independent full-flow relief; not an identified vendor pump curve"
+    },
+    {
+      "name": "hydraulic_0.3_7_2_False",
+      "passed": true,
+      "metrics": {
+        "steady_bar": 0.02862039472567618,
+        "bypass_blocked": false
+      },
+      "basis": "Monotone curve-shape family, fixed return, bounded metering branch and independent full-flow relief; not an identified vendor pump curve"
+    },
+    {
+      "name": "hydraulic_0.3_7_2_True",
+      "passed": true,
+      "metrics": {
+        "steady_bar": 0.18830579145595994,
+        "bypass_blocked": true
+      },
+      "basis": "Monotone curve-shape family, fixed return, bounded metering branch and independent full-flow relief; not an identified vendor pump curve"
+    },
+    {
+      "name": "hydraulic_0.3_10_0.5_False",
+      "passed": true,
+      "metrics": {
+        "steady_bar": 0.0675787687680959,
+        "bypass_blocked": false
+      },
+      "basis": "Monotone curve-shape family, fixed return, bounded metering branch and independent full-flow relief; not an identified vendor pump curve"
+    },
+    {
+      "name": "hydraulic_0.3_10_0.5_True",
+      "passed": true,
+      "metrics": {
+        "steady_bar": 0.29556650246305416,
+        "bypass_blocked": true
+      },
+      "basis": "Monotone curve-shape family, fixed return, bounded metering branch and independent full-flow relief; not an identified vendor pump curve"
+    },
+    {
+      "name": "hydraulic_0.3_10_1_False",
+      "passed": true,
+      "metrics": {
+        "steady_bar": 0.057156550392721425,
+        "bypass_blocked": false
+      },
+      "basis": "Monotone curve-shape family, fixed return, bounded metering branch and independent full-flow relief; not an identified vendor pump curve"
+    },
+    {
+      "name": "hydraulic_0.3_10_1_True",
+      "passed": true,
+      "metrics": {
+        "steady_bar": 0.26543882642457595,
+        "bypass_blocked": true
+      },
+      "basis": "Monotone curve-shape family, fixed return, bounded metering branch and independent full-flow relief; not an identified vendor pump curve"
+    },
+    {
+      "name": "hydraulic_0.3_10_2_False",
+      "passed": true,
+      "metrics": {
+        "steady_bar": 0.045311476621328506,
+        "bypass_blocked": false
+      },
+      "basis": "Monotone curve-shape family, fixed return, bounded metering branch and independent full-flow relief; not an identified vendor pump curve"
+    },
+    {
+      "name": "hydraulic_0.3_10_2_True",
+      "passed": true,
+      "metrics": {
+        "steady_bar": 0.20459177850920363,
+        "bypass_blocked": true
+      },
+      "basis": "Monotone curve-shape family, fixed return, bounded metering branch and independent full-flow relief; not an identified vendor pump curve"
+    },
+    {
+      "name": "hydraulic_0.6_7_0.5_False",
+      "passed": true,
+      "metrics": {
+        "steady_bar": 0.03989942014427683,
+        "bypass_blocked": false
+      },
+      "basis": "Monotone curve-shape family, fixed return, bounded metering branch and independent full-flow relief; not an identified vendor pump curve"
+    },
+    {
+      "name": "hydraulic_0.6_7_0.5_True",
+      "passed": true,
+      "metrics": {
+        "steady_bar": 0.34285714285714286,
+        "bypass_blocked": true
+      },
+      "basis": "Monotone curve-shape family, fixed return, bounded metering branch and independent full-flow relief; not an identified vendor pump curve"
+    },
+    {
+      "name": "hydraulic_0.6_7_1_False",
+      "passed": true,
+      "metrics": {
+        "steady_bar": 0.037558178649373164,
+        "bypass_blocked": false
+      },
+      "basis": "Monotone curve-shape family, fixed return, bounded metering branch and independent full-flow relief; not an identified vendor pump curve"
+    },
+    {
+      "name": "hydraulic_0.6_7_1_True",
+      "passed": true,
+      "metrics": {
+        "steady_bar": 0.33393945621638743,
+        "bypass_blocked": true
+      },
+      "basis": "Monotone curve-shape family, fixed return, bounded metering branch and independent full-flow relief; not an identified vendor pump curve"
+    },
+    {
+      "name": "hydraulic_0.6_7_2_False",
+      "passed": true,
+      "metrics": {
+        "steady_bar": 0.03387605996427802,
+        "bypass_blocked": false
+      },
+      "basis": "Monotone curve-shape family, fixed return, bounded metering branch and independent full-flow relief; not an identified vendor pump curve"
+    },
+    {
+      "name": "hydraulic_0.6_7_2_True",
+      "passed": true,
+      "metrics": {
+        "steady_bar": 0.3300211355093946,
+        "bypass_blocked": true
+      },
+      "basis": "Monotone curve-shape family, fixed return, bounded metering branch and independent full-flow relief; not an identified vendor pump curve"
+    },
+    {
+      "name": "hydraulic_0.6_10_0.5_False",
+      "passed": true,
+      "metrics": {
+        "steady_bar": 0.07615635681364588,
+        "bypass_blocked": false
+      },
+      "basis": "Monotone curve-shape family, fixed return, bounded metering branch and independent full-flow relief; not an identified vendor pump curve"
+    },
+    {
+      "name": "hydraulic_0.6_10_0.5_True",
+      "passed": true,
+      "metrics": {
+        "steady_bar": 0.35982652859245623,
+        "bypass_blocked": true
+      },
+      "basis": "Monotone curve-shape family, fixed return, bounded metering branch and independent full-flow relief; not an identified vendor pump curve"
+    },
+    {
+      "name": "hydraulic_0.6_10_1_False",
+      "passed": true,
+      "metrics": {
+        "steady_bar": 0.06845852603459504,
+        "bypass_blocked": false
+      },
+      "basis": "Monotone curve-shape family, fixed return, bounded metering branch and independent full-flow relief; not an identified vendor pump curve"
+    },
+    {
+      "name": "hydraulic_0.6_10_1_True",
+      "passed": true,
+      "metrics": {
+        "steady_bar": 0.34089306000534236,
+        "bypass_blocked": true
+      },
+      "basis": "Monotone curve-shape family, fixed return, bounded metering branch and independent full-flow relief; not an identified vendor pump curve"
+    },
+    {
+      "name": "hydraulic_0.6_10_2_False",
+      "passed": true,
+      "metrics": {
+        "steady_bar": 0.05805799051013126,
+        "bypass_blocked": false
+      },
+      "basis": "Monotone curve-shape family, fixed return, bounded metering branch and independent full-flow relief; not an identified vendor pump curve"
+    },
+    {
+      "name": "hydraulic_0.6_10_2_True",
+      "passed": true,
+      "metrics": {
+        "steady_bar": 0.3306388878390243,
+        "bypass_blocked": true
+      },
+      "basis": "Monotone curve-shape family, fixed return, bounded metering branch and independent full-flow relief; not an identified vendor pump curve"
+    },
+    {
+      "name": "permanent_bypass_normal_pressure",
+      "passed": true,
+      "metrics": {
+        "required_bypass_Lmin": 10,
+        "pressure_bar": 0.1
+      },
+      "basis": "Certified complete return passes maximum pump free flow by0.10bar; branch only adds capacity. Hose ID alone does not prove this."
+    },
+    {
+      "name": "valve_suppressor_stored_energy",
+      "passed": true,
+      "metrics": {
+        "max_energy_J": 1.7999999999999998,
+        "minimum_rating_J": 5
+      },
+      "basis": "Worst allowed coil L and current, independent of whether a short simulation reached steady state; verify actual suppressor pulse duration/temperature curve."
+    },
+    {
+      "name": "AFE_hold_up_before_isolation",
+      "passed": true,
+      "metrics": {
+        "droop_V": 0.010000000000000002,
+        "rail_after_delay_V": 4.49
+      },
+      "basis": "Explicit 50us worst disconnect envelope, no ideal instantaneous switch claim"
+    },
+    {
+      "name": "LM5069_current_bound_0.0274",
+      "passed": true,
+      "metrics": {
+        "min_A": 1.7525475175254752,
+        "max_A": 2.267197522671975
+      },
+      "basis": "TI threshold bounds and 1% reference shunt; actual module output acceptance required"
+    },
+    {
+      "name": "LM5069_current_bound_0.0681",
+      "passed": true,
+      "metrics": {
+        "min_A": 0.7051365929544497,
+        "max_A": 0.9122057580207361
+      },
+      "basis": "TI threshold bounds and 1% reference shunt; actual module output acceptance required"
+    },
+    {
+      "name": "LM5069_timer_bound",
+      "passed": true,
+      "metrics": {
+        "min_s": 0.02024133333333333,
+        "max_s": 0.05823999999999999,
+        "max_fault_energy_J": 1.4559999999999997
+      },
+      "basis": "680nF 5%, TI timer threshold/current extremes; regulator limiting only, restart remains human-gated"
+    },
+    {
+      "name": "thermal_pass_junction_bound",
+      "passed": true,
+      "metrics": {
+        "junction_bound_C": 78.5
+      },
+      "basis": "Case limited to <=75C and RthetaJC <=0.14C/W; not ambient-only thermal arithmetic"
+    },
+    {
+      "name": "water_thermal_3L_30C",
+      "passed": true,
+      "metrics": {
+        "peak_C": 38.023014678757335,
+        "trip_at_s": null
+      },
+      "basis": "First-order 60min water energy balance, both loads heat water at full 30W, no invented measured endurance result"
+    },
+    {
+      "name": "water_thermal_3L_35C",
+      "passed": true,
+      "metrics": {
+        "peak_C": 40.00175038221355,
+        "trip_at_s": 2183
+      },
+      "basis": "First-order 60min water energy balance, both loads heat water at full 30W, no invented measured endurance result"
+    },
+    {
+      "name": "water_thermal_2L_30C",
+      "passed": true,
+      "metrics": {
+        "peak_C": 40.002017759137026,
+        "trip_at_s": 3049
+      },
+      "basis": "First-order 60min water energy balance, both loads heat water at full 30W, no invented measured endurance result"
+    },
+    {
+      "name": "water_thermal_1L_30C",
+      "passed": true,
+      "metrics": {
+        "peak_C": 40.00528082523913,
+        "trip_at_s": 1525
+      },
+      "basis": "First-order 60min water energy balance, both loads heat water at full 30W, no invented measured endurance result"
+    },
+    {
+      "name": "linear_FET_short_overshoot",
+      "passed": true,
+      "metrics": {
+        "overshoot_A": 8,
+        "VDS_V": 30,
+        "duration_us": 20,
+        "power_W": 240,
+        "junction_bound_C": 108.6
+      },
+      "basis": "Contract bound, conservative half of 575W SOA reference and manufacturer 75C FBSOA curve; supplier must prove its actual gate/choke waveform. Behavioral current limiter does not simulate IC overshoot."
+    },
+    {
+      "name": "LM5069_insertion_delay",
+      "passed": true,
+      "metrics": {
+        "min_s": 0.30362,
+        "max_s": 0.9900799999999998
+      },
+      "basis": "Initial TIMER insertion charge differs from fault charge; wait for ready and new permit; held permit must not start on readiness restoration."
+    }
+  ],
+  "physical_qualification": false,
+  "manufacturer_macromodel": false,
+  "procurement_status": "Requirements envelope only; supplier compliance/drawings mandatory",
+  "all_experiments_ok": true,
+  "numerical_refinement": [
+    {
+      "name": "power",
+      "coarse": 0.2321251074532968,
+      "refined": 0.2321237956589031,
+      "relative_difference": 5.651270650516098e-06,
+      "passed": true,
+      "relative_tolerance": 0.01
+    },
+    {
+      "name": "AFE",
+      "coarse": 1.529345112536,
+      "refined": 1.52922722359,
+      "relative_difference": 7.70905357827148e-05,
+      "passed": true,
+      "relative_tolerance": 0.001
+    },
+    {
+      "name": "hydraulic",
+      "coarse": 0.7590232498793154,
+      "refined": 0.7590232549503803,
+      "relative_difference": 6.681040229342121e-09,
+      "passed": true,
+      "relative_tolerance": 0.001
+    }
+  ]
+}

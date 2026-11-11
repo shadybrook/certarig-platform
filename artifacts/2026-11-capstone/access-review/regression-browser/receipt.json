@@ -1,0 +1,16 @@
+{
+  "evidence_kind": "simulated",
+  "approval_actor": "automated browser test exercising human UI",
+  "provider": "fake",
+  "run_id": "run_20261109T081848_a36228",
+  "result": "passed",
+  "channel": "reactor_temperature",
+  "assertions": [
+    "unreviewed blocked",
+    "review accepted",
+    "denial retained",
+    "explicit approval",
+    "run passed",
+    "downloaded"
+  ]
+}

@@ -29,8 +29,24 @@ class CertaRig:
     def live(self) -> dict[str, Any]:
         return self.client.state()
 
-    def run(self, procedure_id: str, label: str | None = None) -> dict[str, Any]:
-        return self.client.run_procedure(procedure_id, label)
+    def run(
+        self, procedure_id: str, label: str | None = None, *, approval_id: str | None = None
+    ) -> dict[str, Any]:
+        return self.client.run_procedure(procedure_id, label, approval_id=approval_id)
+
+    def create_interview(self) -> dict[str, Any]:
+        return self.client.create_interview()
+
+    def interview(self, interview_id: str) -> dict[str, Any]:
+        return self.client.interview(interview_id)
+
+    def answer_interview(
+        self, interview_id: str, expected_revision: int, answers: dict[str, Any], sources: dict[str, str]
+    ) -> dict[str, Any]:
+        return self.client.answer_interview(interview_id, expected_revision, answers, sources)
+
+    def propose_interview(self, interview_id: str) -> dict[str, Any]:
+        return self.client.propose_interview(interview_id)
 
     def pull_evidence(self, out_dir: str | Path | None = None, run_id: str | None = None) -> dict[str, Any]:
         export = self.client.export_evidence(run_id=run_id)

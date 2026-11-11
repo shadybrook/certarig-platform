@@ -69,6 +69,7 @@ class ProcedureRunner:
         self._lock = threading.RLock()
         self._runs: dict[str, ProcedureRun] = {}
         self._procedures: dict[str, Procedure] = {}
+        self._contexts: dict[str, dict[str, Any]] = {}
         self._active: str | None = None
         self._thread: threading.Thread | None = None
         self._abort_reason: str | None = None
@@ -109,7 +110,7 @@ class ProcedureRunner:
             return self._runs.get(self._active) if self._active else None
 
     # ------------------------------------------------------------------ control
-    def start(self, procedure: Procedure, label: str, requested_by: str) -> ProcedureRun:
+    def start(self, procedure: Procedure, label: str, requested_by: str, evidence_context: dict[str, Any] | None = None) -> ProcedureRun:
         with self._lock:
             if self._active is not None:
                 raise RunnerError(f"a procedure run is already active: {self._active}")
@@ -137,6 +138,7 @@ class ProcedureRunner:
             )
             self._runs[run.run_id] = run
             self._procedures[run.run_id] = procedure
+            self._contexts[run.run_id] = json.loads(json.dumps(evidence_context or {}))
             self._active = run.run_id
             self._abort_reason = None
             self._ack_event.clear()
@@ -472,7 +474,18 @@ class ProcedureRunner:
         run.ended_at = utc_now()
         run.current_step = None
         self._event(run, "finished", status=status.value, reason=reason)
-        self._persist(run, status)
+        try:
+            self._persist(run, status)
+        except (OSError, ValueError, KeyError) as exc:
+            from ..atomic import write_json_atomic
+
+            status = RunStatus.ABORTED
+            run.outcome_reason = f"Evidence persistence failed: {type(exc).__name__}"
+            self._event(run, "evidence_incomplete", error=str(exc))
+            target = self.evidence_dir / "procedure_runs" / run.run_id
+            document = run.to_dict()
+            document.update(status=status.value, terminal=True)
+            write_json_atomic(target / "run.json", document)
         with self._lock:
             run.status = status
             self._active = None
@@ -492,13 +505,42 @@ class ProcedureRunner:
                 json.dumps(procedure.raw, indent=2, sort_keys=True), encoding="utf-8"
             )
         document = run.to_dict()
+        document["evidence_dir"] = "."
         if status is not None:
             document["status"] = status.value
             document["terminal"] = status.terminal
         (target / "run.json").write_text(json.dumps(document, indent=2, sort_keys=True), encoding="utf-8")
         if status is not None and status.terminal:
+            import hashlib
+
             from certarig.edge.bundle import write_run_bundle
 
+            from ..atomic import write_bytes_atomic, write_json_atomic
+            from ..recording_analysis import analyze_csv, reproduce_checks
+
+            context = self._contexts.get(run.run_id, {})
+            for key in ("config", "commissioning", "approval", "interview", "calibration_records", "configuration_history", "revalidation", "test_profile", "rehearsal"):
+                if key in context:
+                    write_json_atomic(target / f"{key}.json", context[key])
+            write_json_atomic(target / "provenance.json", {
+                "evidence_kind": "simulated" if self.config.hardware.mode in {"simulator", "mock"} else "physical",
+                "provider": context.get("provider", "not_recorded"),
+                "approval_required": self.config.commissioning_required,
+                "interview_required": "interview" in context,
+                "adapter_identity": f"{type(self.runtime.hardware).__module__}.{type(self.runtime.hardware).__name__}",
+            })
+            if run.recording:
+                filename = str(run.recording["filename"])
+                if Path(filename).name != filename or "/" in filename or "\\" in filename:
+                    raise ValueError("unsafe recording filename")
+                source = self.evidence_dir / filename
+                data = source.read_bytes()
+                if hashlib.sha256(data).hexdigest() != run.recording["sha256"]:
+                    raise ValueError("recording checksum mismatch")
+                write_bytes_atomic(target / filename, data)
+                if context.get("config"):
+                    write_json_atomic(target / "sample_analysis.json", analyze_csv(data, context["config"]))
+                    write_json_atomic(target / "check_analysis.json", reproduce_checks(data, context["config"], document))
             seed = getattr(getattr(self.runtime.hardware, "settings", None), "seed", None)
             write_run_bundle(
                 target,

@@ -1,0 +1,14 @@
+{
+  "revision": "CR-EXT-R1",
+  "dated": "2026-11-10",
+  "order_lines": 63,
+  "sourcing_requirements_final": true,
+  "availability_or_price_limit": false,
+  "declared_model_validation_complete": true,
+  "actual_supplier_circuits_qualified": false,
+  "physical_commissioning_complete": false,
+  "custom_fabrication_release": false,
+  "no_purchases_made": true,
+  "next_gate": "Exact supplier article data and as-built/design schematics for S01/S02/S03; check and rerun affected cases before fabrication release",
+  "limitations": "No manufacturer IC macromodel, hardware motor/valve identification, EMC/PCB certification or physical safety certification claimed"
+}

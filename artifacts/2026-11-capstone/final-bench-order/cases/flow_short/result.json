@@ -1,0 +1,26 @@
+{
+  "case": {
+    "name": "flow_short",
+    "family": "flow",
+    "params": {
+      "level": "short"
+    },
+    "unsafe": false
+  },
+  "assessment": {
+    "checks": {
+      "healthy_low_or_high_is_valid_zero_or_pulse": true,
+      "conditioned_field_input_bounded": true
+    },
+    "metrics": {
+      "line_V": 1.063829454515e-06,
+      "ratio": 2.12765890903e-07,
+      "valid": false
+    },
+    "criteria_pass": true
+  },
+  "samples": 1008,
+  "horizon": 0.01,
+  "netlist_sha256": "1a250899bf8739d100851d34d20062b979ad33734c909a94e9c511868e62c09b",
+  "experiment_ok": true
+}

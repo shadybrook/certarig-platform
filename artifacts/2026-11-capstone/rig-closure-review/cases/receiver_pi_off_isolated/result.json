@@ -1,0 +1,42 @@
+{
+  "case": {
+    "name": "receiver_pi_off_isolated",
+    "family": "loop",
+    "params": {
+      "off": true
+    },
+    "original": "unprotected_receiver_pi_off",
+    "outcome": "power_off"
+  },
+  "original_control": false,
+  "assessment": {
+    "checks": {
+      "ADC_or_120R_input_within_rail_plus_0.3V": true,
+      "burden_below_half_watt": true,
+      "off_ADC_discharged": true,
+      "off_injection_below_1uA": true,
+      "invalid_observation_refuses_authority": true,
+      "recovery_requires_explicit_reset": true
+    },
+    "metrics": {
+      "raw_max_V": 2.000000029052,
+      "pin_max_V": 1.52919103605,
+      "final_current_mA": 20.0,
+      "burden_max_W": 0.04000000116206,
+      "off_injection_A": 6.109236709269e-12,
+      "inferred_current_A": 0.0008584776672951885,
+      "observation_valid": false,
+      "reference_guard_sequence": [
+        true,
+        false,
+        false,
+        true
+      ]
+    },
+    "passed": true
+  },
+  "samples": 20081,
+  "horizon_s": 0.04,
+  "netlist_sha256": "891d9ad8eaca7fdf956bf9c5b21ce7b511ec0a8b3e77da35db1abbedddf5d9bf",
+  "experiment_ok": true
+}

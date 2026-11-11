@@ -1,0 +1,207 @@
+{
+  "applies_to": {
+    "actuators": [
+      "permit_relay"
+    ],
+    "concepts": [
+      "pressure",
+      "flow",
+      "emergency_stop"
+    ]
+  },
+  "domain": "electronics",
+  "evaluate": [
+    {
+      "event_observed": "permit_accepted"
+    },
+    {
+      "event_observed": "operator_safe"
+    },
+    {
+      "event_observed": "permit_rejected_reset_required"
+    },
+    {
+      "event_not_observed": "pressure_high_forced_safe"
+    },
+    {
+      "event_not_observed": "estop_open_forced_safe"
+    }
+  ],
+  "id": "relay_truth_table",
+  "preconditions": [
+    {
+      "eq": false,
+      "state": "estop_active"
+    },
+    {
+      "eq": true,
+      "state": "process_healthy"
+    }
+  ],
+  "record": true,
+  "requires_output": true,
+  "steps": [
+    {
+      "id": "boot_safe",
+      "predicate": {
+        "all": [
+          {
+            "eq": false,
+            "state": "output_high"
+          },
+          {
+            "eq": false,
+            "state": "relay_energized_expected"
+          }
+        ]
+      },
+      "type": "expect"
+    },
+    {
+      "command": "reset",
+      "expect": {
+        "all": [
+          {
+            "eq": false,
+            "state": "trip_latched"
+          },
+          {
+            "eq": false,
+            "state": "output_high"
+          }
+        ]
+      },
+      "id": "cycle1_reset",
+      "type": "command"
+    },
+    {
+      "command": "permit",
+      "expect": {
+        "all": [
+          {
+            "eq": true,
+            "state": "output_high"
+          },
+          {
+            "eq": true,
+            "state": "relay_energized_expected"
+          }
+        ]
+      },
+      "id": "cycle1_permit",
+      "type": "command"
+    },
+    {
+      "duration_ms": 500,
+      "id": "cycle1_hold",
+      "type": "wait"
+    },
+    {
+      "command": "safe",
+      "expect": {
+        "all": [
+          {
+            "eq": false,
+            "state": "output_high"
+          },
+          {
+            "eq": true,
+            "state": "trip_latched"
+          }
+        ]
+      },
+      "id": "cycle1_safe",
+      "type": "command"
+    },
+    {
+      "command": "reset",
+      "expect": {
+        "eq": false,
+        "state": "trip_latched"
+      },
+      "id": "cycle2_reset",
+      "type": "command"
+    },
+    {
+      "command": "permit",
+      "expect": {
+        "eq": true,
+        "state": "output_high"
+      },
+      "id": "cycle2_permit",
+      "type": "command"
+    },
+    {
+      "duration_ms": 500,
+      "id": "cycle2_hold",
+      "type": "wait"
+    },
+    {
+      "command": "safe",
+      "expect": {
+        "eq": false,
+        "state": "output_high"
+      },
+      "id": "cycle2_safe",
+      "type": "command"
+    },
+    {
+      "command": "reset",
+      "expect": {
+        "eq": false,
+        "state": "trip_latched"
+      },
+      "id": "cycle3_reset",
+      "type": "command"
+    },
+    {
+      "command": "permit",
+      "expect": {
+        "eq": true,
+        "state": "output_high"
+      },
+      "id": "cycle3_permit",
+      "type": "command"
+    },
+    {
+      "duration_ms": 500,
+      "id": "cycle3_hold",
+      "type": "wait"
+    },
+    {
+      "command": "safe",
+      "expect": {
+        "eq": false,
+        "state": "output_high"
+      },
+      "id": "cycle3_safe",
+      "type": "command"
+    },
+    {
+      "command": "permit",
+      "expect": {
+        "all": [
+          {
+            "eq": false,
+            "state": "output_high"
+          },
+          {
+            "eq": "permit_rejected_reset_required",
+            "state": "last_event"
+          }
+        ]
+      },
+      "id": "permit_without_reset",
+      "type": "command"
+    }
+  ],
+  "summary": "Cycles the kernel through safe, reset, permit and safe three times and proves the commanded output and expected indicator states follow the truth table each time. No operator action.\n",
+  "tags": [
+    "relay",
+    "output",
+    "truth-table"
+  ],
+  "timeout_s": 300,
+  "title": "Relay command truth table",
+  "version": 1
+}

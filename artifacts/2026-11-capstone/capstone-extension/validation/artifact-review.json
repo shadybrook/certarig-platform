@@ -1,0 +1,16 @@
+{
+  "report_pages": 16,
+  "chapters": 6,
+  "abstract_words": 250,
+  "font_body": "Times New Roman 12",
+  "heading_points": 14,
+  "line_spacing": 1.5,
+  "margins_inches": 1,
+  "page_numbers": "bottom centred",
+  "visual_review": "all sixteen pages inspected; corrected orphan ending pages; latest digit-only metrics update inspected on page9",
+  "slide_visual_review": "all ten imported-template slides inspected; final metrics slide inspected after update",
+  "portal": "desktop and 390px mobile checked; previews and hardware review load",
+  "software_check_exit": 0,
+  "source_worktree_clean": true,
+  "no_physical_result_claimed": true
+}

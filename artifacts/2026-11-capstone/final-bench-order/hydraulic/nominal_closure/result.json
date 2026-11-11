@@ -1,0 +1,17 @@
+{
+  "parameters": {
+    "name": "nominal_closure",
+    "C": 2e-10,
+    "closing": 0.1,
+    "dt": 0.0001,
+    "end": 2.0,
+    "unsafe": false
+  },
+  "peak_bar": 0.7546502107570888,
+  "min_bar": 0.4614629929977645,
+  "observation_envelope_pass": true,
+  "experiment_ok": true,
+  "steps": 20001,
+  "saved_samples": 20001,
+  "model": "RK4, source0.60bar upper envelope, I=7.1e7, feed R=2e12, valve Kv chosen at1.5Lmin/0.45bar, compliance as declared; negative window ends at203.2ms before first vacuum/cavitation; it proves initial overpressure only; no post-cavitation prediction"
+}

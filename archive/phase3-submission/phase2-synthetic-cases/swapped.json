@@ -1,0 +1,339 @@
+{
+  "id": "swapped",
+  "title": "Case 2: Swapped analog channels",
+  "summary": "Pressure and flow channel assignments are reversed in the proposed configuration.",
+  "generatedAt": "2026-08-24T15:30:00.000Z",
+  "baselineVersion": "rig-graph-v1.4",
+  "proposedVersion": "rig-graph-v1.5-swapped",
+  "channels": [
+    {
+      "id": "AI0",
+      "device": "Flow sensor F1",
+      "kind": "flow",
+      "unit": "L/min",
+      "validRange": [
+        0,
+        20
+      ],
+      "safeRange": [
+        0,
+        18
+      ],
+      "calibration": "CAL-F1-2026-03",
+      "confidence": 0.98,
+      "evidence": "channel configuration and response signature"
+    },
+    {
+      "id": "AI1",
+      "device": "Pressure sensor P1",
+      "kind": "pressure",
+      "unit": "bar",
+      "validRange": [
+        0,
+        5
+      ],
+      "safeRange": [
+        0,
+        4.2
+      ],
+      "calibration": "CAL-P1-2026-04",
+      "confidence": 0.96,
+      "evidence": "wiring register and calibration record"
+    },
+    {
+      "id": "DI0",
+      "device": "Valve limit switch LS1",
+      "kind": "position",
+      "unit": "state",
+      "validRange": [
+        0,
+        1
+      ],
+      "safeRange": [
+        0,
+        1
+      ],
+      "calibration": "not required",
+      "confidence": 1,
+      "evidence": "digital input register"
+    },
+    {
+      "id": "DO0",
+      "device": "Normally closed valve V1",
+      "kind": "command",
+      "unit": "state",
+      "validRange": [
+        0,
+        1
+      ],
+      "safeRange": [
+        0,
+        1
+      ],
+      "calibration": "not required",
+      "confidence": 1,
+      "evidence": "approved output configuration"
+    }
+  ],
+  "changes": [
+    {
+      "code": "MAPPING_CHANGED",
+      "severity": "review",
+      "channel": "AI0",
+      "message": "AI0 changed from Pressure sensor P1 to Flow sensor F1."
+    },
+    {
+      "code": "UNIT_CHANGED",
+      "severity": "review",
+      "channel": "AI0",
+      "message": "AI0 changed unit from bar to L/min."
+    },
+    {
+      "code": "MAPPING_CHANGED",
+      "severity": "review",
+      "channel": "AI1",
+      "message": "AI1 changed from Flow sensor F1 to Pressure sensor P1."
+    },
+    {
+      "code": "UNIT_CHANGED",
+      "severity": "review",
+      "channel": "AI1",
+      "message": "AI1 changed unit from L/min to bar."
+    }
+  ],
+  "telemetry": [
+    {
+      "time": 0,
+      "pressure": 0.2,
+      "flow": 0.7,
+      "valve": 0
+    },
+    {
+      "time": 0.5,
+      "pressure": 0.2,
+      "flow": 0.68,
+      "valve": 0
+    },
+    {
+      "time": 1,
+      "pressure": 0.2,
+      "flow": 0.66,
+      "valve": 0
+    },
+    {
+      "time": 1.5,
+      "pressure": 0.2,
+      "flow": 0.64,
+      "valve": 0
+    },
+    {
+      "time": 2,
+      "pressure": 0.2,
+      "flow": 0.62,
+      "valve": 0
+    },
+    {
+      "time": 2.5,
+      "pressure": 5.61,
+      "flow": 1.05,
+      "valve": 1
+    },
+    {
+      "time": 3,
+      "pressure": 5.45,
+      "flow": 1.15,
+      "valve": 1
+    },
+    {
+      "time": 3.5,
+      "pressure": 5.28,
+      "flow": 1.25,
+      "valve": 1
+    },
+    {
+      "time": 4,
+      "pressure": 5.14,
+      "flow": 1.35,
+      "valve": 1
+    },
+    {
+      "time": 4.5,
+      "pressure": 5.06,
+      "flow": 1.45,
+      "valve": 1
+    },
+    {
+      "time": 5,
+      "pressure": 5.06,
+      "flow": 1.55,
+      "valve": 1
+    },
+    {
+      "time": 5.5,
+      "pressure": 5.15,
+      "flow": 1.65,
+      "valve": 1
+    },
+    {
+      "time": 6,
+      "pressure": 5.3,
+      "flow": 1.75,
+      "valve": 1
+    },
+    {
+      "time": 6.5,
+      "pressure": 5.48,
+      "flow": 1.85,
+      "valve": 1
+    },
+    {
+      "time": 7,
+      "pressure": 5.63,
+      "flow": 1.95,
+      "valve": 1
+    },
+    {
+      "time": 7.5,
+      "pressure": 5.73,
+      "flow": 2.05,
+      "valve": 1
+    },
+    {
+      "time": 8,
+      "pressure": 5.75,
+      "flow": 2.15,
+      "valve": 1
+    },
+    {
+      "time": 8.5,
+      "pressure": 5.68,
+      "flow": 2.25,
+      "valve": 1
+    },
+    {
+      "time": 9,
+      "pressure": 5.54,
+      "flow": 2.35,
+      "valve": 1
+    },
+    {
+      "time": 9.5,
+      "pressure": 0.2,
+      "flow": 0.32,
+      "valve": 0
+    },
+    {
+      "time": 10,
+      "pressure": 0.2,
+      "flow": 0.3,
+      "valve": 0
+    },
+    {
+      "time": 10.5,
+      "pressure": 0.2,
+      "flow": 0.28,
+      "valve": 0
+    },
+    {
+      "time": 11,
+      "pressure": 0.2,
+      "flow": 0.26,
+      "valve": 0
+    },
+    {
+      "time": 11.5,
+      "pressure": 0.2,
+      "flow": 0.24,
+      "valve": 0
+    },
+    {
+      "time": 12,
+      "pressure": 0.2,
+      "flow": 0.22,
+      "valve": 0
+    }
+  ],
+  "findings": [
+    {
+      "code": "MAPPING_CHANGED",
+      "severity": "review",
+      "channel": "AI0",
+      "message": "AI0 changed from Pressure sensor P1 to Flow sensor F1."
+    },
+    {
+      "code": "UNIT_CHANGED",
+      "severity": "review",
+      "channel": "AI0",
+      "message": "AI0 changed unit from bar to L/min."
+    },
+    {
+      "code": "MAPPING_CHANGED",
+      "severity": "review",
+      "channel": "AI1",
+      "message": "AI1 changed from Flow sensor F1 to Pressure sensor P1."
+    },
+    {
+      "code": "UNIT_CHANGED",
+      "severity": "review",
+      "channel": "AI1",
+      "message": "AI1 changed unit from L/min to bar."
+    },
+    {
+      "code": "SIGNATURE_CONFLICT",
+      "severity": "review",
+      "channel": "AI0/AI1",
+      "message": "Observed response signatures do not agree with the proposed pressure and flow labels."
+    }
+  ],
+  "plan": {
+    "allowedToRun": false,
+    "steps": [
+      {
+        "id": "P01",
+        "action": "Validate model schema and approved safety limits",
+        "status": "complete"
+      },
+      {
+        "id": "P02",
+        "action": "Check evidence and confidence for every material channel",
+        "status": "blocked"
+      },
+      {
+        "id": "P03",
+        "action": "Arm bounded simulator plan for valve V1",
+        "status": "not run"
+      },
+      {
+        "id": "P04",
+        "action": "Compare predicted and measured pressure and flow response",
+        "status": "not run"
+      },
+      {
+        "id": "P05",
+        "action": "Request confirmation of AI0 and AI1 wiring",
+        "status": "review"
+      }
+    ],
+    "abortRule": "Close V1 and record the event if pressure exceeds 4.2 bar, evidence is missing, or the model is unresolved."
+  },
+  "status": {
+    "key": "review",
+    "label": "Review required",
+    "tone": "warning"
+  },
+  "metrics": {
+    "channels": 4,
+    "confidence": 99,
+    "findings": 5,
+    "maxPressure": 5.75
+  },
+  "evidenceBundle": {
+    "inputs": [
+      "rig_configuration.json",
+      "calibration_register.json",
+      "test_plan.json"
+    ],
+    "records": 35,
+    "checksum": "CERTARIG-SWAPPED-20260824"
+  }
+}

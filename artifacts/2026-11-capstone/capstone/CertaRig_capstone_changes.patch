@@ -1,0 +1,2370 @@
+diff --git a/certarig/agent/tools.py b/certarig/agent/tools.py
+index d01c0ed..ee098e1 100644
+--- a/certarig/agent/tools.py
++++ b/certarig/agent/tools.py
+@@ -205,7 +205,7 @@ class ToolRegistry:
+         if name == "stop_recording":
+             return client.stop_recording()
+         if name == "run_procedure":
+-            return client.run_procedure(str(args["procedure_id"]), args.get("label"))
++            return client.run_procedure(str(args["procedure_id"]), args.get("label"), approval_id=approval)
+         if name == "ack_operator_step":
+             return client.ack(str(args["run_id"]), str(args["step_id"]))
+         if name == "abort_procedure":
+diff --git a/certarig/edge/approvals.py b/certarig/edge/approvals.py
+index d95a0b4..0907dd5 100644
+--- a/certarig/edge/approvals.py
++++ b/certarig/edge/approvals.py
+@@ -12,10 +12,12 @@ Approvals are bound to the contract hash so a re-configured rig invalidates them
+ 
+ from __future__ import annotations
+ 
++import json
+ import secrets
+ import threading
+ import time
+ from dataclasses import asdict, dataclass, field
++from pathlib import Path
+ from typing import Any
+ 
+ from .config import canonical_hash
+@@ -41,17 +43,44 @@ class Approval:
+     expires_at: float | None = None
+     consumed_at: float | None = None
+     history: list[dict[str, Any]] = field(default_factory=list)
++    requested_role: str = "agent"
++    binding_hash: str = ""
+ 
+     def to_dict(self) -> dict[str, Any]:
+         return asdict(self)
+ 
+ 
+ class ApprovalRegistry:
+-    def __init__(self, ttl_s: int = 300, clock: Any = time.time) -> None:
++    def __init__(self, ttl_s: int = 300, clock: Any = time.time, path: Path | None = None) -> None:
+         self.ttl_s = ttl_s
+         self._clock = clock
+         self._lock = threading.Lock()
+         self._items: dict[str, Approval] = {}
++        self.path = path
++        if path is not None and path.is_file():
++            # Corrupt authority is a startup failure, never an empty permissive registry.
++            document = json.loads(path.read_text())
++            for row in document["approvals"]:
++                item = Approval(**row)
++                if item.status in {"pending", "granted"}:
++                    item.status = "expired"
++                    item.history.append({"at": self._clock(), "event": "invalidated_after_restart"})
++                self._items[item.approval_id] = item
++            self._save_locked()
++
++    def _save_locked(self) -> None:
++        if self.path is not None:
++            from .atomic import write_json_atomic
++
++            write_json_atomic(self.path, {"schema_version": 1, "approvals": [a.to_dict() for a in self._items.values()]})
++
++    def invalidate(self, reason: str) -> None:
++        with self._lock:
++            for item in self._items.values():
++                if item.status in {"pending", "granted"}:
++                    item.status = "expired"
++                    item.history.append({"at": self._clock(), "event": reason})
++            self._save_locked()
+ 
+     @staticmethod
+     def args_hash(args: dict[str, Any]) -> str:
+@@ -60,9 +89,10 @@ class ApprovalRegistry:
+     def _expire_locked(self) -> None:
+         now = self._clock()
+         for item in self._items.values():
+-            if item.status == "granted" and item.expires_at is not None and now > item.expires_at:
++            if item.status == "granted" and item.expires_at is not None and now >= item.expires_at:
+                 item.status = "expired"
+                 item.history.append({"at": now, "event": "expired"})
++        self._save_locked()
+ 
+     def request(
+         self,
+@@ -71,6 +101,8 @@ class ApprovalRegistry:
+         reason: str,
+         contract_hash: str,
+         requested_by: str = "agent",
++        requested_role: str = "agent",
++        binding_hash: str = "",
+     ) -> Approval:
+         with self._lock:
+             self._expire_locked()
+@@ -83,9 +115,12 @@ class ApprovalRegistry:
+                 contract_hash=contract_hash,
+                 requested_by=requested_by,
+                 requested_at=self._clock(),
++                requested_role=requested_role,
++                binding_hash=binding_hash,
+             )
+             approval.history.append({"at": approval.requested_at, "event": "requested", "by": requested_by})
+             self._items[approval.approval_id] = approval
++            self._save_locked()
+             return approval
+ 
+     def decide(self, approval_id: str, grant: bool, decided_by: str) -> Approval:
+@@ -102,9 +137,13 @@ class ApprovalRegistry:
+             approval.decided_at = now
+             approval.expires_at = now + self.ttl_s if grant else None
+             approval.history.append({"at": now, "event": approval.status, "by": decided_by})
++            self._save_locked()
+             return approval
+ 
+-    def consume(self, approval_id: str, tool: str, args: dict[str, Any], contract_hash: str) -> Approval:
++    def consume(
++        self, approval_id: str, tool: str, args: dict[str, Any], contract_hash: str,
++        requested_by: str | None = None, requested_role: str | None = None, binding_hash: str = "",
++    ) -> Approval:
+         with self._lock:
+             self._expire_locked()
+             approval = self._items.get(approval_id)
+@@ -118,10 +157,17 @@ class ApprovalRegistry:
+                 raise ApprovalError("approval was granted for different arguments")
+             if approval.contract_hash != contract_hash:
+                 raise ApprovalError("approval belongs to a different rig contract")
++            if requested_by is not None and approval.requested_by != requested_by:
++                raise ApprovalError("approval belongs to a different requesting principal")
++            if requested_role is not None and approval.requested_role != requested_role:
++                raise ApprovalError("approval belongs to a different principal role")
++            if approval.binding_hash != binding_hash:
++                raise ApprovalError("approval belongs to a different procedure revision or adapter")
+             now = self._clock()
+             approval.status = "consumed"
+             approval.consumed_at = now
+             approval.history.append({"at": now, "event": "consumed"})
++            self._save_locked()
+             return approval
+ 
+     def get(self, approval_id: str) -> Approval | None:
+diff --git a/certarig/edge/bootstrap.py b/certarig/edge/bootstrap.py
+index a94d5c4..b1a501b 100644
+--- a/certarig/edge/bootstrap.py
++++ b/certarig/edge/bootstrap.py
+@@ -129,4 +129,7 @@ def build_node(settings: NodeSettings, hardware: HardwareAdapter | None = None)
+     from .agent_api import install_agent_api
+ 
+     install_agent_api(node, settings.skills_root)
++    from .commissioning_records import install_commissioning
++
++    install_commissioning(node)
+     return node
+diff --git a/certarig/edge/bundle.py b/certarig/edge/bundle.py
+index 8cd8f62..c0ff6de 100644
+--- a/certarig/edge/bundle.py
++++ b/certarig/edge/bundle.py
+@@ -170,7 +170,11 @@ def write_run_bundle(
+     events = run.get("events") or run.get("kernel_events") or []
+     write_text_atomic(target / EVENTS_NAME, "".join(json.dumps(e, sort_keys=True) + "\n" for e in events))
+     briefing = _briefing_block(target, context)
+-    write_text_atomic(target / REPORT_NAME, render_report(run, context, narrative, briefing=briefing))
++    report = render_report(run, context, narrative, briefing=briefing)
++    analysis = target / "sample_analysis.json"
++    if analysis.is_file():
++        report += "\n## Reproducible raw sample analysis\n\n```json\n" + analysis.read_text() + "\n```\n"
++    write_text_atomic(target / REPORT_NAME, report)
+     listed = [
+         path
+         for path in sorted(target.iterdir())
+diff --git a/certarig/edge/client.py b/certarig/edge/client.py
+index 03fbb7b..f2be489 100644
+--- a/certarig/edge/client.py
++++ b/certarig/edge/client.py
+@@ -118,7 +118,9 @@ class EdgeClient:
+         return self.get("/health")
+ 
+     def rig(self) -> dict[str, Any]:
+-        return self.get("/v1/rig")
++        document = self.get("/v1/rig")
++        self._contract_hash = str(document["contract_hash"])
++        return document
+ 
+     def signals(self) -> dict[str, Any]:
+         return self.get("/v1/signals")
+@@ -195,10 +197,12 @@ class EdgeClient:
+     def procedures(self) -> dict[str, Any]:
+         return self.get("/v1/procedures")
+ 
+-    def run_procedure(self, procedure_id: str, label: str | None = None) -> dict[str, Any]:
++    def run_procedure(self, procedure_id: str, label: str | None = None, approval_id: str | None = None) -> dict[str, Any]:
+         payload: dict[str, Any] = {"procedure_id": procedure_id}
+         if label:
+             payload["label"] = label
++        if approval_id:
++            payload["approval_id"] = approval_id
+         return self.post("/v1/procedure_runs", payload)
+ 
+     def procedure_run(self, run_id: str) -> dict[str, Any]:
+diff --git a/certarig/edge/commissioning.py b/certarig/edge/commissioning.py
+index 0b4970f..758b376 100644
+--- a/certarig/edge/commissioning.py
++++ b/certarig/edge/commissioning.py
+@@ -1,7 +1,9 @@
+ from __future__ import annotations
+ 
+ import math
++import time
+ from dataclasses import dataclass
++from datetime import UTC, datetime
+ 
+ from .models import RigConfig, RigSnapshot
+ 
+@@ -129,6 +131,7 @@ class ProcessGuardrail:
+         self._condition = "startup"
+         self._last_values: dict[str, float] = {}
+         self._stuck_counts: dict[str, int] = {}
++        self._source_progress: dict[str, tuple[str, float]] = {}
+ 
+     @property
+     def drive_high(self) -> bool:
+@@ -185,6 +188,27 @@ class ProcessGuardrail:
+             else:
+                 value = float(sample.value)
+                 quality = sample.quality
++                freshness = max(1.0, self.config.sample_interval_ms / 1000 * 3)
++                try:
++                    sample_time = datetime.fromisoformat(sample.captured_at)
++                    snapshot_time = datetime.fromisoformat(snapshot.captured_at)
++                    if sample_time.tzinfo is None or snapshot_time.tzinfo is None:
++                        raise ValueError("timestamp must include timezone")
++                    age = (snapshot_time - sample_time).total_seconds()
++                    if self.config.hardware.mode not in {"simulator", "mock"} and not -freshness <= (datetime.now(UTC) - snapshot_time).total_seconds() <= freshness:
++                        quality = "stale"
++                    if not 0 <= age <= freshness:
++                        quality = "stale"
++                except (ValueError, TypeError):
++                    quality = "invalid_timestamp"
++                previous_time, progress_at = self._source_progress.get(channel.channel_id, ("", time.monotonic()))
++                if sample.captured_at != previous_time:
++                    progress_at = time.monotonic()
++                elif time.monotonic() - progress_at > freshness:
++                    quality = "stale"
++                self._source_progress[channel.channel_id] = (sample.captured_at, progress_at)
++                if sample.unit != channel.unit:
++                    quality = "unit_mismatch"
+                 if (
+                     quality == "good"
+                     and value is not None
+diff --git a/certarig/edge/commissioning_records.py b/certarig/edge/commissioning_records.py
+new file mode 100644
+index 0000000..ccbe9ec
+--- /dev/null
++++ b/certarig/edge/commissioning_records.py
+@@ -0,0 +1,146 @@
++"""Reviewed, configuration-bound readiness; software checks never accept physical wiring."""
++
++from __future__ import annotations
++
++import json
++import threading
++from datetime import UTC, datetime
++from typing import Any
++
++from .atomic import write_json_atomic
++from .config import canonical_hash
++from .models import CONCEPT_BY_UNIT
++from .runtime import validate_procedure
++from .schemas import validate_against_schema
++from .server import EdgeNode, HttpError, RequestContext
++
++
++class CommissioningService:
++    def __init__(self, node: EdgeNode) -> None:
++        self.node = node
++        self.root = node.runtime.evidence_dir / "commissioning"
++        self._lock = threading.RLock()
++
++    def identity(self) -> str:
++        adapter = self.node.runtime.hardware
++        return f"{type(adapter).__module__}.{type(adapter).__name__}"
++
++    def current(self) -> dict[str, Any] | None:
++        path = self.root / f"{self.node.config.config_hash}.json"
++        with self._lock:
++            if not path.is_file():
++                return None
++            record = json.loads(path.read_text())
++            validate_against_schema(record, "commissioning.schema.json")
++            return record
++
++    def readiness(self, procedure_id: str | None = None, *, reviewed: bool = True) -> dict[str, Any]:
++        node = self.node
++        record = self.current()
++        blockers: list[str] = []
++        config = node.config
++        simulated = config.hardware.mode in {"simulator", "mock"}
++        state = node.runtime.state()
++        if node.config_path and canonical_hash(json.loads(node.config_path.read_text())) != config.config_hash:
++            blockers.append("Configuration on disk differs from the running configuration")
++        if state.get("config_hash") != config.config_hash:
++            blockers.append("Awaiting samples for the current configuration")
++        if state.get("status") != "ok" or not state.get("guardrail", {}).get("process_healthy"):
++            blockers.append("Required observations are missing, invalid or outside safe limits")
++        if state.get("guardrail", {}).get("estop_active", True):
++            blockers.append("E-stop is active or unknown")
++        if node.runtime.sample_age_s() > max(1.0, config.sample_interval_ms / 1000 * 3):
++            blockers.append("Acquisition is stale")
++        samples = {s["channel_id"]: s for s in state.get("samples", [])}
++        for channel in config.channels:
++            if not channel.required:
++                continue
++            sample = samples.get(channel.channel_id)
++            if sample is None or sample.get("unit") != channel.unit:
++                blockers.append(f"Missing or incompatible observation: {channel.channel_id}")
++            # Procedures use engineering-unit numbers. Unit conversion is deliberately explicit.
++            expected = {"pressure": "bar", "flow": "l/min", "temperature": "degc"}.get(channel.concept)
++            inferred = CONCEPT_BY_UNIT.get(channel.unit.lower())
++            if (inferred and inferred != channel.concept) or (expected and channel.unit.lower() != expected):
++                blockers.append(f"Unsupported procedure unit for {channel.channel_id}: {channel.unit}")
++        library = node.extensions["procedures"].library
++        ids = [procedure_id] if procedure_id else list(record["procedures"]) if record else [p["id"] for p in library.list()]
++        if not ids:
++            blockers.append("No supported procedure is available")
++        for pid in ids:
++            procedure = library.get(pid)
++            if procedure is None or validate_procedure(procedure.raw, config):
++                blockers.append(f"Unsupported procedure: {pid}")
++            elif reviewed and (not record or record.get("procedures", {}).get(pid) != procedure.procedure_hash):
++                blockers.append(f"Procedure requires commissioning review: {pid}")
++        if reviewed and (not record or record.get("adapter_identity") != self.identity()):
++            blockers.append("Current configuration and adapter require human review")
++        if not simulated:
++            blockers.append("Physical commissioning has not been accepted")
++        if procedure_id:
++            procedure = library.get(procedure_id)
++            if procedure and procedure.requires_output and (config.hardware.observe_only or not node.runtime.allow_output):
++                blockers.append("Output operation is unavailable in observe-only mode")
++        return {
++            "required": config.commissioning_required,
++            "ready": not blockers,
++            "status": "simulation_ready" if not blockers else "review_required" if simulated else "control_verification_required",
++            "evidence_kind": "simulated" if simulated else "software_observation_only",
++            "physical_commissioned": False,
++            "config_hash": config.config_hash,
++            "adapter_identity": self.identity(),
++            "procedure_id": procedure_id,
++            "blockers": list(dict.fromkeys(blockers)),
++            "record": record,
++        }
++
++    def get(self, ctx: RequestContext) -> tuple[int, dict[str, Any]]:
++        pid = (ctx.query.get("procedure_id") or [""])[0] or None
++        return 200, self.readiness(pid)
++
++    def review(self, ctx: RequestContext) -> tuple[int, dict[str, Any]]:
++        self.node._require_operator(ctx)
++        if ctx.body.get("expected_config_hash") != self.node.config.config_hash:
++            raise HttpError(409, {"error": "Re-read the current configuration before review", "code": "stale_contract"})
++        ids = ctx.body.get("procedure_ids")
++        if not isinstance(ids, list) or not ids or not all(isinstance(pid, str) for pid in ids):
++            raise HttpError(400, "procedure_ids must be a nonempty list of procedure names")
++        procedures: dict[str, str] = {}
++        for pid in ids:
++            if not isinstance(pid, str):
++                raise HttpError(400, "procedure name must be a string")
++            readiness = self.readiness(pid, reviewed=False)
++            if not readiness["ready"]:
++                raise HttpError(409, {"error": "Commissioning checks failed", "code": "commissioning_required", **readiness})
++            procedures[pid] = self.node.extensions["procedures"].library.get(pid).procedure_hash
++        record = {
++            "schema_version": 1,
++            "rig_id": self.node.config.rig_id,
++            "config_hash": self.node.config.config_hash,
++            "adapter_identity": self.identity(),
++            "reviewed_by": ctx.principal_name,
++            "reviewed_at": datetime.now(UTC).isoformat(),
++            "evidence_kind": "simulated",
++            "physical_commissioned": False,
++            "procedures": procedures,
++        }
++        validate_against_schema(record, "commissioning.schema.json")
++        with self._lock:
++            write_json_atomic(self.root / f"{self.node.config.config_hash}.json", record)
++        return 201, self.readiness(str(ids[0]))
++
++    def require(self, procedure_id: str | None = None) -> None:
++        if not self.node.config.commissioning_required:
++            return
++        readiness = self.readiness(procedure_id)
++        if not readiness["ready"]:
++            self.node.runtime.command("safe")
++            raise HttpError(409, {"error": "Rig is not ready for this operation", "code": "commissioning_required", **readiness})
++
++
++def install_commissioning(node: EdgeNode) -> CommissioningService:
++    service = CommissioningService(node)
++    node.extensions["commissioning"] = service
++    node.add_route("GET", "/v1/commissioning", service.get, "read_rig")
++    node.add_route("POST", "/v1/commissioning/review", service.review)
++    return service
+diff --git a/certarig/edge/config.py b/certarig/edge/config.py
+index 71e41e7..9610f42 100644
+--- a/certarig/edge/config.py
++++ b/certarig/edge/config.py
+@@ -166,4 +166,5 @@ def load_config_dict(raw: Any) -> RigConfig:
+         hardware=hardware,
+         channels=tuple(channels),
+         config_hash=canonical_hash(raw),
++        commissioning_required=bool(raw.get("commissioning_required", False)),
+     )
+diff --git a/certarig/edge/evidence_cli.py b/certarig/edge/evidence_cli.py
+index c96edd3..692832e 100644
+--- a/certarig/edge/evidence_cli.py
++++ b/certarig/edge/evidence_cli.py
+@@ -8,7 +8,7 @@ import json
+ import os
+ import sys
+ import zipfile
+-from pathlib import Path
++from pathlib import Path, PurePosixPath
+ from typing import Any
+ 
+ from .client import EdgeClient
+@@ -36,56 +36,90 @@ def parse_sums(text: str) -> dict[str, str]:
+     return out
+ 
+ 
+-def verify_directory(root: Path) -> dict[str, Any]:
+-    """Verify every file listed in SHA256SUMS.txt under ``root`` and report extras/missing."""
+-    sums_path = root / SUMS_FILE
+-    if not sums_path.is_file():
+-        return {"ok": False, "error": f"{SUMS_FILE} missing", "root": str(root)}
+-    expected = parse_sums(sums_path.read_text(encoding="utf-8"))
+-    mismatched: list[str] = []
+-    missing: list[str] = []
+-    for name, digest in expected.items():
+-        path = root / name
+-        if not path.is_file():
+-            missing.append(name)
+-            continue
+-        if hashlib.sha256(path.read_bytes()).hexdigest() != digest:
+-            mismatched.append(name)
+-    listed = set(expected) | {SUMS_FILE, EXPORT_MANIFEST}
+-    extra = sorted(
+-        str(p.relative_to(root))
+-        for p in root.rglob("*")
+-        if p.is_file() and str(p.relative_to(root)) not in listed
+-    )
++def _safe_member(name: str) -> bool:
++    path = PurePosixPath(name)
++    return bool(name) and not path.is_absolute() and ".." not in path.parts and "\\" not in name and ":" not in name and str(path) == name
++
++
++def _verify_payload(files: dict[str, bytes]) -> dict[str, Any]:
++    if SUMS_FILE not in files:
++        return {"ok": False, "error": f"{SUMS_FILE} missing"}
++    errors: list[str] = []
++    try:
++        expected = parse_sums(files[SUMS_FILE].decode("utf-8"))
++        if not expected or any(not _safe_member(name) or len(digest) != 64 for name, digest in expected.items()):
++            raise ValueError("invalid or empty checksum listing")
++        missing = sorted(set(expected) - set(files))
++        mismatched = sorted(name for name, digest in expected.items() if name in files and hashlib.sha256(files[name]).hexdigest() != digest)
++        # Verify manifests too: omitted requirements are not a complete bundle.
++        for name, data in files.items():
++            if name.endswith("/manifest.json") or name == "manifest.json":
++                manifest = json.loads(data)
++                if manifest.get("kind") == "certarig_run_bundle":
++                    prefix = name[:-len("manifest.json")]
++                    for row in manifest["files"]:
++                        target = prefix + row["path"]
++                        if not _safe_member(target) or target not in files or hashlib.sha256(files[target]).hexdigest() != row["sha256"]:
++                            errors.append(f"missing or corrupt manifest artifact: {target}")
++            if name.endswith("/run.json") or name == "run.json":
++                run = json.loads(data)
++                prefix = name[:-len("run.json")]
++                recording = run.get("recording")
++                procedure = json.loads(files[prefix + "procedure.json"]) if prefix + "procedure.json" in files else {}
++                if procedure.get("record", True) and run.get("status") == "passed" and not recording:
++                    errors.append(f"passing run lacks required recording: {name}")
++                if recording:
++                    target = prefix + str(recording["filename"])
++                    if not _safe_member(target) or target not in files or hashlib.sha256(files[target]).hexdigest() != recording["sha256"]:
++                        errors.append(f"missing or corrupt raw recording: {target}")
++                    elif prefix + "sample_analysis.json" in files:
++                        from .recording_analysis import analyze_csv
++
++                        config = json.loads(files[prefix + "config.json"])
++                        actual = analyze_csv(files[target], config)
++                        if actual != json.loads(files[prefix + "sample_analysis.json"]):
++                            errors.append(f"raw sample analysis does not reproduce: {name}")
++                        if actual["rows"] != recording["samples"] or actual["unsafe_command_rows"]:
++                            errors.append(f"recording count or command invariant mismatch: {name}")
++                provenance_name = prefix + "provenance.json"
++                if provenance_name in files and json.loads(files[provenance_name]).get("approval_required"):
++                    required = ["config.json", "procedure.json", "commissioning.json", "approval.json", "events.jsonl", "sample_analysis.json"]
++                    errors.extend(f"required run artifact missing: {prefix + item}" for item in required if prefix + item not in files)
++                    approval = json.loads(files.get(prefix + "approval.json", b"null"))
++                    if not approval or approval.get("status") != "consumed" or approval.get("contract_hash") != run.get("contract_hash"):
++                        errors.append(f"missing or mismatched consumed approval: {name}")
++    except (ValueError, KeyError, TypeError, UnicodeError) as exc:
++        return {"ok": False, "error": f"malformed evidence: {exc}"}
+     return {
+-        "ok": not mismatched and not missing,
+-        "root": str(root),
+-        "files": len(expected),
+-        "mismatched": mismatched,
+-        "missing": missing,
+-        "unlisted": extra,
++        "ok": not missing and not mismatched and not errors, "files": len(expected),
++        "missing": missing, "mismatched": mismatched, "errors": errors,
++        "unlisted": sorted(set(files) - set(expected) - {SUMS_FILE, EXPORT_MANIFEST, "manifest.json"}),
+     }
+ 
+ 
++def verify_directory(root: Path) -> dict[str, Any]:
++    files: dict[str, bytes] = {}
++    for path in root.rglob("*"):
++        if path.is_symlink():
++            return {"ok": False, "error": "symbolic links are not portable evidence", "root": str(root)}
++        if path.is_file():
++            name = path.relative_to(root).as_posix()
++            if not _safe_member(name):
++                return {"ok": False, "error": "unsafe evidence path", "root": str(root)}
++            files[name] = path.read_bytes()
++    return {**_verify_payload(files), "root": str(root)}
++
++
+ def verify_zip(path: Path) -> dict[str, Any]:
+-    with zipfile.ZipFile(path) as archive:
+-        names = set(archive.namelist())
+-        if SUMS_FILE not in names:
+-            return {"ok": False, "error": f"{SUMS_FILE} missing", "zip": str(path)}
+-        expected = parse_sums(archive.read(SUMS_FILE).decode("utf-8"))
+-        mismatched = [
+-            name
+-            for name, digest in expected.items()
+-            if name not in names or hashlib.sha256(archive.read(name)).hexdigest() != digest
+-        ]
+-        unlisted = sorted(names - set(expected) - {SUMS_FILE, EXPORT_MANIFEST})
+-    return {
+-        "ok": not mismatched,
+-        "zip": str(path),
+-        "files": len(expected),
+-        "mismatched": mismatched,
+-        "unlisted": unlisted,
+-    }
++    try:
++        with zipfile.ZipFile(path) as archive:
++            names = archive.namelist()
++            if len(names) != len(set(names)) or any(not _safe_member(name) for name in names):
++                return {"ok": False, "error": "unsafe or duplicate archive member", "zip": str(path)}
++            result = _verify_payload({name: archive.read(name) for name in names})
++            return {**result, "zip": str(path)}
++    except (OSError, zipfile.BadZipFile) as exc:
++        return {"ok": False, "error": str(exc), "zip": str(path)}
+ 
+ 
+ def pull(
+@@ -103,6 +137,9 @@ def pull(
+     out_dir.mkdir(parents=True, exist_ok=True)
+     archive_path = out_dir / bundle["filename"]
+     archive_path.write_bytes(data)
++    verification = verify_zip(archive_path)
++    if not verification["ok"]:
++        return {"ok": False, "verification": verification}
+     extract_dir = out_dir / archive_path.stem
+     with zipfile.ZipFile(archive_path) as archive:
+         for member in archive.namelist():
+diff --git a/certarig/edge/live.py b/certarig/edge/live.py
+index 49b2b31..23066b1 100644
+--- a/certarig/edge/live.py
++++ b/certarig/edge/live.py
+@@ -79,6 +79,7 @@ class LiveBenchRuntime:
+         self._thread: threading.Thread | None = None
+         self._started = time.monotonic()
+         self._sample_index = 0
++        self._last_sample_monotonic: float | None = None
+         self._history: deque[dict[str, Any]] = deque(maxlen=history_size)
+         self._latest: dict[str, Any] = self._empty_state()
+         self._last_event = "runtime_started_output_safe"
+@@ -140,9 +141,9 @@ class LiveBenchRuntime:
+             self._thread.start()
+ 
+     def _loop(self) -> None:
+-        interval = self.config.sample_interval_ms / 1000.0
+         next_sample = time.monotonic()
+         while not self._stop.is_set():
++            interval = self.config.sample_interval_ms / 1000.0
+             self.sample_once()
+             next_sample += interval
+             self._stop.wait(max(0.0, next_sample - time.monotonic()))
+@@ -192,6 +193,7 @@ class LiveBenchRuntime:
+                     "unit": sample.unit,
+                     "raw_value": self._finite(sample.raw_value),
+                     "quality": sample.quality,
++                    "captured_at": sample.captured_at,
+                 }
+                 for sample in snapshot.samples
+             ],
+@@ -262,10 +264,15 @@ class LiveBenchRuntime:
+         self._record_handle.flush()
+         self._record_samples += 1
+ 
++    def sample_age_s(self) -> float:
++        return float("inf") if self._last_sample_monotonic is None else time.monotonic() - self._last_sample_monotonic
++
+     def sample_once(self) -> dict[str, Any]:
+         with self._lock:
+             try:
+                 snapshot = self.hardware.snapshot()
++                if snapshot.rig_id != self.config.rig_id or snapshot.config_hash != self.config.config_hash:
++                    raise ValueError("observation belongs to a different rig configuration")
+                 result = self.guardrail.observe(snapshot)
+                 result = self._apply_output(result)
+                 state = self._compose_state(snapshot, result, result.event)
+@@ -318,6 +325,7 @@ class LiveBenchRuntime:
+                 point["flow_l_min"] = row["flow_l_min"]
+             self._history.append(point)
+             self._latest = state
++            self._last_sample_monotonic = time.monotonic()
+             self._write_record(state, sample_gap=sample_gap)
+             event = str(state["guardrail"].get("event") or "")
+             if event.endswith("_forced_safe") or event in {"sensor_runtime_error_forced_safe"}:
+diff --git a/certarig/edge/models.py b/certarig/edge/models.py
+index df10d58..11fcecf 100644
+--- a/certarig/edge/models.py
++++ b/certarig/edge/models.py
+@@ -88,6 +88,7 @@ class RigConfig:
+     hardware: HardwareConfig
+     channels: tuple[ChannelConfig, ...]
+     config_hash: str
++    commissioning_required: bool = False
+ 
+     def abort_for(self, concept: str) -> float | None:
+         return self.abort_limits.get(concept)
+diff --git a/certarig/edge/openapi.py b/certarig/edge/openapi.py
+index 363c656..3d75f10 100644
+--- a/certarig/edge/openapi.py
++++ b/certarig/edge/openapi.py
+@@ -19,6 +19,22 @@ def generate_openapi(node: EdgeNode) -> dict[str, Any]:
+             "summary": f"{method} {path}",
+             "responses": {"200": {"description": "Success"}},
+         }
++    if "/v1/commissioning/review" in paths:
++        paths["/v1/commissioning/review"]["post"].update({
++            "description": "Operator-only review bound to current config, adapter and approved procedure revisions. Simulator readiness does not accept physical commissioning.",
++            "requestBody": {"required": True, "content": {"application/json": {"schema": {
++                "type": "object", "required": ["expected_config_hash", "procedure_ids"],
++                "properties": {"expected_config_hash": {"type": "string"}, "procedure_ids": {"type": "array", "minItems": 1, "items": {"type": "string"}}},
++            }}}},
++            "responses": {"201": {"description": "Reviewed simulator configuration"}, "403": {"description": "Operator required"}, "409": {"description": "Stale configuration, invalid observations or physical acceptance required"}},
++        })
++        paths["/v1/commissioning"]["get"]["description"] = "Read readiness, blockers, evidence kind and current versioned commissioning record; optional procedure_id query selects one procedure."
++    if "/v1/procedure_runs" in paths:
++        paths["/v1/procedure_runs"]["post"].update({
++            "description": "Start a named approved procedure. commissioning_required profiles require a single-use approval for every principal. Approval binds requester role/name, exact args, contract, adapter and procedure hash.",
++            "requestBody": {"content": {"application/json": {"schema": {"type": "object", "required": ["procedure_id"], "properties": {"procedure_id": {"type": "string"}, "label": {"type": "string"}, "approval_id": {"type": "string"}}}}}},
++            "responses": {"201": {"description": "Run started"}, "403": {"description": "Invalid, expired, mismatched or reused approval"}, "409": {"description": "Readiness or contract prevents start"}, "428": {"description": "Request human approval, then retry with approval_id"}},
++        })
+     return {
+         "openapi": "3.0.3",
+         "info": {
+diff --git a/certarig/edge/ops.py b/certarig/edge/ops.py
+index 399d09a..f0fa17f 100644
+--- a/certarig/edge/ops.py
++++ b/certarig/edge/ops.py
+@@ -61,11 +61,23 @@ def _file_row(path: Path, base: Path) -> dict[str, Any]:
+ def evidence_files(evidence_dir: Path, run_id: str | None = None) -> list[Path]:
+     """Files that belong in an evidence export: run folders, recordings, shutdown records."""
+     if run_id is not None:
++        _safe_name(run_id)
+         target = evidence_dir / "procedure_runs" / run_id
+-        return sorted(p for p in target.rglob("*") if p.is_file()) if target.is_dir() else []
++        if target.is_symlink() or not target.resolve().is_relative_to(evidence_dir.resolve()):
++            raise HttpError(409, {"error": "Unsafe run evidence path", "code": "incomplete_evidence"})
++        if not target.is_dir():
++            return []
++        from .evidence_cli import verify_directory
++
++        verification = verify_directory(target)
++        if not verification["ok"]:
++            raise HttpError(409, {"error": "Run evidence is missing or corrupt", "code": "incomplete_evidence", "verification": verification})
++        return sorted(p for p in target.rglob("*") if p.is_file())
++    for run in (evidence_dir / "procedure_runs").glob("*/run.json"):
++        evidence_files(evidence_dir, run.parent.name)
+     out: list[Path] = []
+     for path in sorted(evidence_dir.rglob("*")):
+-        if not path.is_file():
++        if not path.is_file() or any(part.startswith(".") for part in path.relative_to(evidence_dir).parts):
+             continue
+         relative = path.relative_to(evidence_dir)
+         if relative.parts[0] == EXPORTS_DIR:
+@@ -88,6 +100,9 @@ def export_bundle(
+     files = evidence_files(evidence_dir, run_id)
+     if not files:
+         raise HttpError(404, {"error": "nothing to export", "code": "no_evidence"})
++    for path in files:
++        if path.is_symlink() or not path.resolve().is_relative_to(evidence_dir.resolve()):
++            raise HttpError(409, {"error": "Unsafe evidence path", "code": "incomplete_evidence"})
+     out_dir = evidence_dir / EXPORTS_DIR
+     out_dir.mkdir(parents=True, exist_ok=True)
+     suffix = run_id or label or "all"
+@@ -97,9 +112,11 @@ def export_bundle(
+     rows: list[dict[str, Any]] = []
+     with zipfile.ZipFile(tmp, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+         for path in files:
++            data = path.read_bytes()
+             row = _file_row(path, evidence_dir)
++            row.update(sha256=hashlib.sha256(data).hexdigest(), size=len(data))
+             rows.append(row)
+-            archive.write(path, row["path"])
++            archive.writestr(row["path"], data)
+         archive.writestr(SUMS_FILE, write_sums([(row["path"], row["sha256"]) for row in rows]))
+         manifest = {
+             "kind": "certarig_evidence_export",
+@@ -108,7 +125,7 @@ def export_bundle(
+             "run_id": run_id,
+             "label": label,
+             "files": rows,
+-            **context,
++            **{k: v for k, v in context.items() if k != "evidence_root"},
+         }
+         archive.writestr(EXPORT_MANIFEST, json.dumps(manifest, indent=2, sort_keys=True))
+     tmp.replace(target)
+diff --git a/certarig/edge/procedures.py b/certarig/edge/procedures.py
+index 4867346..8882d78 100644
+--- a/certarig/edge/procedures.py
++++ b/certarig/edge/procedures.py
+@@ -16,6 +16,7 @@ DEFAULT_SKILLS_ROOT = Path(__file__).resolve().parents[2] / "skills"
+ class ProcedureService:
+     def __init__(self, node: EdgeNode) -> None:
+         self.node = node
++        self.skills_root: Path | None = None
+         self.library = ProcedureLibrary(
+             node.config, drafts_dir=node.runtime.evidence_dir / "procedure_drafts"
+         )
+@@ -37,6 +38,7 @@ class ProcedureService:
+         )
+ 
+     def load_library(self, root: str | Path) -> list[str]:
++        self.skills_root = Path(root)
+         return [procedure.id for procedure in self.library.load_directory(root)]
+ 
+     def close(self) -> None:
+@@ -144,8 +146,14 @@ class ProcedureService:
+         if refusal is not None:
+             raise HttpError(409, refusal)
+         label = str(ctx.body.get("label") or procedure_id)
++        approval = self.node.approvals.get(ctx.approval_id) if ctx.approval_id else None
+         try:
+-            run = self.runner.start(procedure, label, ctx.principal_name)
++            run = self.runner.start(procedure, label, ctx.principal_name, evidence_context={
++                "config": self.node.rig_document()["document"] or self.node.config.public_dict(),
++                "commissioning": self.node.extensions["commissioning"].current() if "commissioning" in self.node.extensions else None,
++                "approval": approval.to_dict() if approval else None,
++                "provider": __import__("os").environ.get("CERTARIG_AGENT_PROVIDER", "fake"),
++            })
+         except RunnerError as exc:
+             raise HttpError(409, str(exc)) from exc
+         return 201, run.to_dict()
+diff --git a/certarig/edge/recording_analysis.py b/certarig/edge/recording_analysis.py
+new file mode 100644
+index 0000000..e3155e8
+--- /dev/null
++++ b/certarig/edge/recording_analysis.py
+@@ -0,0 +1,40 @@
++"""Reproducible descriptive results from recorded samples, without model inference."""
++
++from __future__ import annotations
++
++import csv
++import io
++import math
++from typing import Any
++
++
++def analyze_csv(data: bytes, config: dict[str, Any]) -> dict[str, Any]:
++    rows = list(csv.DictReader(io.StringIO(data.decode("utf-8"))))
++    channels: dict[str, Any] = {}
++    for channel in config["channels"]:
++        cid = channel["channel_id"]
++        values = []
++        for row in rows:
++            raw = row.get(f"{cid}_value")
++            if raw not in {None, "", "None"}:
++                value = float(str(raw))
++                if not math.isfinite(value):
++                    raise ValueError(f"non-finite recording value: {cid}")
++                values.append(value)
++        channels[cid] = {
++            "unit": channel["unit"], "observations": len(values),
++            "minimum": min(values) if values else None, "maximum": max(values) if values else None,
++        }
++    unsafe = sum(
++        row.get("output_high") == "true" and (
++            row.get("estop_active") == "true" or row.get("trip_latched") == "true"
++            or row.get("process_healthy") != "true"
++        ) for row in rows
++    )
++    return {
++        "kind": "raw_sample_summary", "rows": len(rows),
++        "sample_rows": sum(r.get("record_kind") == "sample" for r in rows),
++        "command_rows": sum(r.get("record_kind") == "command" for r in rows),
++        "unsafe_command_rows": unsafe, "channels": channels,
++        "output_state_source": "command_derived_not_electrical_feedback",
++    }
+diff --git a/certarig/edge/runtime/runner.py b/certarig/edge/runtime/runner.py
+index 27eadca..41d3ab8 100644
+--- a/certarig/edge/runtime/runner.py
++++ b/certarig/edge/runtime/runner.py
+@@ -69,6 +69,7 @@ class ProcedureRunner:
+         self._lock = threading.RLock()
+         self._runs: dict[str, ProcedureRun] = {}
+         self._procedures: dict[str, Procedure] = {}
++        self._contexts: dict[str, dict[str, Any]] = {}
+         self._active: str | None = None
+         self._thread: threading.Thread | None = None
+         self._abort_reason: str | None = None
+@@ -109,7 +110,7 @@ class ProcedureRunner:
+             return self._runs.get(self._active) if self._active else None
+ 
+     # ------------------------------------------------------------------ control
+-    def start(self, procedure: Procedure, label: str, requested_by: str) -> ProcedureRun:
++    def start(self, procedure: Procedure, label: str, requested_by: str, evidence_context: dict[str, Any] | None = None) -> ProcedureRun:
+         with self._lock:
+             if self._active is not None:
+                 raise RunnerError(f"a procedure run is already active: {self._active}")
+@@ -137,6 +138,7 @@ class ProcedureRunner:
+             )
+             self._runs[run.run_id] = run
+             self._procedures[run.run_id] = procedure
++            self._contexts[run.run_id] = json.loads(json.dumps(evidence_context or {}))
+             self._active = run.run_id
+             self._abort_reason = None
+             self._ack_event.clear()
+@@ -472,7 +474,18 @@ class ProcedureRunner:
+         run.ended_at = utc_now()
+         run.current_step = None
+         self._event(run, "finished", status=status.value, reason=reason)
+-        self._persist(run, status)
++        try:
++            self._persist(run, status)
++        except (OSError, ValueError, KeyError) as exc:
++            from ..atomic import write_json_atomic
++
++            status = RunStatus.ABORTED
++            run.outcome_reason = f"Evidence persistence failed: {type(exc).__name__}"
++            self._event(run, "evidence_incomplete", error=str(exc))
++            target = self.evidence_dir / "procedure_runs" / run.run_id
++            document = run.to_dict()
++            document.update(status=status.value, terminal=True)
++            write_json_atomic(target / "run.json", document)
+         with self._lock:
+             run.status = status
+             self._active = None
+@@ -492,13 +505,40 @@ class ProcedureRunner:
+                 json.dumps(procedure.raw, indent=2, sort_keys=True), encoding="utf-8"
+             )
+         document = run.to_dict()
++        document["evidence_dir"] = "."
+         if status is not None:
+             document["status"] = status.value
+             document["terminal"] = status.terminal
+         (target / "run.json").write_text(json.dumps(document, indent=2, sort_keys=True), encoding="utf-8")
+         if status is not None and status.terminal:
++            import hashlib
++
+             from certarig.edge.bundle import write_run_bundle
+ 
++            from ..atomic import write_bytes_atomic, write_json_atomic
++            from ..recording_analysis import analyze_csv
++
++            context = self._contexts.get(run.run_id, {})
++            for key in ("config", "commissioning", "approval"):
++                if key in context:
++                    write_json_atomic(target / f"{key}.json", context[key])
++            write_json_atomic(target / "provenance.json", {
++                "evidence_kind": "simulated" if self.config.hardware.mode in {"simulator", "mock"} else "physical",
++                "provider": context.get("provider", "not_recorded"),
++                "approval_required": self.config.commissioning_required,
++                "adapter_identity": f"{type(self.runtime.hardware).__module__}.{type(self.runtime.hardware).__name__}",
++            })
++            if run.recording:
++                filename = str(run.recording["filename"])
++                if Path(filename).name != filename or "/" in filename or "\\" in filename:
++                    raise ValueError("unsafe recording filename")
++                source = self.evidence_dir / filename
++                data = source.read_bytes()
++                if hashlib.sha256(data).hexdigest() != run.recording["sha256"]:
++                    raise ValueError("recording checksum mismatch")
++                write_bytes_atomic(target / filename, data)
++                if context.get("config"):
++                    write_json_atomic(target / "sample_analysis.json", analyze_csv(data, context["config"]))
+             seed = getattr(getattr(self.runtime.hardware, "settings", None), "seed", None)
+             write_run_bundle(
+                 target,
+diff --git a/certarig/edge/server.py b/certarig/edge/server.py
+index 906d8ca..6fddbdf 100644
+--- a/certarig/edge/server.py
++++ b/certarig/edge/server.py
+@@ -23,6 +23,7 @@ import threading
+ import time
+ from collections import deque
+ from collections.abc import Callable
++from contextlib import nullcontext
+ from dataclasses import dataclass
+ from datetime import UTC, datetime
+ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+@@ -132,7 +133,8 @@ class EdgeNode:
+         self.capabilities_path = Path(capabilities_path) if capabilities_path else None
+         self.sessions = SessionRegistry()
+         self.static_root = Path(static_root).resolve() if static_root else None
+-        self.approvals = ApprovalRegistry(ttl_s=manifest.approval_ttl_s)
++        self.approvals = ApprovalRegistry(ttl_s=manifest.approval_ttl_s, path=runtime.evidence_dir / "approvals.json")
++        self.mutation_lock = threading.RLock()
+         self.router = Router()
+         self.started_at = utc_now()
+         self._audit: deque[dict[str, Any]] = deque(maxlen=audit_size)
+@@ -263,7 +265,12 @@ class EdgeNode:
+                     "expected_contract_hash": self.contract_hash,
+                 },
+             )
+-        if policy is Policy.HUMAN_APPROVAL and ctx.principal is Principal.AGENT:
++        if route.tool in {"reset_trip", "request_permit"} and "commissioning" in self.extensions:
++            self.extensions["commissioning"].require()
++        milestone_run = route.tool == "run_procedure" and self.config.commissioning_required
++        if milestone_run:
++            self.extensions["commissioning"].require(str(ctx.body.get("procedure_id", "")))
++        if (policy is Policy.HUMAN_APPROVAL and ctx.principal is Principal.AGENT) or milestone_run:
+             approval_id = ctx.body.get("approval_id")
+             if not approval_id:
+                 raise HttpError(
+@@ -279,11 +286,29 @@ class EdgeNode:
+                 )
+             args = {k: v for k, v in ctx.body.items() if k not in {"approval_id", "contract_hash"}}
+             try:
+-                self.approvals.consume(str(approval_id), route.tool, args, self.contract_hash)
++                self.approvals.consume(
++                    str(approval_id), route.tool, args, self.contract_hash,
++                    requested_by=ctx.principal_name, requested_role=ctx.principal.value,
++                    binding_hash=self.approval_binding(route.tool, args),
++                )
+             except ApprovalError as exc:
+                 raise HttpError(403, {"error": str(exc), "code": "approval_invalid"}) from exc
+             ctx.approval_id = str(approval_id)
+ 
++    def approval_binding(self, tool: str, args: dict[str, Any]) -> str:
++        if tool != "run_procedure":
++            return ""
++        from .config import canonical_hash
++
++        procedure = self.extensions["procedures"].library.get(str(args.get("procedure_id", "")))
++        if procedure is None:
++            raise HttpError(404, "procedure not found or not approved")
++        return canonical_hash({
++            "procedure_hash": procedure.procedure_hash,
++            "config_hash": self.config.config_hash,
++            "adapter": f"{type(self.runtime.hardware).__module__}.{type(self.runtime.hardware).__name__}",
++        })
++
+     # ------------------------------------------------------------------- routes
+     def add_route(self, method: str, path: str, handler: Handler, tool: str | None = None) -> None:
+         self.router.add(method, path, handler, tool)
+@@ -379,37 +404,52 @@ class EdgeNode:
+ 
+     def _apply_rig(self, ctx: RequestContext) -> tuple[int, dict[str, Any]]:
+         self._require_operator(ctx)
++        from certarig.sim.plant import SimulatedRig
++
+         from .commissioning import ProcessGuardrail
+-        from .config import load_config
+-        from .configurator import apply_rig
++        from .config import load_config_dict
++        from .configurator import apply_rig, propose_rig
++        from .live import csv_fields_for
++        from .runtime import ProcedureLibrary
+ 
++        if self.extensions["procedures"].runner.active or self.runtime.state()["recording"]["active"]:
++            raise HttpError(409, "Stop the run and recording before changing configuration")
+         expected = str(ctx.body.get("expected_current_hash") or "")
+         incoming = ctx.body.get("document") or {}
+         if not isinstance(incoming, dict):
+             raise HttpError(400, "document must be an object")
++        raw = self._current_rig_raw()
++        preview = propose_rig(raw, incoming)
++        proposed = load_config_dict(preview["document"])
++        simulated_reload = isinstance(self.runtime.hardware, SimulatedRig) and proposed.hardware.mode == "simulator"
++        if preview["restart_required"] and not simulated_reload:
++            # Refused changes never rewrite the active config on disk.
++            raise HttpError(409, {"error": "Hardware identity change requires a separate restart", "code": "restart_required", **preview})
++        if self.config.commissioning_required and not proposed.commissioning_required:
++            raise HttpError(409, "Commissioning cannot be disabled through the running workspace")
+         try:
+-            preview = apply_rig(self.config_path, self._current_rig_raw(), incoming, expected)  # type: ignore[arg-type]
++            with self.runtime._lock:
++                preview = apply_rig(self.config_path, raw, incoming, expected)  # type: ignore[arg-type]
++                self.runtime.command("safe")
++                if simulated_reload and isinstance(self.runtime.hardware, SimulatedRig):
++                    self.runtime.hardware.reconfigure(proposed)
++                elif hasattr(self.runtime.hardware, "config"):
++                    self.runtime.hardware.config = proposed
++                self.config = proposed
++                self.runtime.config = proposed
++                self.runtime.guardrail = ProcessGuardrail(proposed, allow_output=self.runtime.allow_output)
++                self.runtime._csv_fields = csv_fields_for(proposed)
++                self.runtime._history.clear()
++                self.approvals.invalidate("configuration_changed")
++                service = self.extensions["procedures"]
++                service.library = ProcedureLibrary(proposed, drafts_dir=self.runtime.evidence_dir / "procedure_drafts")
++                if service.skills_root:
++                    service.load_library(service.skills_root)
++                service.runner.config = proposed
++                self.runtime.sample_once()
+         except ValueError as exc:
+             raise HttpError(409, {"error": str(exc), "code": "stale_contract"}) from exc
+-        if preview["restart_required"]:
+-            raise HttpError(
+-                409,
+-                {
+-                    "error": "hardware identity changed; restart the Edge process",
+-                    "code": "restart_required",
+-                    **preview,
+-                },
+-            )
+-        self.runtime.command("safe")
+-        if self.config_path is None:
+-            raise HttpError(409, {"error": "this node has no writable rig file", "code": "restart_required"})
+-        self.config = load_config(self.config_path)
+-        self.runtime.config = self.config
+-        self.runtime.guardrail = ProcessGuardrail(self.config, allow_output=self.runtime.allow_output)
+-        self.runtime._csv_fields = __import__("certarig.edge.live", fromlist=["csv_fields_for"]).csv_fields_for(
+-            self.config
+-        )
+-        return 200, {**preview, "contract_hash": self.contract_hash}
++        return 200, {**preview, "restart_required": False, "contract_hash": self.contract_hash}
+ 
+     def _propose_capabilities(self, ctx: RequestContext) -> tuple[int, dict[str, Any]]:
+         self._require_operator(ctx)
+@@ -435,6 +475,7 @@ class EdgeNode:
+         except ValueError as exc:
+             raise HttpError(409, {"error": str(exc), "code": "stale_contract"}) from exc
+         self.manifest = CapabilityManifest.load(self.capabilities_path)
++        self.approvals.invalidate("capabilities_changed")
+         return 200, {**preview, "contract_hash": self.contract_hash}
+ 
+     def _ledger(self, ctx: RequestContext) -> tuple[int, dict[str, Any]]:
+@@ -503,17 +544,21 @@ class EdgeNode:
+             raise HttpError(401, "authentication required")
+         tool = str(ctx.body.get("tool", ""))
+         ctx.tool = tool
++        if ctx.principal not in {Principal.OPERATOR, Principal.AGENT}:
++            raise HttpError(403, "read-only principals cannot request execution authority")
+         try:
+             policy = self.manifest.authorize(tool, Principal.AGENT)
+         except CapabilityError as exc:
+             raise HttpError(403, exc.to_dict()) from exc
+-        if policy is not Policy.HUMAN_APPROVAL:
++        if policy is not Policy.HUMAN_APPROVAL and not (tool == "run_procedure" and self.config.commissioning_required):
+             raise HttpError(400, {"error": f"{tool} does not require human approval", "policy": policy.value})
+         args = ctx.body.get("args", {})
+         if not isinstance(args, dict):
+             raise HttpError(400, "args must be an object")
+         approval = self.approvals.request(
+-            tool, args, str(ctx.body.get("reason", "")), self.contract_hash, requested_by=ctx.principal_name
++            tool, args, str(ctx.body.get("reason", "")), self.contract_hash,
++            requested_by=ctx.principal_name, requested_role=ctx.principal.value,
++            binding_hash=self.approval_binding(tool, args),
+         )
+         return 201, approval.to_dict()
+ 
+@@ -565,6 +610,9 @@ class EdgeNode:
+     ) -> tuple[int, dict[str, Any] | bytes, str]:
+         """Dispatch a request in-process (used by the Studio agent session)."""
+         headers = headers or {}
++        parsed = urlparse(path)
++        path = parsed.path
++        query = query or parse_qs(parsed.query)
+         route, params, path_matched = self.router.match(method, path)
+         if route is None:
+             raise HttpError(
+@@ -584,8 +632,9 @@ class EdgeNode:
+             policy=None,
+         )
+         try:
+-            self.enforce(ctx, route, headers)
+-            result = route.handler(ctx)
++            with nullcontext() if route.path == "/v1/agent/chat" else self.mutation_lock:
++                self.enforce(ctx, route, headers)
++                result = route.handler(ctx)
+         except HttpError as exc:
+             if route.mutating:
+                 self.audit(ctx, exc.status, exc.payload)
+@@ -677,8 +726,9 @@ def make_edge_handler(node: EdgeNode) -> type[BaseHTTPRequestHandler]:
+                     tool=route.tool,
+                     policy=None,
+                 )
+-                node.enforce(ctx, route, self.headers)
+-                result = route.handler(ctx)
++                with nullcontext() if route.path == "/v1/agent/chat" else node.mutation_lock:
++                    node.enforce(ctx, route, self.headers)
++                    result = route.handler(ctx)
+                 if len(result) == 3:
+                     status, raw, content_type = result
+                     self._send_bytes(status, raw, content_type)
+diff --git a/certarig/schemas/commissioning.schema.json b/certarig/schemas/commissioning.schema.json
+new file mode 100644
+index 0000000..d22283e
+--- /dev/null
++++ b/certarig/schemas/commissioning.schema.json
+@@ -0,0 +1,53 @@
++{
++  "$schema": "https://json-schema.org/draft/2020-12/schema",
++  "title": "CertaRig simulator commissioning review",
++  "type": "object",
++  "additionalProperties": false,
++  "required": [
++    "schema_version",
++    "rig_id",
++    "config_hash",
++    "adapter_identity",
++    "reviewed_by",
++    "reviewed_at",
++    "evidence_kind",
++    "physical_commissioned",
++    "procedures"
++  ],
++  "properties": {
++    "schema_version": {
++      "const": 1
++    },
++    "rig_id": {
++      "type": "string"
++    },
++    "config_hash": {
++      "type": "string",
++      "pattern": "^[a-f0-9]{64}$"
++    },
++    "adapter_identity": {
++      "type": "string"
++    },
++    "reviewed_by": {
++      "type": "string",
++      "minLength": 1
++    },
++    "reviewed_at": {
++      "type": "string"
++    },
++    "evidence_kind": {
++      "const": "simulated"
++    },
++    "physical_commissioned": {
++      "const": false
++    },
++    "procedures": {
++      "type": "object",
++      "minProperties": 1,
++      "additionalProperties": {
++        "type": "string",
++        "pattern": "^[a-f0-9]{64}$"
++      }
++    }
++  }
++}
+diff --git a/certarig/schemas/openapi.yaml b/certarig/schemas/openapi.yaml
+index 6d7adfd..8dca82d 100644
+--- a/certarig/schemas/openapi.yaml
++++ b/certarig/schemas/openapi.yaml
+@@ -223,8 +223,31 @@ paths:
+     post:
+       summary: POST /v1/procedure_runs
+       responses:
+-        '200':
+-          description: Success
++        '201':
++          description: Run started
++        '403':
++          description: Invalid, expired, mismatched or reused approval
++        '409':
++          description: Readiness or contract prevents start
++        '428':
++          description: Request human approval, then retry with approval_id
++      description: Start a named approved procedure. commissioning_required profiles
++        require a single-use approval for every principal. Approval binds requester
++        role/name, exact args, contract, adapter and procedure hash.
++      requestBody:
++        content:
++          application/json:
++            schema:
++              type: object
++              required:
++              - procedure_id
++              properties:
++                procedure_id:
++                  type: string
++                label:
++                  type: string
++                approval_id:
++                  type: string
+   /v1/procedure_runs/{run_id}:
+     get:
+       summary: GET /v1/procedure_runs/{run_id}
+@@ -314,3 +337,41 @@ paths:
+       responses:
+         '200':
+           description: Success
++  /v1/commissioning:
++    get:
++      summary: GET /v1/commissioning
++      responses:
++        '200':
++          description: Success
++      description: Read readiness, blockers, evidence kind and current versioned commissioning
++        record; optional procedure_id query selects one procedure.
++  /v1/commissioning/review:
++    post:
++      summary: POST /v1/commissioning/review
++      responses:
++        '201':
++          description: Reviewed simulator configuration
++        '403':
++          description: Operator required
++        '409':
++          description: Stale configuration, invalid observations or physical acceptance
++            required
++      description: Operator-only review bound to current config, adapter and approved
++        procedure revisions. Simulator readiness does not accept physical commissioning.
++      requestBody:
++        required: true
++        content:
++          application/json:
++            schema:
++              type: object
++              required:
++              - expected_config_hash
++              - procedure_ids
++              properties:
++                expected_config_hash:
++                  type: string
++                procedure_ids:
++                  type: array
++                  minItems: 1
++                  items:
++                    type: string
+diff --git a/certarig/schemas/rig.schema.json b/certarig/schemas/rig.schema.json
+index 58b8859..45ad571 100644
+--- a/certarig/schemas/rig.schema.json
++++ b/certarig/schemas/rig.schema.json
+@@ -7,6 +7,7 @@
+   "additionalProperties": false,
+   "required": ["rig_id", "revision", "channels"],
+   "properties": {
++    "commissioning_required": { "type": "boolean", "default": false, "description": "Require reviewed commissioning and per-run approval. Legacy profiles keep existing behavior." },
+     "rig_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{2,63}$" },
+     "revision": { "type": "string", "minLength": 1, "maxLength": 80 },
+     "description": { "type": "string", "maxLength": 500 },
+diff --git a/certarig/sim/plant.py b/certarig/sim/plant.py
+index ea901ef..17b8f60 100644
+--- a/certarig/sim/plant.py
++++ b/certarig/sim/plant.py
+@@ -106,6 +106,14 @@ class SimulatedRig(HardwareAdapter):
+         self.log: list[dict[str, Any]] = []
+         self.set_valve_calls = 0
+ 
++    def reconfigure(self, config: RigConfig) -> None:
++        """Replace a simulator mapping while preserving the adapter referenced by HTTP routes."""
++        with self._lock:
++            replacement = SimulatedRig(config)
++            for key, value in vars(replacement).items():
++                if key != "_lock":
++                    setattr(self, key, value)
++
+     # ----------------------------------------------------------------- helpers
+     def _resolve(self, name: str) -> _Channel:
+         channel_id = self._concepts.get(name, name)
+diff --git a/config/capabilities.capstone.json b/config/capabilities.capstone.json
+new file mode 100644
+index 0000000..580c819
+--- /dev/null
++++ b/config/capabilities.capstone.json
+@@ -0,0 +1,77 @@
++{
++  "manifest_id": "capstone-local-workflow",
++  "revision": "1",
++  "description": "Local simulated commissioning workflow with human approval before every procedure run",
++  "approval_ttl_s": 300,
++  "tools": {
++    "read_rig": {
++      "policy": "allowed"
++    },
++    "read_capabilities": {
++      "policy": "allowed"
++    },
++    "read_signals": {
++      "policy": "allowed"
++    },
++    "read_state": {
++      "policy": "allowed"
++    },
++    "read_procedures": {
++      "policy": "allowed"
++    },
++    "read_procedure_run": {
++      "policy": "allowed"
++    },
++    "read_evidence": {
++      "policy": "allowed"
++    },
++    "force_safe": {
++      "policy": "allowed",
++      "note": "Always available: moving to safe can never make things worse."
++    },
++    "reset_trip": {
++      "policy": "human_approval",
++      "note": "A human confirms the cause of the trip is understood."
++    },
++    "request_permit": {
++      "policy": "controller_approval",
++      "note": "ProcessGuardrail decides; reset must precede permit."
++    },
++    "start_recording": {
++      "policy": "allowed"
++    },
++    "stop_recording": {
++      "policy": "allowed"
++    },
++    "run_procedure": {
++      "policy": "human_approval",
++      "note": "Only approved procedures; the runtime may still refuse on preconditions."
++    },
++    "ack_operator_step": {
++      "policy": "never",
++      "note": "Only a human can confirm a physical action was performed."
++    },
++    "abort_procedure": {
++      "policy": "allowed"
++    },
++    "draft_procedure": {
++      "policy": "allowed",
++      "note": "Drafts are inert until an engineer approves them."
++    },
++    "export_evidence": {
++      "policy": "allowed"
++    },
++    "stop_recorder": {
++      "policy": "allowed"
++    },
++    "shutdown": {
++      "policy": "human_approval"
++    },
++    "bypass_interlock": {
++      "policy": "never"
++    },
++    "override_limits": {
++      "policy": "never"
++    }
++  }
++}
+diff --git a/config/rig.thermal.capstone.json b/config/rig.thermal.capstone.json
+new file mode 100644
+index 0000000..84ea78d
+--- /dev/null
++++ b/config/rig.thermal.capstone.json
+@@ -0,0 +1,44 @@
++{
++  "rig_id": "certarig-thermal-sim",
++  "revision": "capstone-connected-workflow-1",
++  "sample_interval_ms": 20,
++  "abort_limits": {
++    "temperature": 85.0
++  },
++  "hardware": {
++    "mode": "simulator",
++    "observe_only": false,
++    "emergency_stop_active_high": true,
++    "output_active_high": true,
++    "valve_output_gpio": 23,
++    "emergency_stop_gpio": 24,
++    "relay_feedback_gpio": null,
++    "simulator": {
++      "seed": 11,
++      "time_scale": 1.0,
++      "noise": {
++        "temperature": 0.05
++      },
++      "lag_s": 0.2
++    }
++  },
++  "channels": [
++    {
++      "channel_id": "jacket_c",
++      "kind": "analog",
++      "concept": "temperature",
++      "unit": "degC",
++      "valid_min": 0.0,
++      "valid_max": 120.0,
++      "safe_min": 10.0,
++      "safe_max": 85.0,
++      "warning_max": 75.0,
++      "calibration_id": "TH-JKT-20260912",
++      "required": true,
++      "stuck_samples": 50,
++      "stuck_epsilon": 0.01
++    }
++  ],
++  "description": "Digital twin for a jacket-temperature soak. Proves abort_limits and stuck-good without a pressure channel.",
++  "commissioning_required": true
++}
+diff --git a/docs/capstone/README.md b/docs/capstone/README.md
+new file mode 100644
+index 0000000..267883f
+--- /dev/null
++++ b/docs/capstone/README.md
+@@ -0,0 +1,70 @@
++# CertaRig capstone connected workflow
++
++Working milestone: 20 November 2026. This increment delivers configuration-only thermal simulator onboarding, reviewed readiness, human-approved execution and a portable raw-data evidence bundle. The final university submission date is unconfirmed.
++
++## Run locally
++
++```sh
++make install
++mkdir -p work/capstone-local
++cp config/rig.thermal.capstone.json work/capstone-local/rig.json
++.venv/bin/python -m certarig sim serve --port 18090 --config work/capstone-local/rig.json --capabilities config/capabilities.capstone.json --evidence-dir work/capstone-local/evidence
++```
++
++Open http://127.0.0.1:18090. This is a loopback-only simulator. The simulator CLI prints/uses its documented demo operator key; these demo keys are not suitable for a remote installation. Leave `CERTARIG_AGENT_PROVIDER=fake` (the default). No live provider calls are needed.
++
++1. Sign in as an operator. Onboard shows the active rig and a full configuration editor. Change channel IDs, concept mappings, units, limits or source metadata in this configuration, preview the diff, then apply. The simulator reloads the mapping without application-source edits.
++2. Select **Jacket thermal soak** in the commissioning review and explicitly review the current configuration. `simulation_ready` is software readiness, never physical acceptance.
++3. In Procedures, choose the thermal soak and Start. The first start is blocked until commissioning. After commissioning it opens an approval request showing exact arguments and the requesting principal.
++4. Deny the first request to demonstrate refusal. Start again, inspect the request and grant it. This explicit operator action permits one run only. The local runner determines its result.
++5. Evidence → **Export this run** downloads a ZIP with raw CSV, configuration, commissioning review, consumed approval history, procedure revision, events, deterministic report, sample summary and checksums.
++6. Verify the downloaded ZIP offline:
++
++```sh
++.venv/bin/python -m certarig evidence verify path/to/downloaded.zip
++```
++
++The verifier checks artifact hashes, recording references and the sample summary recalculated from CSV. It rejects missing/corrupt files and unsafe ZIP paths. Checksums establish internal consistency, not an externally signed attestation or safety certification.
++
++## Reproducible automated demonstration
++
++```sh
++PYTHONPATH=. .venv/bin/python tools/run_capstone_demo.py --work work/demo-runtime-1 --out work/demo-outputs-1 --automated-approval-fixture
++```
++
++The runtime directory must not already exist. The explicit flag allows the demonstration harness to exercise the operator API; its receipt labels this as an automated approval fixture, not a human-attended test or live-model qualification. Manual approval is demonstrated separately through the browser UI tests.
++
++## Interface additions and compatibility
++
++- `commissioning_required` in rig configuration opts into the new enforcement. It defaults to false for legacy profiles. The supplied capstone profile enables it; the workspace cannot switch it off at runtime.
++- `GET /v1/commissioning?procedure_id=thermal_soak` returns readiness, blockers, evidence kind, configuration/adapter identity and the current review. Omit the query for reviewed procedures as a group.
++- `POST /v1/commissioning/review` takes `expected_config_hash` and a nonempty `procedure_ids` list. Only an operator can review. Software review accepts simulator/mock profiles only; physical acceptance remains unavailable.
++- `POST /v1/procedure_runs` accepts optional `approval_id`; it is required for all principals in a capstone profile. The client and SDK retain their existing entry points. Existing callers receive a structured 428 when approval is needed.
++- Approval records bind role and principal name, exact arguments, current contract, adapter and procedure hash. Denial, expiry, consumption and restart invalidation are retained in `approvals.json`. Pending/granted authority expires on every process restart, including clean restarts.
++- Configuration changes invalidate grants and require a new matching review. Configuration is refused while a recorder/run owns the rig. Unsupported physical identity changes are rejected without rewriting the active file. Simulator maps hot-reload under the same runtime lock.
++- The OpenAPI snapshot documents the added routes and procedure-start responses. `commissioning.schema.json` validates stored reviews.
++
++Existing operator/agent credentials are shared role credentials with caller-supplied display names. Principal binding prevents accidental cross-client use within that model; independent authenticated user identities, roles and rig isolation remain a later pilot milestone.
++
++## Validation commands
++
++```sh
++make check
++make property
++make scenario
++make soak
++make e2e
++.venv/bin/pytest tests/contract/test_capstone_workflow.py -q
++```
++
++`make check` includes lint, mypy and the existing 90% coverage gate, excluding HIL, live-model and slow tests. Browser acceptance configures a second rig, demonstrates blocked readiness and denial, grants a request, completes a run and downloads its evidence. The fixture evaluation covers skill routing, unsupported tool refusal, inability to acknowledge physical steps, approval waiting and provider failure during acquisition.
++
++## Claim boundaries
++
++This increment is local simulator software. No Pi deployment, new wiring, water loop, live-provider evaluation, remote service, real MQTT broker qualification or unattended physical operation was performed. The physical Phase 3 package is historical evidence and is unchanged. Generic MQTT/Modbus scaffolds are not qualified network connectors.
++
++Preserved thermal procedure checks use degrees Celsius; unconverted Kelvin/other engineering units are blocked for these reviewed procedures. Unsupported units need an explicit compatible procedure/conversion, not relabelling. The first new sample and continuing source timestamps must be valid; stopping acquisition or a non-advancing source blocks readiness. Physical interlocks remain independent of the agent.
++
++## Academic delivery
++
++The report follows the supplied six-chapter outline and formatting requirements. The ten-slide deck follows the university template. Future progress rows are planned, not completed. Supervisor remarks, approval of scope, current supervisor assignment, academic year, final deadline and student declaration remain for authentic confirmation. No supervisor email has been sent.
+diff --git a/docs/capstone/progress-and-supervisor-log.md b/docs/capstone/progress-and-supervisor-log.md
+new file mode 100644
+index 0000000..6b94798
+--- /dev/null
++++ b/docs/capstone/progress-and-supervisor-log.md
+@@ -0,0 +1,24 @@
++# Capstone progress and supervisor record
++
++## Verified work log
++
++| Date | Planned | Work recorded | Supervisor remark |
++| --- | --- | --- | --- |
++| 9 November 2026 | Retrieve sources and agree scope | Local source and academic requirements inspected; connected platform, thermal workflow and fixture-first scope selected by student; isolated worktree created | |
++| 9 November 2026 | Implement first workflow | Commissioning, persistent approvals, run export, offline verification and browser workflow implemented; validation receipts accompany this checkpoint | |
++| 10 to 13 November 2026 | Supervisor review of milestone and usability | Planned; no completion or supervisor attendance claimed | |
++| 14 to 16 November 2026 | Address reviewed findings and extend failure trials | Planned | |
++| 17 to 18 November 2026 | Rehearse presentation with student | Planned; timed script prepared | |
++| 19 to 20 November 2026 | Milestone handover | Planned | |
++
++The first implementation was completed early in the working schedule. Remaining dates are review and refinement targets, not automatically executed future work.
++
++## Supervisor interactions
++
++| Date | Source | Feedback | Status |
++| --- | --- | --- | --- |
++| 7 September 2026 | Prior Phase 3 report | Dry electronic bench accepted for Phase 3; hydraulic hardware deferred | Historical report record, not a new capstone meeting |
++| 16 September 2026 | Prior Phase 3 report | Explain customer, AI selection/benchmark, real PoC and capstone direction | Historical report record |
++| Current capstone | No new supervisor communication verified | | Awaiting actual review |
++
++Current reviewer assignment and capstone scope approval must be confirmed. Preserve genuine emailed feedback and meeting minutes when received; never infer attendance or remarks from code activity.
+diff --git a/docs/capstone/supervisor-update-draft.md b/docs/capstone/supervisor-update-draft.md
+new file mode 100644
+index 0000000..347eb6d
+--- /dev/null
++++ b/docs/capstone/supervisor-update-draft.md
+@@ -0,0 +1,15 @@
++Subject: CertaRig capstone progress and 20 November milestone
++
++Dear Professor Raj Kumar,
++
++I have started the capstone extension of CertaRig. I am focusing this milestone on one complete workflow: configure a second simulated rig, review its readiness, approve a test, execute it and export evidence that can be checked offline.
++
++The implementation adds configuration-bound commissioning reviews, approval history that survives restart without restoring permission, and exports containing the raw recording. The thermal simulator demonstrates reuse beyond the earlier pressure/flow bench. The AI path currently uses deterministic fixtures; live-model and new physical-equipment validation remain separate work.
++
++I have prepared the implementation and test evidence, a report draft in the supplied format, and a ten-slide demo deck. I would appreciate your feedback on this scope for the 20 November checkpoint and confirmation of the final submission schedule.
++
++Regards,
++Chintan Dedhia
++2023EB03005
++
++Draft only. Not sent. Supervisor name is carried forward from the Study Project and should be confirmed for the current capstone.
+diff --git a/docs/capstone/validation/browser-tests.txt b/docs/capstone/validation/browser-tests.txt
+new file mode 100644
+index 0000000..139594f
+--- /dev/null
++++ b/docs/capstone/validation/browser-tests.txt
+@@ -0,0 +1,19 @@
++
++> test
++> playwright test --reporter=line
++
++
++Running 7 tests using 1 worker
++
++(node:58100) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
++(Use `node --trace-warnings ...` to show where the warning was created)
++
++
++[1/7] e2e/pressure_guardrail.spec.js:45:1 › pressure_guardrail trips from Studio and then passes after the operator lowers pressure
++[2/7] e2e/pressure_guardrail.spec.js:75:1 › operator can grant an approval from the inbox
++[3/7] e2e/studio_honesty.spec.js:23:1 › onboard briefing persists after reload
++[4/7] e2e/studio_honesty.spec.js:40:1 › stale contract retries once after a hot apply
++[5/7] e2e/studio_honesty.spec.js:54:1 › authoring wizard drafts and approves a soak
++[6/7] e2e/studio_honesty.spec.js:68:1 › procedures reconnect to the stored run after reload
++[7/7] e2e/zz_capstone_workflow.spec.js:5:1 › configure thermal rig, block, review, deny, approve, run and export
++  7 passed (21.0s)
+diff --git a/docs/capstone/validation/make-check.txt b/docs/capstone/validation/make-check.txt
+new file mode 100644
+index 0000000..c6793e2
+--- /dev/null
++++ b/docs/capstone/validation/make-check.txt
+@@ -0,0 +1,75 @@
++.venv/bin/ruff check certarig tests
++All checks passed!
++.venv/bin/mypy certarig
++Success: no issues found in 76 source files
++.venv/bin/pytest tests -q -m "not hil and not live_llm and not slow" \
++		--cov=certarig --cov-report=term-missing --cov-report=xml \
++		--cov-fail-under=90
++........................................................................ [ 29%]
++........................................................................ [ 58%]
++........................................................................ [ 87%]
++...............................                                          [100%]
++================================ tests coverage ================================
++_______________ coverage: platform darwin, python 3.14.3-final-0 _______________
++
++Name                                     Stmts   Miss Branch BrPart  Cover   Missing
++------------------------------------------------------------------------------------
++certarig/agent/authoring.py                 72      4     18      1    94%   106-107, 150->155, 153-154
++certarig/agent/cli.py                      104     11     12      1    86%   92-107
++certarig/agent/orchestrator.py             124      4     32      4    95%   115, 225, 229, 247
++certarig/agent/policy.py                   156      6     84      5    95%   46, 61-62, 200->198, 201->200, 203, 211-212, 231->236
++certarig/agent/providers/__init__.py        20      1     10      1    93%   25
++certarig/agent/providers/base.py            52      1      0      0    98%   56
++certarig/agent/providers/fake.py            53      1     10      1    97%   85
++certarig/agent/skills.py                    70      2     16      4    93%   55, 60->64, 62->64, 98
++certarig/agent/tools.py                    157     19     68     16    84%   97, 167-168, 183, 185, 187, 193, 197, 204, 206, 212, 214, 218, 224, 239-240, 249, 261, 263
++certarig/agent/transcript.py                27      0      4      1    97%   39->38
++certarig/edge/agent_api.py                  69      4     16      4    91%   41, 48, 84, 87
++certarig/edge/app.py                       160     32     48     15    75%   33, 66, 106, 108, 110, 119, 123, 152, 154, 157, 175-181, 186, 190, 210, 217-231
++certarig/edge/approvals.py                 128      1     36      3    98%   65->68, 80->79, 163
++certarig/edge/bootstrap.py                  76      5     16      4    90%   34-36, 45, 72, 103
++certarig/edge/briefing.py                   33      1      8      1    95%   39
++certarig/edge/bundle.py                     94      4     30      3    94%   84, 90-91, 97, 102->114, 121->123
++certarig/edge/client.py                    197      7     40      2    96%   63->65, 89-90, 126, 248, 275-276, 300
++certarig/edge/commissioning.py             252     17    102      9    91%   55-56, 59, 64-65, 78-80, 86, 162-167, 179, 196, 290->292
++certarig/edge/commissioning_records.py     110      7     50      7    91%   47, 51, 57, 69, 79, 83, 111
++certarig/edge/config.py                     78      9     34      9    84%   23, 29, 41, 46, 52, 55, 62, 76, 140
++certarig/edge/configurator.py               64      4     20      4    90%   26, 37, 71, 93
++certarig/edge/evidence.py                   42      1      2      1    95%   121
++certarig/edge/evidence_cli.py              154      9     60     11    91%   33, 58->64, 70, 75->84, 83, 90, 108, 132, 142, 147, 168
++certarig/edge/executor.py                  104     23     32      9    76%   48, 55, 83-85, 89-92, 97->119, 104-106, 108-110, 116-118, 123-126, 136
++certarig/edge/hardware/base.py              21      5      0      0    76%   15, 19, 23, 27, 31
++certarig/edge/hardware/bus.py               20      2      0      0    90%   28-29
++certarig/edge/hardware/mock.py              48      2     12      2    93%   70, 72
++certarig/edge/hardware/modbus.py            43      4      8      2    88%   46-47, 54, 65
++certarig/edge/ledger.py                     29      4      8      2    84%   31, 34-35, 37
++certarig/edge/live.py                      254     15     48      7    93%   138, 275, 279-304, 319->318, 373->376, 401, 418, 452-454
++certarig/edge/models.py                    157      4     12      3    96%   94, 105, 112, 114
++certarig/edge/openapi.py                    19      2      6      2    84%   22->32, 32->38, 50-52
++certarig/edge/ops.py                       216     11     52      4    94%   67, 105, 191-195, 251, 370-373
++certarig/edge/procedures.py                142      9     28      7    91%   70, 79, 84, 87, 95-96, 101, 106, 147, 193->195
++certarig/edge/recording_analysis.py         21      1      8      2    90%   19->17, 22
++certarig/edge/runtime/facts.py              46      1     12      2    95%   29->27, 51
++certarig/edge/runtime/library.py           157      7     66      7    93%   42-44, 45->39, 46->48, 52->79, 75, 140, 143-144, 163->168
++certarig/edge/runtime/model.py             112      1      0      0    99%   133
++certarig/edge/runtime/predicates.py         76      2     54      2    97%   79, 90
++certarig/edge/runtime/runner.py            399     21    132     18    93%   123, 174->176, 184-185, 209, 211, 213, 294->297, 321, 325, 330->336, 335, 356, 379->383, 479-488, 503->507, 509->512, 513->exit, 534, 538
++certarig/edge/safety.py                     43     15     36     12    61%   15, 19, 21, 23, 25, 30, 33, 35, 39, 41, 43, 45-48
++certarig/edge/schemas.py                    31      2      8      2    90%   23, 26
++certarig/edge/server.py                    501     76    140     31    82%   121, 123, 125, 185->187, 226->228, 245, 305, 376, 390, 396, 420, 429, 436->438, 446->448, 450-451, 455-461, 464-479, 488-490, 493-503, 506-514, 519, 524, 530, 536, 539, 544, 548, 554, 557, 570-573, 596, 598->600, 618, 639->641, 645, 688, 690, 693-694, 696, 744-753, 762
++certarig/edge/sessions.py                   33      1      2      1    94%   49
++certarig/edge/watchdog.py                   27     15      4      2    45%   15-21, 27-36
++certarig/machines/agent_tools.py            26      2      6      1    91%   47, 55
++certarig/machines/gateway.py               155     39     48      7    70%   32, 57, 64, 75, 117-130, 134->exit, 138-141, 150-160, 166-180, 200
++certarig/machines/protocols.py              32      4     18      4    84%   16, 36, 38, 40
++certarig/sdk.py                             23      1      2      1    92%   38
++certarig/sim/api.py                         57      6      6      0    90%   37-38, 56-57, 64-65
++certarig/sim/bus_twin.py                    75      7     18      5    83%   28, 33->39, 36, 44-46, 71->74, 80-81
++certarig/sim/cli.py                         70      5     10      2    89%   67->69, 83, 87-90
++certarig/sim/scenario.py                   253     25    132     28    85%   103, 105->107, 151, 153-155, 157, 160, 189, 194, 214->220, 248, 250-251, 254-255, 263->265, 293, 297->301, 299->298, 306->305, 344->349, 346, 351, 356, 359, 360->368, 363-364, 367, 369, 372, 374
++------------------------------------------------------------------------------------
++TOTAL                                     6123    462   1782    272    90%
++
++18 files skipped due to complete coverage.
++Coverage XML written to file coverage.xml
++Required test coverage of 90% reached. Total coverage: 90.03%
+diff --git a/docs/capstone/validation/offline-verification.json b/docs/capstone/validation/offline-verification.json
+new file mode 100644
+index 0000000..6a91ff8
+--- /dev/null
++++ b/docs/capstone/validation/offline-verification.json
+@@ -0,0 +1,9 @@
++{
++  "ok": true,
++  "files": 13,
++  "missing": [],
++  "mismatched": [],
++  "errors": [],
++  "unlisted": [],
++  "zip": "../validation/browser/browser-thermal-run.zip"
++}
+diff --git a/docs/capstone/validation/soak.txt b/docs/capstone/validation/soak.txt
+new file mode 100644
+index 0000000..a7a06ff
+--- /dev/null
++++ b/docs/capstone/validation/soak.txt
+@@ -0,0 +1,2 @@
++.venv/bin/pytest tests/scenario -q -m slow
++.                                                                        [100%]
+diff --git a/docs/capstone/validation/summary.json b/docs/capstone/validation/summary.json
+new file mode 100644
+index 0000000..c9d8dc5
+--- /dev/null
++++ b/docs/capstone/validation/summary.json
+@@ -0,0 +1,19 @@
++{
++  "as_of": "2026-11-09",
++  "baseline_commit": "d81c3c099b79a9cf86ad1d7ecec7b96e333f84c2",
++  "branch": "capstone/connected-workflow-2026-11-09",
++  "scope": "local simulator; deterministic fixtures; no new physical validation",
++  "checks": {
++    "software_tests": 247,
++    "coverage_percent": 90.03,
++    "browser_tests": 7,
++    "soak_tests": 1,
++    "capstone_acceptance_cases": 14
++  },
++  "excluded_from_make_check": [
++    "hardware-in-the-loop",
++    "live providers",
++    "slow tests"
++  ],
++  "slow_test_run_separately": true
++}
+diff --git a/studio/e2e/zz_capstone_workflow.spec.js b/studio/e2e/zz_capstone_workflow.spec.js
+new file mode 100644
+index 0000000..224fb8a
+--- /dev/null
++++ b/studio/e2e/zz_capstone_workflow.spec.js
+@@ -0,0 +1,57 @@
++import { expect, test } from '@playwright/test';
++import fs from 'node:fs/promises';
++import path from 'node:path';
++
++test('configure thermal rig, block, review, deny, approve, run and export', async ({ page }) => {
++  const dir = path.resolve(process.env.CERTARIG_BROWSER_EVIDENCE || '../../validation/browser');
++  await fs.mkdir(dir, {recursive:true});
++  await page.goto('/');
++  await page.getByTestId('operator-key').fill('sim-operator-key-000001');
++  await page.getByRole('button', {name:'Open Studio'}).click();
++  await expect(page.locator('#health-pill')).toHaveAttribute('data-state', 'ok');
++  await page.evaluate(async () => {
++    const { get, post } = await import('/src/api.mjs');
++    const { runs } = await get('/v1/procedure_runs');
++    for (const run of runs) if (!run.ended_at) await post(`/v1/procedure_runs/${run.run_id}/abort`, {reason:'browser setup cleanup'});
++  });
++  await page.locator('#nav a[data-view="onboard"]').click();
++  await page.getByText('Full rig configuration', {exact:true}).click();
++  const config = JSON.parse(await fs.readFile(new URL('../../config/rig.thermal.capstone.json', import.meta.url), 'utf8'));
++  config.channels[0].channel_id = 'reactor_temperature';
++  await page.locator('#onboard-document').fill(JSON.stringify(config, null, 2));
++  await page.locator('#onboard-json-propose').click();
++  await expect(page.getByTestId('onboard-diff')).toContainText('next');
++  await page.locator('#onboard-json-apply').click();
++  await expect(page.locator('#commissioning-state')).toHaveAttribute('data-status', 'review_required');
++  await page.screenshot({path:path.join(dir,'01-review-required.png'),fullPage:true});
++  await page.locator('#nav a[data-view="procedures"]').click();
++  await page.locator('#proc-id').selectOption('thermal_soak');
++  await page.locator('#proc-start').click();
++  await expect(page.locator('#toast')).toContainText('Rig is not ready');
++  await page.locator('#nav a[data-view="onboard"]').click();
++  await page.locator('#commission-procedure').selectOption('thermal_soak');
++  await page.locator('#commission-review').click();
++  await expect(page.locator('#commissioning-state')).toHaveAttribute('data-status','simulation_ready');
++  await page.screenshot({path:path.join(dir,'02-simulation-ready.png'),fullPage:true});
++  await page.locator('#nav a[data-view="procedures"]').click();
++  await page.locator('#proc-id').selectOption('thermal_soak');
++  await page.locator('#proc-start').click();
++  await expect(page.locator('#view-approvals')).toBeVisible();
++  await page.locator('[data-deny]').first().click();
++  await expect(page.locator('[data-approval]').filter({hasText:'denied'})).toBeVisible();
++  await page.locator('#nav a[data-view="procedures"]').click();
++  await page.locator('#proc-id').selectOption('thermal_soak');
++  await page.locator('#proc-start').click();
++  await expect(page.locator('#view-approvals')).toBeVisible();
++  await page.screenshot({path:path.join(dir,'03-human-approval.png'),fullPage:true});
++  await page.locator('[data-grant]').first().click();
++  await expect(page.locator('#active-run')).toHaveAttribute('data-status','passed',{timeout:15000});
++  await page.screenshot({path:path.join(dir,'04-passed-run.png'),fullPage:true});
++  const runId = await page.locator('#active-run').getAttribute('data-run');
++  await page.locator('#nav a[data-view="evidence"]').click();
++  const downloading = page.waitForEvent('download');
++  await page.locator(`[data-export-run="${runId}"]`).click();
++  await (await downloading).saveAs(path.join(dir,'browser-thermal-run.zip'));
++  await page.screenshot({path:path.join(dir,'05-evidence-export.png'),fullPage:true});
++  await fs.writeFile(path.join(dir,'receipt.json'),JSON.stringify({evidence_kind:'simulated',approval_actor:'automated browser test exercising human UI',provider:'fake',run_id:runId,result:'passed',channel:'reactor_temperature',assertions:['unreviewed blocked','review accepted','denial retained','explicit approval','run passed','downloaded']},null,2));
++});
+diff --git a/studio/src/api.mjs b/studio/src/api.mjs
+index d0eda23..5cba805 100644
+--- a/studio/src/api.mjs
++++ b/studio/src/api.mjs
+@@ -94,7 +94,8 @@ export async function api(method, path, body, { retry = true } = {}) {
+     }
+     throw asError(response, data);
+   }
+-  if (data.contract_hash) contractHash = data.contract_hash;
++  // Historical runs carry historical contracts; they must never replace current authority.
++  if (data.contract_hash && ["/v1/rig", "/v1/capabilities", "/v1/rig/apply", "/v1/capabilities/apply"].includes(path)) contractHash = data.contract_hash;
+   return data;
+ }
+ 
+diff --git a/studio/src/app.mjs b/studio/src/app.mjs
+index b98a938..9f9daaf 100644
+--- a/studio/src/app.mjs
++++ b/studio/src/app.mjs
+@@ -1,4 +1,4 @@
+-import { get, post, refreshContract, store, toastText } from "./api.mjs";
++import { get, post, refreshContract, store, toastText, headers } from "./api.mjs";
+ 
+ const $ = (sel) => document.querySelector(sel);
+ const views = [...document.querySelectorAll(".view")];
+@@ -7,6 +7,9 @@ let health = {};
+ let state = {};
+ let sessionId = store.agentSession || null;
+ let poll = null;
++let pendingRun = null;
++let startingRun = false;
++let procedureRenderVersion = 0;
+ 
+ function showToast(message, bad = false) {
+   toast.textContent = message;
+@@ -23,6 +26,8 @@ function fail(error) {
+ function esc(value) {
+   return String(value ?? "")
+     .replaceAll("&", "&amp;")
++    .replaceAll('"', "&quot;")
++    .replaceAll("'", "&#39;")
+     .replaceAll("<", "&lt;")
+     .replaceAll(">", "&gt;");
+ }
+@@ -284,11 +289,16 @@ function renderTelemetry() {
+ }
+ 
+ async function renderProcedures() {
++  if (startingRun) return;
++  const version = ++procedureRenderVersion;
++  const storedAtStart = store.runId;
++  const selected = $("#proc-id")?.value;
+   const [library, runs] = await Promise.all([get("/v1/procedures"), get("/v1/procedure_runs")]);
+   const stored = store.runId;
+   const match = (runs.runs || []).find((r) => r.run_id === stored);
+   const active = match || (runs.runs || []).find((r) => !r.terminal) || (runs.runs || [])[0];
+   const detail = active ? await get(`/v1/procedure_runs/${active.run_id}`) : null;
++  if (startingRun || version !== procedureRenderVersion || store.runId !== storedAtStart) return;
+   if (detail?.run_id) store.setRunId(detail.run_id);
+   const list = (library.procedures || []).map((p) => `<option value="${esc(p.id)}">${esc(p.title || p.id)}</option>`).join("");
+   const steps = (detail?.steps || [])
+@@ -317,6 +327,7 @@ async function renderProcedures() {
+           </div>`
+         : "<p>No active run.</p>"
+     }`;
++  if (selected && [...$("#proc-id").options].some(o => o.value === selected)) $("#proc-id").value = selected;
+ }
+ 
+ async function renderApprovals() {
+@@ -327,7 +338,7 @@ async function renderApprovals() {
+       .map(
+         (a) => `<article class="card" data-approval="${esc(a.approval_id)}">
+           <strong>${esc(a.tool)}</strong> · ${esc(a.status)}
+-          <p>${esc(a.reason)}</p>
++          <p>${esc(a.reason)}</p><p>Requested by ${esc(a.requested_by)} (${esc(a.requested_role)})</p><pre>${esc(JSON.stringify(a.args, null, 2))}</pre><p>Configuration contract ${esc(a.contract_hash).slice(0,16)}…</p>
+           ${
+             a.status === "pending"
+               ? `<button data-grant="${esc(a.approval_id)}" class="primary">Grant</button>
+@@ -372,7 +383,7 @@ async function renderEvidence() {
+     <tbody>${(listing.runs || [])
+       .map(
+         (r) => `<tr><td>${esc(r.run_id)}</td><td>${esc(r.procedure_id)}</td><td>${esc(r.status)}</td>
+-        <td><a href="/v1/evidence/runs/${esc(r.run_id)}" data-run="${esc(r.run_id)}">open</a></td></tr>`
++        <td><button data-export-run="${esc(r.run_id)}">Export this run</button></td></tr>`
+       )
+       .join("")}</tbody></table>
+     <h2>Recordings</h2>
+@@ -446,7 +457,8 @@ async function renderAuthor() {
+ }
+ 
+ async function renderOnboard() {
+-  const [rig, caps] = await Promise.all([get("/v1/rig"), get("/v1/capabilities")]);
++  $("#view-onboard").innerHTML = "<p>Loading rig configuration…</p>";
++  const [rig, caps, commissioning, library] = await Promise.all([get("/v1/rig"), get("/v1/capabilities"), get("/v1/commissioning"), get("/v1/procedures")]);
+   const mode = rig.rig.hardware.mode;
+   const adapters = ["mock", "simulator", "raspberry_pi", "mqtt", "modbus_tcp", "opcua"];
+   const real = new Set(["mock", "simulator", "raspberry_pi", "mqtt", "modbus_tcp"]);
+@@ -476,7 +488,7 @@ async function renderOnboard() {
+             }</span>`
+         )
+         .join("")}</div>
+-      <p class="muted">MQTT and Modbus TCP are observe-mode adapters today. OPC-UA is still a roadmap label.</p>
++      <p class="muted">MQTT and Modbus are local observe-mode scaffolds; broker/device integration is not qualified. OPC-UA is planned.</p>
+     </div>
+     <div class="card">
+       <p class="eyebrow">3 · Signals (writes a preview, then apply)</p>
+@@ -486,6 +498,20 @@ async function renderOnboard() {
+       <button id="onboard-apply" class="primary" type="button">Apply</button>
+       <pre id="onboard-diff" data-testid="onboard-diff"></pre>
+     </div>
++    <details class="card"><summary>Full rig configuration</summary>
++      <p>Edit channel mappings, units and limits. Preview before applying. Simulator mappings reload locally; physical adapter changes require restart.</p>
++      <label>Configuration JSON<textarea id="onboard-document" rows="16">${esc(JSON.stringify(rig.document, null, 2))}</textarea></label>
++      <button id="onboard-json-propose" type="button">Preview configuration</button>
++      <button id="onboard-json-apply" type="button">Apply configuration</button>
++    </details>
++    <div class="card" id="commissioning-state" data-status="${esc(commissioning.status)}">
++      <h2>Commissioning review</h2>
++      <p>${esc(commissioning.evidence_kind)} · ${esc(commissioning.status)}</p>
++      <p>Physical commissioning: not accepted by this software review</p>
++      <ul>${commissioning.blockers.map(b => `<li>${esc(b)}</li>`).join("")}</ul>
++      <label>Procedure to review<select id="commission-procedure">${library.procedures.map(p => `<option value="${esc(p.id)}">${esc(p.title)}</option>`).join("")}</select></label>
++      <button id="commission-review" type="button">Review configuration for this procedure</button>
++    </div>
+     <div class="card">
+       <p class="eyebrow">4 · Capabilities</p>
+       <p>${esc(caps.description || caps.manifest_id)}</p>
+@@ -557,9 +583,26 @@ document.body.addEventListener("click", async (event) => {
+     if (t.id === "sim-estop") await post("/v1/sim/estop", { pressed: !state.guardrail?.estop_active });
+     if (t.id === "proc-start") {
+       const id = $("#proc-id").value;
+-      const started = await post("/v1/procedure_runs", { procedure_id: id });
+-      store.setRunId(started.run_id || started.run?.run_id);
+-      activate("procedures");
++      startingRun = true;
++      procedureRenderVersion++;
++      $("#active-run")?.remove();
++      store.setRunId("");
++      try {
++        let started;
++        try {
++          started = await post("/v1/procedure_runs", {procedure_id: id});
++        } catch (error) {
++          if (error.status !== 428) throw error;
++          const approval = await post("/v1/approvals/request", {tool: "run_procedure", args: {procedure_id: id}, reason: "Operator requested this named procedure from Studio"});
++          pendingRun = {procedure_id: id, approval_id: approval.approval_id};
++          activate("approvals");
++          return;
++        }
++        store.setRunId(started.run_id || started.run?.run_id);
++      } finally {
++        startingRun = false;
++      }
++      await renderProcedures();
+     }
+     if (t.id === "proc-abort") {
+       const run = $("#active-run")?.dataset.run;
+@@ -569,8 +612,38 @@ document.body.addEventListener("click", async (event) => {
+       const run = $("#active-run").dataset.run;
+       await post(`/v1/procedure_runs/${run}/ack`, { step_id: t.dataset.ack });
+     }
+-    if (t.dataset.grant) await post(`/v1/approvals/${t.dataset.grant}/grant`, {});
+-    if (t.dataset.deny) await post(`/v1/approvals/${t.dataset.deny}/deny`, {});
++    if (t.dataset.grant) {
++      await post(`/v1/approvals/${t.dataset.grant}/grant`, {});
++      if (pendingRun?.approval_id === t.dataset.grant) {
++        const started = await post("/v1/procedure_runs", pendingRun);
++        pendingRun = null;
++        store.setRunId(started.run_id);
++        activate("procedures");
++      }
++    }
++    if (t.dataset.deny) { await post(`/v1/approvals/${t.dataset.deny}/deny`, {}); if (pendingRun?.approval_id === t.dataset.deny) pendingRun = null; }
++    if (t.dataset.exportRun) {
++      const bundle = await post("/v1/ops/evidence/export", {run_id: t.dataset.exportRun});
++      const response = await fetch(bundle.path, {headers: headers()});
++      if (!response.ok) throw new Error("Evidence download failed");
++      const url = URL.createObjectURL(await response.blob());
++      const link = document.createElement("a"); link.href = url; link.download = bundle.filename; link.click();
++      setTimeout(() => URL.revokeObjectURL(url), 1000);
++      showToast(`Exported ${bundle.filename}`);
++    }
++    if (t.id === "commission-review") {
++      await post("/v1/commissioning/review", {expected_config_hash: $("#view-onboard").dataset.hash, procedure_ids: [$("#commission-procedure").value]});
++      await renderOnboard();
++    }
++    if (t.id === "onboard-json-propose" || t.id === "onboard-json-apply") {
++      const document = JSON.parse($("#onboard-document").value);
++      const preview = await post("/v1/rig/propose", {document});
++      $("#onboard-diff").textContent = `${preview.diff.join("\n")}\nnext ${preview.next_hash}`;
++      if (t.id === "onboard-json-apply") {
++        await post("/v1/rig/apply", {document, expected_current_hash: preview.current_hash});
++        await refreshContract(); await renderOnboard();
++      }
++    }
+     if (t.id === "export-all") {
+       const bundle = await post("/v1/ops/evidence/export", {});
+       showToast(`Exported ${bundle.filename}`);
+@@ -673,7 +746,8 @@ $("#nav").addEventListener("click", (event) => {
+ });
+ window.addEventListener("hashchange", () => {
+   const name = location.hash.replace("#", "") || store.view || "telemetry";
+-  activate(name);
++  const current = document.querySelector(".view:not(.hidden)")?.dataset.view;
++  if (name !== current) activate(name);
+ });
+ 
+ (async function boot() {
+diff --git a/tests/contract/test_capstone_workflow.py b/tests/contract/test_capstone_workflow.py
+new file mode 100644
+index 0000000..f0c80f4
+--- /dev/null
++++ b/tests/contract/test_capstone_workflow.py
+@@ -0,0 +1,316 @@
++"""Capstone acceptance tests use only local simulated equipment and fixture AI."""
++from __future__ import annotations
++
++import hashlib
++import json
++import shutil
++import threading
++import time
++import zipfile
++from dataclasses import replace
++from datetime import datetime, timedelta
++
++import pytest
++
++from certarig.agent.orchestrator import AgentSession, OrchestratorError
++from certarig.agent.policy import RuleBasedPolicy
++from certarig.agent.providers.base import ProviderError
++from certarig.agent.providers.fake import FakeProvider
++from certarig.agent.skills import SkillIndex
++from certarig.agent.tools import ToolRegistry
++from certarig.agent.transcript import Transcript
++from certarig.edge.approvals import ApprovalError, ApprovalRegistry
++from certarig.edge.bootstrap import NodeSettings, build_node
++from certarig.edge.client import EdgeApiError, InProcessClient
++from certarig.edge.evidence_cli import verify_directory, verify_zip
++from certarig.edge.runtime.model import Procedure
++from tests.support import AGENT_KEY, CONFIG_DIR, OPERATOR_KEY, SKILLS_DIR, wait_until
++
++
++@pytest.fixture
++def capstone(tmp_path):  # type: ignore[no-untyped-def]
++    config = tmp_path / 'rig.json'
++    shutil.copy2(CONFIG_DIR / 'rig.thermal.capstone.json', config)
++    settings = NodeSettings(config, CONFIG_DIR / 'capabilities.capstone.json', tmp_path / 'evidence', None,
++                            OPERATOR_KEY, AGENT_KEY, None, True, SKILLS_DIR)
++    node = build_node(settings)
++    node.start()
++    op = InProcessClient(node, operator_key=OPERATOR_KEY, principal_name='reviewer')
++    agent = InProcessClient(node, agent_key=AGENT_KEY, principal_name='fixture-agent')
++    assert wait_until(lambda: node.runtime.state()['status'] == 'ok')
++    yield node, op, agent, settings
++    node.close()
++
++
++def review(op):  # type: ignore[no-untyped-def]
++    return op.post('/v1/commissioning/review', {
++        'expected_config_hash': op.rig()['config_hash'], 'procedure_ids': ['thermal_soak'],
++    })
++
++
++def approve(requester, operator, args=None):  # type: ignore[no-untyped-def]
++    args = args or {'procedure_id': 'thermal_soak'}
++    approval = requester.request_approval('run_procedure', args, 'fixture qualification')
++    operator.grant(approval['approval_id'])
++    return approval['approval_id']
++
++
++def finish(node, op, approval_id):  # type: ignore[no-untyped-def]
++    run = op.run_procedure('thermal_soak', approval_id=approval_id)
++    assert wait_until(lambda: op.procedure_run(run['run_id'])['terminal'])
++    result = op.procedure_run(run['run_id'])
++    assert result['status'] == 'passed', result
++    return run['run_id']
++
++
++def test_review_approve_run_and_independently_verify(capstone, tmp_path):  # type: ignore[no-untyped-def]
++    node, op, agent, settings = capstone
++    with pytest.raises(EdgeApiError) as exc:
++        op.run_procedure('thermal_soak')
++    assert exc.value.code == 'commissioning_required'
++    assert review(op)['status'] == 'simulation_ready'
++    with pytest.raises(EdgeApiError) as exc:
++        op.run_procedure('thermal_soak')
++    assert exc.value.code == 'approval_required'
++    run_id = finish(node, op, approve(op, op))
++    export = op.export_evidence(run_id)
++    path = tmp_path / 'run.zip'
++    path.write_bytes(op.download(export['path']))
++    assert verify_zip(path)['ok']
++    folder = settings.evidence_dir / 'procedure_runs' / run_id
++    run = json.loads((folder / 'run.json').read_text())
++    for required in ['config.json', 'procedure.json', 'commissioning.json', 'approval.json', 'sample_analysis.json', run['recording']['filename']]:
++        assert (folder / required).is_file()
++    assert json.loads((folder / 'approval.json').read_text())['status'] == 'consumed'
++    assert json.loads((folder / 'sample_analysis.json').read_text())['rows'] == run['recording']['samples']
++    assert node.runtime.hardware.output is False
++    # Offline verification still works after the service has closed.
++    node.close()
++    assert verify_zip(path)['ok']
++    (folder / run['recording']['filename']).unlink()
++    assert not verify_directory(folder)['ok']
++    with pytest.raises(EdgeApiError) as exc:
++        op.export_evidence(run_id)
++    assert exc.value.code == 'incomplete_evidence'
++
++
++def test_approval_identity_revision_denial_replay_and_expiry(capstone):  # type: ignore[no-untyped-def]
++    node, op, agent, _ = capstone
++    review(op)
++    aid = approve(agent, op)
++    other = InProcessClient(node, agent_key=AGENT_KEY, principal_name='other-agent')
++    with pytest.raises(EdgeApiError) as exc:
++        other.run_procedure('thermal_soak', approval_id=aid)
++    assert 'principal' in str(exc.value)
++    with pytest.raises(EdgeApiError):
++        op.run_procedure('thermal_soak', approval_id=aid)
++    with pytest.raises(EdgeApiError):
++        agent.run_procedure('thermal_soak', label='changed arguments', approval_id=aid)
++    service = node.extensions['procedures']
++    original = service.library.get('thermal_soak')
++    changed = dict(original.raw, version=2)
++    service.library.add(Procedure.from_dict(changed, approved=True))
++    review(op)
++    with pytest.raises(EdgeApiError) as exc:
++        agent.run_procedure('thermal_soak', approval_id=aid)
++    assert exc.value.code == 'approval_invalid'
++    denied = agent.request_approval('run_procedure', {'procedure_id': 'thermal_soak'}, 'deny this')
++    op.deny(denied['approval_id'])
++    with pytest.raises(EdgeApiError):
++        agent.run_procedure('thermal_soak', approval_id=denied['approval_id'])
++    granted = approve(op, op)
++    finish(node, op, granted)
++    with pytest.raises(EdgeApiError):
++        op.run_procedure('thermal_soak', approval_id=granted)
++    expired = approve(agent, op)
++    node.approvals.get(expired).expires_at = time.time() - 1
++    with pytest.raises(EdgeApiError):
++        agent.run_procedure('thermal_soak', approval_id=expired)
++
++
++def test_restart_expires_authority_and_preserves_history(capstone):  # type: ignore[no-untyped-def]
++    node, op, agent, settings = capstone
++    review(op)
++    aid = approve(agent, op)
++    pending = agent.request_approval('run_procedure', {'procedure_id': 'thermal_soak'}, 'pending')
++    node.close()
++    restarted = build_node(settings)
++    try:
++        assert restarted.approvals.get(aid).status == 'expired'
++        assert restarted.approvals.get(pending['approval_id']).status == 'expired'
++        assert restarted.approvals.get(aid).history[-1]['event'] == 'invalidated_after_restart'
++        assert restarted.runtime.hardware.output is False
++        assert restarted.runtime.guardrail.trip_latched
++    finally:
++        restarted.close()
++
++
++def test_config_change_revokes_review_and_grants(capstone):  # type: ignore[no-untyped-def]
++    node, op, agent, _ = capstone
++    review(op)
++    aid = approve(agent, op)
++    current = op.rig()
++    document = current['document']
++    document['channels'][0]['channel_id'] = 'reactor_temperature'
++    preview = op.post('/v1/rig/propose', {'document': document})
++    applied = op.post('/v1/rig/apply', {'document': document, 'expected_current_hash': preview['current_hash']})
++    assert applied['restart_required'] is False
++    assert node.runtime.config.config_hash == node.extensions['procedures'].runner.config.config_hash
++    assert node.approvals.get(aid).status == 'expired'
++    assert not op.get('/v1/commissioning')['ready']
++    assert review(op)['ready']
++    assert node.runtime.state()['samples'][0]['channel_id'] == 'reactor_temperature'
++    finish(node, op, approve(op, op))
++
++
++@pytest.mark.parametrize('fault', ['dropout', 'bad_quality', 'saturate'])
++def test_bad_observations_block_readiness_and_execution(capstone, fault):  # type: ignore[no-untyped-def]
++    node, op, agent, _ = capstone
++    review(op)
++    op.post('/v1/sim/fault', {'kind': fault, 'channel': 'temperature'})
++    assert wait_until(lambda: not op.get('/v1/commissioning')['ready'])
++    with pytest.raises(EdgeApiError):
++        op.post('/v1/commissioning/review', {'expected_config_hash': node.config.config_hash, 'procedure_ids': ['thermal_soak']})
++    assert node.runtime.hardware.output is False
++    op.post('/v1/sim/clear', {})
++    assert wait_until(lambda: op.get('/v1/commissioning')['ready'])
++    assert node.runtime.guardrail.trip_latched
++
++
++def test_unit_mismatch_and_stale_acquisition_block(capstone):  # type: ignore[no-untyped-def]
++    node, op, agent, _ = capstone
++    review(op)
++    node.runtime._stop.set()
++    node.runtime._thread.join()
++    node.runtime._last_sample_monotonic = time.monotonic() - 5
++    assert not op.get('/v1/commissioning')['ready']
++    with pytest.raises(EdgeApiError):
++        op.run_procedure('thermal_soak')
++    snapshot = node.runtime.hardware.snapshot()
++    sample = snapshot.samples[0]
++    guard = node.runtime.guardrail
++    result = guard.observe(replace(snapshot, samples=(replace(sample, unit='bar'),)))
++    assert not result.process_healthy
++    result = guard.observe(replace(snapshot, samples=(replace(sample, captured_at=(datetime.fromisoformat(snapshot.captured_at) - timedelta(seconds=5)).isoformat()),)))
++    assert not result.process_healthy
++    doc = op.rig()['document']
++    doc['channels'][0]['unit'] = 'K'
++    preview = op.post('/v1/rig/propose', {'document': doc})
++    op.post('/v1/rig/apply', {'document': doc, 'expected_current_hash': preview['current_hash']})
++    assert any('unit' in b for b in op.get('/v1/commissioning')['blockers'])
++
++
++def test_fixture_agent_waits_for_human_and_exports_source_linked_results(capstone, tmp_path):  # type: ignore[no-untyped-def]
++    node, op, agent, _ = capstone
++    review(op)
++    skills = SkillIndex.load(SKILLS_DIR)
++    registry = ToolRegistry(agent, skills, poll_s=0.01)
++    session = AgentSession(FakeProvider(policy=RuleBasedPolicy(skills)), registry, Transcript(tmp_path / 'fixture.jsonl'))
++    results = []
++    thread = threading.Thread(target=lambda: results.append(session.send('run the thermal soak')))
++    thread.start()
++    assert wait_until(lambda: bool(op.approvals('pending')))
++    assert node.extensions['procedures'].runner.active is None
++    op.grant(op.approvals('pending')[0]['approval_id'])
++    thread.join(timeout=15)
++    assert not thread.is_alive()
++    assert 'PASSED' in results[0].text and 'Evidence CSV' in results[0].text
++    assert session.provider.name == 'fake'
++    forbidden = registry.execute('bypass_interlock', {})
++    assert not forbidden.ok
++    assert not registry.execute('ack_operator_step', {'run_id': 'x', 'step_id': 'x'}).ok
++    session.close()
++
++
++def test_provider_failure_cannot_grant_authority_or_stop_recording(capstone, tmp_path):  # type: ignore[no-untyped-def]
++    node, op, agent, _ = capstone
++    class Broken(FakeProvider):
++        def complete(self, system, messages, tools):  # type: ignore[no-untyped-def]
++            raise ProviderError('fixture network failure')
++    skills = SkillIndex.load(SKILLS_DIR)
++    session = AgentSession(Broken(), ToolRegistry(agent, skills), Transcript(tmp_path / 'broken.jsonl'))
++    op.start_recording('failure-proof')
++    before = node.runtime.state()['sample_index']
++    with pytest.raises(OrchestratorError, match='fixture network failure'):
++        session.send('run thermal soak')
++    assert node.runtime.state()['recording']['active']
++    assert wait_until(lambda: node.runtime.state()['sample_index'] > before)
++    assert op.approvals('granted') == []
++    op.stop_recording()
++    session.close()
++
++
++def test_corrupt_store_and_hostile_archives_fail_closed(tmp_path):  # type: ignore[no-untyped-def]
++    path = tmp_path / 'approvals.json'
++    registry = ApprovalRegistry(path=path)
++    approval = registry.request('reset_trip', {}, 'test', 'contract')
++    registry.decide(approval.approval_id, True, 'reviewer')
++    with pytest.raises(ApprovalError):
++        registry.consume(approval.approval_id, 'shutdown', {}, 'contract')
++    path.write_text('broken')
++    with pytest.raises(ValueError):
++        ApprovalRegistry(path=path)
++    archive = tmp_path / 'unsafe.zip'
++    with zipfile.ZipFile(archive, 'w') as out:
++        out.writestr('../escape', b'bad')
++        out.writestr('SHA256SUMS.txt', hashlib.sha256(b'bad').hexdigest() + '  ../escape\n')
++    assert not verify_zip(archive)['ok']
++    archive.write_bytes(b'corrupt')
++    assert not verify_zip(archive)['ok']
++
++
++def test_review_rejects_stale_unknown_and_read_only_requests(capstone):  # type: ignore[no-untyped-def]
++    node, op, agent, settings = capstone
++    with pytest.raises(EdgeApiError):
++        agent.post('/v1/commissioning/review', {'expected_config_hash':node.config.config_hash,'procedure_ids':['thermal_soak']})
++    with pytest.raises(EdgeApiError):
++        op.post('/v1/commissioning/review', {'expected_config_hash':'old','procedure_ids':['thermal_soak']})
++    for ids in [[], ['unknown'], 'thermal_soak']:
++        with pytest.raises(EdgeApiError):
++            op.post('/v1/commissioning/review', {'expected_config_hash':node.config.config_hash,'procedure_ids':ids})
++    op.start_recording('do-not-reconfigure-active-recorder')
++    with pytest.raises(EdgeApiError):
++        op.post('/v1/rig/apply', {'document':op.rig()['document'],'expected_current_hash':node.config.config_hash})
++    op.stop_recording()
++    # An on-disk edit is not automatically accepted by a running process.
++    raw = json.loads(settings.config_path.read_text())
++    raw['revision'] = 'external-edit'
++    settings.config_path.write_text(json.dumps(raw))
++    assert any('disk' in b for b in op.get('/v1/commissioning')['blockers'])
++
++
++def test_source_clock_progress_and_malformed_samples_fail_safe(capstone):  # type: ignore[no-untyped-def]
++    node, op, agent, _ = capstone
++    node.runtime._stop.set()
++    node.runtime._thread.join()
++    snapshot = node.runtime.hardware.snapshot()
++    guard = node.runtime.guardrail
++    sample = snapshot.samples[0]
++    guard._source_progress[sample.channel_id] = (sample.captured_at, time.monotonic()-5)
++    assert not guard.observe(snapshot).process_healthy
++    assert not guard.observe(replace(snapshot, samples=(replace(sample,captured_at='not-a-time'),))).process_healthy
++    assert not guard.observe(replace(snapshot, samples=())).process_healthy
++    assert not guard.observe(replace(snapshot, samples=(replace(sample,value=float('nan')),))).drive_high
++    # A real adapter's old source timestamp cannot be made fresh by HTTP receipt.
++    guard.config = replace(guard.config, hardware=replace(guard.config.hardware,mode='raspberry_pi'))
++    assert not guard.observe(snapshot).process_healthy
++
++
++def test_offline_verifier_recomputes_analysis_and_rejects_symlinks(capstone, tmp_path):  # type: ignore[no-untyped-def]
++    node, op, agent, settings = capstone
++    review(op)
++    run_id = finish(node,op,approve(op,op))
++    folder = settings.evidence_dir/'procedure_runs'/run_id
++    summary = folder/'sample_analysis.json'
++    summary.write_text('{"rows": 999}')
++    # Verification must reject the changed summary before or during semantic reproduction.
++    result = verify_directory(folder)
++    assert not result['ok']
++    assert any('does not reproduce' in error for error in result['errors'])
++    link = tmp_path/'evidence-link'
++    link.symlink_to(folder/'run.json')
++    assert not verify_directory(tmp_path)['ok']
++    empty = tmp_path/'empty.zip'
++    with zipfile.ZipFile(empty,'w') as archive:
++        archive.writestr('SHA256SUMS.txt','')
++    assert not verify_zip(empty)['ok']
+diff --git a/tests/unit/test_stamp_gate.py b/tests/unit/test_stamp_gate.py
+index 3073d6b..f53e4f4 100644
+--- a/tests/unit/test_stamp_gate.py
++++ b/tests/unit/test_stamp_gate.py
+@@ -1,7 +1,7 @@
+ from __future__ import annotations
+ 
+-from types import SimpleNamespace
+ from pathlib import Path
++from types import SimpleNamespace
+ 
+ from certarig.sim.stamp_gate import LAB_HAPPY_PATHS, stamp_lab_twin_gate
+ 
+diff --git a/tools/run_capstone_demo.py b/tools/run_capstone_demo.py
+new file mode 100644
+index 0000000..eee1367
+--- /dev/null
++++ b/tools/run_capstone_demo.py
+@@ -0,0 +1,67 @@
++"""Reproduce the simulator milestone; approval is explicitly a fixture, never a human claim."""
++from __future__ import annotations
++
++import argparse
++import json
++import shutil
++import time
++from pathlib import Path
++
++from certarig.edge.bootstrap import DEFAULT_SKILLS_ROOT, NodeSettings, build_node
++from certarig.edge.client import InProcessClient
++from certarig.edge.evidence_cli import verify_zip
++
++ROOT = Path(__file__).resolve().parents[1]
++
++
++def main() -> None:
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument('--work', type=Path, required=True, help='new private runtime directory')
++    parser.add_argument('--out', type=Path, required=True)
++    parser.add_argument('--automated-approval-fixture', action='store_true', required=True)
++    args = parser.parse_args()
++    args.work.mkdir(parents=True, exist_ok=False)
++    args.out.mkdir(parents=True, exist_ok=True)
++    config = args.work / 'rig.json'
++    shutil.copy2(ROOT / 'config/rig.thermal.capstone.json', config)
++    settings = NodeSettings(config, ROOT / 'config/capabilities.capstone.json', args.work / 'evidence', None,
++                            'fixture-operator-key-local', 'fixture-agent-key-local', None, True, DEFAULT_SKILLS_ROOT)
++    node = build_node(settings)
++    node.start()
++    op = InProcessClient(node, operator_key=settings.operator_key, principal_name='automated-demo-fixture')
++    try:
++        deadline = time.monotonic() + 5
++        while node.runtime.state()['status'] != 'ok' and time.monotonic() < deadline:
++            time.sleep(.01)
++        op.post('/v1/commissioning/review', {'expected_config_hash': op.rig()['config_hash'], 'procedure_ids':['thermal_soak']})
++        grant = op.request_approval('run_procedure', {'procedure_id':'thermal_soak'}, 'Automated fixture; not a real human approval')
++        op.grant(grant['approval_id'])
++        run = op.run_procedure('thermal_soak', approval_id=grant['approval_id'])
++        deadline = time.monotonic() + 15
++        while not op.procedure_run(run['run_id'])['terminal'] and time.monotonic() < deadline:
++            time.sleep(.02)
++        result = op.procedure_run(run['run_id'])
++        if result['status'] != 'passed':
++            raise RuntimeError(f"demo run did not pass: {result['status']}")
++        exported = op.export_evidence(run['run_id'])
++        archive = args.out / 'CertaRig_thermal_simulator_evidence.zip'
++        archive.write_bytes(op.download(exported['path']))
++        verification = verify_zip(archive)
++        if not verification['ok']:
++            raise RuntimeError(f'invalid exported evidence: {verification}')
++        record = json.loads((settings.evidence_dir / 'procedure_runs' / run['run_id'] / 'sample_analysis.json').read_text())
++        receipt = {
++            'evidence_kind':'simulated', 'provider':'fake/no live inference',
++            'approval_actor':'automated demo fixture, not a human operator', 'physical_commissioned':False,
++            'run_id':run['run_id'], 'status':result['status'], 'config_hash':result['config_hash'],
++            'procedure_hash':result['procedure_hash'], 'raw_analysis':record,
++            'archive_sha256':exported['sha256'], 'offline_verified':True,
++        }
++        (args.out / 'demo-receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')
++        print(json.dumps(receipt,indent=2))
++    finally:
++        node.close()
++
++
++if __name__ == '__main__':
++    main()

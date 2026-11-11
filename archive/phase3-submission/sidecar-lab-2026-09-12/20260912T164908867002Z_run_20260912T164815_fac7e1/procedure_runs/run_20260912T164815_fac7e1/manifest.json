@@ -1,0 +1,44 @@
+{
+  "certarig_version": "0.4.0",
+  "config_hash": "e9922ec2e77b1006a336b4739b200d6c5372b02b457446b1b44b9c45bfed29ed",
+  "contract_hash": "9e144a0f814cb0726daa25d675af6993ce183b9e3e3db58fc8a621dcc23db1f7",
+  "created_at": "2026-09-12T16:48:59.352599+00:00",
+  "files": [
+    {
+      "path": "briefing.json",
+      "sha256": "e4a381534d6efabb390d4d5f0178ee9eafb00bf5cbf3e8c3086fb7267590016c",
+      "size": 310
+    },
+    {
+      "path": "events.jsonl",
+      "sha256": "17130bf495021ec746c77047c1f4c631aaf9c6be6d501e4a9ac51484c9ce2c85",
+      "size": 3934
+    },
+    {
+      "path": "procedure.json",
+      "sha256": "efbfcc032ae9bffcb8eb9c809830909083bab18312703344d766686c4be0fe9b",
+      "size": 4421
+    },
+    {
+      "path": "report.md",
+      "sha256": "c086cf0542ee8ca97841c6549d151f5ea69bfdce3c745a01581574f376d6efe1",
+      "size": 2390
+    },
+    {
+      "path": "run.json",
+      "sha256": "1f4b925aaec519e91c8432192708cfcdda68292d45646e13d89ad650ca34bbf0",
+      "size": 14749
+    }
+  ],
+  "hardware_identity": "RaspberryPiHardware@certarig-pi config=e9922ec2e77b",
+  "hardware_mode": "raspberry_pi",
+  "kind": "certarig_run_bundle",
+  "manifest_hash": "a2338aa9c3b0ae78ee29426fbfbd79bbb68e91750f815624dc140d912f98ada5",
+  "outcome_reason": "all steps and checks passed",
+  "procedure_hash": "e4fc18842bf34db758d06c9a1013ad8fc7b81bab26b195eeece634e1ef52832e",
+  "procedure_id": "pressure_guardrail",
+  "rig_id": "certarig-wave1-dry-bench",
+  "run_id": "run_20260912T164815_fac7e1",
+  "seed": null,
+  "status": "passed"
+}

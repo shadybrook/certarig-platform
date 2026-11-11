@@ -1,0 +1,14 @@
+
+Note: No compatibility mode selected!
+
+
+Circuit: certarig r1_power_heartbeat_missing: bounded functional power stage r1
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+Operating point simulation skipped by 'uic',
+  now using transient initial conditions.
+ Reference value :  1.27170e+00
+No. of Data Rows : 14066
+ngspice-47 done

@@ -1,0 +1,39 @@
+{
+  "name": "r1_flow_5.5V_CTR0.2",
+  "family": "flow",
+  "revision": "R1",
+  "params": {
+    "supply": 5.5,
+    "ctr": 0.2
+  },
+  "diagnostic": false,
+  "process_exit": 0,
+  "samples": 10407,
+  "wall_seconds": 0.211,
+  "netlist_sha256": "b3b10de7cd6e7d684cc7d1bf53ed55a9e9612bdddf72012664ede1405b6943aa",
+  "checks": [
+    {
+      "check": "logic_voltage_safe",
+      "passed": true
+    },
+    {
+      "check": "LED_current_bounded",
+      "passed": true
+    },
+    {
+      "check": "pulse_high_recognizable",
+      "passed": true
+    },
+    {
+      "check": "pulse_low_recognizable",
+      "passed": true
+    }
+  ],
+  "metrics": {
+    "logic_max_v": 3.300000006329,
+    "logic_min_v": 0.009578229406906,
+    "led_max_a": 0.00635659835828
+  },
+  "criteria_pass": true,
+  "reused_trace": true
+}

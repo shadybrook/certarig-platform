@@ -1,0 +1,29 @@
+{
+  "name": "protected_pi_poweroff_refined",
+  "family": "loop",
+  "params": {
+    "off": true,
+    "step": 5e-07
+  },
+  "expected": "within_envelope",
+  "reason": "",
+  "checks": {
+    "ADC_or_120R_input_within_rail_plus_0.3V": true,
+    "burden_below_half_watt": true,
+    "transmitter_reaches_requested_current": true,
+    "off_ADC_discharged": true,
+    "off_injection_below_1uA": true
+  },
+  "metrics": {
+    "raw_max_V": 2.000000026725,
+    "pin_max_V": 1.52919103605,
+    "final_current_mA": 20.0,
+    "burden_max_W": 0.04000000106901,
+    "off_injection_A": 6.109236876946e-12
+  },
+  "criteria_pass": true,
+  "samples": 80074,
+  "horizon_s": 0.04,
+  "netlist_sha256": "93aa52a1724b481d243cd95958047cfcdaaf4d693dc8d4e58b9029ebe2bf195e",
+  "matched_expectation": true
+}

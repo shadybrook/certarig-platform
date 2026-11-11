@@ -1,0 +1,26 @@
+{
+  "name": "protected_100R_33mA",
+  "family": "loop",
+  "params": {
+    "current": 0.033
+  },
+  "expected": "within_envelope",
+  "reason": "",
+  "checks": {
+    "ADC_or_120R_input_within_rail_plus_0.3V": true,
+    "burden_below_half_watt": true,
+    "transmitter_reaches_requested_current": true
+  },
+  "metrics": {
+    "raw_max_V": 3.292311332388,
+    "pin_max_V": 2.523098619923,
+    "final_current_mA": 33.0,
+    "burden_max_W": 0.1083931390937,
+    "off_injection_A": null
+  },
+  "criteria_pass": true,
+  "samples": 20008,
+  "horizon_s": 0.04,
+  "netlist_sha256": "fdeb6f83421d5f9d08bfd0fe6cf01ba3c77b96d79b533e1230b3fc1fc36ee28f",
+  "matched_expectation": true
+}

@@ -1,0 +1,27 @@
+[
+  {
+    "component": "Vishay IRL540",
+    "url": "https://www.vishay.com/docs/91300/irl540.pdf",
+    "use": "0.077ohm maximum at 5V gate; 2x hot multiplier and 20C/W mounted path are explicit additional design assumptions"
+  },
+  {
+    "component": "TI TPS25940L",
+    "url": "https://www.ti.com/lit/ds/symlink/tps25940.pdf",
+    "use": "Current limiting, slew control and latch-off feature direction. The new circuit is a behavioral envelope, not this device model; SOA remains unqualified"
+  },
+  {
+    "component": "TI INA219",
+    "url": "https://www.ti.com/lit/ds/symlink/ina219.pdf",
+    "use": "+/-320mV shunt range; 50milliohm selected circuit has +/-6.4A nominal measurement range before tolerance/derating"
+  },
+  {
+    "component": "Pro-Range supply listing",
+    "url": "https://robu.in/product-category/power-supply-adapter/",
+    "use": "Rs1049 category price for 12V5A; exact stocked SKU and transient qualification unconfirmed"
+  },
+  {
+    "component": "Phoenix PHWB12",
+    "url": "https://phoenixhose.com/product/pvc-water-braided-hose-phwb-phoenix/",
+    "use": "Rs60/m published; 5m offcut sale is not confirmed"
+  }
+]

@@ -8,6 +8,9 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from .models import RigConfig
+from .revalidation import model_revision, profile_hash
+
 WINDOW_S = 24 * 3600
 
 
@@ -15,7 +18,7 @@ def _path(evidence_dir: Path, procedure_hash: str) -> Path:
     return evidence_dir / "twin_gate" / f"{procedure_hash}.json"
 
 
-def record_sim_pass(evidence_dir: Path, procedure_id: str, procedure_hash: str, run_id: str) -> Path:
+def record_sim_pass(evidence_dir: Path, procedure_id: str, procedure_hash: str, run_id: str, config: RigConfig | None = None) -> Path:
     target = _path(evidence_dir, procedure_hash)
     target.parent.mkdir(parents=True, exist_ok=True)
     document = {
@@ -25,6 +28,9 @@ def record_sim_pass(evidence_dir: Path, procedure_id: str, procedure_hash: str, 
         "passed_at": datetime.now(UTC).isoformat(),
         "passed_at_unix": time.time(),
     }
+    if config is not None:
+        document["test_profile_hash"] = profile_hash(config)
+        document["model_revision"] = model_revision(config)
     from .atomic import write_json_atomic
 
     write_json_atomic(target, document)
@@ -37,6 +43,7 @@ def check_gate(
     hardware_mode: str,
     window_s: int = WINDOW_S,
     now: float | None = None,
+    config: RigConfig | None = None,
 ) -> dict[str, Any] | None:
     """Return None if the run may start; otherwise a refusal payload."""
     if hardware_mode != "raspberry_pi":
@@ -49,8 +56,10 @@ def check_gate(
             "procedure_hash": procedure_hash,
         }
     document = json.loads(path.read_text(encoding="utf-8"))
+    if config is not None and (document.get("test_profile_hash") != profile_hash(config) or document.get("model_revision") != model_revision(config)):
+        return {"error": "digital-twin test profile changed; rehearse this exact configuration", "code": "twin_profile_mismatch"}
     age = (now if now is not None else time.time()) - float(document.get("passed_at_unix") or 0)
-    if age > window_s:
+    if age < 0 or age > window_s:
         return {
             "error": f"digital-twin gate: last simulator pass is {age / 3600:.1f} h old (limit {window_s / 3600:.0f} h)",
             "code": "twin_gate_stale",

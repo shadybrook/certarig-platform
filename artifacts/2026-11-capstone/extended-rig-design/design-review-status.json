@@ -1,0 +1,32 @@
+{
+  "revision": "R0",
+  "drawing_kind": "functional electrical architecture and hydraulic layout, not component-level construction schematic",
+  "build_ready": false,
+  "electrical_design_validated": false,
+  "physical_validation_completed": false,
+  "erc_or_spice_run": false,
+  "desk_checks": {
+    "assumed_sensor_min_v": 10.0,
+    "illustrative_burden_ohm": 150.0,
+    "assumed_supply_v": 12.0,
+    "burden_v_at_20ma": 3.0,
+    "sensor_available_v_at_20ma": 9.0,
+    "supply_margin_v": -1.0,
+    "combination_accepted": false,
+    "receiver_v_at_24ma": 3.6,
+    "receiver_accepted": false
+  },
+  "proposed_current_measurement_channels": 2,
+  "operating_pressure_bar": null,
+  "purchase_release": false,
+  "required_inputs": [
+    "current as-built photographs and continuity record",
+    "accepted exact component variants and ratings",
+    "matched delivered quote",
+    "reviewed electrical/hydraulic netlist and worst-case calculations",
+    "attended physical qualification"
+  ],
+  "preserved_baseline": "Phase 3 card and indicator-only circuit remain unchanged",
+  "drawing_layout_checked": true,
+  "review_scope": "Referenced datasheet reading, arithmetic and rendered-document checks only; no circuit simulation or physical qualification"
+}

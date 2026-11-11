@@ -1,6 +1,20 @@
 import { defineConfig } from "@playwright/test";
+import { copyFileSync, existsSync, mkdtempSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 const PORT = Number(process.env.CERTARIG_E2E_PORT || 18080);
+const ROOT = fileURLToPath(new URL("../", import.meta.url));
+// Reviews and approvals intentionally survive restarts. Each suite needs its
+// own state so a previous accepted configuration cannot satisfy this run.
+const runtime = mkdtempSync(path.join(tmpdir(), "certarig-e2e-"));
+for (const file of ["rig.sim.json", "capabilities.wave1.json"]) {
+  copyFileSync(path.join(ROOT, "config", file), path.join(runtime, file));
+}
+const python = existsSync(path.join(ROOT, ".venv/bin/python"))
+  ? path.join(ROOT, ".venv/bin/python") : "python3";
+const quote = (value) => `'${String(value).replaceAll("'", "'\\''")}'`;
 
 export default defineConfig({
   testDir: "./e2e",
@@ -14,9 +28,10 @@ export default defineConfig({
     trace: "retain-on-failure",
   },
   webServer: {
-    command: `cd .. && mkdir -p /tmp/certarig-e2e-${PORT}-cfg && cp config/rig.sim.json config/capabilities.wave1.json /tmp/certarig-e2e-${PORT}-cfg && $(test -x .venv/bin/python && echo .venv/bin/python || echo python3) -m certarig sim serve --port ${PORT} --config /tmp/certarig-e2e-${PORT}-cfg/rig.sim.json --capabilities /tmp/certarig-e2e-${PORT}-cfg/capabilities.wave1.json --evidence-dir /tmp/certarig-e2e-${PORT}`,
+    cwd: ROOT,
+    command: `${quote(python)} -m certarig sim serve --port ${PORT} --config ${quote(path.join(runtime, "rig.sim.json"))} --capabilities ${quote(path.join(runtime, "capabilities.wave1.json"))} --evidence-dir ${quote(path.join(runtime, "evidence"))}`,
     url: `http://127.0.0.1:${PORT}/health`,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: false,
     timeout: 30_000,
   },
 });

@@ -1,0 +1,43 @@
+{
+  "name": "negative_no_suppression",
+  "family": "power",
+  "revision": "UNPROTECTED",
+  "params": {
+    "no_suppression": true
+  },
+  "diagnostic": true,
+  "process_exit": 0,
+  "samples": 49950,
+  "wall_seconds": 3.081,
+  "netlist_sha256": "f966eeee1360caa293b665b90b3e2fe03082b91aa094f3dbb98720e5a1af4fee",
+  "checks": [
+    {
+      "check": "startup_no_drive",
+      "passed": true
+    },
+    {
+      "check": "run_has_expected_load_response",
+      "passed": true
+    },
+    {
+      "check": "drain_voltage_below_70V_model_design_limit",
+      "passed": false
+    },
+    {
+      "check": "permit_off_removes_current",
+      "passed": true
+    },
+    {
+      "check": "feedback_is_3V3_bounded",
+      "passed": true
+    }
+  ],
+  "metrics": {
+    "peak_drain_v": 100.2365227316,
+    "min_bus_v": 5.999726680205e-09,
+    "peak_pump_a": 0.5830152441518,
+    "peak_valve_a": 0.4822736112405,
+    "peak_shunt_v": 0.04747955286848
+  },
+  "criteria_pass": false
+}

@@ -1,0 +1,36 @@
+
+Note: No compatibility mode selected!
+
+
+Circuit: cr-ext-r1 coil coil_1
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+src                                       26.4
+mid                                  0.0920777
+drain                                0.0920777
+gate                                         5
+0_vmeas_0                                    0
+z                                      26.2206
+cv                                     26.3079
+cp                                 2.79464e-11
+bclamppower#branch                           0
+v_dav#branch                      -1.06228e-12
+bcoilv#branch                                0
+lcoil#branch                          0.597907
+vgate#branch                                 0
+v24#branch                           -0.597907
+
+ Reference value :  4.09260e-01
+ Reference value :  5.23821e-01
+ Reference value :  6.40362e-01
+ Reference value :  7.53482e-01
+No. of Data Rows : 154290
+ngspice-47 done

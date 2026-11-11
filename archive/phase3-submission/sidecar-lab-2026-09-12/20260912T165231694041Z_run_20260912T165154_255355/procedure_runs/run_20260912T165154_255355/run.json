@@ -1,0 +1,425 @@
+{
+  "checks": [
+    {
+      "check": {
+        "event_observed": "estop_open_forced_safe"
+      },
+      "observed_events": [
+        "csv_recording_stopped",
+        "estop_closed_reset_required",
+        "estop_open_forced_safe",
+        "permit_accepted",
+        "permit_rejected_reset_required",
+        "trip_reset_output_safe"
+      ],
+      "passed": true
+    },
+    {
+      "check": {
+        "event_observed": "estop_closed_reset_required"
+      },
+      "observed_events": [
+        "csv_recording_stopped",
+        "estop_closed_reset_required",
+        "estop_open_forced_safe",
+        "permit_accepted",
+        "permit_rejected_reset_required",
+        "trip_reset_output_safe"
+      ],
+      "passed": true
+    },
+    {
+      "check": {
+        "event_observed": "permit_rejected_reset_required"
+      },
+      "observed_events": [
+        "csv_recording_stopped",
+        "estop_closed_reset_required",
+        "estop_open_forced_safe",
+        "permit_accepted",
+        "permit_rejected_reset_required",
+        "trip_reset_output_safe"
+      ],
+      "passed": true
+    },
+    {
+      "check": {
+        "max_elapsed_ms": 300,
+        "step": "output_removed"
+      },
+      "measured_ms": 0.867,
+      "passed": true
+    }
+  ],
+  "config_hash": "e9922ec2e77b1006a336b4739b200d6c5372b02b457446b1b44b9c45bfed29ed",
+  "contract_hash": "9e144a0f814cb0726daa25d675af6993ce183b9e3e3db58fc8a621dcc23db1f7",
+  "created_at": "2026-09-12T16:51:54.751592+00:00",
+  "current_step": null,
+  "ended_at": "2026-09-12T16:52:20.680977+00:00",
+  "events": [
+    {
+      "at": "2026-09-12T16:51:54.754905+00:00",
+      "kind": "preflight"
+    },
+    {
+      "at": "2026-09-12T16:51:54.775442+00:00",
+      "filename": "20260912T165154772516Z_estop_anti_restart.csv",
+      "kind": "recording_started"
+    },
+    {
+      "at": "2026-09-12T16:51:54.775726+00:00",
+      "kind": "step_started",
+      "step": "reset",
+      "type": "command"
+    },
+    {
+      "at": "2026-09-12T16:51:54.778123+00:00",
+      "command": "reset",
+      "kernel_event": "trip_reset_output_safe",
+      "kind": "command",
+      "step": "reset"
+    },
+    {
+      "at": "2026-09-12T16:51:54.779318+00:00",
+      "elapsed_ms": 3.569,
+      "kind": "step_passed",
+      "step": "reset"
+    },
+    {
+      "at": "2026-09-12T16:51:54.779408+00:00",
+      "kind": "step_started",
+      "step": "permit",
+      "type": "command"
+    },
+    {
+      "at": "2026-09-12T16:51:54.780921+00:00",
+      "command": "permit",
+      "kernel_event": "permit_accepted",
+      "kind": "command",
+      "step": "permit"
+    },
+    {
+      "at": "2026-09-12T16:51:54.781846+00:00",
+      "elapsed_ms": 2.425,
+      "kind": "step_passed",
+      "step": "permit"
+    },
+    {
+      "at": "2026-09-12T16:51:54.781924+00:00",
+      "kind": "step_started",
+      "step": "press_estop",
+      "type": "trigger"
+    },
+    {
+      "at": "2026-09-12T16:51:54.781964+00:00",
+      "instruction": "Press the E-stop mushroom head firmly until it latches.",
+      "kind": "instruction",
+      "step": "press_estop"
+    },
+    {
+      "at": "2026-09-12T16:52:19.487327+00:00",
+      "elapsed_ms": 24705.377,
+      "kind": "step_passed",
+      "step": "press_estop"
+    },
+    {
+      "at": "2026-09-12T16:52:19.487449+00:00",
+      "kind": "step_started",
+      "step": "output_removed",
+      "type": "expect"
+    },
+    {
+      "at": "2026-09-12T16:52:19.488516+00:00",
+      "elapsed_ms": 1.055,
+      "kind": "step_passed",
+      "step": "output_removed"
+    },
+    {
+      "at": "2026-09-12T16:52:19.488601+00:00",
+      "kind": "step_started",
+      "step": "release_estop",
+      "type": "trigger"
+    },
+    {
+      "at": "2026-09-12T16:52:19.488646+00:00",
+      "instruction": "Twist the E-stop head to release it.",
+      "kind": "instruction",
+      "step": "release_estop"
+    },
+    {
+      "at": "2026-09-12T16:52:19.670731+00:00",
+      "elapsed_ms": 182.116,
+      "kind": "step_passed",
+      "step": "release_estop"
+    },
+    {
+      "at": "2026-09-12T16:52:19.670812+00:00",
+      "kind": "step_started",
+      "step": "no_restart",
+      "type": "expect"
+    },
+    {
+      "at": "2026-09-12T16:52:20.672773+00:00",
+      "elapsed_ms": 1001.938,
+      "kind": "step_passed",
+      "step": "no_restart"
+    },
+    {
+      "at": "2026-09-12T16:52:20.672867+00:00",
+      "kind": "step_started",
+      "step": "permit_rejected",
+      "type": "command"
+    },
+    {
+      "at": "2026-09-12T16:52:20.674144+00:00",
+      "command": "permit",
+      "kernel_event": "permit_rejected_reset_required",
+      "kind": "command",
+      "step": "permit_rejected"
+    },
+    {
+      "at": "2026-09-12T16:52:20.675110+00:00",
+      "elapsed_ms": 2.23,
+      "kind": "step_passed",
+      "step": "permit_rejected"
+    },
+    {
+      "at": "2026-09-12T16:52:20.675198+00:00",
+      "kind": "step_started",
+      "step": "end_safe",
+      "type": "command"
+    },
+    {
+      "at": "2026-09-12T16:52:20.676488+00:00",
+      "command": "safe",
+      "kernel_event": "operator_safe",
+      "kind": "command",
+      "step": "end_safe"
+    },
+    {
+      "at": "2026-09-12T16:52:20.676630+00:00",
+      "elapsed_ms": 1.417,
+      "kind": "step_passed",
+      "step": "end_safe"
+    },
+    {
+      "at": "2026-09-12T16:52:20.677861+00:00",
+      "kernel_event": "operator_safe",
+      "kind": "kernel_forced_safe"
+    },
+    {
+      "at": "2026-09-12T16:52:20.680919+00:00",
+      "filename": "20260912T165154772516Z_estop_anti_restart.csv",
+      "kind": "recording_stopped",
+      "samples": 264,
+      "sha256": "205149a1248dd3986b1f1aee81fe9a14f4e3f71118576eb0eacd9d5e35b81347"
+    },
+    {
+      "at": "2026-09-12T16:52:20.681027+00:00",
+      "kind": "finished",
+      "reason": "all steps and checks passed",
+      "status": "passed"
+    }
+  ],
+  "evidence_dir": "evidence/runs/procedure_runs/run_20260912T165154_255355",
+  "hardware_mode": "raspberry_pi",
+  "kernel_events": [
+    {
+      "at": "2026-09-12T16:51:40.739507+00:00",
+      "event": "csv_recording_stopped",
+      "reason": "reset_required"
+    },
+    {
+      "at": "2026-09-12T16:51:54.775935+00:00",
+      "event": "trip_reset_output_safe",
+      "reason": "output_safe"
+    },
+    {
+      "at": "2026-09-12T16:51:54.779656+00:00",
+      "event": "permit_accepted",
+      "reason": "permit_active"
+    },
+    {
+      "at": "2026-09-12T16:52:19.468421+00:00",
+      "event": "estop_open_forced_safe",
+      "reason": "estop_open"
+    },
+    {
+      "at": "2026-09-12T16:52:19.668924+00:00",
+      "event": "estop_closed_reset_required",
+      "reason": "reset_required"
+    },
+    {
+      "at": "2026-09-12T16:52:20.673070+00:00",
+      "event": "permit_rejected_reset_required",
+      "reason": "reset_required"
+    }
+  ],
+  "label": "estop_anti_restart",
+  "outcome_reason": "all steps and checks passed",
+  "peaks": {
+    "flow": 7.47879,
+    "flow_emulator": 7.47879,
+    "pressure": 3.13144,
+    "pressure_emulator": 3.13144
+  },
+  "procedure_hash": "b312dca54cd03eed9164451cb73cc2809d9c2bacee93598a1a9ea7b6076f59b8",
+  "procedure_id": "estop_anti_restart",
+  "procedure_title": "E-stop trip and anti-restart verification",
+  "recording": {
+    "filename": "20260912T165154772516Z_estop_anti_restart.csv",
+    "samples": 264,
+    "sha256": "205149a1248dd3986b1f1aee81fe9a14f4e3f71118576eb0eacd9d5e35b81347"
+  },
+  "recovery": "If the output stayed on with the E-stop pressed, remove the external relay supply immediately. Check NC1 wiring on GPIO24 and NC2 in the relay power branch.\n",
+  "requested_by": "certarig-agent",
+  "rig_id": "certarig-wave1-dry-bench",
+  "run_id": "run_20260912T165154_255355",
+  "started_at": "2026-09-12T16:51:54.754834+00:00",
+  "status": "passed",
+  "steps": [
+    {
+      "detail": {
+        "expect": "trip_latched == false",
+        "kernel_event": "trip_reset_output_safe",
+        "kernel_reason": "output_safe",
+        "observed": {
+          "trip_latched": false
+        },
+        "satisfied_after_ms": 0.815
+      },
+      "elapsed_ms": 3.569,
+      "ended_at": "2026-09-12T16:51:54.779166+00:00",
+      "instruction": null,
+      "started_at": "2026-09-12T16:51:54.775685+00:00",
+      "status": "passed",
+      "step_id": "reset",
+      "title": "reset",
+      "type": "command"
+    },
+    {
+      "detail": {
+        "expect": "output_high == true",
+        "kernel_event": "permit_accepted",
+        "kernel_reason": "permit_active",
+        "observed": {
+          "output_high": true
+        },
+        "satisfied_after_ms": 0.697
+      },
+      "elapsed_ms": 2.425,
+      "ended_at": "2026-09-12T16:51:54.781787+00:00",
+      "instruction": null,
+      "started_at": "2026-09-12T16:51:54.779374+00:00",
+      "status": "passed",
+      "step_id": "permit",
+      "title": "permit",
+      "type": "command"
+    },
+    {
+      "detail": {
+        "observed": {
+          "estop_active": true
+        },
+        "predicate": "estop_active == true",
+        "triggered_after_ms": 24705.084
+      },
+      "elapsed_ms": 24705.377,
+      "ended_at": "2026-09-12T16:52:19.487153+00:00",
+      "instruction": "Press the E-stop mushroom head firmly until it latches.",
+      "started_at": "2026-09-12T16:51:54.781892+00:00",
+      "status": "passed",
+      "step_id": "press_estop",
+      "title": "Operator presses the E-stop",
+      "type": "trigger"
+    },
+    {
+      "detail": {
+        "observed": {
+          "output_high": false,
+          "trip_latched": true
+        },
+        "predicate": "(output_high == false and trip_latched == true)",
+        "satisfied_after_ms": 0.867
+      },
+      "elapsed_ms": 1.055,
+      "ended_at": "2026-09-12T16:52:19.488456+00:00",
+      "instruction": null,
+      "started_at": "2026-09-12T16:52:19.487407+00:00",
+      "status": "passed",
+      "step_id": "output_removed",
+      "title": "output_removed",
+      "type": "expect"
+    },
+    {
+      "detail": {
+        "observed": {
+          "estop_active": false
+        },
+        "predicate": "estop_active == false",
+        "triggered_after_ms": 181.91
+      },
+      "elapsed_ms": 182.116,
+      "ended_at": "2026-09-12T16:52:19.670650+00:00",
+      "instruction": "Twist the E-stop head to release it.",
+      "started_at": "2026-09-12T16:52:19.488564+00:00",
+      "status": "passed",
+      "step_id": "release_estop",
+      "title": "Operator releases the E-stop",
+      "type": "trigger"
+    },
+    {
+      "detail": {
+        "held_ms": 1000,
+        "observed": {
+          "output_high": false,
+          "reason": "reset_required"
+        },
+        "predicate": "(output_high == false and reason == reset_required)",
+        "satisfied_after_ms": 0.763
+      },
+      "elapsed_ms": 1001.938,
+      "ended_at": "2026-09-12T16:52:20.672668+00:00",
+      "instruction": null,
+      "started_at": "2026-09-12T16:52:19.670779+00:00",
+      "status": "passed",
+      "step_id": "no_restart",
+      "title": "no_restart",
+      "type": "expect"
+    },
+    {
+      "detail": {
+        "expect": "last_event == permit_rejected_reset_required",
+        "kernel_event": "permit_rejected_reset_required",
+        "kernel_reason": "reset_required",
+        "observed": {
+          "last_event": "permit_rejected_reset_required"
+        },
+        "satisfied_after_ms": 0.756
+      },
+      "elapsed_ms": 2.23,
+      "ended_at": "2026-09-12T16:52:20.675050+00:00",
+      "instruction": null,
+      "started_at": "2026-09-12T16:52:20.672828+00:00",
+      "status": "passed",
+      "step_id": "permit_rejected",
+      "title": "permit_rejected",
+      "type": "command"
+    },
+    {
+      "detail": {
+        "kernel_event": "operator_safe",
+        "kernel_reason": "operator_safe"
+      },
+      "elapsed_ms": 1.417,
+      "ended_at": "2026-09-12T16:52:20.676574+00:00",
+      "instruction": null,
+      "started_at": "2026-09-12T16:52:20.675161+00:00",
+      "status": "passed",
+      "step_id": "end_safe",
+      "title": "end_safe",
+      "type": "command"
+    }
+  ],
+  "terminal": true
+}

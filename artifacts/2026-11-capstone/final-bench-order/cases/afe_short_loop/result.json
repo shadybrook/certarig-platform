@@ -1,0 +1,28 @@
+{
+  "case": {
+    "name": "afe_short_loop",
+    "family": "afe",
+    "params": {
+      "fault": "short_loop"
+    },
+    "unsafe": false
+  },
+  "assessment": {
+    "checks": {
+      "adc_pin_absolute_budget": true,
+      "burden_below_half_watt": true,
+      "host_poweroff_injection_bounded": true,
+      "fault_is_not_a_valid_observation": true
+    },
+    "metrics": {
+      "pin_max_V": 2.523140962478,
+      "rail_min_V": 4.600176529529,
+      "host_off_pin_V": 0.033
+    },
+    "criteria_pass": true
+  },
+  "samples": 20083,
+  "horizon": 0.04,
+  "netlist_sha256": "ebd414f46a221420840f77f02c897cad55baf611fbeb8053531483b65b86dc6f",
+  "experiment_ok": true
+}

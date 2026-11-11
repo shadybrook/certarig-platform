@@ -1,0 +1,46 @@
+{
+  "name": "r1_receiver_3.6mA",
+  "family": "receiver",
+  "revision": "R1",
+  "params": {
+    "current": 0.0036
+  },
+  "diagnostic": false,
+  "process_exit": 0,
+  "samples": 20008,
+  "wall_seconds": 0.402,
+  "netlist_sha256": "98b459b914deb906f388849e737db08157ed2d2a74fdaf1bf46a85ea371356c7",
+  "checks": [
+    {
+      "check": "ADC_normal_range_margin",
+      "passed": true
+    },
+    {
+      "check": "ADC_below_supply_for_valid_observation",
+      "passed": true
+    },
+    {
+      "check": "transmitter_current_tracks_request",
+      "passed": true
+    },
+    {
+      "check": "sensor_compliance_nonnegative",
+      "passed": true
+    },
+    {
+      "check": "burden_below_0.5W",
+      "passed": true
+    }
+  ],
+  "metrics": {
+    "adc_pin_max_v": 0.2752554208927,
+    "adc_pin_min_v": 0.2752551289944,
+    "sensor_headroom_min_v": 13.55083868156,
+    "burden_peak_w": 0.001289968526615,
+    "adc_steady_v": 0.2752554208926,
+    "loop_steady_a": 0.0036,
+    "off_rail_injection_peak_a": null
+  },
+  "criteria_pass": true,
+  "reused_trace": true
+}

@@ -1,0 +1,50 @@
+[
+  {
+    "issue": "33mA receiver fault",
+    "requirement": "S03:100ohm burden, bounded loop supply/current, protected input; fault is invalid, not normal.",
+    "evidence": "afe_21.6_0.033 / afe_26.4_0.033",
+    "physical_qualification": false
+  },
+  {
+    "issue": "Back-powering Pi/ADC",
+    "requirement": "Field ADC isolation, hold-up and power-off input disconnect; no host field-ground tie.",
+    "evidence": "afe_rail_loss / negative_afe_no_hold_no_isolation",
+    "physical_qualification": false
+  },
+  {
+    "issue": "12V transmitter compliance",
+    "requirement": "Separate permanent24V loop supply, minimum21.6V tested.",
+    "evidence": "afe_21.6_0.02",
+    "physical_qualification": false
+  },
+  {
+    "issue": "Open burden",
+    "requirement": "Bound input and refuse calibrated invalid observation; repair/requalify before use.",
+    "evidence": "afe_open_burden",
+    "physical_qualification": false
+  },
+  {
+    "issue": "3.6A driver headline rating",
+    "requirement": "Do not order the old DRV8871 board; bounded smaller pump and S01 engineered stage.",
+    "evidence": "power_13.2_2.268 / thermal_pass_junction_bound",
+    "physical_qualification": false
+  },
+  {
+    "issue": "Hot-board driver failure",
+    "requirement": "Linear-rated pass device, case monitoring/cutout, current/power limit and SOA requirement.",
+    "evidence": "power_short / linear_FET_short_overshoot",
+    "physical_qualification": false
+  },
+  {
+    "issue": "Weak supply/startup",
+    "requirement": "12V5A source, <=0.30ohm loop and explicit <=1.5A/60ms pump startup contract.",
+    "evidence": "power_10.8_1.752 / power_low_limit_fast_timer",
+    "physical_qualification": false
+  },
+  {
+    "issue": "Old startup latch",
+    "requirement": "Revised lower-power matched pump, bounded softstart and latched fault handling; not an unqualified old3A pump.",
+    "evidence": "power_max_cap_low_limit / power_restore",
+    "physical_qualification": false
+  }
+]

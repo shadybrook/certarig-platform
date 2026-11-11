@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
+import re
 from pathlib import Path
 from typing import Any
 
@@ -21,6 +23,8 @@ def canonical_hash(value: dict[str, Any]) -> str:
 def _require_number(value: Any, field: str) -> float:
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         raise ConfigurationError(f"{field} must be numeric")
+    if not math.isfinite(value):
+        raise ConfigurationError(f"{field} must be finite")
     return float(value)
 
 
@@ -107,6 +111,7 @@ def load_config_dict(raw: Any) -> RigConfig:
                 stuck_samples=int(item["stuck_samples"]) if item.get("stuck_samples") is not None else None,
                 stuck_epsilon=float(item["stuck_epsilon"]) if item.get("stuck_epsilon") is not None else None,
                 source=dict(item["source"]) if isinstance(item.get("source"), dict) else None,
+                max_age_ms=int(item["max_age_ms"]) if item.get("max_age_ms") is not None else None,
             )
         )
 
@@ -132,10 +137,53 @@ def load_config_dict(raw: Any) -> RigConfig:
         ),
         simulator=dict(hardware_raw["simulator"]) if hardware_raw.get("simulator") is not None else None,
         observe_only=bool(hardware_raw.get("observe_only", False)),
+        feedback_required=bool(hardware_raw.get("feedback_required", False)),
+        feedback_settle_ms=int(hardware_raw.get("feedback_settle_ms", 250)),
+        feedback_active_high=bool(hardware_raw.get("feedback_active_high", True)),
         mqtt=dict(hardware_raw["mqtt"]) if isinstance(hardware_raw.get("mqtt"), dict) else None,
         modbus=dict(hardware_raw["modbus"]) if isinstance(hardware_raw.get("modbus"), dict) else None,
     )
     sample_interval_ms = int(raw.get("sample_interval_ms", 100))
+    if hardware.feedback_required and hardware.relay_feedback_gpio is None:
+        raise ConfigurationError("feedback_required needs a reviewed feedback GPIO")
+    if hardware.mode == "raspberry_pi":
+        controls = [hardware.valve_output_gpio, hardware.emergency_stop_gpio]
+        if len(set(controls)) != len(controls) or any(pin in {2, 3} for pin in controls):
+            raise ConfigurationError("Control GPIOs must be distinct and cannot use I2C pins")
+        pins = {2, 3, hardware.valve_output_gpio, hardware.emergency_stop_gpio}
+        if hardware.relay_feedback_gpio is not None:
+            if hardware.relay_feedback_gpio in pins:
+                raise ConfigurationError("feedback GPIO conflicts with a reserved control/input")
+            pins.add(hardware.relay_feedback_gpio)
+        for channel in channels:
+            source = channel.source or {}
+            kind = source.get("kind")
+            if kind == "pulse":
+                pin = source.get("gpio")
+                if isinstance(pin, bool) or not isinstance(pin, int) or not 0 <= pin <= 27 or pin in pins:
+                    raise ConfigurationError("pulse GPIO conflicts with reserved wiring")
+                pins.add(pin)
+                if _require_number(source.get("pulses_per_litre"), "pulses_per_litre") <= 0:
+                    raise ConfigurationError("pulse calibration must be positive")
+                if _require_number(source.get("window_s", 1), "window_s") <= 0:
+                    raise ConfigurationError("pulse window must be positive")
+            elif kind == "w1":
+                if not re.fullmatch(r"28-[a-fA-F0-9]+", str(source.get("device_id", ""))):
+                    raise ConfigurationError("1-Wire identity must name an explicit sensor")
+                pin = source.get("gpio")
+                if isinstance(pin, bool) or not isinstance(pin, int) or not 0 <= pin <= 27 or pin in pins:
+                    raise ConfigurationError("1-Wire GPIO must match reviewed, nonconflicting kernel wiring")
+                pins.add(pin)
+            elif kind == "ina219":
+                if _require_number(source.get("shunt_ohms"), "shunt_ohms") <= 0 or not isinstance(source.get("address"), int) or not 0x40 <= source["address"] <= 0x4F or source["address"] == hardware.ads1115_address:
+                    raise ConfigurationError("current monitor requires a verified shunt and nonconflicting address")
+            if kind in {"adc", "pulse", "w1", "ina219"}:
+                if not 0.02 <= _require_number(source.get("poll_s", 1 if kind == "w1" else 0.1), "poll_s") <= 10:
+                    raise ConfigurationError("poll_s must be 0.02–10 seconds")
+                for key, default in (("gain", 1), ("offset", 0)):
+                    _require_number(source.get(key, default), key)
+            if kind == "adc" and (channel.adc_channel is None or channel.raw_min_v is None or channel.raw_max_v is None or not 0 <= channel.raw_min_v < channel.raw_max_v <= 3.3):
+                raise ConfigurationError("reviewed ADC scaling must stay within 0–3.3 V")
     if sample_interval_ms < 20:
         raise ConfigurationError("sample_interval_ms must be at least 20")
 
@@ -166,4 +214,6 @@ def load_config_dict(raw: Any) -> RigConfig:
         hardware=hardware,
         channels=tuple(channels),
         config_hash=canonical_hash(raw),
+        commissioning_required=bool(raw.get("commissioning_required", False)),
+        wiring_revision=raw.get("wiring_revision"),
     )

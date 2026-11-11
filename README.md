@@ -1,3 +1,12 @@
+> **Latest capstone update - 11 November 2026:**
+> [Progress and latest source milestones](docs/capstone/LATEST_PROGRESS.md) |
+> [Extended-bench circuit diagram](docs/hardware/extended-rig/CR-EXT-R1/CertaRig_Extended_Bench_Circuit_CR-EXT-R1.pdf) |
+> [All generated deliverables](artifacts/2026-11-capstone/README.md)
+>
+> Completed simulator/commissioning work is at repository root. Ongoing sandbox
+> work is a separately labelled development snapshot. New physical bench
+> commissioning and detailed supplier schematics remain pending.
+
 # CertaRig
 
 A user-deployable test-operations platform. The LLM interprets and asks; deterministic code compares numbers, enforces limits and drives the output. The agent reaches the rig only through the Edge API, filtered by a capability manifest.
@@ -14,13 +23,21 @@ Studio (browser)  ──►  Edge node  ──►  ProcessGuardrail  ──►  
 
 The Phase 3 PoC that this was imported from is frozen. This repo is the platform.
 
+## Experimental CNC and printer integration
+
+The [machine control feasibility study](docs/research/2026-11-07-machine-control-feasibility.md) maps supported integration routes for CNC, filament and resin machines. The [reproducible machine lab](docs/research/MACHINE_CONTROL_LAB.md) exercises the existing agent tool loop against real OctoPrint 1.11.8 and its bundled VIRTUAL printer. It verifies 12 controller integration checks, including job completion and approval refusals. The gateway remains restricted to the virtual printer; physical machines and live model inference are separate validation milestones.
+
+**Phase 3 evidence, CSVs, graphs, circuit, BOM, and lab bundles:** start at [docs/phase3-submission/README.md](docs/phase3-submission/README.md). Frozen source: https://github.com/shadybrook/certarig-phase-2-poc
+
 ## Gate 0–5 evidence review and visual explainer
 
 The 12 September dry-bench progression is analysed as six gates, numbered Gate 0 through Gate 5. The review distinguishes measured evidence from interpretation and documents the product direction that follows from the lab.
 
 - [Evidence and product-direction report](deliverables/CertaRig_Gates_0_to_5_Evidence_and_Product_Direction.pdf) ([editable DOCX](deliverables/CertaRig_Gates_0_to_5_Evidence_and_Product_Direction.docx))
+- [Phase 3 film pack](docs/explainer/phase3-film/PRODUCTION.md) — watch `motion/LOOKBOOK.mp4`, then record
+- [Phase 3 submission film script](deliverables/CertaRig_Phase3_Submission_Film_Script.docx)
 - [Visual explainer video script](deliverables/CertaRig_Visual_Explainer_Video_Script.pdf) ([editable DOCX](deliverables/CertaRig_Visual_Explainer_Video_Script.docx))
-- [Source analysis](docs/explainer/2026-09-13-gates-0-to-5-analysis.md) and [script source](docs/explainer/2026-09-13-video-script.md)
+- [Source analysis](docs/explainer/2026-09-13-gates-0-to-5-analysis.md) and [lab explainer script source](docs/explainer/2026-09-13-video-script.md)
 - [Derived hardware-run summary](docs/explainer/data/hardware_run_summary.csv), [evidence verification record](docs/explainer/data/evidence_verification.json), and [visual assets](docs/explainer/assets/)
 
 Rebuild the derived data, plots, and editable documents with the scripts in `tools/`. The hardware exports preserve run metadata, checks, events, peaks, sample counts, and recording hashes, but do not contain the referenced raw physical CSV recordings. Accordingly, the report does not reconstruct or invent physical waveforms.

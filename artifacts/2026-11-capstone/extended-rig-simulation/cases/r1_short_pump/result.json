@@ -1,0 +1,47 @@
+{
+  "name": "r1_short_pump",
+  "family": "power",
+  "revision": "R1",
+  "params": {
+    "short_load": "pump"
+  },
+  "diagnostic": false,
+  "process_exit": 0,
+  "samples": 56954,
+  "wall_seconds": 4.172,
+  "netlist_sha256": "9b477bef1f3c6ba6176614da77f5338158d9d88be0964fc489e8e538fb042651",
+  "checks": [
+    {
+      "check": "startup_no_drive",
+      "passed": true
+    },
+    {
+      "check": "drain_voltage_below_70V_model_design_limit",
+      "passed": true
+    },
+    {
+      "check": "permit_off_removes_current",
+      "passed": true
+    },
+    {
+      "check": "overcurrent_latches_trip",
+      "passed": true
+    },
+    {
+      "check": "overcurrent_removes_current",
+      "passed": true
+    },
+    {
+      "check": "feedback_is_3V3_bounded",
+      "passed": true
+    }
+  ],
+  "metrics": {
+    "peak_drain_v": 31.10518118265,
+    "min_bus_v": -5.285416234625e-05,
+    "peak_pump_a": 4.797427754277,
+    "peak_valve_a": 0.003841001764395,
+    "peak_shunt_v": 0.2398713204638
+  },
+  "criteria_pass": true
+}

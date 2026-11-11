@@ -1,0 +1,95 @@
+CertaRig r1_power_heartbeat_missing: bounded functional power stage R1
+* 12V Thevenin supply with 0.3 ohm source/wiring; no SMPS current limit assumed.
+V12 source 0 PWL(0 0 0.005 12 1.4 12)
+Rsrc source raw .3
+Craw raw 0 10u
+Vaux aux 0 PWL(0 0 0.002 5 1.4 5)
+Vadc adcrail 0 PWL(0 0 0.002 3.3 1.4 3.3)
+Vestop estop 0 PWL(0 5 1.4 5)
+Vpermit permit 0 PWL(0 0 0.12 0 0.1201 3.3 1.4 3.3)
+Vreset reset 0 PWL(0 0 0.05 0 0.0501 3.3 0.07 3.3 0.0701 0 1.4 0)
+Vhb hb 0 PWL(0 0 1.4 0)
+Rpgfilter raw pgfiltered 10k
+Cpgfilter pgfiltered 0 10n
+Bpg pg 0 V=(v(aux)>4.5 && v(adcrail)>3.0 && v(pgfiltered)>10.0 ? 5 : 0)
+Rhblag hb hblag 1k
+Chblag hblag 0 100n
+Bedge edge 0 V=(abs(v(hb)-v(hblag))>.5 ? 5 : 0)
+Rwd aux wd 288.539k
+Cwd wd 0 1.00000002834e-06 IC=0
+Bwdreset wd 0 I=(v(edge)>2.5 ? v(wd)/10 : 0)
+Cseen seen 0 10n IC=0
+Rseen seen 0 1e10
+Bseen seen 0 I=(v(aux)<4.5 ? v(seen)/100 : (v(edge)>2.5 ? (v(seen)-5)/100 : 0))
+Bwdok wdok 0 V=(v(seen)>2.5 && v(wd)<2.5 && v(aux)>4.5 ? 5 : 0)
+Rreset reset resetlag 1k
+Creset resetlag 0 1u
+Bresetedge resetedge 0 V=(v(reset)-v(resetlag)>.5 ? 5 : 0)
+Carm arm 0 1u IC=0
+Rarm arm 0 1e10
+Barm arm 0 I=(v(estop)<2.5 || v(pg)<2.5 || v(wdok)<2.5 || v(itrip)>2.5 ? v(arm)/100 : (v(resetedge)>2.5 && v(permit)<.5 ? (v(arm)-5)/100 : 0))
+Bdrive drive 0 V=(v(arm)>2.5 && v(permit)>2.4 && v(aux)>4.5 ? 5 : 0)
+Rkdelay drive kdelay 10k
+Ckdelay kdelay 0 1.5u
+Barmbuffer armcmd 0 V=(v(arm)>2.5 ? 5 : 0)
+Rk0 armcmd k0delay 10k
+Ck0 k0delay 0 1.5u
+Sestop raw mid k0delay 0 CONTACT
+* Continuous conductance transition avoids an ideal-contact discontinuity.
+Bmaster mid bus I=v(mid,bus)*(1e-10+(1/.03-1e-10)*(1+tanh((v(kdelay)-2.5)/.1))/2)
+Cmaster mid bus 100p
+Cestop raw mid 100p
+Rbleed bus 0 10k
+Cbus bus 0 10u
+Rdriver drive gatein 50
+Rgate gatein gate 100
+Rpulldown gate 0 47k
+Cgate gate 0 3n
+Rpump bus pumptop 20
+Lpump pumptop pumpdrain 0.01
+Spump pumpdrain pumpsource gate 0 MOS
+Cpumposs pumpdrain pumpsource 1n
+Rpumpsense pumpsource 0 .05
+Dpumpfly pumpdrain pumpz FLY
+Dpumpz bus pumpz ZENER
+Dpumpav 0 pumpdrain AVAL
+Rvalve bus valvetop 24
+Lvalve valvetop valvedrain 0.2
+Svalve valvedrain valvesource gate 0 MOS
+Cvalveoss valvedrain valvesource 1n
+Rvalvesense valvesource 0 .05
+Dvalvefly valvedrain valvez FLY
+Dvalvez bus valvez ZENER
+Dvalveav 0 valvedrain AVAL
+Citrip itrip 0 1u IC=0
+Ritrip itrip 0 1e10
+Bitrip itrip 0 I=(v(itrip)>2.5 || v(pumpsource)>.2 || v(valvesource)>.2 ? (v(itrip)-5)/100 : (v(resetedge)>2.5 && v(permit)<.5 ? v(itrip)/100 : 0))
+* Fast OC veto exists independently of slow relay contact motion.
+Bocgate gatein 0 I=(v(itrip)>2.5 ? v(gatein)/.1 : 0)
+* Actual isolated voltage-feedback interface: current-limited optocoupler LED,
+* reverse LED diode, bounded CTR equivalent and local 3.3V pullup.
+Rled bus ledtop 1.8k
+Vledsense ledtop led 0
+Dled led 0 LED
+Dledreverse 0 led REV
+Rfb adcrail feedback 10k
+Cfb feedback 0 1n
+Bphoto feedback 0 I=0.2*max(0,i(Vledsense))*v(feedback)/sqrt(v(feedback)*v(feedback)+.0025)
+
+.model CONTACT SW(Ron=.03 Roff=1e10 Vt=2.5 Vh=.1)
+.model MOS SW(Ron=.10 Roff=1e10 Vt=2.5 Vh=.1)
+.model FLY D(Is=1n Rs=.05 N=1.5 Cjo=50p BV=100)
+.model ZENER D(Is=1p Rs=.2 N=1 BV=20 IBV=1m Cjo=30p)
+.model AVAL D(Is=1p Rs=.1 N=1 BV=100 IBV=1m Cjo=30p)
+.model LED D(Is=1e-20 N=1.8 Rs=5 Cjo=20p)
+.model REV D(Is=1n N=1.2 Rs=.05)
+.options method=gear reltol=1e-4 abstol=1n
+.control
+set wr_singlescale
+set wr_vecnames
+set numdgt=12
+tran 0.0001 1.4 0 0.0001 uic
+wrdata trace.dat v(permit) v(estop) v(arm) v(wdok) v(bus) v(gate) i(lpump) i(lvalve) v(pumpdrain) v(valvedrain) v(feedback) v(adcrail) v(aux) v(itrip) v(pumpsource) v(valvesource)
+quit
+.endc
+.end

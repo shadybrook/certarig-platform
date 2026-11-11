@@ -1,0 +1,38 @@
+{
+  "case": {
+    "name": "softstart_low_supply",
+    "family": "start_power",
+    "params": {
+      "supply": 10.8,
+      "limit": 3.68
+    },
+    "original": "",
+    "outcome": "normal"
+  },
+  "original_control": false,
+  "assessment": {
+    "checks": {
+      "measured_pump_shunt_in_range": true,
+      "source_within_5A": true,
+      "actuator_voltage_below_18V": true,
+      "peak_current_limited": true,
+      "startup_above_6V": true,
+      "no_spurious_trip": true,
+      "steady_after_startup": true
+    },
+    "metrics": {
+      "supply_peak_A": 3.108346022969,
+      "pump_peak_A": 3.108348964545,
+      "pump_shunt_peak_V": 0.1554174482273,
+      "trip_peak_V": 2.955397779518e-19,
+      "start_output_min_V": 9.746588693957,
+      "efuse_energy_J": 0.12973317221642097,
+      "silicon_SOA_qualified": false
+    },
+    "passed": true
+  },
+  "samples": 30389,
+  "horizon_s": 0.3,
+  "netlist_sha256": "3d3cb9aeffb5fded62fbf709e4c939ec620bb5163ed1bc2336b5ff2a5ffedde7",
+  "experiment_ok": true
+}

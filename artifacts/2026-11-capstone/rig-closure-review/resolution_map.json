@@ -1,0 +1,150 @@
+[
+  {
+    "issue": "Receiver fault above 3.3V input budget",
+    "original": "sen0262_burden_33mA_fault",
+    "mitigation": "receiver_33mA_contained_refusal",
+    "fix": "Use the bounded protected 100ohm receiver and correct full-network scaling. The 33mA observation is invalid and must refuse execution.",
+    "remaining": "The current-limit dynamics, clamp, power-good timing and actual PCB still need qualification.",
+    "original_still_rejected": true,
+    "mitigation_checks_pass": true,
+    "revised_metrics": {
+      "raw_max_V": 3.292311332388,
+      "pin_max_V": 2.523098619923,
+      "final_current_mA": 33.0,
+      "burden_max_W": 0.1083931390937,
+      "off_injection_A": null,
+      "inferred_current_A": 0.03299912879750249,
+      "observation_valid": false,
+      "reference_guard_sequence": [
+        true,
+        false,
+        false,
+        true
+      ]
+    }
+  },
+  {
+    "issue": "Back-powering an unpowered Pi/ADC",
+    "original": "unprotected_receiver_pi_off",
+    "mitigation": "receiver_pi_off_isolated",
+    "fix": "Isolate the signal when the ADC rail is absent, discharge the ADC pin, and reject the observation.",
+    "remaining": "Actual power-off switch timing, rail sequencing and leakage require component/board verification.",
+    "original_still_rejected": true,
+    "mitigation_checks_pass": true,
+    "revised_metrics": {
+      "raw_max_V": 2.000000029052,
+      "pin_max_V": 1.52919103605,
+      "final_current_mA": 20.0,
+      "burden_max_W": 0.04000000116206,
+      "off_injection_A": 6.109236709269e-12,
+      "inferred_current_A": 0.0008584776672951885,
+      "observation_valid": false,
+      "reference_guard_sequence": [
+        true,
+        false,
+        false,
+        true
+      ]
+    }
+  },
+  {
+    "issue": "Insufficient 12V loop compliance",
+    "original": "nishka_12V_insufficient_compliance",
+    "mitigation": "receiver_24V_fullscale",
+    "fix": "Retain a separate 24V instrument supply; 21.6V and 26.4V corner checks also pass.",
+    "remaining": "Confirm the exact transmitter revision, supply regulation and its calibration. This is not the actuator supply.",
+    "original_still_rejected": true,
+    "mitigation_checks_pass": true,
+    "revised_metrics": {
+      "raw_max_V": 1.995340601079,
+      "pin_max_V": 1.52919103605,
+      "final_current_mA": 20.0,
+      "burden_max_W": 0.03981384114315,
+      "off_injection_A": null,
+      "inferred_current_A": 0.019999999825109582,
+      "observation_valid": true
+    }
+  },
+  {
+    "issue": "Open/missing receiver burden",
+    "original": "missing_burden_protected",
+    "mitigation": "receiver_burden_open_refused",
+    "fix": "Contain the input voltage and detect the invalid calibrated reading. Keep authority refused after the signal recovers until an explicit reset. Restore the resistor and requalify before running.",
+    "remaining": "A missing resistor is not made healthy by software. The guard exercised here is an offline reference, not deployed Edge integration.",
+    "original_still_rejected": true,
+    "mitigation_checks_pass": true,
+    "revised_metrics": {
+      "raw_max_V": 12.94446582836,
+      "pin_max_V": 2.847082783609,
+      "final_current_mA": 1.009712211553,
+      "burden_max_W": 1.675591955817e-07,
+      "off_injection_A": null,
+      "inferred_current_A": 0.037236456290909846,
+      "observation_valid": false,
+      "reference_guard_sequence": [
+        true,
+        false,
+        false,
+        true
+      ]
+    }
+  },
+  {
+    "issue": "DRV8871 advertised as 3.6A continuous",
+    "original": "drv8871_3.6A_continuous_claim",
+    "mitigation": "unidirectional_stage_3.6A_thermal",
+    "fix": "Use a one-direction power stage appropriate for an on/off pump/solenoid. A 0.154ohm hot bound and mounted thermal path no worse than 20C/W give 89.9C at 3.6A/50C ambient in the thermal analogy.",
+    "remaining": "Vishay IRL540 0.077ohm at 5V gate is the reference; 2x hot multiplier and 20C/W are design bounds, not measured assembly properties. Gate drive, SOA, suppression and heatsinking remain to qualify.",
+    "original_still_rejected": true,
+    "mitigation_checks_pass": true,
+    "revised_metrics": {
+      "junction_max_C": 89.9168,
+      "load_min_V": 11.4456
+    }
+  },
+  {
+    "issue": "Hot-board driver thermal failure",
+    "original": "drv8871_1.5A_hot_board_bound",
+    "mitigation": "unidirectional_stage_hot_1.5A",
+    "fix": "The same one-direction stage gives 56.9C at 1.5A and 50C ambient under those declared thermal bounds.",
+    "remaining": "The DRV8871 control remains rejected. This demonstrates a different candidate design, not a retrofit qualification of that board.",
+    "original_still_rejected": true,
+    "mitigation_checks_pass": true,
+    "revised_metrics": {
+      "junction_max_C": 56.93,
+      "load_min_V": 11.769
+    }
+  },
+  {
+    "issue": "Weak supply/wiring during startup",
+    "original": "pump_weak_supply_startup",
+    "mitigation": "supply_10.8V_0.3ohm_3x_start",
+    "fix": "Specify adequate supply and total wiring/contact impedance, current-limit startup and sequence the valve after the pump settles. A 0.3ohm source envelope passes the previous weak-source startup test.",
+    "remaining": "The new weak-source scenario deliberately latches a refusal. Actual adapter current limit, wiring resistance and pump startup must be measured; nameplate wattage alone is insufficient.",
+    "original_still_rejected": true,
+    "mitigation_checks_pass": true,
+    "revised_metrics": {
+      "operating_input_min_V": 9.4514268461,
+      "operating_source_max_A": 4.495243846332,
+      "connection_inrush_peak_A": 4.495243846332
+    }
+  },
+  {
+    "issue": "Startup trips the old 2.5A latch",
+    "original": "integrated_unknown_startup_trip",
+    "mitigation": "softstart_3A_100uF",
+    "fix": "Use bounded soft start/current limiting; measure pump current across a correctly sized 50milliohm shunt; retain a 5A fast veto plus an approximately 80ms sustained-overload timer above 2.5A. Add output discharge and reset-required fault latching.",
+    "remaining": "The 50milliohm circuit requires a suitable precision power shunt, Kelvin wiring and recalibration; an untouched R100 INA219 board is not this circuit. Actual eFuse SOA, fast response and pump internals remain unqualified.",
+    "original_still_rejected": true,
+    "mitigation_checks_pass": true,
+    "revised_metrics": {
+      "supply_peak_A": 3.121496565021,
+      "pump_peak_A": 3.121499863151,
+      "pump_shunt_peak_V": 0.1560749931576,
+      "trip_peak_V": 2.955397779518e-19,
+      "start_output_min_V": 10.94616884091,
+      "efuse_energy_J": 0.15762505750207054,
+      "silicon_SOA_qualified": false
+    }
+  }
+]

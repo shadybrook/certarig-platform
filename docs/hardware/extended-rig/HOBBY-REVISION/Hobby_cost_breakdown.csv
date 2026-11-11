@@ -1,0 +1,17 @@
+item,target_INR,low_INR,high_INR,basis
+Pump,600,500,900,Small12V low-head centrifugal; listing scale only; startup/head curve needed
+NC direct-acting valve,1000,800,1500,"12V zero-differential; local quote required, no motorized industrial actuator"
+Pressure sensor,3000,2600,3500,0-0.5bar class range; exact transfer/accuracy must be confirmed; PR19C050K conflicting sheet remains on hold
+Flow sensor,300,250,400,YF-S302 class; calibrate actual low-flow pulse curve
+Temperature probes,300,300,500,Two DS18B20-class powered probes
+Current measurement,400,300,600,INA219-class module(s); input/shunt/clamp review required
+Supply and converters,1000,1000,1500,"Enclosed12V supply, field buck and24V loop boost if transmitter needs it; Pi PSU reused"
+Actuator protection and controls,1200,900,1600,"Drivers, suppression, fuses, manually reset hardware cutoff, STOP/RESET; existing E-stop only after acceptance"
+Basic field isolation/interfaces,1000,900,1800,I2C isolation + field temperature bridge and digital optoisolation allowance; exact board quotes pending
+Level/leak/thermal switches,300,300,700,"Hobby switches, independent cutoff where appropriate; no certified safety function claim"
+Box and terminals,500,500,1000,"Small box, terminals, wire; reuse acceptable stock"
+Plumbing and mounting,1500,1800,3200,"Includes hose, barbs, tees, clamps, permanently open bypass, reservoir and tray"
+Simple references,300,400,800,"Water-column/volume/temperature comparisons, borrowed references where accepted"
+Development storage,600,500,800,NewmicroSD; preserve original Phase3 card
+Pressure-protection allowance,1500,,,UNPRICED: compatible relief/arrestor solution or a validated lower-energy envelope. Generic domestic arrestor pair is not assumed compatible.
+Delivery and spares,1000,700,1500,Planning allowance

@@ -1,0 +1,43 @@
+{
+  "name": "r1_master_welded",
+  "family": "power",
+  "revision": "R1",
+  "params": {
+    "master_welded": true
+  },
+  "diagnostic": false,
+  "process_exit": 0,
+  "samples": 72501,
+  "wall_seconds": 5.142,
+  "netlist_sha256": "526b7c39f1961b7e08e422e61558a3d40717b625f6ec5763f7e69d20e07c5742",
+  "checks": [
+    {
+      "check": "startup_no_drive",
+      "passed": true
+    },
+    {
+      "check": "run_has_expected_load_response",
+      "passed": true
+    },
+    {
+      "check": "drain_voltage_below_70V_model_design_limit",
+      "passed": true
+    },
+    {
+      "check": "permit_off_removes_current",
+      "passed": true
+    },
+    {
+      "check": "feedback_is_3V3_bounded",
+      "passed": true
+    }
+  ],
+  "metrics": {
+    "peak_drain_v": 33.06167766165,
+    "min_bus_v": 5.999706537231e-09,
+    "peak_pump_a": 0.5830144762779,
+    "peak_valve_a": 0.4822736112071,
+    "peak_shunt_v": 0.1109341539751
+  },
+  "criteria_pass": true
+}

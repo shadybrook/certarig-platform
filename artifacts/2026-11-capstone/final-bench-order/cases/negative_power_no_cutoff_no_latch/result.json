@@ -1,0 +1,32 @@
+{
+  "case": {
+    "name": "negative_power_no_cutoff_no_latch",
+    "family": "power",
+    "params": {
+      "fault": "q_short",
+      "unguarded": true
+    },
+    "unsafe": true
+  },
+  "assessment": {
+    "checks": {
+      "fault_does_not_restart": false,
+      "pre_fault_actuation_was_observed": true,
+      "pass_current_bounded": true,
+      "pass_power_bounded": true,
+      "regulated_forward_SOA_rectangle": true
+    },
+    "metrics": {
+      "output_max_V": 12.84837232481,
+      "pass_peak_A": 1.79623345027,
+      "pass_peak_W": 10.93307662169,
+      "tail_voltage_max_V": 12.84837232481,
+      "pass_energy_J": 0.10720277982869846
+    },
+    "criteria_pass": false
+  },
+  "samples": 80555,
+  "horizon": 0.8,
+  "netlist_sha256": "7de6a7978097b2c707b0bbbad4a3e6e60c6ee5e9703e7b4f91c133aec60fc218",
+  "experiment_ok": true
+}

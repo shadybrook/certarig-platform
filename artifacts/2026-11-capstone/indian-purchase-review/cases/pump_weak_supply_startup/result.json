@@ -1,0 +1,25 @@
+{
+  "name": "pump_weak_supply_startup",
+  "family": "pump_input",
+  "params": {
+    "supply": 10.8,
+    "startup": 3,
+    "source_r": 1.2
+  },
+  "expected": "reject",
+  "reason": "Assumed high source impedance / startup demand drops below manufacturer operating minimum",
+  "checks": {
+    "input_6_to_18V": false,
+    "steady_startup_demand_below_5A": true
+  },
+  "metrics": {
+    "operating_input_min_V": 5.409962748761,
+    "operating_source_max_A": 4.491697709365,
+    "connection_inrush_peak_A": 4.491697709365
+  },
+  "criteria_pass": false,
+  "samples": 15023,
+  "horizon_s": 0.15,
+  "netlist_sha256": "083f7d4f2d08b09456363cc2cf61640072bbcd2454fc61b5504e2f90906271a0",
+  "matched_expectation": true
+}

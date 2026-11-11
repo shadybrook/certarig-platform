@@ -1,0 +1,26 @@
+{
+  "name": "missing_burden_protected",
+  "family": "loop",
+  "params": {
+    "burden": 1000000000.0
+  },
+  "expected": "reject",
+  "reason": "Input clamp limits voltage but sensor cannot produce the requested full-scale current",
+  "checks": {
+    "ADC_or_120R_input_within_rail_plus_0.3V": true,
+    "burden_below_half_watt": true,
+    "transmitter_reaches_requested_current": false
+  },
+  "metrics": {
+    "raw_max_V": 12.94446582836,
+    "pin_max_V": 2.847082783609,
+    "final_current_mA": 1.009712211553,
+    "burden_max_W": 1.675591955817e-07,
+    "off_injection_A": null
+  },
+  "criteria_pass": false,
+  "samples": 20008,
+  "horizon_s": 0.04,
+  "netlist_sha256": "e8bbd872a030cc761f39d0df4316a3c59d49f379bb9b14c29e5e9efb71a6490c",
+  "matched_expectation": true
+}

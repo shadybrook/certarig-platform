@@ -1,0 +1,28 @@
+{
+  "name": "protected_21.6V_100.1R",
+  "family": "loop",
+  "params": {
+    "supply": 21.6,
+    "burden": 100.1,
+    "rail": 3.135
+  },
+  "expected": "within_envelope",
+  "reason": "",
+  "checks": {
+    "ADC_or_120R_input_within_rail_plus_0.3V": true,
+    "burden_below_half_watt": true,
+    "transmitter_reaches_requested_current": true
+  },
+  "metrics": {
+    "raw_max_V": 1.997331288485,
+    "pin_max_V": 1.530716659577,
+    "final_current_mA": 20.0,
+    "burden_max_W": 0.03985346929031,
+    "off_injection_A": null
+  },
+  "criteria_pass": true,
+  "samples": 20008,
+  "horizon_s": 0.04,
+  "netlist_sha256": "0edac8f56125c91be29ad510f7008dea53b925ae169f96c62e059cbdf6fe33a7",
+  "matched_expectation": true
+}

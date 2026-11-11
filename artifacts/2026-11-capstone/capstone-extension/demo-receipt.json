@@ -1,0 +1,36 @@
+{
+  "evidence_kind": "simulated",
+  "provider": "fake/no live inference",
+  "approval_actor": "automated demo fixture, not a human operator",
+  "physical_commissioned": false,
+  "run_id": "run_20261109T092836_b80741",
+  "status": "passed",
+  "config_hash": "c8ba9834595bf42cfa2fa741689dd01b516ac79c610d7ff8b5fdbeba73a3be9b",
+  "procedure_hash": "daf032eea8b5192a3df9098b30d3daba76d68ea0b414d35acad8af9aef452d18",
+  "raw_analysis": {
+    "channels": {
+      "jacket_c": {
+        "maximum": 45.12445,
+        "minimum": 44.87777,
+        "observations": 77,
+        "unit": "degC"
+      }
+    },
+    "command_rows": 2,
+    "feedback_observations": 0,
+    "feedback_transition_intervals_s": [],
+    "kind": "raw_sample_summary",
+    "output_state_source": "command_derived_not_electrical_feedback",
+    "rows": 77,
+    "sample_rows": 75,
+    "unsafe_command_rows": 0
+  },
+  "archive_sha256": "c88e5c74b7a231c8cefd1fe195960ce88929a3529f324b8f14d2079702b5c2dc",
+  "offline_verified": true,
+  "interview_id": "iv_41f68349c7404042",
+  "incomplete_interview_blocked": true,
+  "unreviewed_start_blocked": true,
+  "denied_approval_blocked": true,
+  "model_revision": "thermal-rc-v1",
+  "rehearsal_run_id": "run_20261109T092835_2dddf4"
+}

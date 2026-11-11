@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import math
+import time
 from dataclasses import dataclass
+from datetime import UTC, datetime
 
 from .models import RigConfig, RigSnapshot
 
@@ -129,6 +131,7 @@ class ProcessGuardrail:
         self._condition = "startup"
         self._last_values: dict[str, float] = {}
         self._stuck_counts: dict[str, int] = {}
+        self._source_progress: dict[str, tuple[str, float]] = {}
 
     @property
     def drive_high(self) -> bool:
@@ -185,6 +188,27 @@ class ProcessGuardrail:
             else:
                 value = float(sample.value)
                 quality = sample.quality
+                freshness = channel.max_age_ms / 1000 if channel.max_age_ms else max(1.0, self.config.sample_interval_ms / 1000 * 3)
+                try:
+                    sample_time = datetime.fromisoformat(sample.captured_at)
+                    snapshot_time = datetime.fromisoformat(snapshot.captured_at)
+                    if sample_time.tzinfo is None or snapshot_time.tzinfo is None:
+                        raise ValueError("timestamp must include timezone")
+                    age = (snapshot_time - sample_time).total_seconds()
+                    if self.config.hardware.mode not in {"simulator", "mock"} and not -freshness <= (datetime.now(UTC) - snapshot_time).total_seconds() <= freshness:
+                        quality = "stale"
+                    if not 0 <= age <= freshness:
+                        quality = "stale"
+                except (ValueError, TypeError):
+                    quality = "invalid_timestamp"
+                previous_time, progress_at = self._source_progress.get(channel.channel_id, ("", time.monotonic()))
+                if sample.captured_at != previous_time:
+                    progress_at = time.monotonic()
+                elif time.monotonic() - progress_at > freshness:
+                    quality = "stale"
+                self._source_progress[channel.channel_id] = (sample.captured_at, progress_at)
+                if sample.unit != channel.unit:
+                    quality = "unit_mismatch"
                 if (
                     quality == "good"
                     and value is not None

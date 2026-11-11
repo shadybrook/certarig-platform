@@ -1,0 +1,30 @@
+{
+  "case": {
+    "name": "negative_afe_no_hold_no_isolation",
+    "family": "afe",
+    "params": {
+      "fault": "rail_loss",
+      "hold": 1e-08,
+      "isolate": false
+    },
+    "unsafe": true
+  },
+  "assessment": {
+    "checks": {
+      "adc_pin_absolute_budget": false,
+      "burden_below_half_watt": true,
+      "host_poweroff_injection_bounded": true,
+      "signal_disconnected_after_loss": false
+    },
+    "metrics": {
+      "pin_max_V": 1.529307074991,
+      "rail_min_V": 0.0005875456305811,
+      "host_off_pin_V": 0.033
+    },
+    "criteria_pass": false
+  },
+  "samples": 20191,
+  "horizon": 0.04,
+  "netlist_sha256": "b57d3822392bcb2105fe7429a8644b6f33bfc2ba39530e2ea08ad3a5b65bcdd2",
+  "experiment_ok": true
+}

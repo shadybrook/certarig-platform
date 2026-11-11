@@ -1,0 +1,34 @@
+{
+  "name": "r1_receiver_short_transmitter",
+  "family": "receiver",
+  "revision": "R1",
+  "params": {
+    "fault": "short_transmitter"
+  },
+  "diagnostic": false,
+  "process_exit": 0,
+  "samples": 20008,
+  "wall_seconds": 0.389,
+  "netlist_sha256": "ed19e7cae48204dbcd45bdaaf1d425c6990c97b03f2a6cefdff5b08ca928a89e",
+  "checks": [
+    {
+      "check": "ADC_normal_range_margin",
+      "passed": true
+    },
+    {
+      "check": "input_fault_burden_survives_envelope",
+      "passed": true
+    }
+  ],
+  "metrics": {
+    "adc_pin_max_v": 2.523098619923,
+    "adc_pin_min_v": 2.523098619788,
+    "sensor_headroom_min_v": 9.882688667612,
+    "burden_peak_w": 0.1083931390937,
+    "adc_steady_v": 2.523098619788,
+    "loop_steady_a": 0.033,
+    "off_rail_injection_peak_a": null
+  },
+  "criteria_pass": true,
+  "reused_trace": true
+}

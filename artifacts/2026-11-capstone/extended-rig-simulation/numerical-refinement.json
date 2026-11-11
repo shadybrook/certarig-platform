@@ -1,0 +1,47 @@
+{
+  "comparison": [
+    {
+      "baseline": "r1_power_estop",
+      "repeat": "r1_refined_estop",
+      "differences": {
+        "peak_drain_v": {
+          "baseline": 33.05959542985,
+          "repeat": 33.05937843095,
+          "relative_difference": 6.563870403719441e-06
+        },
+        "peak_pump_a": {
+          "baseline": 0.5817667055978,
+          "repeat": 0.581741986342,
+          "relative_difference": 4.248998019668838e-05
+        },
+        "peak_valve_a": {
+          "baseline": 0.4810320651278,
+          "repeat": 0.4810320651278,
+          "relative_difference": 0.0
+        }
+      }
+    },
+    {
+      "baseline": "r1_short_pump",
+      "repeat": "r1_refined_short",
+      "differences": {
+        "peak_drain_v": {
+          "baseline": 31.10518118265,
+          "repeat": 31.09707412568,
+          "relative_difference": 0.0002606336520721834
+        },
+        "peak_pump_a": {
+          "baseline": 4.797427754277,
+          "repeat": 4.805787945913,
+          "relative_difference": 0.001742640444881495
+        },
+        "peak_valve_a": {
+          "baseline": 0.003841001764395,
+          "repeat": 0.003850979809678,
+          "relative_difference": 0.0025977715958096035
+        }
+      }
+    }
+  ],
+  "interpretation": "Numerical sensitivity only; not validation of assumed models"
+}

@@ -1,0 +1,281 @@
+diff --git a/certarig/agent/tools.py b/certarig/agent/tools.py
+index 7952e52..31e3029 100644
+--- a/certarig/agent/tools.py
++++ b/certarig/agent/tools.py
+@@ -172,6 +172,14 @@ class ToolRegistry:
+                     },
+                     "review_location": "Onboard: review complete source document and diff",
+                 }
++            if name in {"sandbox_experiment", "read_sandbox"} and not result.get("artifact_name"):
++                allowed = {"sandbox_id", "revision", "status", "snapshot_hash", "expires_at", "authority", "job_id", "kind", "qualification", "proposal_id", "error", "artifacts"}
++                brief = {k:v for k,v in result.items() if k in allowed}
++                if "jobs" in result:
++                    brief["jobs"] = [{k:v for k,v in j.items() if k in allowed} for j in result["jobs"]]
++                if result.get("receipt"):
++                    brief["verification"] = result["receipt"]["verification"]
++                result = brief
+             return ToolResult(name, arguments, True, result, _ms(started))
+         except EdgeApiError as exc:
+             payload = dict(exc.payload)
+@@ -198,6 +206,26 @@ class ToolRegistry:
+     def _edge(self, name: str, args: dict[str, Any]) -> dict[str, Any]:
+         client = self.client
+         approval = args.get("approval_id")
++        if name == "read_sandbox":
++            base = "/v1/sandboxes/" + str(args["sandbox_id"])
++            if args.get("job_id"):
++                base += "/jobs/" + str(args["job_id"])
++                if args.get("artifact_name"):
++                    from urllib.parse import quote
++                    artifact = str(args["artifact_name"])
++                    data = client.request("GET", base + "/artifacts/" + quote(artifact, safe=""), raw=True)
++                    return {"artifact_name": artifact, "bytes": len(data), "preview": "PNG available in Studio" if artifact.endswith(".png") else data[:8000].decode(errors="replace"), "truncated": len(data)>8000, "evidence_kind": "untrusted_experiment_artifact_not_authority"}
++            return client.get(base)
++        if name == "sandbox_experiment":
++            action = args["action"]
++            sandbox_payload = {k:v for k,v in args.items() if k not in {"action", "sandbox_id"}}
++            if action == "create":
++                return client.post("/v1/sandboxes", sandbox_payload)
++            base = "/v1/sandboxes/" + str(args["sandbox_id"])
++            if action == "close":
++                return client.request("DELETE", base, {})
++            suffix = {"revise": "/revisions", "run": "/jobs", "propose": "/proposals"}[action]
++            return client.post(base + suffix, sandbox_payload)
+         if name == "commissioning_interview":
+             action = args["action"]
+             base = "/v1/commissioning/interviews"
+diff --git a/certarig/edge/bootstrap.py b/certarig/edge/bootstrap.py
+index af92bb5..a41f068 100644
+--- a/certarig/edge/bootstrap.py
++++ b/certarig/edge/bootstrap.py
+@@ -57,6 +57,7 @@ class NodeSettings:
+     allow_output: bool
+     skills_root: Path | None = None
+     poweroff_command: str | None = None
++    sandbox_socket: Path | None = None
+ 
+     @classmethod
+     def from_env(
+@@ -83,6 +84,7 @@ class NodeSettings:
+             allow_output=os.environ.get("CERTARIG_ENABLE_ACTUATION") == "1",
+             skills_root=Path(skills_root) if skills_root else None,
+             poweroff_command=os.environ.get("CERTARIG_POWEROFF_CMD") or None,
++            sandbox_socket=Path(os.environ["CERTARIG_SANDBOX_SOCKET"]) if os.environ.get("CERTARIG_SANDBOX_SOCKET") else None,
+         )
+ 
+ 
+@@ -135,4 +137,7 @@ def build_node(settings: NodeSettings, hardware: HardwareAdapter | None = None)
+     from .interviews import install_interviews
+ 
+     install_interviews(node)
++    from certarig.sandbox.api import install as install_sandboxes
++
++    install_sandboxes(node, settings.sandbox_socket)
+     return node
+diff --git a/certarig/edge/capabilities.py b/certarig/edge/capabilities.py
+index b16ad61..f944cdf 100644
+--- a/certarig/edge/capabilities.py
++++ b/certarig/edge/capabilities.py
+@@ -59,6 +59,9 @@ def _params(properties: dict[str, Any] | None = None, required: list[str] | None
+ TOOL_CATALOGUE: dict[str, ToolSpec] = {
+     spec.name: spec
+     for spec in (
++        ToolSpec("read_sandbox", "Read a disposable sandbox and its jobs; no execution authority.", False, _params({"sandbox_id": {"type": "string"}, "job_id": {"type": "string"}, "artifact_name": {"type": "string"}}, ["sandbox_id"])),
++        ToolSpec("sandbox_experiment", "Create/read/revise/run/close a local experiment or submit an inert configuration/procedure proposal. Code runs only in the isolated broker; never applies or approves equipment changes.", True,
++            _params({"action": {"enum": ["create", "revise", "run", "propose", "close"]}, "sandbox_id": {"type": "string"}, "source": {"type": "string"}, "procedure_id": {"type": "string"}, "interview_id": {"type": "string"}, "recording_id": {"enum": ["latest"]}, "seed": {"type": "integer"}, "expected_revision": {"type": "integer"}, "document": {"type": "object"}, "procedure": {"type": "object"}, "kind": {"enum": ["python", "spice", "rehearsal", "configuration", "procedure"]}, "job_id": {"type": "string"}}, ["action"])),
+         ToolSpec("read_rig", "Read the public rig configuration, signals map and hashes.", False, _params()),
+         ToolSpec(
+             "read_capabilities", "Read this manifest: what the agent may do right now.", False, _params()
+diff --git a/certarig/edge/cli.py b/certarig/edge/cli.py
+index 1362c08..9d4d1f9 100644
+--- a/certarig/edge/cli.py
++++ b/certarig/edge/cli.py
+@@ -110,6 +110,9 @@ def build_parser() -> argparse.ArgumentParser:
+     parser = argparse.ArgumentParser(prog="certarig", description="CertaRig agentic test-operations platform")
+     subparsers = parser.add_subparsers(dest="command", required=True)
+     add_edge_parser(subparsers)
++    from certarig.sandbox.cli import add_parser as add_sandbox_parser
++
++    add_sandbox_parser(subparsers)
+     try:
+         from certarig.sim.cli import add_sim_parser
+ 
+diff --git a/certarig/edge/client.py b/certarig/edge/client.py
+index bef70a6..07773d0 100644
+--- a/certarig/edge/client.py
++++ b/certarig/edge/client.py
+@@ -139,6 +139,41 @@ class EdgeClient:
+     def propose_interview(self, interview_id: str) -> dict[str, Any]:
+         return self.post(f"/v1/commissioning/interviews/{interview_id}/propose", {})
+ 
++    def sandbox_preflight(self) -> dict[str, Any]:
++        return self.get("/v1/sandboxes/preflight")
++
++    def create_sandbox(self, source: str = "active", procedure_id: str | None = None, seed: int = 11) -> dict[str, Any]:
++        body: dict[str, Any] = {"source": source, "seed": seed}
++        if procedure_id:
++            body["procedure_id"] = procedure_id
++        return self.post("/v1/sandboxes", body)
++
++    def sandbox(self, sandbox_id: str) -> dict[str, Any]:
++        return self.get(f"/v1/sandboxes/{sandbox_id}")
++
++    def run_sandbox(self, sandbox_id: str, kind: str, source: str = "") -> dict[str, Any]:
++        return self.post(f"/v1/sandboxes/{sandbox_id}/jobs", {"kind": kind, "source": source})
++
++    def revise_sandbox(self, sandbox_id: str, revision: int, document: dict[str, Any], procedure: dict[str, Any] | None = None) -> dict[str, Any]:
++        body: dict[str, Any] = {"expected_revision": revision, "document": document}
++        if procedure is not None:
++            body["procedure"] = procedure
++        return self.post(f"/v1/sandboxes/{sandbox_id}/revisions", body)
++
++    def sandbox_job(self, sandbox_id: str, job_id: str) -> dict[str, Any]:
++        return self.get(f"/v1/sandboxes/{sandbox_id}/jobs/{job_id}")
++
++    def propose_sandbox(self, sandbox_id: str, job_id: str, kind: str = "configuration") -> dict[str, Any]:
++        return self.post(f"/v1/sandboxes/{sandbox_id}/proposals", {"job_id": job_id, "kind": kind})
++
++    def export_sandbox(self, sandbox_id: str) -> bytes:
++        data: bytes = self.request("GET", f"/v1/sandboxes/{sandbox_id}/export", raw=True)
++        return data
++
++    def close_sandbox(self, sandbox_id: str) -> dict[str, Any]:
++        result: dict[str, Any] = self.request("DELETE", f"/v1/sandboxes/{sandbox_id}", {})
++        return result
++
+     def signals(self) -> dict[str, Any]:
+         return self.get("/v1/signals")
+ 
+diff --git a/certarig/edge/openapi.py b/certarig/edge/openapi.py
+index ee9e1c5..a779d4a 100644
+--- a/certarig/edge/openapi.py
++++ b/certarig/edge/openapi.py
+@@ -46,7 +46,20 @@ def generate_openapi(node: EdgeNode) -> dict[str, Any]:
+         paths["/v1/rig/apply"]["post"]["description"] = "Operator-only application with expected_current_hash. When supplying interview_id also supply interview_revision; the proposed document must match exactly. Material changes invalidate approvals/reviews and preserve configuration history."
+         paths["/v1/rig/propose"]["post"]["description"] = "Validate proposed configuration and return semantic revalidation requirements. Rig-level/unclassified changes require full qualification."
+         paths["/v1/commissioning/physical"]["post"].update({"description": "Operator-attested observation, attended trial or acceptance of a specific Pi configuration/wiring revision. Requires hashed physical qualification records and their raw artifacts. Trials expire after 30 minutes and on restart. Accepted procedures require passing physical trials. Not safety certification.", "requestBody": {"required": True, "content": {"application/json": {"schema": {"type": "object", "required": ["stage", "expected_config_hash", "wiring_revision", "procedure_ids", "attest_reviewed", "checks"], "properties": {"stage": {"enum": ["observation", "trial", "accepted"]}, "expected_config_hash": {"type": "string"}, "wiring_revision": {"type": "string"}, "procedure_ids": {"type": "array", "items": {"type": "string"}}, "attest_reviewed": {"type": "boolean"}, "checks": {"type": "object", "description": "Named checks mapped to local path and SHA-256. JSON records must include exact config/wiring identity, passed=true, evidence_kind=physical and raw artifact references."}}}}}}, "responses": {"201": {"description": "Review retained with readiness"}, "403": {"description": "Human operator required"}, "409": {"description": "Missing, stale or incompatible qualification"}}})
++    if "/v1/sandboxes" in paths:
++        for path, operations in paths.items():
++            if path.startswith("/v1/sandboxes"):
++                for operation in operations.values():
++                    operation.update(description="Authenticated local sandbox broker operation. No physical authority. Disabled/unavailable isolation returns503; invalid or stale experiment returns409. Generated code never runs on the host.", security=[{"operatorKey": []}, {"agentKey": []}, {"session": []}])
++        requests = {"/v1/sandboxes": {"source": {"enum": ["active", "thermal", "pressure_flow", "interview"]}, "procedure_id": {"type": "string"}, "interview_id": {"type": "string"}, "recording_id": {"enum": ["latest"]}, "seed": {"type": "integer"}},
++                    "/v1/sandboxes/{sandbox_id}/jobs": {"kind": {"enum": ["python", "spice", "rehearsal"]}, "source": {"type": "string", "maxLength": 256000}},
++                    "/v1/sandboxes/{sandbox_id}/revisions": {"expected_revision": {"type": "integer"}, "document": {"type": "object"}, "procedure": {"type": "object"}},
++                    "/v1/sandboxes/{sandbox_id}/proposals": {"job_id": {"type": "string"}, "kind": {"enum": ["configuration", "procedure"]}}}
++        for path, properties in requests.items():
++            paths[path]["post"]["requestBody"] = {"required": True, "content": {"application/json": {"schema": {"type": "object", "properties": properties, "additionalProperties": False}}}}
++        paths["/v1/sandboxes/{sandbox_id}/export"]["get"]["responses"] = {"200": {"description": "Checksummed sandbox ZIP; numerical replay does not authenticate origin without local broker"}, "409": {"description": "Active job or missing/corrupt evidence"}}
+     return {
++        "components": {"securitySchemes": {"operatorKey": {"type": "apiKey", "in": "header", "name": "X-CertaRig-Operator-Key"}, "agentKey": {"type": "apiKey", "in": "header", "name": "X-CertaRig-Agent-Key"}, "session": {"type": "apiKey", "in": "header", "name": "X-CertaRig-Session"}}},
+         "openapi": "3.0.3",
+         "info": {
+             "title": "CertaRig Edge API",
+diff --git a/certarig/edge/procedures.py b/certarig/edge/procedures.py
+index 4417c66..0a75497 100644
+--- a/certarig/edge/procedures.py
++++ b/certarig/edge/procedures.py
+@@ -90,6 +90,11 @@ class ProcedureService:
+     def approve_draft(self, ctx: RequestContext) -> tuple[int, dict[str, Any]]:
+         if ctx.principal is not Principal.OPERATOR:
+             raise HttpError(403, "only an engineer (operator principal) can approve a procedure draft")
++        if "sandboxes" in self.node.extensions and (ctx.body.get("sandbox_id") or ctx.body.get("sandbox_proposal_id")):
++            draft = self.library.draft(ctx.params["procedure_hash"])
++            if draft is None:
++                raise HttpError(404, "draft not found")
++            self.node.extensions["sandboxes"].handoff(ctx, "procedure", draft.raw)
+         try:
+             procedure = self.library.approve_draft(ctx.params["procedure_hash"], ctx.principal_name)
+         except KeyError as exc:
+diff --git a/certarig/edge/server.py b/certarig/edge/server.py
+index 2faea70..bfbe72b 100644
+--- a/certarig/edge/server.py
++++ b/certarig/edge/server.py
+@@ -418,6 +418,8 @@ class EdgeNode:
+             raise HttpError(409, "Stop the run and recording before changing configuration")
+         expected = str(ctx.body.get("expected_current_hash") or "")
+         incoming = ctx.body.get("document") or {}
++        if "sandboxes" in self.extensions:
++            self.extensions["sandboxes"].handoff(ctx, "configuration", incoming)
+         if not isinstance(incoming, dict):
+             raise HttpError(400, "document must be an object")
+         raw = self._current_rig_raw()
+@@ -643,7 +645,7 @@ class EdgeNode:
+             policy=None,
+         )
+         try:
+-            with nullcontext() if route.path == "/v1/agent/chat" else self.mutation_lock:
++            with nullcontext() if route.path == "/v1/agent/chat" or route.path.startswith("/v1/sandboxes") else self.mutation_lock:
+                 self.enforce(ctx, route, headers)
+                 result = route.handler(ctx)
+         except HttpError as exc:
+@@ -737,7 +739,7 @@ def make_edge_handler(node: EdgeNode) -> type[BaseHTTPRequestHandler]:
+                     tool=route.tool,
+                     policy=None,
+                 )
+-                with nullcontext() if route.path == "/v1/agent/chat" else node.mutation_lock:
++                with nullcontext() if route.path == "/v1/agent/chat" or route.path.startswith("/v1/sandboxes") else node.mutation_lock:
+                     node.enforce(ctx, route, self.headers)
+                     result = route.handler(ctx)
+                 if len(result) == 3:
+@@ -779,6 +781,8 @@ def make_edge_handler(node: EdgeNode) -> type[BaseHTTPRequestHandler]:
+ 
+ 
+ def make_edge_server(node: EdgeNode, host: str = "127.0.0.1", port: int = 0) -> ThreadingHTTPServer:
++    if node.flags.get("sandbox_local_only") and host not in {"127.0.0.1", "localhost", "::1"}:
++        raise ValueError("Sandbox-enabled Edge must bind loopback only")
+     server = ThreadingHTTPServer((host, port), make_edge_handler(node))
+     server.daemon_threads = True
+     return server
+diff --git a/pyproject.toml b/pyproject.toml
+index 8a0ce26..6eb01cd 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -47,6 +47,7 @@ certarig = ["py.typed"]
+ testpaths = ["tests"]
+ addopts = "-q -p no:cacheprovider"
+ markers = [
++  "sandbox_runtime: real-container isolation/fault release qualification (explicit opt-in)",
+   "hil: hardware-in-the-loop tests that need the real Raspberry Pi bench",
+   "live_llm: tests that call a real LLM provider (opt-in, need an API key)",
+   "slow: long-running soak or property tests",
+diff --git a/studio/index.html b/studio/index.html
+index 743cd01..187cf1b 100644
+--- a/studio/index.html
++++ b/studio/index.html
+@@ -22,6 +22,7 @@
+         <a href="#capabilities" data-view="capabilities">Capabilities</a>
+         <a href="#author" data-view="author">Author</a>
+         <a href="#onboard" data-view="onboard">Onboard</a>
++        <a href="#sandbox" data-view="sandbox">Sandbox</a>
+       </nav>
+       <div class="session">
+         <span id="health-pill" class="pill" data-state="down">offline</span>
+@@ -56,6 +57,7 @@
+       <section id="view-capabilities" class="view hidden" data-view="capabilities"></section>
+       <section id="view-author" class="view hidden" data-view="author"></section>
+       <section id="view-onboard" class="view hidden" data-view="onboard"></section>
++      <section id="view-sandbox" class="view hidden" data-view="sandbox"></section>
+     </main>
+ 
+     <div id="toast" class="toast hidden" role="status"></div>
+diff --git a/studio/src/app.mjs b/studio/src/app.mjs
+index 2522359..9d78626 100644
+--- a/studio/src/app.mjs
++++ b/studio/src/app.mjs
+@@ -1,5 +1,7 @@
+ import { get, post, refreshContract, store, toastText, headers } from "./api.mjs";
+ 
++import { renderSandbox } from "./sandbox.mjs";
++
+ const $ = (sel) => document.querySelector(sel);
+ const views = [...document.querySelectorAll(".view")];
+ const toast = $("#toast");
+@@ -582,6 +584,7 @@ async function render() {
+     else if (name === "capabilities") await renderCapabilities();
+     else if (name === "author") await renderAuthor();
+     else if (name === "onboard") await renderOnboard();
++    else if (name === "sandbox") await renderSandbox();
+   } catch (error) {
+     fail(error);
+   }

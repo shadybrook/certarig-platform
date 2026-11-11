@@ -129,4 +129,10 @@ def build_node(settings: NodeSettings, hardware: HardwareAdapter | None = None) 
     from .agent_api import install_agent_api
 
     install_agent_api(node, settings.skills_root)
+    from .commissioning_records import install_commissioning
+
+    install_commissioning(node)
+    from .interviews import install_interviews
+
+    install_interviews(node)
     return node

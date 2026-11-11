@@ -1,0 +1,49 @@
+{
+  "name": "r1_receiver_corner_26.4V_99.9R",
+  "family": "receiver",
+  "revision": "R1",
+  "params": {
+    "supply": 26.4,
+    "burden": 99.9,
+    "current": 0.02,
+    "rail": 3.135
+  },
+  "diagnostic": false,
+  "process_exit": 0,
+  "samples": 20008,
+  "wall_seconds": 0.39,
+  "netlist_sha256": "b8080e9e012ee94995ee0bb466614b5651245962c02d0fe71ca29ab23ab3a70b",
+  "checks": [
+    {
+      "check": "ADC_normal_range_margin",
+      "passed": true
+    },
+    {
+      "check": "ADC_below_supply_for_valid_observation",
+      "passed": true
+    },
+    {
+      "check": "transmitter_current_tracks_request",
+      "passed": true
+    },
+    {
+      "check": "sensor_compliance_nonnegative",
+      "passed": true
+    },
+    {
+      "check": "burden_below_0.5W",
+      "passed": true
+    }
+  ],
+  "metrics": {
+    "adc_pin_max_v": 1.527665402863,
+    "adc_pin_min_v": 1.527665402862,
+    "sensor_headroom_min_v": 13.90665009563,
+    "burden_peak_w": 0.03977421262526,
+    "adc_steady_v": 1.527665402862,
+    "loop_steady_a": 0.02,
+    "off_rail_injection_peak_a": null
+  },
+  "criteria_pass": true,
+  "reused_trace": true
+}

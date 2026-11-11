@@ -1,0 +1,288 @@
+{
+  "checks": [
+    {
+      "check": {
+        "event_not_observed": "permit_accepted"
+      },
+      "observed_events": [
+        "csv_recording_started",
+        "operator_safe",
+        "sensor_invalid_forced_safe"
+      ],
+      "passed": true
+    },
+    {
+      "check": {
+        "step_passed": "settle"
+      },
+      "passed": false
+    },
+    {
+      "check": {
+        "peak_below": 10.0,
+        "signal": "pressure"
+      },
+      "passed": true,
+      "peak": 0.0
+    },
+    {
+      "check": {
+        "peak_below": 20.0,
+        "signal": "flow"
+      },
+      "passed": true,
+      "peak": 0.0
+    }
+  ],
+  "config_hash": "e9922ec2e77b1006a336b4739b200d6c5372b02b457446b1b44b9c45bfed29ed",
+  "contract_hash": "9e144a0f814cb0726daa25d675af6993ce183b9e3e3db58fc8a621dcc23db1f7",
+  "created_at": "2026-09-12T16:23:52.034896+00:00",
+  "current_step": null,
+  "ended_at": "2026-09-12T16:24:08.814197+00:00",
+  "events": [
+    {
+      "at": "2026-09-12T16:23:52.038105+00:00",
+      "kind": "preflight"
+    },
+    {
+      "at": "2026-09-12T16:23:52.043010+00:00",
+      "filename": "20260912T162352039157Z_observe-adc.csv",
+      "kind": "recording_started"
+    },
+    {
+      "at": "2026-09-12T16:23:52.043379+00:00",
+      "kind": "step_started",
+      "step": "baseline",
+      "type": "expect"
+    },
+    {
+      "at": "2026-09-12T16:23:53.063961+00:00",
+      "elapsed_ms": 1020.552,
+      "kind": "step_passed",
+      "step": "baseline"
+    },
+    {
+      "at": "2026-09-12T16:23:53.064090+00:00",
+      "kind": "step_started",
+      "step": "pressure_low",
+      "type": "trigger"
+    },
+    {
+      "at": "2026-09-12T16:23:53.064151+00:00",
+      "instruction": "Turn P1 fully anticlockwise (minimum pressure).",
+      "kind": "instruction",
+      "step": "pressure_low"
+    },
+    {
+      "at": "2026-09-12T16:23:53.088710+00:00",
+      "elapsed_ms": 24.602,
+      "kind": "step_passed",
+      "step": "pressure_low"
+    },
+    {
+      "at": "2026-09-12T16:23:53.088801+00:00",
+      "kind": "step_started",
+      "step": "pressure_high",
+      "type": "trigger"
+    },
+    {
+      "at": "2026-09-12T16:23:53.088853+00:00",
+      "instruction": "Turn P1 slowly to maximum. Expect the trip indicator; the output is not armed.",
+      "kind": "instruction",
+      "step": "pressure_high"
+    },
+    {
+      "at": "2026-09-12T16:24:08.809045+00:00",
+      "kind": "step_failed",
+      "reason": "sensor invalid during step: pressure, pressure_emulator",
+      "step": "pressure_high"
+    },
+    {
+      "at": "2026-09-12T16:24:08.810830+00:00",
+      "kernel_event": "operator_safe",
+      "kind": "kernel_forced_safe"
+    },
+    {
+      "at": "2026-09-12T16:24:08.814131+00:00",
+      "filename": "20260912T162352039157Z_observe-adc.csv",
+      "kind": "recording_stopped",
+      "samples": 169,
+      "sha256": "fbabf42bf15716bb561907504adb0a66c92c47ae35decb4b00815786d14f65d1"
+    },
+    {
+      "at": "2026-09-12T16:24:08.814254+00:00",
+      "kind": "finished",
+      "reason": "step pressure_high failed: sensor invalid during step: pressure, pressure_emulator",
+      "status": "failed"
+    }
+  ],
+  "evidence_dir": "evidence/runs/procedure_runs/run_20260912T162352_6515a9",
+  "hardware_mode": "raspberry_pi",
+  "kernel_events": [
+    {
+      "at": "2026-09-12T16:23:45.997348+00:00",
+      "event": "operator_safe",
+      "reason": "reset_required"
+    },
+    {
+      "at": "2026-09-12T16:23:52.042061+00:00",
+      "event": "csv_recording_started",
+      "reason": "reset_required"
+    },
+    {
+      "at": "2026-09-12T16:24:08.787198+00:00",
+      "event": "sensor_invalid_forced_safe",
+      "reason": "pressure_invalid"
+    }
+  ],
+  "label": "observe-adc",
+  "outcome_reason": "step pressure_high failed: sensor invalid during step: pressure, pressure_emulator",
+  "peaks": {
+    "flow": 0.0,
+    "flow_emulator": 0.0,
+    "pressure": 0.0,
+    "pressure_emulator": 0.0
+  },
+  "procedure_hash": "c8a138df2e810a9bbabc6d8ba64317f54e9e0ae5b48006aadfb522eeeaae8a9b",
+  "procedure_id": "adc_validation",
+  "procedure_title": "ADC channel validation sweep",
+  "recording": {
+    "filename": "20260912T162352039157Z_observe-adc.csv",
+    "samples": 169,
+    "sha256": "fbabf42bf15716bb561907504adb0a66c92c47ae35decb4b00815786d14f65d1"
+  },
+  "recovery": null,
+  "requested_by": "lab",
+  "rig_id": "certarig-wave1-dry-bench",
+  "run_id": "run_20260912T162352_6515a9",
+  "started_at": "2026-09-12T16:23:52.038026+00:00",
+  "status": "failed",
+  "steps": [
+    {
+      "detail": {
+        "held_ms": 1000,
+        "observed": {
+          "flow.quality": "good",
+          "pressure.quality": "good"
+        },
+        "predicate": "(pressure quality == good and flow quality == good)",
+        "satisfied_after_ms": 0.788
+      },
+      "elapsed_ms": 1020.552,
+      "ended_at": "2026-09-12T16:23:53.063870+00:00",
+      "instruction": null,
+      "started_at": "2026-09-12T16:23:52.043328+00:00",
+      "status": "passed",
+      "step_id": "baseline",
+      "title": "baseline",
+      "type": "expect"
+    },
+    {
+      "detail": {
+        "observed": {
+          "pressure": 0.0
+        },
+        "predicate": "pressure < 0.5",
+        "triggered_after_ms": 24.331
+      },
+      "elapsed_ms": 24.602,
+      "ended_at": "2026-09-12T16:23:53.088611+00:00",
+      "instruction": "Turn P1 fully anticlockwise (minimum pressure).",
+      "started_at": "2026-09-12T16:23:53.064045+00:00",
+      "status": "passed",
+      "step_id": "pressure_low",
+      "title": "pressure_low",
+      "type": "trigger"
+    },
+    {
+      "detail": {
+        "invalid_signals": [
+          "pressure",
+          "pressure_emulator"
+        ],
+        "qualities": {
+          "flow": "good",
+          "flow_emulator": "good",
+          "pressure": "out_of_range",
+          "pressure_emulator": "out_of_range"
+        },
+        "reason": "sensor invalid during step: pressure, pressure_emulator"
+      },
+      "elapsed_ms": 15720.208,
+      "ended_at": "2026-09-12T16:24:08.808905+00:00",
+      "instruction": "Turn P1 slowly to maximum. Expect the trip indicator; the output is not armed.",
+      "started_at": "2026-09-12T16:23:53.088763+00:00",
+      "status": "failed",
+      "step_id": "pressure_high",
+      "title": "pressure_high",
+      "type": "trigger"
+    },
+    {
+      "detail": {},
+      "elapsed_ms": null,
+      "ended_at": null,
+      "instruction": null,
+      "started_at": null,
+      "status": "skipped",
+      "step_id": "pressure_mid",
+      "title": "pressure_mid",
+      "type": "trigger"
+    },
+    {
+      "detail": {},
+      "elapsed_ms": null,
+      "ended_at": null,
+      "instruction": null,
+      "started_at": null,
+      "status": "skipped",
+      "step_id": "flow_low",
+      "title": "flow_low",
+      "type": "trigger"
+    },
+    {
+      "detail": {},
+      "elapsed_ms": null,
+      "ended_at": null,
+      "instruction": null,
+      "started_at": null,
+      "status": "skipped",
+      "step_id": "flow_high",
+      "title": "flow_high",
+      "type": "trigger"
+    },
+    {
+      "detail": {},
+      "elapsed_ms": null,
+      "ended_at": null,
+      "instruction": null,
+      "started_at": null,
+      "status": "skipped",
+      "step_id": "flow_mid",
+      "title": "flow_mid",
+      "type": "trigger"
+    },
+    {
+      "detail": {},
+      "elapsed_ms": null,
+      "ended_at": null,
+      "instruction": null,
+      "started_at": null,
+      "status": "skipped",
+      "step_id": "settle",
+      "title": "settle",
+      "type": "expect"
+    },
+    {
+      "detail": {},
+      "elapsed_ms": null,
+      "ended_at": null,
+      "instruction": null,
+      "started_at": null,
+      "status": "skipped",
+      "step_id": "output_never_armed",
+      "title": "output_never_armed",
+      "type": "expect"
+    }
+  ],
+  "terminal": true
+}

@@ -1,0 +1,26 @@
+{
+  "case": {
+    "name": "flow_open",
+    "family": "flow",
+    "params": {
+      "level": "open"
+    },
+    "unsafe": false
+  },
+  "assessment": {
+    "checks": {
+      "healthy_low_or_high_is_valid_zero_or_pulse": true,
+      "conditioned_field_input_bounded": true
+    },
+    "metrics": {
+      "line_V": 4.751869541924,
+      "ratio": 0.9503739083848,
+      "valid": false
+    },
+    "criteria_pass": true
+  },
+  "samples": 1008,
+  "horizon": 0.01,
+  "netlist_sha256": "d910c4f7c6bac1053ad259d2265f9a6cc080405aa2e3a3061f07a509df18bb7c",
+  "experiment_ok": true
+}

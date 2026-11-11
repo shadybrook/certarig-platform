@@ -1,0 +1,50 @@
+
+Running 8 tests using 1 worker
+
+(node:64739) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 e2e/pressure_guardrail.spec.js:45:1 › pressure_guardrail trips from Studio and then passes after the operator lowers pressure (5.9s)
+  ✓  2 e2e/pressure_guardrail.spec.js:75:1 › operator can grant an approval from the inbox (1.9s)
+  ✓  3 e2e/studio_honesty.spec.js:23:1 › onboard briefing persists after reload (2.1s)
+  ✓  4 e2e/studio_honesty.spec.js:40:1 › stale contract retries once after a hot apply (1.2s)
+  ✓  5 e2e/studio_honesty.spec.js:54:1 › authoring wizard drafts and approves a soak (1.3s)
+  ✓  6 e2e/studio_honesty.spec.js:68:1 › procedures reconnect to the stored run after reload (2.0s)
+  ✓  7 e2e/zz_capstone_workflow.spec.js:5:1 › configure thermal rig, block, review, deny, approve, run and export (4.4s)
+  ✓  8 e2e/zz_commissioning_interview.spec.js:3:1 › resume an incomplete interview, then onboard both fixture plants through reviewed proposals (2.5s)
+[WebServer] ----------------------------------------
+[WebServer] Exception occurred during processing of request from ('127.0.0.1', 64344)
+[WebServer] Traceback (most recent call last):
+[WebServer]   File "/opt/homebrew/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/socketserver.py", line 697, in process_request_thread
+[WebServer]     self.finish_request(request, client_address)
+[WebServer]     ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+[WebServer]   File "/opt/homebrew/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/socketserver.py", line 362, in finish_request
+[WebServer]     self.RequestHandlerClass(request, client_address, self)
+[WebServer]     ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[WebServer]   File "/opt/homebrew/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/socketserver.py", line 766, in __init__
+[WebServer]     self.handle()
+[WebServer]     ~~~~~~~~~~~^^
+[WebServer]   File "/opt/homebrew/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/http/server.py", line 496, in handle
+[WebServer]     self.handle_one_request()
+[WebServer]     ~~~~~~~~~~~~~~~~~~~~~~~^^
+[WebServer]   File "/opt/homebrew/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/http/server.py", line 484, in handle_one_request
+[WebServer]     method()
+[WebServer]     ~~~~~~^^
+[WebServer]   File "/Users/chintandedhia/Documents/Codex/2026-11-09/okay-we-should-start-working-on/work/certarig-capstone/certarig/edge/server.py", line 770, in do_POST
+[WebServer]     self._dispatch("POST")
+[WebServer]     ~~~~~~~~~~~~~~^^^^^^^^
+[WebServer]   File "/Users/chintandedhia/Documents/Codex/2026-11-09/okay-we-should-start-working-on/work/certarig-capstone/certarig/edge/server.py", line 748, in _dispatch
+[WebServer]     self._send_json(status, payload)
+[WebServer]     ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+[WebServer]   File "/Users/chintandedhia/Documents/Codex/2026-11-09/okay-we-should-start-working-on/work/certarig-capstone/certarig/edge/server.py", line 694, in _send_json
+[WebServer]     self._send_bytes(status, json.dumps(payload, sort_keys=True).encode("utf-8"), "application/json")
+[WebServer]     ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[WebServer]   File "/Users/chintandedhia/Documents/Codex/2026-11-09/okay-we-should-start-working-on/work/certarig-capstone/certarig/edge/server.py", line 691, in _send_bytes
+[WebServer]     self.wfile.write(body)
+[WebServer]     ~~~~~~~~~~~~~~~~^^^^^^
+[WebServer]   File "/opt/homebrew/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/socketserver.py", line 845, in write
+[WebServer]     self._sock.sendall(b)
+[WebServer]     ~~~~~~~~~~~~~~~~~~^^^
+[WebServer] BrokenPipeError: [Errno 32] Broken pipe
+[WebServer] ----------------------------------------
+
+  8 passed (22.7s)

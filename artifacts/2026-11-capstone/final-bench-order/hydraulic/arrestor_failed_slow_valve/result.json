@@ -1,0 +1,17 @@
+{
+  "parameters": {
+    "name": "arrestor_failed_slow_valve",
+    "C": 3e-14,
+    "closing": 0.05,
+    "dt": 2e-06,
+    "end": 0.8,
+    "unsafe": false
+  },
+  "peak_bar": 1.1735351742012956,
+  "min_bar": 0.026584356365762313,
+  "observation_envelope_pass": true,
+  "experiment_ok": true,
+  "steps": 400001,
+  "saved_samples": 400001,
+  "model": "RK4, source0.60bar upper envelope, I=7.1e7, feed R=2e12, valve Kv chosen at1.5Lmin/0.45bar, compliance as declared; negative window ends at203.2ms before first vacuum/cavitation; it proves initial overpressure only; no post-cavitation prediction"
+}

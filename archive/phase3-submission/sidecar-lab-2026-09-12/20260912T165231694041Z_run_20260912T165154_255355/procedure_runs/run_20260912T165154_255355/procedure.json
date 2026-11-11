@@ -1,0 +1,144 @@
+{
+  "applies_to": {
+    "actuators": [
+      "permit_relay"
+    ],
+    "concepts": [
+      "pressure",
+      "emergency_stop"
+    ]
+  },
+  "domain": "electronics",
+  "evaluate": [
+    {
+      "event_observed": "estop_open_forced_safe"
+    },
+    {
+      "event_observed": "estop_closed_reset_required"
+    },
+    {
+      "event_observed": "permit_rejected_reset_required"
+    },
+    {
+      "max_elapsed_ms": 300,
+      "step": "output_removed"
+    }
+  ],
+  "id": "estop_anti_restart",
+  "preconditions": [
+    {
+      "eq": false,
+      "state": "estop_active"
+    },
+    {
+      "eq": "safe",
+      "signal_state": "pressure"
+    }
+  ],
+  "record": true,
+  "recovery": "If the output stayed on with the E-stop pressed, remove the external relay supply immediately. Check NC1 wiring on GPIO24 and NC2 in the relay power branch.\n",
+  "requires_output": true,
+  "steps": [
+    {
+      "command": "reset",
+      "expect": {
+        "eq": false,
+        "state": "trip_latched"
+      },
+      "id": "reset",
+      "type": "command"
+    },
+    {
+      "command": "permit",
+      "expect": {
+        "eq": true,
+        "state": "output_high"
+      },
+      "id": "permit",
+      "type": "command"
+    },
+    {
+      "allow_estop": true,
+      "id": "press_estop",
+      "instruction": "Press the E-stop mushroom head firmly until it latches.",
+      "predicate": {
+        "eq": true,
+        "state": "estop_active"
+      },
+      "timeout_s": 180,
+      "title": "Operator presses the E-stop",
+      "type": "trigger"
+    },
+    {
+      "allow_estop": true,
+      "id": "output_removed",
+      "predicate": {
+        "all": [
+          {
+            "eq": false,
+            "state": "output_high"
+          },
+          {
+            "eq": true,
+            "state": "trip_latched"
+          }
+        ]
+      },
+      "type": "expect",
+      "within_ms": 300
+    },
+    {
+      "allow_estop": true,
+      "id": "release_estop",
+      "instruction": "Twist the E-stop head to release it.",
+      "predicate": {
+        "eq": false,
+        "state": "estop_active"
+      },
+      "timeout_s": 180,
+      "title": "Operator releases the E-stop",
+      "type": "trigger"
+    },
+    {
+      "hold_ms": 1000,
+      "id": "no_restart",
+      "predicate": {
+        "all": [
+          {
+            "eq": false,
+            "state": "output_high"
+          },
+          {
+            "eq": "reset_required",
+            "state": "reason"
+          }
+        ]
+      },
+      "type": "expect",
+      "within_ms": 1000
+    },
+    {
+      "command": "permit",
+      "expect": {
+        "eq": "permit_rejected_reset_required",
+        "state": "last_event"
+      },
+      "id": "permit_rejected",
+      "type": "command"
+    },
+    {
+      "command": "safe",
+      "id": "end_safe",
+      "type": "command"
+    }
+  ],
+  "summary": "Proves that pressing the E-stop while the permit output is energised removes the output immediately, that releasing the E-stop does not restart it, and that a permit without a reset is rejected.\n",
+  "tags": [
+    "estop",
+    "interlock",
+    "anti-restart"
+  ],
+  "timeout_s": 600,
+  "title": "E-stop trip and anti-restart verification",
+  "version": 1
+}

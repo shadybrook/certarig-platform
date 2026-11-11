@@ -1,0 +1,47 @@
+CR-EXT-R1 AFE afe_short_burden
+* Field ADC 5V; host connected through isolated I2C, not analog.
+Vloop loop 0 24
+Btx loop raw I=min(0.02,min(.033,max(0,(v(loop)-v(raw)-11)/55)))
+Rburden raw 0 0.001
+* Real wiring/filter capacitance prevents a singular open-input initial step.
+Craw raw 0 10n IC=0
+Vfield field 0 5
+Dhold field adcrail HOLD
+Cadc adcrail 0 0.0001 IC=4.6
+Bload adcrail 0 I=.02*max(0,v(adcrail))/(max(0,v(adcrail))+.1)
+Rpg field pg 10k
+Cpg pg 0 39n IC=5
+Ben en 0 V=(v(pg)>4.4 ? 5 : 0)
+* Independent passive reference remains available from instrument 24V.
+Rbias loop ref 10k
+Dref 0 ref REF
+Rseries raw pre 10k
+Dupper pre ref CLAMP
+Dlower 0 pre CLAMP
+Smux pre pin en 0 SWITCH
+Boff 0 pin I=(v(en)<2.5 ? 2u : 0)
+Rdis pin 0 33k
+Cpin pin 0 10p
+Radc pin 0 6Meg
+Dhi pin adcrail ESD
+Dlo 0 pin ESD
+Vhost hostrail 0 0
+Bhostleak 0 hostpin I=1u
+Rhost hostpin hostrail 33k
+.model HOLD D(Is=1u N=1 Rs=.05)
+.model REF D(Is=1p N=1 Rs=.8 BV=2.5 IBV=80u)
+.model CLAMP D(Is=1e-7 N=1.05 Rs=.5 Cjo=10p)
+.model ESD D(Is=1p N=1.3 Rs=10 Cjo=4p)
+.model SWITCH SW(Ron=4.5 Roff=1e12 Vt=2.5 Vh=.05)
+Bpow power 0 V=v(raw)*v(raw)/0.001
+
+.options method=gear reltol=1e-5
+.control
+set wr_singlescale
+set wr_vecnames
+set numdgt=12
+tran 2e-06 0.04 0 2e-06 uic
+wrdata trace.dat v(raw) v(pin) v(adcrail) v(en) i(Vloop) v(power) v(hostpin)
+quit
+.endc
+.end

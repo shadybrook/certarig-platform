@@ -1,0 +1,48 @@
+{
+  "name": "r1_refined_estop",
+  "family": "power",
+  "revision": "R1",
+  "params": {
+    "fault": "estop",
+    "max_step_s": 2e-05
+  },
+  "diagnostic": false,
+  "process_exit": 0,
+  "samples": 99536,
+  "wall_seconds": 7.22,
+  "netlist_sha256": "905a4f3f5a230b86984f5030a67a443226f7406e514ec78492a87cd183a4d009",
+  "checks": [
+    {
+      "check": "startup_no_drive",
+      "passed": true
+    },
+    {
+      "check": "run_has_expected_load_response",
+      "passed": true
+    },
+    {
+      "check": "drain_voltage_below_70V_model_design_limit",
+      "passed": true
+    },
+    {
+      "check": "fault_removes_current",
+      "passed": true
+    },
+    {
+      "check": "release_does_not_restart",
+      "passed": true
+    },
+    {
+      "check": "feedback_is_3V3_bounded",
+      "passed": true
+    }
+  ],
+  "metrics": {
+    "peak_drain_v": 33.05937843095,
+    "min_bus_v": -2.29752138332e-05,
+    "peak_pump_a": 0.581741986342,
+    "peak_valve_a": 0.4810320651278,
+    "peak_shunt_v": 0.02908709936111
+  },
+  "criteria_pass": true
+}

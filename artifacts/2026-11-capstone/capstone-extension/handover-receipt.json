@@ -1,0 +1,28 @@
+{
+  "as_of": "2026-11-09",
+  "baseline": "2f25d66",
+  "head": "a7f8795046a1a3907c438d8f0df5f7f7baf3b084",
+  "validated_source_commit": "0f00140",
+  "branch": "capstone/connected-workflow-2026-11-09",
+  "worktree_clean": true,
+  "commits": [
+    "a7f8795 Map signed missions to evidence and document gated water-loop procurement",
+    "0f00140 Keep structured interview answers separate from command routing",
+    "7279765 Add source-bound interviews, thermal qualification and observed rig extensions"
+  ],
+  "scope": "local simulator and software fixtures; no physical commissioning or paid provider calls",
+  "physical_complete": false,
+  "procurement_ready": false,
+  "live_provider_qualification": "deferred",
+  "local_broker": "two tests passed; temporary Docker broker stopped after validation",
+  "source_review": "GBrain unavailable; signed report and local source used",
+  "final_university_deadline": "unconfirmed",
+  "next_human_steps": [
+    "Separate 32 GB microSD",
+    "Confirm institution final deadline/reviewer/submission",
+    "Current bench photographs and wiring review",
+    "Corrected matched hardware basket and delivered quote before ordering",
+    "Attended dry feedback, calibration and protected commissioning",
+    "Actual supervisor feedback, rehearsal and demo video"
+  ]
+}

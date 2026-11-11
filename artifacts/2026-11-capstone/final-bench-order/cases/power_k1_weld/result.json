@@ -1,0 +1,31 @@
+{
+  "case": {
+    "name": "power_k1_weld",
+    "family": "power",
+    "params": {
+      "fault": "k1_weld"
+    },
+    "unsafe": false
+  },
+  "assessment": {
+    "checks": {
+      "fault_does_not_restart": true,
+      "pre_fault_actuation_was_observed": true,
+      "pass_current_bounded": true,
+      "pass_power_bounded": true,
+      "regulated_forward_SOA_rectangle": true
+    },
+    "metrics": {
+      "output_max_V": 12.78246697113,
+      "pass_peak_A": 1.796233671311,
+      "pass_peak_W": 10.93307780846,
+      "tail_voltage_max_V": 7.994954105928e-07,
+      "pass_energy_J": 0.11173516544448314
+    },
+    "criteria_pass": true
+  },
+  "samples": 80486,
+  "horizon": 0.8,
+  "netlist_sha256": "5443ba19428e18cff24916f8cdf81c3f46f9eda5316d89b1d0e398101e0d48b4",
+  "experiment_ok": true
+}

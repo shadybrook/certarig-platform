@@ -1,0 +1,34 @@
+{
+  "name": "r1_receiver_short_burden",
+  "family": "receiver",
+  "revision": "R1",
+  "params": {
+    "fault": "short_burden"
+  },
+  "diagnostic": false,
+  "process_exit": 0,
+  "samples": 20008,
+  "wall_seconds": 0.403,
+  "netlist_sha256": "23670e3a60980232777627f75b258d110fb6421007ff9329e9876194548e6789",
+  "checks": [
+    {
+      "check": "ADC_normal_range_margin",
+      "passed": true
+    },
+    {
+      "check": "bad_loop_not_normal_4mA_reading",
+      "passed": true
+    }
+  ],
+  "metrics": {
+    "adc_pin_max_v": 0.0007605917419693,
+    "adc_pin_min_v": 0.0007605672580608,
+    "sensor_headroom_min_v": 13.49997999993,
+    "burden_peak_w": 4.000029627892e-07,
+    "adc_steady_v": 0.0007605917419693,
+    "loop_steady_a": 0.02,
+    "off_rail_injection_peak_a": null
+  },
+  "criteria_pass": true,
+  "reused_trace": true
+}

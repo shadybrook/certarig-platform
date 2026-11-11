@@ -1,0 +1,33 @@
+{
+  "name": "integrated_estop_reset_held",
+  "family": "integrated",
+  "params": {
+    "fault": "estop_reset_held"
+  },
+  "expected": "within_envelope",
+  "reason": "",
+  "checks": {
+    "startup_no_drive": true,
+    "run_has_expected_load_response": true,
+    "drain_voltage_below_70V_model_design_limit": true,
+    "fault_removes_current": true,
+    "release_does_not_restart": true,
+    "feedback_is_3V3_bounded": true,
+    "BLDC_reverse_above_assumed_minus1V": true
+  },
+  "metrics": {
+    "peak_drain_v": 41.65263856668,
+    "min_bus_v": -1.611972695957e-07,
+    "peak_pump_a": 1.376875330476,
+    "peak_valve_a": 0.7689116655417,
+    "peak_shunt_v": 0.1376877971913,
+    "pump_terminal_min_V": -0.01191336398566,
+    "pump_terminal_max_V": 11.18277380488,
+    "trip_latch_max_V": 0.0
+  },
+  "criteria_pass": true,
+  "samples": 38361,
+  "horizon_s": 1.4,
+  "netlist_sha256": "d9fa310761df14a5850263de44fd882e5e4490cfc4fd2acc17f59654f7af3e9c",
+  "matched_expectation": true
+}

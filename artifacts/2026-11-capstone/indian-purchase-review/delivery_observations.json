@@ -1,0 +1,31 @@
+{
+  "checked": "9-10 November 2026",
+  "PIN": "400053",
+  "observations": [
+    {
+      "supplier": "Robu",
+      "product": "R256922",
+      "method": "Live browser product/pincode UI",
+      "stock": "In Stock",
+      "price_INR": 2929,
+      "arrival_estimate": [
+        "2026-11-13 air",
+        "2026-11-16 standard"
+      ]
+    },
+    {
+      "supplier": "Evelta",
+      "product": "147-SEN0262",
+      "method": "Live browser product/pincode UI",
+      "stock": 25,
+      "price_INR": 546.34,
+      "arrival_estimate": "2026-11-12; holiday dispatch warning"
+    },
+    {
+      "supplier": "Industrybuying",
+      "product": "PNE.DIR.18723207",
+      "method": "Live browser pincode UI",
+      "service": "Prepaid/COD shown; no arrival date observed"
+    }
+  ]
+}

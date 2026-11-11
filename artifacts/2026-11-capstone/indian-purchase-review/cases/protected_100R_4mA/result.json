@@ -1,0 +1,26 @@
+{
+  "name": "protected_100R_4mA",
+  "family": "loop",
+  "params": {
+    "current": 0.004
+  },
+  "expected": "within_envelope",
+  "reason": "",
+  "checks": {
+    "ADC_or_120R_input_within_rail_plus_0.3V": true,
+    "burden_below_half_watt": true,
+    "transmitter_reaches_requested_current": true
+  },
+  "metrics": {
+    "raw_max_V": 0.3990681279223,
+    "pin_max_V": 0.3058389854702,
+    "final_current_mA": 4.0,
+    "burden_max_W": 0.001592553707234,
+    "off_injection_A": null
+  },
+  "criteria_pass": true,
+  "samples": 20008,
+  "horizon_s": 0.04,
+  "netlist_sha256": "5be6c625698e6d7311a9c34fa4e496455406c66d20caa31106ec36d1f9e0b6d2",
+  "matched_expectation": true
+}

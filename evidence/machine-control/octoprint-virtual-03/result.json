@@ -1,0 +1,135 @@
+{
+  "result": "passed",
+  "controller": {
+    "api": "0.1",
+    "server": "1.11.8",
+    "text": "OctoPrint 1.11.8"
+  },
+  "physical_machine": false,
+  "agent_provider": "fake-scripted",
+  "live_llm_inference": false,
+  "operator_approvals": "automated_test_harness_only",
+  "checks": [
+    {
+      "check": "controller_state",
+      "expected": "Operational",
+      "observed": "Operational",
+      "job": null,
+      "passed": true
+    },
+    {
+      "check": "agent_tool_action",
+      "action": "start",
+      "approved_by_test_harness": false,
+      "ok": false,
+      "result": {
+        "error": "approval_required_or_invalid"
+      },
+      "passed": true
+    },
+    {
+      "check": "agent_tool_action",
+      "action": "start",
+      "approved_by_test_harness": true,
+      "ok": true,
+      "result": {
+        "dispatched": true,
+        "action": "start",
+        "job": "certarig-virtual.gcode",
+        "physical_result": "not_measured",
+        "requires_state_confirmation": true
+      },
+      "passed": true
+    },
+    {
+      "check": "controller_state",
+      "expected": "Printing",
+      "observed": "Printing",
+      "job": "certarig-virtual.gcode",
+      "passed": true
+    },
+    {
+      "check": "agent_tool_action",
+      "action": "pause",
+      "approved_by_test_harness": false,
+      "ok": true,
+      "result": {
+        "dispatched": true,
+        "action": "pause",
+        "job": "certarig-virtual.gcode",
+        "physical_result": "not_measured",
+        "requires_state_confirmation": true
+      },
+      "passed": true
+    },
+    {
+      "check": "controller_state",
+      "expected": "Paused",
+      "observed": "Paused",
+      "job": "certarig-virtual.gcode",
+      "passed": true
+    },
+    {
+      "check": "agent_tool_action",
+      "action": "resume",
+      "approved_by_test_harness": false,
+      "ok": false,
+      "result": {
+        "error": "approval_required_or_invalid"
+      },
+      "passed": true
+    },
+    {
+      "check": "agent_tool_action",
+      "action": "resume",
+      "approved_by_test_harness": true,
+      "ok": true,
+      "result": {
+        "dispatched": true,
+        "action": "resume",
+        "job": "certarig-virtual.gcode",
+        "physical_result": "not_measured",
+        "requires_state_confirmation": true
+      },
+      "passed": true
+    },
+    {
+      "check": "controller_state",
+      "expected": "Printing",
+      "observed": "Printing",
+      "job": "certarig-virtual.gcode",
+      "passed": true
+    },
+    {
+      "check": "agent_tool_action",
+      "action": "cancel",
+      "approved_by_test_harness": false,
+      "ok": true,
+      "result": {
+        "dispatched": true,
+        "action": "cancel",
+        "job": "certarig-virtual.gcode",
+        "physical_result": "not_measured",
+        "requires_state_confirmation": true
+      },
+      "passed": true
+    },
+    {
+      "check": "controller_state",
+      "expected": "Operational",
+      "observed": "Operational",
+      "job": "certarig-virtual.gcode",
+      "passed": true
+    },
+    {
+      "check": "virtual_job_completed",
+      "state": "Operational",
+      "completion_percent": 100.0,
+      "passed": true
+    }
+  ],
+  "audit_final_hash": "30da404f3447c27ae8cfddc57f7e6024c7f68560b2bda36b73d93bf8a4cb4311",
+  "job_sha256": "84b44def4fa08962a7bcab7d4ed38ce814d086916b28ab34ce99f97535e94497",
+  "source_commit": "f77ccaaa3ffd12cdb87b2c3fa0a627315b556998",
+  "source_state": "uncommitted research additions; see source-manifest.json"
+}

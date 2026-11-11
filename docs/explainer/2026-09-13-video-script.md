@@ -1,5 +1,7 @@
 # CertaRig visual explainer script
 
+The Phase 3 *submission* film (Curastra grammar, customer, AI stack, stitched demo, capstone missions) lives in [`phase3-film/`](phase3-film/README.md). This 13 September script remains the lab explainer. Do not splice the two spines into one cut.
+
 **Working title:** The AI can ask. Only the kernel can say yes.
 **Target duration:** 10 minutes 30 seconds to 12 minutes
 **Format:** Original curiosity led engineering explainer with visual intuition, clean diagrams, physical demonstrations, and restrained presenter shots. This borrows broad educational techniques, not the exact voice or visual identity of any specific creator.

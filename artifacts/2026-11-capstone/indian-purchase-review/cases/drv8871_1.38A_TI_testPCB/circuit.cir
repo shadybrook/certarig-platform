@@ -1,0 +1,19 @@
+DRV8871 steady conduction / thermal analogy: drv8871_1.38A_TI_testPCB
+Vbus bus 0 12
+Rbridge bus load 0.565
+Iload load 0 1.38
+Bheat 0 trise I=i(Vbus)*i(Vbus)*0.565
+Rtheta trise 0 41.1
+Cthermal trise 0 .02 IC=0
+Bjunction tj 0 V=40+v(trise)
+
+.options method=gear reltol=1e-5
+.control
+set wr_singlescale
+set wr_vecnames
+set numdgt=12
+tran 0.01 15 0 0.01
+wrdata trace.dat v(load) v(tj) i(Vbus)
+quit
+.endc
+.end

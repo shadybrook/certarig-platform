@@ -1,0 +1,22 @@
+
+Note: No compatibility mode selected!
+
+
+Circuit: topsflo b12 electrical input envelope: pump_input_10.8v_start2x
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+source                                    10.8
+bus                                       10.8
+vsource#branch                    -8.28967e-16
+
+
+No. of Data Rows : 15017
+ngspice-47 done

@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-10",
+  "basis": "9-10 November candidate basket, not a new delivered quote",
+  "previous_planning_total_INR": 25394.89,
+  "potential_changes": [
+    {
+      "change": "Buy 5m of PHWB12 instead of a 30m roll",
+      "potential_saving_INR": 1770,
+      "confirmed": false,
+      "condition": "Supplier must sell the offcut; tax/freight unchanged assumption"
+    },
+    {
+      "change": "Qualify Pro-Range 12V5A in place of Mean Well GST60A12-P1J",
+      "potential_saving_INR": 1664,
+      "confirmed": false,
+      "condition": "Exact SKU, compliance, transient/current-limit behavior and delivery must pass"
+    }
+  ],
+  "subtotal_after_these_two_conditional_changes_INR": 21960.89,
+  "powerstage_adjustment": "Remove the old Rs470.82 DRV8871 line only when replacing it with a fully quoted assembled one-direction/current-limited stage. New eFuse, driver, shunt, heatsinking, discharge and PCB costs are unquoted; do not assume a saving.",
+  "optional_scope_reduction": "A gravity-fed loop avoids buying a pump and its power channel, because Phase1 makes the pump optional. This is an alternative requiring a new matched design and acceptance review; it is not a claim that the water-loop or calibrated sensing requirement disappears.",
+  "optimization": [
+    "Use already-owned spare Pi/ADS1115/tools after confirming current inventory and preserve the frozen Phase3 installation.",
+    "Consolidate a matched BSP fitting schedule and shipping; buy hose by required length.",
+    "Borrow institution-owned calibrated references only after access and suitability are confirmed; retain calibration evidence.",
+    "Avoid buying both comparison receiver and final receiver. SEN0262 was already excluded from the earlier primary subtotal, so this is not a new Rs546 saving.",
+    "Defer unused H-bridge/reversal, physical heating, extra controller, industrial write interfaces and additional actuators.",
+    "Retain appropriate independent safeguards, sensor references and enclosure/assembly costs."
+  ],
+  "no_purchase_order": true
+}

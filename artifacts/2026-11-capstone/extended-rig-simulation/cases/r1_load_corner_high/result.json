@@ -1,0 +1,46 @@
+{
+  "name": "r1_load_corner_high",
+  "family": "power",
+  "revision": "R1",
+  "params": {
+    "supply": 13.2,
+    "valve_r": 15,
+    "valve_l": 0.5,
+    "watchdog_s": 0.25
+  },
+  "diagnostic": false,
+  "process_exit": 0,
+  "samples": 51822,
+  "wall_seconds": 3.969,
+  "netlist_sha256": "bbe086808abf9dca1fc47e642c7323417a53670f7d8cbfd8f979796a58691596",
+  "checks": [
+    {
+      "check": "startup_no_drive",
+      "passed": true
+    },
+    {
+      "check": "run_has_expected_load_response",
+      "passed": true
+    },
+    {
+      "check": "drain_voltage_below_70V_model_design_limit",
+      "passed": true
+    },
+    {
+      "check": "permit_off_removes_current",
+      "passed": true
+    },
+    {
+      "check": "feedback_is_3V3_bounded",
+      "passed": true
+    }
+  ],
+  "metrics": {
+    "peak_drain_v": 34.3853602499,
+    "min_bus_v": -2.418188389238e-05,
+    "peak_pump_a": 0.6416733796969,
+    "peak_valve_a": 0.8363010609497,
+    "peak_shunt_v": 0.04181505309806
+  },
+  "criteria_pass": true
+}

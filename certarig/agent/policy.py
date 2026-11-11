@@ -80,6 +80,67 @@ class RuleBasedPolicy:
     def _open_turn(
         self, request: str, messages: Sequence[Message], tools: Sequence[ToolSpec]
     ) -> ProviderResponse:
+        if self._tool_available(tools, "commissioning_interview"):
+            previous = self._interview(messages)
+            text = self._last_user(messages)
+            structured_answer = text.lstrip().startswith("{") or any(
+                text.lower().startswith(k + ":") for k in ("equipment", "safe_state", "procedures")
+            )
+            if (
+                not structured_answer
+                and ("commission" in request or "onboard" in request)
+                and not any(word in request for word in ("propose", "check mapping", "apply"))
+            ):
+                if previous and "new" not in request:
+                    return call(
+                        tool_call(
+                            "commissioning_interview",
+                            {"action": "read", "interview_id": previous["interview_id"]},
+                        )
+                    )
+                return call(tool_call("commissioning_interview", {"action": "create"}))
+            if previous and previous.get("status") != "applied":
+                base = {"interview_id": previous["interview_id"]}
+                if not structured_answer and "apply" in request:
+                    return say(
+                        "Apply the reviewed proposal yourself in Onboard. The agent cannot apply mappings, accept physical commissioning or grant authority."
+                    )
+                if not structured_answer and ("propose" in request or "check mapping" in request):
+                    return call(tool_call("commissioning_interview", {**base, "action": "propose"}))
+                text = self._last_user(messages)
+                if text.lstrip().startswith("{"):
+                    try:
+                        payload = json.loads(text)
+                    except ValueError:
+                        return say(
+                            "The deterministic interview needs valid JSON or equipment:, safe_state:, procedures: answers. No configuration was applied."
+                        )
+                    if not isinstance(payload, dict):
+                        return say("Provide an answers and sources object for the interview.")
+                    return call(
+                        tool_call(
+                            "commissioning_interview",
+                            {
+                                **base,
+                                "action": "update",
+                                "expected_revision": previous["revision"],
+                                "answers": payload.get("answers", {}),
+                                "sources": payload.get("sources", {}),
+                            },
+                        )
+                    )
+                if any(text.lower().startswith(k + ":") for k in ("equipment", "safe_state", "procedures")):
+                    return call(
+                        tool_call(
+                            "commissioning_interview",
+                            {
+                                **base,
+                                "action": "update",
+                                "expected_revision": previous["revision"],
+                                "text": text,
+                            },
+                        )
+                    )
         words = set(re.findall(r"[a-z]+", request))
         if words & _ABORT_WORDS:
             run_id = self._active_run_id(messages)
@@ -110,6 +171,27 @@ class RuleBasedPolicy:
         messages: Sequence[Message],
     ) -> ProviderResponse:
         name, last = results[-1]
+        if name == "commissioning_interview" and "error" not in last:
+            blockers = last.get("blockers") or []
+            if last.get("status") == "proposed":
+                return say(
+                    f"Deterministic interview {last['interview_id']} has a proposed map. Review the sources, diff and revalidation checklist in Onboard and apply it as the operator. No execution authority was granted."
+                )
+            missing = [
+                k
+                for k in ("equipment", "safe_state", "procedures", "document", "calibration_records")
+                if not last.get("answers", {}).get(k)
+            ]
+            return say(
+                f"Deterministic commissioning fixture {last['interview_id']}; saved revision {last['revision']}. "
+                + (
+                    "Missing: " + ", ".join(missing) + ". "
+                    if missing
+                    else "Answers saved; ask me to propose the mapping. "
+                )
+                + ("Blockers: " + "; ".join(blockers) + ". " if blockers else "")
+                + "Describe equipment, safe_state and procedures using labelled lines. Supply the signal map and calibration references as JSON answers with sources. Unknown facts remain unresolved; nothing has been applied."
+            )
         # refusals first
         if last.get("code") == "approval_required" and self._tool_available(tools, "request_approval"):
             failed_tool = str(last.get("tool"))
@@ -192,6 +274,18 @@ class RuleBasedPolicy:
         if name == "abort_procedure":
             return say(f"Run {last.get('run_id')} aborted; the kernel was forced safe.")
         return say(f"Done: {name} returned {json.dumps(last)[:300]}.")
+
+    @staticmethod
+    def _interview(messages: Sequence[Message]) -> dict[str, Any] | None:
+        for message in reversed(messages):
+            if message.role == "tool" and message.name == "commissioning_interview":
+                try:
+                    value = json.loads(message.content)
+                    if value.get("interview_id"):
+                        return dict(value)
+                except (ValueError, AttributeError):
+                    pass
+        return None
 
     @staticmethod
     def _last_tool_args(messages: Sequence[Message], name: str) -> dict[str, Any]:

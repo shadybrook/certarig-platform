@@ -1,0 +1,21 @@
+CertaRig r1_flow_4.5V_CTR0.2: pulse interface R1
+Vfield field 0 PULSE(0 4.5 .001 10u 10u .0009 .002)
+Vrail rail 0 3.3
+Rled field sense 560
+Vled sense led 0
+Dled led 0 LED
+Danti 0 led REV
+Rpull rail pin 10k
+Cpin pin 0 1n
+Bphoto pin 0 I=0.2*max(0,i(Vled))*v(pin)/sqrt(v(pin)*v(pin)+.0025)
+.model LED D(Is=1e-20 N=1.8 Rs=5 Cjo=20p)
+.model REV D(Is=1n N=1.2 Rs=.05)
+.control
+set wr_singlescale
+set wr_vecnames
+set numdgt=12
+tran 2u .02 0 2u
+wrdata trace.dat v(field) v(pin) v(rail) i(Vled)
+quit
+.endc
+.end

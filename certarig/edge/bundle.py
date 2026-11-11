@@ -170,7 +170,11 @@ def write_run_bundle(
     events = run.get("events") or run.get("kernel_events") or []
     write_text_atomic(target / EVENTS_NAME, "".join(json.dumps(e, sort_keys=True) + "\n" for e in events))
     briefing = _briefing_block(target, context)
-    write_text_atomic(target / REPORT_NAME, render_report(run, context, narrative, briefing=briefing))
+    report = render_report(run, context, narrative, briefing=briefing)
+    analysis = target / "sample_analysis.json"
+    if analysis.is_file():
+        report += "\n## Reproducible raw sample analysis\n\n```json\n" + analysis.read_text() + "\n```\n"
+    write_text_atomic(target / REPORT_NAME, report)
     listed = [
         path
         for path in sorted(target.iterdir())

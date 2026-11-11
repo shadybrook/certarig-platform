@@ -1,0 +1,26 @@
+{
+  "name": "protected_100R_20mA",
+  "family": "loop",
+  "params": {
+    "current": 0.02
+  },
+  "expected": "within_envelope",
+  "reason": "",
+  "checks": {
+    "ADC_or_120R_input_within_rail_plus_0.3V": true,
+    "burden_below_half_watt": true,
+    "transmitter_reaches_requested_current": true
+  },
+  "metrics": {
+    "raw_max_V": 1.995340601079,
+    "pin_max_V": 1.52919103605,
+    "final_current_mA": 20.0,
+    "burden_max_W": 0.03981384114315,
+    "off_injection_A": null
+  },
+  "criteria_pass": true,
+  "samples": 20008,
+  "horizon_s": 0.04,
+  "netlist_sha256": "330f891630bdf4fa4bbeb8a95b7ab2c90149f67c045a7aabb2ef43a8e5a9284d",
+  "matched_expectation": true
+}
