@@ -1,0 +1,39 @@
+{
+  "name": "r1_power_stuck_command",
+  "family": "power",
+  "revision": "R1",
+  "params": {
+    "fault": "stuck_command"
+  },
+  "diagnostic": false,
+  "process_exit": 0,
+  "samples": 16765,
+  "wall_seconds": 1.097,
+  "netlist_sha256": "ae9b5505d6b94d08b336dec6d760b8e90e80230a9c833e4377b62eafe0048347",
+  "checks": [
+    {
+      "check": "startup_no_drive",
+      "passed": true
+    },
+    {
+      "check": "drain_voltage_below_70V_model_design_limit",
+      "passed": true
+    },
+    {
+      "check": "watchdog_removes_current",
+      "passed": true
+    },
+    {
+      "check": "feedback_is_3V3_bounded",
+      "passed": true
+    }
+  ],
+  "metrics": {
+    "peak_drain_v": 5.881425701811e-05,
+    "min_bus_v": 2.999879816654e-09,
+    "peak_pump_a": 2.050458030653e-11,
+    "peak_valve_a": 2.351910908459e-11,
+    "peak_shunt_v": 1.132002960283e-12
+  },
+  "criteria_pass": true
+}

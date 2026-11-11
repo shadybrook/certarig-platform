@@ -1,0 +1,32 @@
+[
+  {
+    "title": "Raspberry Pi3A+ official reduced schematic",
+    "url": "https://datasheets.raspberrypi.com/rpi3/raspberry-pi-3-a-plus-reduced-schematics.pdf",
+    "use": "J8 header identities checked for the proposed new harness. Supplier terminal numbers and current physical wiring must still be checked before installation."
+  },
+  {
+    "title": "TI LM5069 Rev G",
+    "url": "https://www.ti.com/lit/ds/symlink/lm5069.pdf",
+    "use": "Latched LM5069-1, current and TIMER bounds. Behavioral controller used in SPICE; manufacturer macromodel not used."
+  },
+  {
+    "title": "TI ADS1115 Rev E",
+    "url": "https://www.ti.com/lit/ds/symlink/ads1115.pdf",
+    "use": "Supply-relative analog limits, multiplexed conversion and data-rate constraints. Two ADCs are specified; no simultaneous-sampling claim."
+  },
+  {
+    "title": "Littelfuse IXTK90N25L2",
+    "url": "https://www.littelfuse.com/assetdocs/Littelfuse-Discrete-MOSFETs-N-Channel-Linear-IXT-90N25-Datasheet.PDF?assetguid=85B50793-C43C-4B40-A84C-3DCCA3D22A7B",
+    "use": "75C FBSOA graph and 250V/2.3A/5s SOA reference. Main waveforms are bounded; a separate overshoot contract still requires the real gate/choke design."
+  },
+  {
+    "title": "Mean Well GST60A specification",
+    "url": "https://www.meanwell.com/Upload/PDF/GST60A/GST60A-SPEC.PDF",
+    "use": "Reference 12V5A and24V2.5A adapters; manufacturer P1J connector dimensions. Confirm exact supplied model/cable."
+  },
+  {
+    "title": "Burkert6213 manufacturer data",
+    "url": "https://www.burkert.com/en/Media/plm/DTS/DS/ds6213-standard-eu-en.pdf?id=DTS0000000000000001000115690ENAF",
+    "use": "Family reference only. Timing table is measured at6bar inlet, not this low-head loop; exact low-pressure timing and mechanical CLOSED accessory remain supplier requirements."
+  }
+]

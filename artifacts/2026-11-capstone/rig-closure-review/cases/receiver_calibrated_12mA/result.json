@@ -1,0 +1,34 @@
+{
+  "case": {
+    "name": "receiver_calibrated_12mA",
+    "family": "loop",
+    "params": {
+      "current": 0.012
+    },
+    "original": "",
+    "outcome": "normal"
+  },
+  "original_control": false,
+  "assessment": {
+    "checks": {
+      "ADC_or_120R_input_within_rail_plus_0.3V": true,
+      "burden_below_half_watt": true,
+      "transmitter_reaches_requested_current": true,
+      "valid_calibrated_reading": true
+    },
+    "metrics": {
+      "raw_max_V": 1.197204361247,
+      "pin_max_V": 0.9175146822144,
+      "final_current_mA": 12.0,
+      "burden_max_W": 0.0143329828259,
+      "off_injection_A": null,
+      "inferred_current_A": 0.012000000518030421,
+      "observation_valid": true
+    },
+    "passed": true
+  },
+  "samples": 20008,
+  "horizon_s": 0.04,
+  "netlist_sha256": "cf5a7b780d675f7f582f75d4809f9e9d366ec844c7ea225074a329b50aa1695c",
+  "experiment_ok": true
+}

@@ -1,0 +1,1 @@
+This is an intentionally corrupted COPY for the refusal demonstration. The original verified ZIP is unchanged. Expected verification result: failure. Do not submit this copy as valid measurement evidence.

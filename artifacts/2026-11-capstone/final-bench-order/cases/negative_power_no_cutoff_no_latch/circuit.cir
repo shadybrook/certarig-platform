@@ -1,0 +1,58 @@
+CR-EXT-R1 protected pump chain negative_power_no_cutoff_no_latch
+Vsource source 0 13.2
+Rsource source raw .3
+Cinput raw 0 220u IC=13.2
+Vcmd cmd 0 PWL(0 0 .12 0 .12001 5 .30 5 .30001 0 .5 0 .50001 5 .8 5)
+Vhealth health 0 5
+Vreset reset 0 PWL(0 0 .05 0 .05001 5 .07 5 .07001 0 .8 0)
+Rreset reset lag 1k
+Creset lag 0 1u IC=0
+Breset edge 0 V=(v(reset)-v(lag)>.5 ? 5 : 0)
+Carm arm 0 1u IC=0
+Rarm arm 0 1e12
+Barm arm 0 I=(v(trip)>2.5 || v(health)<2.5 || v(raw)<9.5 ? v(arm)/100 : (v(edge)>2.5 && v(cmd)<.5 ? (v(arm)-5)/100 : 0))
+Barmbuffer armcmd 0 V=(v(arm)>2.5 ? 5 : 0)
+Rk armcmd k 10k
+Ck k 0 3.5u IC=0
+Sk1 raw middle k 0 CONTACT
+Sk2 middle input k 0 CONTACT
+.model CONTACT SW(Ron=.03 Roff=1e12 Vt=2.5 Vh=.05)
+Vweld wc 0 PWL(0 0 .2 0 .20001 5 .8 5)
+Sweld raw middle wc 0 CONTACT
+Vweld2 wc2 0 PWL(0 0 .2 0 .20001 5 .8 5)
+Sweld2 middle input wc2 0 CONTACT
+Ben enabled 0 V=(v(arm)>2.5 && v(cmd)>2.5 && v(trip)<2.5 ? 5 : 0)
+Crun elapsed 0 1m IC=0
+Brun 0 elapsed I=(v(enabled)>2.5 ? .001 : -v(elapsed)/1)
+Coff offtime 0 1m IC=0
+Boff 0 offtime I=(v(enabled)<2.5 ? .001 : -v(offtime)/1)
+Cramp ramp 0 10u IC=0
+Bramp 0 ramp I=(v(enabled)>2.5 ? min(.0005,max(0,(1-v(ramp))/.1)) : -v(ramp)/1)
+Btarget target 0 V=max(0,v(input))*min(1,max(0,v(ramp)))
+Bbound bound 0 V=min(2.268,25/max(.1,v(input,out)))
+Bpass input measured I=(v(enabled)>2.5 ? min(v(bound),max(0,(v(target)-v(out))/.072)) : 0)
+Vsense measured out 0
+Cout out 0 0.00047 IC=0
+Bdis out 0 I=(v(enabled)<2.5 ? v(out)/47 : v(out)/10000)
+Bpump out 0 I=(v(elapsed)<.06 ? 1.5 : 1.0)*(1+tanh((v(out)-5.8)/.25))/2
+Blimiting limiting 0 V=(i(Vsense)>.99*v(bound) && v(enabled)>2.5 ? 5 : 0)
+Ctimer timer 0 1m IC=0
+Btimer 0 timer I=(v(limiting)>2.5 ? .001 : (v(timer)>0 ? -.00001 : 0))
+Ctrip trip 0 1u IC=0
+Rtrip trip 0 1e12
+Btrip trip 0 I=(v(trip)>2.5 || v(timer)>0.06 || (v(elapsed)>.10 && v(out)<6) || (v(offtime)>.12 && time>.3 && v(out)>1) ? (v(trip)-5)/100 : 0)
+Bpower power 0 V=max(0,v(input,out)*i(Vsense))
+Vqs qs 0 PWL(0 0 .2 0 .20001 5 .8 5)
+Sqs input out qs 0 CONTACT
+Rtrip_bypass trip 0 .00001
+
+.options method=gear reltol=1e-5
+.control
+set wr_singlescale
+set wr_vecnames
+set numdgt=12
+tran 1e-05 0.8 0 1e-05 uic
+wrdata trace.dat v(out) i(Vsource) v(arm) v(trip) v(enabled) i(Vsense) v(power) v(timer)
+quit
+.endc
+.end

@@ -1,0 +1,20 @@
+[
+  {
+    "pack": "extended-rig-simulation",
+    "verified_files": 236,
+    "sha256_manifest": "3da1c24861d1dad722850d39700ac32b22fcad357796d63de02f337b7dfacaa6",
+    "preserved": true
+  },
+  {
+    "pack": "indian-purchase-review",
+    "verified_files": 170,
+    "sha256_manifest": "722f726757067ec932fa910f62a1dee2b04ebb8bd8d16b45ebdb445524930d28",
+    "preserved": true
+  },
+  {
+    "pack": "rig-closure-review",
+    "verified_files": 138,
+    "sha256_manifest": "299fdbc3306125503a80ff8fcec99be4f131b159540c6888d9fd9272dda392a5",
+    "preserved": true
+  }
+]

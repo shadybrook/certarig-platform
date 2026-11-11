@@ -1,0 +1,7 @@
+{
+  "offline_missing_evidence_rejected": true,
+  "offline_corrupt_evidence_rejected": true,
+  "original_evidence_preserved": true,
+  "missing_test_output": "VERIFICATION FAILED: Missing or invalid evidence path: cases/r1_power_normal/circuit.cir",
+  "corrupt_test_output": "VERIFICATION FAILED: Checksum mismatch: cases/r1_power_normal/circuit.cir"
+}

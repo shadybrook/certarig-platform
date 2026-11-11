@@ -1,0 +1,97 @@
+CertaRig r1_combined_fault_estop: bounded functional power stage R1
+* 12V Thevenin supply with 0.3 ohm source/wiring; no SMPS current limit assumed.
+V12 source 0 PWL(0 0 0.005 12 1.4 12)
+Rsrc source raw .3
+Craw raw 0 10u
+Vaux aux 0 PWL(0 0 0.002 5 1.4 5)
+Vadc adcrail 0 PWL(0 0 0.002 3.3 1.4 3.3)
+Vestop estop 0 PWL(0 5 0.35 5 0.3501 0 0.5 0 0.5001 5 1.4 5)
+Vpermit permit 0 PWL(0 0 0.12 0 0.1201 3.3 1.4 3.3)
+Vreset reset 0 PWL(0 0 0.05 0 0.0501 3.3 0.07 3.3 0.0701 0 1.4 0)
+Vhb hb 0 PWL(0 0 0.005 0 0.0051 3.3 0.015 3.3 0.0151 0 0.025 0 0.0251 3.3 0.035 3.3 0.0351 0 0.045 0 0.0451 3.3 0.055 3.3 0.0551 0 0.065 0 0.0651 3.3 0.075 3.3 0.0751 0 0.085 0 0.0851 3.3 0.095 3.3 0.0951 0 0.105 0 0.1051 3.3 0.115 3.3 0.1151 0 0.125 0 0.1251 3.3 0.135 3.3 0.1351 0 0.145 0 0.1451 3.3 0.155 3.3 0.1551 0 0.165 0 0.1651 3.3 0.175 3.3 0.1751 0 0.185 0 0.1851 3.3 0.195 3.3 0.1951 0 0.205 0 0.2051 3.3 0.215 3.3 0.2151 0 0.225 0 0.2251 3.3 0.235 3.3 0.2351 0 0.245 0 0.2451 3.3 0.255 3.3 0.2551 0 0.265 0 0.2651 3.3 0.275 3.3 0.2751 0 0.285 0 0.2851 3.3 0.295 3.3 0.2951 0 0.305 0 0.3051 3.3 0.315 3.3 0.3151 0 0.325 0 0.3251 3.3 0.335 3.3 0.3351 0 0.345 0 0.3451 3.3 0.355 3.3 0.3551 0 0.365 0 0.3651 3.3 0.375 3.3 0.3751 0 0.385 0 0.3851 3.3 0.395 3.3 0.3951 0 0.405 0 0.4051 3.3 0.415 3.3 0.4151 0 0.425 0 0.4251 3.3 0.435 3.3 0.4351 0 0.445 0 0.4451 3.3 0.455 3.3 0.4551 0 0.465 0 0.4651 3.3 0.475 3.3 0.4751 0 0.485 0 0.4851 3.3 0.495 3.3 0.4951 0 0.505 0 0.5051 3.3 0.515 3.3 0.5151 0 0.525 0 0.5251 3.3 0.535 3.3 0.5351 0 0.545 0 0.5451 3.3 0.555 3.3 0.5551 0 0.565 0 0.5651 3.3 0.575 3.3 0.5751 0 0.585 0 0.5851 3.3 0.595 3.3 0.5951 0 0.605 0 0.6051 3.3 0.615 3.3 0.6151 0 0.625 0 0.6251 3.3 0.635 3.3 0.6351 0 0.645 0 0.6451 3.3 0.655 3.3 0.6551 0 0.665 0 0.6651 3.3 0.675 3.3 0.6751 0 0.685 0 0.6851 3.3 0.695 3.3 0.6951 0 0.705 0 0.7051 3.3 0.715 3.3 0.7151 0 0.725 0 0.7251 3.3 0.735 3.3 0.7351 0 0.745 0 0.7451 3.3 0.755 3.3 0.7551 0 0.765 0 0.7651 3.3 0.775 3.3 0.7751 0 0.785 0 0.7851 3.3 0.795 3.3 0.7951 0 0.805 0 0.8051 3.3 0.815 3.3 0.8151 0 0.825 0 0.8251 3.3 0.835 3.3 0.8351 0 0.845 0 0.8451 3.3 0.855 3.3 0.8551 0 0.865 0 0.8651 3.3 0.875 3.3 0.8751 0 0.885 0 0.8851 3.3 0.895 3.3 0.8951 0 0.905 0 0.9051 3.3 0.915 3.3 0.9151 0 0.925 0 0.9251 3.3 0.935 3.3 0.9351 0 0.945 0 0.9451 3.3 0.955 3.3 0.9551 0 0.965 0 0.9651 3.3 0.975 3.3 0.9751 0 0.985 0 0.9851 3.3 0.995 3.3 0.9951 0 1.005 0 1.0051 3.3 1.015 3.3 1.0151 0 1.025 0 1.0251 3.3 1.035 3.3 1.0351 0 1.045 0 1.0451 3.3 1.055 3.3 1.0551 0 1.065 0 1.0651 3.3 1.075 3.3 1.0751 0 1.085 0 1.0851 3.3 1.095 3.3 1.0951 0 1.105 0 1.1051 3.3 1.115 3.3 1.1151 0 1.125 0 1.1251 3.3 1.135 3.3 1.1351 0 1.145 0 1.1451 3.3 1.155 3.3 1.1551 0 1.165 0 1.1651 3.3 1.175 3.3 1.1751 0 1.185 0 1.1851 3.3 1.195 3.3 1.1951 0 1.205 0 1.2051 3.3 1.215 3.3 1.2151 0 1.225 0 1.2251 3.3 1.235 3.3 1.2351 0 1.245 0 1.2451 3.3 1.255 3.3 1.2551 0 1.265 0 1.2651 3.3 1.275 3.3 1.2751 0 1.285 0 1.2851 3.3 1.295 3.3 1.2951 0 1.305 0 1.3051 3.3 1.315 3.3 1.3151 0 1.325 0 1.3251 3.3 1.335 3.3 1.3351 0 1.345 0 1.3451 3.3 1.355 3.3 1.3551 0 1.365 0 1.3651 3.3 1.375 3.3 1.3751 0 1.385 0 1.3851 3.3 1.395 3.3 1.3951 0 1.4 0)
+Rpgfilter raw pgfiltered 10k
+Cpgfilter pgfiltered 0 10n
+Bpg pg 0 V=(v(aux)>4.5 && v(adcrail)>3.0 && v(pgfiltered)>10.0 ? 5 : 0)
+Rhblag hb hblag 1k
+Chblag hblag 0 100n
+Bedge edge 0 V=(abs(v(hb)-v(hblag))>.5 ? 5 : 0)
+Rwd aux wd 288.539k
+Cwd wd 0 1.00000002834e-06 IC=0
+Bwdreset wd 0 I=(v(edge)>2.5 ? v(wd)/10 : 0)
+Cseen seen 0 10n IC=0
+Rseen seen 0 1e10
+Bseen seen 0 I=(v(aux)<4.5 ? v(seen)/100 : (v(edge)>2.5 ? (v(seen)-5)/100 : 0))
+Bwdok wdok 0 V=(v(seen)>2.5 && v(wd)<2.5 && v(aux)>4.5 ? 5 : 0)
+Rreset reset resetlag 1k
+Creset resetlag 0 1u
+Bresetedge resetedge 0 V=(v(reset)-v(resetlag)>.5 ? 5 : 0)
+Carm arm 0 1u IC=0
+Rarm arm 0 1e10
+Barm arm 0 I=(v(estop)<2.5 || v(pg)<2.5 || v(wdok)<2.5 || v(itrip)>2.5 ? v(arm)/100 : (v(resetedge)>2.5 && v(permit)<.5 ? (v(arm)-5)/100 : 0))
+Bdrive drive 0 V=(v(arm)>2.5 && v(permit)>2.4 && v(aux)>4.5 ? 5 : 0)
+Rkdelay drive kdelay 10k
+Ckdelay kdelay 0 1.5u
+Barmbuffer armcmd 0 V=(v(arm)>2.5 ? 5 : 0)
+Rk0 armcmd k0delay 10k
+Ck0 k0delay 0 1.5u
+Sestop raw mid k0delay 0 CONTACT
+* Continuous conductance transition avoids an ideal-contact discontinuity.
+Bmaster mid bus I=v(mid,bus)*(1e-10+(1/.03-1e-10)*(1+tanh((v(kdelay)-2.5)/.1))/2)
+Cmaster mid bus 100p
+Cestop raw mid 100p
+Rbleed bus 0 10k
+Cbus bus 0 10u
+Rdriver drive gatein 50
+Rgate gatein gate 100
+Rpulldown gate 0 47k
+Cgate gate 0 3n
+Rweld mid bus .001
+Rpump bus pumptop 20
+Lpump pumptop pumpdrain 0.01
+Spump pumpdrain pumpsource gate 0 MOS
+Cpumposs pumpdrain pumpsource 1n
+Rpumpsense pumpsource 0 .05
+Rpumpshort pumpdrain pumpsource .001
+Dpumpfly pumpdrain pumpz FLY
+Dpumpz bus pumpz ZENER
+Dpumpav 0 pumpdrain AVAL
+Rvalve bus valvetop 24
+Lvalve valvetop valvedrain 0.2
+Svalve valvedrain valvesource gate 0 MOS
+Cvalveoss valvedrain valvesource 1n
+Rvalvesense valvesource 0 .05
+Dvalvefly valvedrain valvez FLY
+Dvalvez bus valvez ZENER
+Dvalveav 0 valvedrain AVAL
+Citrip itrip 0 1u IC=0
+Ritrip itrip 0 1e10
+Bitrip itrip 0 I=(v(itrip)>2.5 || v(pumpsource)>.2 || v(valvesource)>.2 ? (v(itrip)-5)/100 : (v(resetedge)>2.5 && v(permit)<.5 ? v(itrip)/100 : 0))
+* Fast OC veto exists independently of slow relay contact motion.
+Bocgate gatein 0 I=(v(itrip)>2.5 ? v(gatein)/.1 : 0)
+* Actual isolated voltage-feedback interface: current-limited optocoupler LED,
+* reverse LED diode, bounded CTR equivalent and local 3.3V pullup.
+Rled bus ledtop 1.8k
+Vledsense ledtop led 0
+Dled led 0 LED
+Dledreverse 0 led REV
+Rfb adcrail feedback 10k
+Cfb feedback 0 1n
+Bphoto feedback 0 I=0.2*max(0,i(Vledsense))*v(feedback)/sqrt(v(feedback)*v(feedback)+.0025)
+
+.model CONTACT SW(Ron=.03 Roff=1e10 Vt=2.5 Vh=.1)
+.model MOS SW(Ron=.10 Roff=1e10 Vt=2.5 Vh=.1)
+.model FLY D(Is=1n Rs=.05 N=1.5 Cjo=50p BV=100)
+.model ZENER D(Is=1p Rs=.2 N=1 BV=20 IBV=1m Cjo=30p)
+.model AVAL D(Is=1p Rs=.1 N=1 BV=100 IBV=1m Cjo=30p)
+.model LED D(Is=1e-20 N=1.8 Rs=5 Cjo=20p)
+.model REV D(Is=1n N=1.2 Rs=.05)
+.options method=gear reltol=1e-4 abstol=1n
+.control
+set wr_singlescale
+set wr_vecnames
+set numdgt=12
+tran 0.0001 1.4 0 0.0001 uic
+wrdata trace.dat v(permit) v(estop) v(arm) v(wdok) v(bus) v(gate) i(lpump) i(lvalve) v(pumpdrain) v(valvedrain) v(feedback) v(adcrail) v(aux) v(itrip) v(pumpsource) v(valvesource)
+quit
+.endc
+.end

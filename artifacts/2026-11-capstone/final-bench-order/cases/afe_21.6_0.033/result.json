@@ -1,0 +1,29 @@
+{
+  "case": {
+    "name": "afe_21.6_0.033",
+    "family": "afe",
+    "params": {
+      "supply": 21.6,
+      "current": 0.033
+    },
+    "unsafe": false
+  },
+  "assessment": {
+    "checks": {
+      "adc_pin_absolute_budget": true,
+      "burden_below_half_watt": true,
+      "host_poweroff_injection_bounded": true,
+      "overrange_is_invalid": true
+    },
+    "metrics": {
+      "pin_max_V": 2.523131070437,
+      "rail_min_V": 4.600176529512,
+      "host_off_pin_V": 0.033
+    },
+    "criteria_pass": true
+  },
+  "samples": 20083,
+  "horizon": 0.04,
+  "netlist_sha256": "1b145d7abccdde8491a8ab7d3a54413384ca8658616e8143b5e0e27661e50cdc",
+  "experiment_ok": true
+}

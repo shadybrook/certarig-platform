@@ -1,0 +1,20 @@
+[
+  {
+    "retained_filename": "LM5069.pdf",
+    "sha256": "d60d8106a6e8113900ff8b9576dd959942fa7169742baf0beeb30684d4d64681",
+    "bytes": 2202582,
+    "distributed_in_pack": false
+  },
+  {
+    "retained_filename": "Burkert6213.pdf",
+    "sha256": "05d3fbf4a32234e7b5fb05c7a54e809172b4500aa189871352ddbd694453087c",
+    "bytes": 2191716,
+    "distributed_in_pack": false
+  },
+  {
+    "retained_filename": "IXTK90N25L2_mirror.pdf",
+    "sha256": "41e70b003d558fec035d7b1c4837000972e12c7ff7c6190d4f636244a8edf28f",
+    "bytes": 7626258,
+    "distributed_in_pack": false
+  }
+]

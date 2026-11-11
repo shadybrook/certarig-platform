@@ -1,0 +1,30 @@
+{
+  "name": "r1_flow_pi_off",
+  "family": "flow",
+  "revision": "R1",
+  "params": {
+    "fault": "pi_off"
+  },
+  "diagnostic": false,
+  "process_exit": 0,
+  "samples": 10287,
+  "wall_seconds": 0.172,
+  "netlist_sha256": "cbcb2fb7d0e43e02049c6653bd749b0f6a43d2f926f91e3716685f2c43dafa3e",
+  "checks": [
+    {
+      "check": "logic_voltage_safe",
+      "passed": true
+    },
+    {
+      "check": "LED_current_bounded",
+      "passed": true
+    }
+  ],
+  "metrics": {
+    "logic_max_v": 0.0,
+    "logic_min_v": 0.0,
+    "led_max_a": 0.005483808212369
+  },
+  "criteria_pass": true,
+  "reused_trace": true
+}

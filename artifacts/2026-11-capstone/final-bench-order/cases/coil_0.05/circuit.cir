@@ -1,0 +1,27 @@
+CR-EXT-R1 coil coil_0.05
+V24 src 0 26.4
+Rcoil src mid 44
+Lcoil mid drain 0.05
+Vgate gate 0 PWL(0 5 .3 5 .30001 0 1 0)
+Sload drain 0 gate 0 SW
+Coss drain 0 1n
+.model SW SW(Ron=.154 Roff=1e12 Vt=2.5 Vh=.05)
+.model D D(Is=1n N=1.5 Rs=.05)
+.model Z D(Is=1p N=1 Rs=.1 BV=28 IBV=1m)
+.model AV D(Is=1p N=1 Rs=.1 BV=100 IBV=1m)
+Dav 0 drain AV
+Dfly drain z D
+Dz src z Z
+BcoilV cv 0 V=v(src,drain)
+BclampPower cp 0 V=max(0,v(drain,src)*i(Dav))
+
+.options method=gear reltol=1e-5
+.control
+set wr_singlescale
+set wr_vecnames
+set numdgt=12
+tran 0.0001 1 0 0.0001
+wrdata trace.dat i(Lcoil) v(drain) v(cv)
+quit
+.endc
+.end

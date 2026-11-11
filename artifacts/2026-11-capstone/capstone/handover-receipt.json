@@ -1,0 +1,41 @@
+{
+  "implementation_commit": "df05bc37dde5207347b95ce4be6e25d87aa69510",
+  "implementation_branch": "capstone/connected-workflow-2026-11-09",
+  "base_commit": "d81c3c099b79a9cf86ad1d7ecec7b96e333f84c2",
+  "worktree_clean": true,
+  "report_pages": 18,
+  "report_fonts": [
+    "/BAAAAA+TimesNewRomanPSMT",
+    "/CAAAAA+TimesNewRomanPSMT",
+    "/DAAAAA+TimesNewRomanPS-ItalicMT",
+    "/EAAAAA+TimesNewRomanPS-BoldMT",
+    "/FAAAAA+TimesNewRomanPS-BoldMT"
+  ],
+  "toc_verified": {
+    "1": 4,
+    "2": 7,
+    "3": 10,
+    "4": 13,
+    "5": 14,
+    "6": 15
+  },
+  "report_margins_inches": 1,
+  "report_body_pt": 12,
+  "report_heading_pt": 14,
+  "report_line_spacing": 1.5,
+  "slides": 10,
+  "timed_speaker_notes": 10,
+  "software_tests": 247,
+  "coverage_percent": 90.03,
+  "browser_tests": 7,
+  "accelerated_soak_passed": true,
+  "positive_exports_verified": 2,
+  "corrupted_copy_rejected": true,
+  "patch_applies_to_base": true,
+  "git_bundle_verified": true,
+  "visual_review": "All pages and slides inspected; final architecture label repaired",
+  "human_spoken_rehearsal": "pending",
+  "supervisor_update": "draft, not sent",
+  "new_capstone_video": "pending",
+  "physical_or_live_model_validation": "not performed"
+}

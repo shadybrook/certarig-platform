@@ -1,0 +1,44 @@
+{
+  "date": "2026-11-09",
+  "scope": "Draft access repair and phase commitment audit",
+  "source_commit": "2f25d66aa1e4be1387b91faec33f4c2ea07a156f",
+  "changes": [
+    "Responsive Studio navigation/content for narrow panels",
+    "Fresh configuration/evidence directory for every browser suite",
+    "Approval inbox test targets its exact approval ID"
+  ],
+  "validation": {
+    "browser_suite_first_fresh_run": {
+      "passed": 7,
+      "failed": 0,
+      "seconds": 22.7
+    },
+    "browser_suite_repeat": {
+      "passed": 7,
+      "failed": 0,
+      "seconds": 21.8
+    },
+    "first_run_bundle_offline_verification": {
+      "ok": true,
+      "files": 13
+    },
+    "pptx_integrity": "OK; 10 slides",
+    "pdf_header": "%PDF-1.7",
+    "review_images": {
+      "slides": 10,
+      "report_pages": 18
+    },
+    "hardware_tests": "not performed",
+    "live_provider_calls": "not performed"
+  },
+  "retained_scope_sources": "sources.json",
+  "processes": {
+    "simulator": "http://127.0.0.1:18090/",
+    "readable_review": "http://127.0.0.1:18091/access-review/"
+  },
+  "initial_regression_findings": [
+    "Durable approval history made the old broad locator ambiguous",
+    "Persisted commissioning state contaminated later suite runs; fixture state is now isolated"
+  ],
+  "historical_handover": "Earlier capstone ZIP/source bundle remain at the preceding revision; Studio-access-and-test-isolation.patch adds this access fix."
+}

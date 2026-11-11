@@ -1,0 +1,43 @@
+Using Python 3.14.3 environment at /Users/chintandedhia/Documents/Codex/2026-11-09/okay-we-should-start-working-on/work/capstone-clean-install
+Resolved 25 packages in 678ms
+Prepared 1 package in 686ms
+Installed 25 packages in 52ms
+ + attrs==26.1.0
+ + certarig==0.4.0 (from file:///Users/chintandedhia/Documents/Codex/2026-11-09/okay-we-should-start-working-on/work/certarig-capstone)
+ + coverage==7.17.2
+ + hypothesis==6.170.15
+ + iniconfig==2.3.1
+ + jsonschema==4.26.0
+ + jsonschema-specifications==2025.9.1
+ + librt==0.16.0
+ + mypy==1.20.2
+ + mypy-extensions==1.2.0
+ + packaging==26.3
+ + paho-mqtt==2.2.0
+ + pathspec==1.1.1
+ + pluggy==1.7.0
+ + pygments==2.21.0
+ + pytest==8.4.2
+ + pytest-cov==7.1.0
+ + pyyaml==6.0.3
+ + referencing==0.37.0
+ + rpds-py==2026.9.1
+ + ruff==0.17.4
+ + sortedcontainers==2.4.0
+ + types-jsonschema==4.26.0.20261006
+ + types-pyyaml==6.0.12.20261103
+ + typing-extensions==4.16.0
+usage: certarig [-h] {edge,sim,agent,evidence} ...
+
+CertaRig agentic test-operations platform
+
+positional arguments:
+  {edge,sim,agent,evidence}
+    edge                run the CertaRig Edge node
+    sim                 digital twin: serve, run scenarios, run the procedure
+                        library
+    agent               LLM agent that operates the rig through the Edge API
+    evidence            pull, list and verify checksummed evidence bundles
+
+options:
+  -h, --help            show this help message and exit

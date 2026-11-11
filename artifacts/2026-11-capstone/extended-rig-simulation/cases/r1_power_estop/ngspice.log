@@ -1,0 +1,17 @@
+
+Note: No compatibility mode selected!
+
+
+Circuit: certarig r1_power_estop: bounded functional power stage r1
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+Operating point simulation skipped by 'uic',
+  now using transient initial conditions.
+ Reference value :  2.85018e-01
+ Reference value :  3.55874e-01
+ Reference value :  3.79251e-01
+ Reference value :  8.12908e-01
+No. of Data Rows : 49132
+ngspice-47 done

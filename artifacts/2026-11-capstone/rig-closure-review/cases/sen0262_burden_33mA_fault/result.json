@@ -1,0 +1,34 @@
+{
+  "case": {
+    "name": "sen0262_burden_33mA_fault",
+    "family": "loop",
+    "params": {
+      "burden": 120,
+      "isolated": false,
+      "current": 0.033
+    },
+    "expected": "reject",
+    "reason": "120ohm input can exceed the 3.3V domain; TP5551 clipping/protection is not modeled"
+  },
+  "original_control": true,
+  "assessment": {
+    "checks": {
+      "ADC_or_120R_input_within_rail_plus_0.3V": false,
+      "burden_input_within_3.6V": false,
+      "burden_below_half_watt": true,
+      "transmitter_reaches_requested_current": true
+    },
+    "metrics": {
+      "raw_max_V": 3.943888549795,
+      "pin_max_V": 3.930462341291,
+      "final_current_mA": 33.0,
+      "burden_max_W": 0.1296188074434,
+      "off_injection_A": null
+    },
+    "criteria_pass": false
+  },
+  "samples": 20008,
+  "horizon_s": 0.04,
+  "netlist_sha256": "8426e45fb996f992452cae475c770ed8fd2ea222c753cc3cf97cf29ded51f81a",
+  "experiment_ok": true
+}

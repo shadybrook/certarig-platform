@@ -1,0 +1,22 @@
+{
+  "name": "drv8871_3.6A_continuous_claim",
+  "family": "thermal_driver",
+  "params": {
+    "amps": 3.6
+  },
+  "expected": "reject",
+  "reason": "TI specifies peak current; sustained conduction exceeds recommended junction envelope",
+  "checks": {
+    "junction_below_125C_conservative_design_limit": false,
+    "load_above_6V": true
+  },
+  "metrics": {
+    "junction_max_C": 340.95064,
+    "load_min_V": 9.966
+  },
+  "criteria_pass": false,
+  "samples": 1508,
+  "horizon_s": 15,
+  "netlist_sha256": "7a91a06dc2159da965f527aaad895107e3c1eb50d53cf3f04e635dc325e5f760",
+  "matched_expectation": true
+}

@@ -1,0 +1,38 @@
+{
+  "case": {
+    "name": "overload_high_supply_limit_corner",
+    "family": "start_power",
+    "params": {
+      "fault": "overload",
+      "supply": 13.2,
+      "limit": 4.32
+    },
+    "original": "",
+    "outcome": "fault"
+  },
+  "original_control": false,
+  "assessment": {
+    "checks": {
+      "measured_pump_shunt_in_range": true,
+      "source_within_5A": true,
+      "actuator_voltage_below_18V": true,
+      "peak_current_limited": true,
+      "fault_latches": true,
+      "permit_retry_does_not_restart": true
+    },
+    "metrics": {
+      "supply_peak_A": 4.011795871445,
+      "pump_peak_A": 4.011795871445,
+      "pump_shunt_peak_V": 0.2005897935723,
+      "trip_peak_V": 4.9999999995,
+      "start_output_min_V": 12.14574898785,
+      "efuse_energy_J": 0.10708393756558326,
+      "silicon_SOA_qualified": false
+    },
+    "passed": true
+  },
+  "samples": 30350,
+  "horizon_s": 0.3,
+  "netlist_sha256": "150fc6f0d57740fc19f0aa07979c44051b7d079e45413ed52bfaa75e21c762b4",
+  "experiment_ok": true
+}

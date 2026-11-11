@@ -1,0 +1,21 @@
+CR-EXT-R1 supervised flow flow_eol_open
+Vfield field 0 5
+Rpull field line 4700
+Rwire line remote 1
+Reol remote 0 1000000000000.0
+Rseries remote sink 2200
+Rnpn sink 0 .001
+Rinput line protected 10k
+Dclamp 0 protected Z
+.model Z D(Is=1p N=1 Rs=.2 BV=4.3 IBV=1m)
+
+.options method=gear reltol=1e-5
+.control
+set wr_singlescale
+set wr_vecnames
+set numdgt=12
+tran 1e-05 0.01 0 1e-05
+wrdata trace.dat v(line) v(protected) i(Vfield)
+quit
+.endc
+.end

@@ -1,0 +1,43 @@
+CertaRig stocked-product loop envelope: protected_100R_4mA
+* Bounded equivalents, not a SEN0262 or MAX14626 vendor macromodel.
+* 120ohm cases examine the SEN0262 burden INPUT, not its TP5551 output.
+Vloop loop 0 24
+Btx loop raw I=min(min(0.004,0.033),max(0,(v(loop)-v(raw)-11)/55))
+Rburden raw 0 100
+Vrail rail 0 3.3
+
+* Candidate 100ohm receiver: 10k series, bounded 2.5V shunt clamp,
+* TMUX1511 4.5ohm ON envelope, 2uA conservative OFF leakage.
+* Reference/diodes/PG implementation and power-off timing remain unselected.
+Rseries raw pre 10k
+Vinst inst 0 5
+Rbias inst ref 1k
+Dref 0 ref REFERENCE
+.model REFERENCE D(Is=1p N=1 Rs=.8 BV=2.5 IBV=80u)
+Dupper pre ref CLAMP
+Dlower 0 pre CLAMP
+.model CLAMP D(Is=1e-7 N=1.05 Rs=.5 Cjo=10p)
+Ben en 0 V=(v(rail)>3 ? 5 : 0)
+Smux pre pin en 0 MUX
+.model MUX SW(Ron=4.5 Roff=1e12 Vt=2.5 Vh=.05)
+Boff 0 pin I=(v(en)<2.5 ? 2u : 0)
+Rdis pin 0 33k
+Cpin pin 0 10p
+
+Radc pin 0 6Meg
+Dhi pin rail ESD
+Dlo 0 pin ESD
+.model ESD D(Is=1p N=1.3 Rs=10 Cjo=4p)
+Bhead head 0 V=v(loop)-v(raw)-11-abs(i(Vloop))*55
+Bpower power 0 V=v(raw)*v(raw)/100
+
+.options method=gear reltol=1e-5
+.control
+set wr_singlescale
+set wr_vecnames
+set numdgt=12
+tran 2e-06 0.04 0 2e-06
+wrdata trace.dat v(raw) v(pin) v(rail) v(head) v(power) i(Vrail) i(Vloop)
+quit
+.endc
+.end

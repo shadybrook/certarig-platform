@@ -1,0 +1,14 @@
+
+Note: No compatibility mode selected!
+
+
+Circuit: certarig revised startup envelope: softstart_high_supply_large_cap
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+Operating point simulation skipped by 'uic',
+  now using transient initial conditions.
+ Reference value :  1.80733e-01
+No. of Data Rows : 30353
+ngspice-47 done

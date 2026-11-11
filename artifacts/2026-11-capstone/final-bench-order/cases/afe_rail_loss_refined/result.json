@@ -1,0 +1,29 @@
+{
+  "case": {
+    "name": "afe_rail_loss_refined",
+    "family": "afe",
+    "params": {
+      "fault": "rail_loss",
+      "step": 2e-07
+    },
+    "unsafe": false
+  },
+  "assessment": {
+    "checks": {
+      "adc_pin_absolute_budget": true,
+      "burden_below_half_watt": true,
+      "host_poweroff_injection_bounded": true,
+      "signal_disconnected_after_loss": true
+    },
+    "metrics": {
+      "pin_max_V": 1.52922722359,
+      "rail_min_V": 1.647308450859e-05,
+      "host_off_pin_V": 0.033
+    },
+    "criteria_pass": true
+  },
+  "samples": 200111,
+  "horizon": 0.04,
+  "netlist_sha256": "be9ef70b459ebfdb45ff6a2d1f81e36781a84469b9944821a8ab78c5057d28a1",
+  "experiment_ok": true
+}

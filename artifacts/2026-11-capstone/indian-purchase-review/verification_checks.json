@@ -1,0 +1,54 @@
+{
+  "offline_replay": true,
+  "scenarios": 39,
+  "calculations": 14,
+  "fault_injections": [
+    {
+      "check": "missing_required_trace",
+      "rejected": true,
+      "detail": "Missing/corrupt evidence: cases/integrated_estop/trace.csv.gz"
+    },
+    {
+      "check": "corrupted_log",
+      "rejected": true,
+      "detail": "Missing/corrupt evidence: cases/integrated_estop/ngspice.log"
+    },
+    {
+      "check": "rehashed_incomplete_transient",
+      "rejected": true,
+      "detail": "Invalid trace"
+    }
+  ],
+  "browser": {
+    "page_opened": true,
+    "visible_primary_cards": 20,
+    "visible_alternative_cards": 4,
+    "embedded_plot_loaded": true,
+    "horizontal_overflow": false
+  },
+  "code_checks": "Ruff lint/format for new procurement tooling; application regression suite not rerun because no application code changed",
+  "checksum_limit": "Consistency only; replacing both checksums and content is not prevented",
+  "numerical_refinement_comparisons": [
+    {
+      "baseline": "integrated_estop",
+      "refined": "integrated_estop_refined",
+      "metric": "peak_drain_v",
+      "relative_difference": 8.816968516046791e-09,
+      "below_one_percent": true
+    },
+    {
+      "baseline": "pump_input_10.8V_start3x",
+      "refined": "pump_input_refined",
+      "metric": "operating_input_min_V",
+      "relative_difference": 7.691967506230344e-11,
+      "below_one_percent": true
+    },
+    {
+      "baseline": "protected_pi_poweroff",
+      "refined": "protected_pi_poweroff_refined",
+      "metric": "off_injection_A",
+      "relative_difference": 1.6767700002645144e-10,
+      "below_one_percent": true
+    }
+  ]
+}

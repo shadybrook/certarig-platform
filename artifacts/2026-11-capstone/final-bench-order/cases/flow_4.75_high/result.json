@@ -1,0 +1,27 @@
+{
+  "case": {
+    "name": "flow_4.75_high",
+    "family": "flow",
+    "params": {
+      "level": "high",
+      "supply": 4.75
+    },
+    "unsafe": false
+  },
+  "assessment": {
+    "checks": {
+      "healthy_low_or_high_is_valid_zero_or_pulse": true,
+      "conditioned_field_input_bounded": true
+    },
+    "metrics": {
+      "line_V": 3.231395799552,
+      "ratio": 0.6802938525372632,
+      "valid": true
+    },
+    "criteria_pass": true
+  },
+  "samples": 1008,
+  "horizon": 0.01,
+  "netlist_sha256": "c44a5cb04e04efaa05899043b84a50b9f23c70d497d01157de783fa2bfdca71f",
+  "experiment_ok": true
+}

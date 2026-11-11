@@ -1,0 +1,17 @@
+{
+  "local_commit": "9412482a15dfa4459edff2437c9d619656e0dcf5",
+  "branch": "capstone/connected-workflow-2026-11-09",
+  "clean_worktree": true,
+  "checks": [
+    "ruff check tools/bench_spec_validation",
+    "ruff format --check tools/bench_spec_validation",
+    "compileall",
+    "offline raw-sample/model replay",
+    "4 damaged-evidence rejection checks",
+    "PDF render review of all23pages",
+    "browser order filtering and persistent shortlist, cleared after test"
+  ],
+  "full_application_regression_rerun": false,
+  "application_control_changes": false,
+  "no_hardware_connection": true
+}

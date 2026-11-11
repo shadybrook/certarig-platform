@@ -1,0 +1,34 @@
+{
+  "case": {
+    "name": "receiver_fullscale_26.4V",
+    "family": "loop",
+    "params": {
+      "supply": 26.4
+    },
+    "original": "",
+    "outcome": "normal"
+  },
+  "original_control": false,
+  "assessment": {
+    "checks": {
+      "ADC_or_120R_input_within_rail_plus_0.3V": true,
+      "burden_below_half_watt": true,
+      "transmitter_reaches_requested_current": true,
+      "valid_calibrated_reading": true
+    },
+    "metrics": {
+      "raw_max_V": 1.995340601079,
+      "pin_max_V": 1.52919103605,
+      "final_current_mA": 20.0,
+      "burden_max_W": 0.03981384114315,
+      "off_injection_A": null,
+      "inferred_current_A": 0.019999999825109582,
+      "observation_valid": true
+    },
+    "passed": true
+  },
+  "samples": 20008,
+  "horizon_s": 0.04,
+  "netlist_sha256": "24de71068a063784facc1082be8351fe5ab19ce70117eb480ea97909c24c7d2a",
+  "experiment_ok": true
+}

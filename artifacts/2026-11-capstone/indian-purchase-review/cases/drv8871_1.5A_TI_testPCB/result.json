@@ -1,0 +1,22 @@
+{
+  "name": "drv8871_1.5A_TI_testPCB",
+  "family": "thermal_driver",
+  "params": {
+    "amps": 1.5
+  },
+  "expected": "within_envelope",
+  "reason": "",
+  "checks": {
+    "junction_below_125C_conservative_design_limit": true,
+    "load_above_6V": true
+  },
+  "metrics": {
+    "junction_max_C": 92.248375,
+    "load_min_V": 11.1525
+  },
+  "criteria_pass": true,
+  "samples": 1508,
+  "horizon_s": 15,
+  "netlist_sha256": "1fd702e8712a57d8353dd792f8fb11a22696a561149ac3dda3a8437a6656c279",
+  "matched_expectation": true
+}

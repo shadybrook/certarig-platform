@@ -1,0 +1,27 @@
+{
+  "review_date": "2026-11-09",
+  "sources": [
+    {
+      "source": "Phase 1 retained proposal",
+      "path": "/Users/chintandedhia/Documents/Codex/2026-07-30/codex-threads-019fa95e-afe4-7e10-b92e/work/phase1/staging/CertaRig-Phase-1-Submission-sanitized.docx",
+      "sha256": "39c9594127a3b35164a3a40122a77166f16793f69656a32ac2804b301ae81518"
+    },
+    {
+      "source": "Phase 2 final report",
+      "path": "/Users/chintandedhia/Documents/Codex/2026-08-24/use-data-analytics-and-invoke-build-2/outputs/CertaRig_Phase_2_Report_Final_Submission.docx",
+      "sha256": "b3015c43bde8d8792054246591f68937335dd7627a34722464401e12a07bc72a"
+    },
+    {
+      "source": "Phase 3 final report",
+      "path": "/Users/chintandedhia/Documents/Codex/2026-08-24/use-data-analytics-and-invoke-build-2/output/phase3_submission_2026-09-17/report/CertaRig_Phase_3_Report_2023EB03005.docx",
+      "sha256": "1ae1450b3bf733e868a5d696196808c56bd94bcdb2a2d1e8250c804d6ff181bb"
+    },
+    {
+      "source": "September inventory",
+      "path": "/Users/chintandedhia/Documents/Codex/2026-08-24/use-data-analytics-and-invoke-build-2/output/CertaRig_Phase_3_Hardware_Inventory_Register_2026-09-06.md",
+      "sha256": "2be052321dc804a86d72b9ab0f6a2dbadcc482fe061240b91dc8d653ae9bb291"
+    }
+  ],
+  "current_inventory_correction": "User confirms no pump, solenoid valve, real pressure/flow/temperature sensors or spare microSD card on 9 November 2026.",
+  "submission_boundary": "Local retained copies reviewed. Blank supervisor blocks and future-work prose do not prove academic approval of a scope revision."
+}

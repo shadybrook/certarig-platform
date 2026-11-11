@@ -1,0 +1,31 @@
+{
+  "case": {
+    "name": "power_estop",
+    "family": "power",
+    "params": {
+      "fault": "estop"
+    },
+    "unsafe": false
+  },
+  "assessment": {
+    "checks": {
+      "fault_does_not_restart": true,
+      "pre_fault_actuation_was_observed": true,
+      "pass_current_bounded": true,
+      "pass_power_bounded": true,
+      "regulated_forward_SOA_rectangle": true
+    },
+    "metrics": {
+      "output_max_V": 12.76744844623,
+      "pass_peak_A": 1.796233671311,
+      "pass_peak_W": 10.93307780846,
+      "tail_voltage_max_V": 7.993531112275e-07,
+      "pass_energy_J": 0.11173411959642834
+    },
+    "criteria_pass": true
+  },
+  "samples": 80470,
+  "horizon": 0.8,
+  "netlist_sha256": "8451c780b19d6395ef1d6cef3b77a854c6017cfef7f31cee01da5c61612ce138",
+  "experiment_ok": true
+}

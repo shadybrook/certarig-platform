@@ -1,0 +1,14 @@
+{
+  "ok": false,
+  "files": 12,
+  "missing": [],
+  "mismatched": [
+    "procedure_runs/run_20261109T073709_fac4e5/20261109T073709097787Z_thermal_soak.csv"
+  ],
+  "errors": [
+    "missing or corrupt manifest artifact: procedure_runs/run_20261109T073709_fac4e5/20261109T073709097787Z_thermal_soak.csv",
+    "missing or corrupt raw recording: procedure_runs/run_20261109T073709_fac4e5/20261109T073709097787Z_thermal_soak.csv"
+  ],
+  "unlisted": [],
+  "zip": "/Users/chintandedhia/Documents/Codex/2026-11-09/okay-we-should-start-working-on/outputs/capstone/expected-failure/intentionally_corrupted_COPY.zip"
+}

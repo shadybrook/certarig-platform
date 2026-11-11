@@ -1,0 +1,26 @@
+{
+  "case": {
+    "name": "flow_eol_open",
+    "family": "flow",
+    "params": {
+      "level": "eol_open"
+    },
+    "unsafe": false
+  },
+  "assessment": {
+    "checks": {
+      "healthy_low_or_high_is_valid_zero_or_pulse": true,
+      "conditioned_field_input_bounded": true
+    },
+    "metrics": {
+      "line_V": 1.594696907981,
+      "ratio": 0.3189393815962,
+      "valid": false
+    },
+    "criteria_pass": true
+  },
+  "samples": 1008,
+  "horizon": 0.01,
+  "netlist_sha256": "9357e5eaf6d5acb014c98f44cac62265785246bb9df273048a37fa44b653b843",
+  "experiment_ok": true
+}

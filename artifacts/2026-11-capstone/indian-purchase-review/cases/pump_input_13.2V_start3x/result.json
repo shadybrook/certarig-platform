@@ -1,0 +1,24 @@
+{
+  "name": "pump_input_13.2V_start3x",
+  "family": "pump_input",
+  "params": {
+    "supply": 13.2,
+    "startup": 3
+  },
+  "expected": "within_envelope",
+  "reason": "",
+  "checks": {
+    "input_6_to_18V": true,
+    "steady_startup_demand_below_5A": true
+  },
+  "metrics": {
+    "operating_input_min_V": 11.85113815198,
+    "operating_source_max_A": 4.496206160075,
+    "connection_inrush_peak_A": 4.496206160075
+  },
+  "criteria_pass": true,
+  "samples": 15019,
+  "horizon_s": 0.15,
+  "netlist_sha256": "bedb0fc8464088d14ca18f11e13d84cd4619d821b06069df8b3c0b3fa222ec01",
+  "matched_expectation": true
+}

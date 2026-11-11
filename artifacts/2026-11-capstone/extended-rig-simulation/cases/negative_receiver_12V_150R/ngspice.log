@@ -1,0 +1,33 @@
+
+Note: No compatibility mode selected!
+
+
+Circuit: certarig negative_receiver_12v_150r: sensor loop / adc protection unprotected
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+loop                                        12
+raw                                    1.98675
+rail                                       3.3
+inst                                         5
+pin                                    1.98675
+headroom                             0.0132454
+power                                0.0263146
+bburden_power#branch                         0
+bheadroom#branch                             0
+vloop#branch                        -0.0132454
+vinst#branch                                 0
+vrail#branch                      -2.31322e-12
+
+
+No. of Data Rows : 20008
+ngspice-47 done
+Note: Starting dynamic gmin stepping
+Note: Dynamic gmin stepping completed

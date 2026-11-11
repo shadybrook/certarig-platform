@@ -1,0 +1,2326 @@
+{
+  "engine": "******\n** ngspice-47 : Circuit level simulation program\n** Compiled with KLU Direct Linear Solver\n** The U. C. Berkeley CAD Group\n** Copyright 1985-1994, Regents of the University of California.\n** Copyright 2001-2026, The ngspice team.\n** Please get your ngspice manual from https://ngspice.sourceforge.io/docs.html\n** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html\n******",
+  "model_kind": "Explicit behavioral IC equivalents plus R/L/diode/switch circuit models; no manufacturer macromodel claim",
+  "physical_validation": false,
+  "procurement_release": false,
+  "construction_release": false,
+  "results": [
+    {
+      "name": "negative_estop_auto_restart",
+      "family": "power",
+      "revision": "UNPROTECTED",
+      "params": {
+        "fault": "estop"
+      },
+      "diagnostic": true,
+      "process_exit": 0,
+      "samples": 45791,
+      "wall_seconds": 3.148,
+      "netlist_sha256": "6f2e5eddacd224ea5fd32b5c64d95fe68e22809ec186f0355906f4ebfbe9bb70",
+      "checks": [
+        {
+          "check": "startup_no_drive",
+          "passed": true
+        },
+        {
+          "check": "run_has_expected_load_response",
+          "passed": true
+        },
+        {
+          "check": "drain_voltage_below_70V_model_design_limit",
+          "passed": true
+        },
+        {
+          "check": "fault_removes_current",
+          "passed": true
+        },
+        {
+          "check": "release_does_not_restart",
+          "passed": false
+        },
+        {
+          "check": "feedback_is_3V3_bounded",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "peak_drain_v": 33.06188029285,
+        "min_bus_v": -0.3064619303939,
+        "peak_pump_a": 0.5830138629254,
+        "peak_valve_a": 0.482273611207,
+        "peak_shunt_v": 0.1769205348218
+      },
+      "criteria_pass": false
+    },
+    {
+      "name": "negative_no_suppression",
+      "family": "power",
+      "revision": "UNPROTECTED",
+      "params": {
+        "no_suppression": true
+      },
+      "diagnostic": true,
+      "process_exit": 0,
+      "samples": 49950,
+      "wall_seconds": 3.081,
+      "netlist_sha256": "f966eeee1360caa293b665b90b3e2fe03082b91aa094f3dbb98720e5a1af4fee",
+      "checks": [
+        {
+          "check": "startup_no_drive",
+          "passed": true
+        },
+        {
+          "check": "run_has_expected_load_response",
+          "passed": true
+        },
+        {
+          "check": "drain_voltage_below_70V_model_design_limit",
+          "passed": false
+        },
+        {
+          "check": "permit_off_removes_current",
+          "passed": true
+        },
+        {
+          "check": "feedback_is_3V3_bounded",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "peak_drain_v": 100.2365227316,
+        "min_bus_v": 5.999726680205e-09,
+        "peak_pump_a": 0.5830152441518,
+        "peak_valve_a": 0.4822736112405,
+        "peak_shunt_v": 0.04747955286848
+      },
+      "criteria_pass": false
+    },
+    {
+      "name": "negative_receiver_12V_150R",
+      "family": "receiver",
+      "revision": "UNPROTECTED",
+      "params": {
+        "supply": 12,
+        "burden": 150
+      },
+      "diagnostic": true,
+      "process_exit": 0,
+      "samples": 20008,
+      "wall_seconds": 0.389,
+      "netlist_sha256": "dd7062d27f172c205ab19d4a43c7dacd8c559061d6e1f43afb65346345634a46",
+      "checks": [
+        {
+          "check": "ADC_normal_range_margin",
+          "passed": true
+        },
+        {
+          "check": "ADC_below_supply_for_valid_observation",
+          "passed": true
+        },
+        {
+          "check": "transmitter_current_tracks_request",
+          "passed": false
+        },
+        {
+          "check": "sensor_compliance_nonnegative",
+          "passed": true
+        },
+        {
+          "check": "burden_below_0.5W",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "adc_pin_max_v": 1.986754306828,
+        "adc_pin_min_v": 1.986754306828,
+        "sensor_headroom_min_v": 0.01324536204608,
+        "burden_peak_w": 0.02631462660954,
+        "adc_steady_v": 1.986754306828,
+        "loop_steady_a": 0.01324536204608,
+        "off_rail_injection_peak_a": null
+      },
+      "criteria_pass": false,
+      "reused_trace": true
+    },
+    {
+      "name": "negative_receiver_24mA_150R",
+      "family": "receiver",
+      "revision": "UNPROTECTED",
+      "params": {
+        "supply": 24,
+        "burden": 150,
+        "current": 0.024
+      },
+      "diagnostic": true,
+      "process_exit": 0,
+      "samples": 20008,
+      "wall_seconds": 0.349,
+      "netlist_sha256": "1c4b638cd8b0591dbad7f6c238ba3e3265aa2caf4032cc6b8c1017b90d7d9611",
+      "checks": [
+        {
+          "check": "ADC_normal_range_margin",
+          "passed": true
+        },
+        {
+          "check": "ADC_below_supply_for_valid_observation",
+          "passed": false
+        },
+        {
+          "check": "transmitter_current_tracks_request",
+          "passed": true
+        },
+        {
+          "check": "sensor_compliance_nonnegative",
+          "passed": true
+        },
+        {
+          "check": "burden_below_0.5W",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "adc_pin_max_v": 3.599908272944,
+        "adc_pin_min_v": 3.599908272944,
+        "sensor_headroom_min_v": 10.40009111959,
+        "burden_peak_w": 0.08639562631494,
+        "adc_steady_v": 3.599908272944,
+        "loop_steady_a": 0.024,
+        "off_rail_injection_peak_a": null
+      },
+      "criteria_pass": false,
+      "reused_trace": true
+    },
+    {
+      "name": "negative_adc_poweroff_backfeed",
+      "family": "receiver",
+      "revision": "UNPROTECTED",
+      "params": {
+        "supply": 24,
+        "burden": 150,
+        "fault": "adc_off"
+      },
+      "diagnostic": true,
+      "process_exit": 0,
+      "samples": 20029,
+      "wall_seconds": 0.346,
+      "netlist_sha256": "f09717a3d298d47e0bd1050caddea29ab983062cbbb1573a16911ff592cbb082",
+      "checks": [
+        {
+          "check": "ADC_normal_range_margin",
+          "passed": false
+        },
+        {
+          "check": "off_pin_discharges_below_0.15V",
+          "passed": false
+        },
+        {
+          "check": "off_supply_injection_below_1uA",
+          "passed": false
+        }
+      ],
+      "metrics": {
+        "adc_pin_max_v": 2.999924501492,
+        "adc_pin_min_v": 0.9224505010417,
+        "sensor_headroom_min_v": 11.00007499852,
+        "burden_peak_w": 0.05999700009679,
+        "adc_steady_v": 0.922536177508,
+        "loop_steady_a": 0.02,
+        "off_rail_injection_peak_a": 0.01658512913844
+      },
+      "criteria_pass": false,
+      "reused_trace": true
+    },
+    {
+      "name": "r1_power_normal",
+      "family": "power",
+      "revision": "R1",
+      "params": {
+        "fault": "normal"
+      },
+      "diagnostic": false,
+      "process_exit": 0,
+      "samples": 48456,
+      "wall_seconds": 3.741,
+      "netlist_sha256": "e48823d5df7221c02492221034f798d797d82d46b841c175f46acd114dedf113",
+      "checks": [
+        {
+          "check": "startup_no_drive",
+          "passed": true
+        },
+        {
+          "check": "run_has_expected_load_response",
+          "passed": true
+        },
+        {
+          "check": "drain_voltage_below_70V_model_design_limit",
+          "passed": true
+        },
+        {
+          "check": "permit_off_removes_current",
+          "passed": true
+        },
+        {
+          "check": "feedback_is_3V3_bounded",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "peak_drain_v": 33.06036662089,
+        "min_bus_v": -2.348373980581e-05,
+        "peak_pump_a": 0.5817667055978,
+        "peak_valve_a": 0.4810320651286,
+        "peak_shunt_v": 0.02908833532394
+      },
+      "criteria_pass": true
+    },
+    {
+      "name": "r1_power_estop",
+      "family": "power",
+      "revision": "R1",
+      "params": {
+        "fault": "estop"
+      },
+      "diagnostic": false,
+      "process_exit": 0,
+      "samples": 49132,
+      "wall_seconds": 3.711,
+      "netlist_sha256": "a4208d9f8a42338050ac254a5dae658b20c36ca75c78af2880d4ac64f2dc56f0",
+      "checks": [
+        {
+          "check": "startup_no_drive",
+          "passed": true
+        },
+        {
+          "check": "run_has_expected_load_response",
+          "passed": true
+        },
+        {
+          "check": "drain_voltage_below_70V_model_design_limit",
+          "passed": true
+        },
+        {
+          "check": "fault_removes_current",
+          "passed": true
+        },
+        {
+          "check": "release_does_not_restart",
+          "passed": true
+        },
+        {
+          "check": "feedback_is_3V3_bounded",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "peak_drain_v": 33.05959542985,
+        "min_bus_v": -2.348373980581e-05,
+        "peak_pump_a": 0.5817667055978,
+        "peak_valve_a": 0.4810320651278,
+        "peak_shunt_v": 0.02908833532394
+      },
+      "criteria_pass": true
+    },
+    {
+      "name": "r1_power_estop_reset_held",
+      "family": "power",
+      "revision": "R1",
+      "params": {
+        "fault": "estop_reset_held"
+      },
+      "diagnostic": false,
+      "process_exit": 0,
+      "samples": 49032,
+      "wall_seconds": 3.659,
+      "netlist_sha256": "83a25f51579f26bfd77f1a21464754e5026ab26d0aca59ac1d600c7d29f0d6eb",
+      "checks": [
+        {
+          "check": "startup_no_drive",
+          "passed": true
+        },
+        {
+          "check": "run_has_expected_load_response",
+          "passed": true
+        },
+        {
+          "check": "drain_voltage_below_70V_model_design_limit",
+          "passed": true
+        },
+        {
+          "check": "fault_removes_current",
+          "passed": true
+        },
+        {
+          "check": "release_does_not_restart",
+          "passed": true
+        },
+        {
+          "check": "feedback_is_3V3_bounded",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "peak_drain_v": 33.05959542985,
+        "min_bus_v": -2.348373980385e-05,
+        "peak_pump_a": 0.5817666880082,
+        "peak_valve_a": 0.4810320651278,
+        "peak_shunt_v": 0.02908833444447
+      },
+      "criteria_pass": true
+    },
+    {
+      "name": "r1_power_estop_release_high",
+      "family": "power",
+      "revision": "R1",
+      "params": {
+        "fault": "estop_release_high"
+      },
+      "diagnostic": false,
+      "process_exit": 0,
+      "samples": 49132,
+      "wall_seconds": 3.694,
+      "netlist_sha256": "cd1117a5291180fe253de6dfa9f99219a4f1b673386a785d4a4ab1a214c9caff",
+      "checks": [
+        {
+          "check": "startup_no_drive",
+          "passed": true
+        },
+        {
+          "check": "run_has_expected_load_response",
+          "passed": true
+        },
+        {
+          "check": "drain_voltage_below_70V_model_design_limit",
+          "passed": true
+        },
+        {
+          "check": "fault_removes_current",
+          "passed": true
+        },
+        {
+          "check": "release_does_not_restart",
+          "passed": true
+        },
+        {
+          "check": "feedback_is_3V3_bounded",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "peak_drain_v": 33.05959542985,
+        "min_bus_v": -2.348373980581e-05,
+        "peak_pump_a": 0.5817667055978,
+        "peak_valve_a": 0.4810320651278,
+        "peak_shunt_v": 0.02908833532394
+      },
+      "criteria_pass": true
+    },
+    {
+      "name": "r1_power_rearm",
+      "family": "power",
+      "revision": "R1",
+      "params": {
+        "fault": "rearm"
+      },
+      "diagnostic": false,
+      "process_exit": 0,
+      "samples": 71767,
+      "wall_seconds": 6.219,
+      "netlist_sha256": "d05cc2367da4c99ca09b652b875c8f3092d65bff8d8acf679352a8d21b457ed8",
+      "checks": [
+        {
+          "check": "startup_no_drive",
+          "passed": true
+        },
+        {
+          "check": "run_has_expected_load_response",
+          "passed": true
+        },
+        {
+          "check": "drain_voltage_below_70V_model_design_limit",
+          "passed": true
+        },
+        {
+          "check": "released_without_reset_stays_off",
+          "passed": true
+        },
+        {
+          "check": "fresh_reset_and_permit_restore_run",
+          "passed": true
+        },
+        {
+          "check": "feedback_is_3V3_bounded",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "peak_drain_v": 33.05959542985,
+        "min_bus_v": -0.02475374030801,
+        "peak_pump_a": 0.5817670312311,
+        "peak_valve_a": 0.4810320651286,
+        "peak_shunt_v": 0.0290883516056
+      },
+      "criteria_pass": true
+    },
+    {
+      "name": "r1_power_heartbeat_loss",
+      "family": "power",
+      "revision": "R1",
+      "params": {
+        "fault": "heartbeat_loss"
+      },
+      "diagnostic": false,
+      "process_exit": 0,
+      "samples": 41052,
+      "wall_seconds": 3.0,
+      "netlist_sha256": "939289229699d28a74aa5f24a7138bb45481fa2be1a7b18d43869149cd07de62",
+      "checks": [
+        {
+          "check": "startup_no_drive",
+          "passed": true
+        },
+        {
+          "check": "run_has_expected_load_response",
+          "passed": true
+        },
+        {
+          "check": "drain_voltage_below_70V_model_design_limit",
+          "passed": true
+        },
+        {
+          "check": "watchdog_removes_current",
+          "passed": true
+        },
+        {
+          "check": "feedback_is_3V3_bounded",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "peak_drain_v": 33.05790765163,
+        "min_bus_v": -2.348373980581e-05,
+        "peak_pump_a": 0.5817667055978,
+        "peak_valve_a": 0.4810320651286,
+        "peak_shunt_v": 0.02908833532394
+      },
+      "criteria_pass": true
+    },
+    {
+      "name": "r1_power_heartbeat_missing",
+      "family": "power",
+      "revision": "R1",
+      "params": {
+        "fault": "heartbeat_missing"
+      },
+      "diagnostic": false,
+      "process_exit": 0,
+      "samples": 14066,
+      "wall_seconds": 0.916,
+      "netlist_sha256": "aacef1e203ba82a3c8a39bd6f8ab889313a2989424473065e9cbd5984c543b00",
+      "checks": [
+        {
+          "check": "startup_no_drive",
+          "passed": true
+        },
+        {
+          "check": "drain_voltage_below_70V_model_design_limit",
+          "passed": true
+        },
+        {
+          "check": "no_heartbeat_no_arm",
+          "passed": true
+        },
+        {
+          "check": "feedback_is_3V3_bounded",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "peak_drain_v": 5.876627903923e-05,
+        "min_bus_v": 2.999879816654e-09,
+        "peak_pump_a": 2.050458030653e-11,
+        "peak_valve_a": 2.351910908459e-11,
+        "peak_shunt_v": 1.132002960283e-12
+      },
+      "criteria_pass": true
+    },
+    {
+      "name": "r1_power_brownout",
+      "family": "power",
+      "revision": "R1",
+      "params": {
+        "fault": "brownout"
+      },
+      "diagnostic": false,
+      "process_exit": 0,
+      "samples": 49054,
+      "wall_seconds": 3.581,
+      "netlist_sha256": "e7e928790270ab792532370c2f5e5629d5b7381662b3dcc47fc211db9301ee07",
+      "checks": [
+        {
+          "check": "startup_no_drive",
+          "passed": true
+        },
+        {
+          "check": "run_has_expected_load_response",
+          "passed": true
+        },
+        {
+          "check": "drain_voltage_below_70V_model_design_limit",
+          "passed": true
+        },
+        {
+          "check": "fault_removes_current",
+          "passed": true
+        },
+        {
+          "check": "release_does_not_restart",
+          "passed": true
+        },
+        {
+          "check": "feedback_is_3V3_bounded",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "peak_drain_v": 33.06046656479,
+        "min_bus_v": -2.348373980581e-05,
+        "peak_pump_a": 0.5817667055978,
+        "peak_valve_a": 0.4810320651279,
+        "peak_shunt_v": 0.02908833532394
+      },
+      "criteria_pass": true
+    },
+    {
+      "name": "r1_power_logic_loss",
+      "family": "power",
+      "revision": "R1",
+      "params": {
+        "fault": "logic_loss"
+      },
+      "diagnostic": false,
+      "process_exit": 0,
+      "samples": 48547,
+      "wall_seconds": 3.733,
+      "netlist_sha256": "94f06a49dcb34a2ab567c08c8cef57836bc21592fec2bd9b202729c85b1dcb00",
+      "checks": [
+        {
+          "check": "startup_no_drive",
+          "passed": true
+        },
+        {
+          "check": "run_has_expected_load_response",
+          "passed": true
+        },
+        {
+          "check": "drain_voltage_below_70V_model_design_limit",
+          "passed": true
+        },
+        {
+          "check": "fault_removes_current",
+          "passed": true
+        },
+        {
+          "check": "release_does_not_restart",
+          "passed": true
+        },
+        {
+          "check": "feedback_is_3V3_bounded",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "peak_drain_v": 33.05282836613,
+        "min_bus_v": -2.348373980581e-05,
+        "peak_pump_a": 0.5817667055978,
+        "peak_valve_a": 0.4810320651279,
+        "peak_shunt_v": 0.02908833532394
+      },
+      "criteria_pass": true
+    },
+    {
+      "name": "r1_power_stuck_command",
+      "family": "power",
+      "revision": "R1",
+      "params": {
+        "fault": "stuck_command"
+      },
+      "diagnostic": false,
+      "process_exit": 0,
+      "samples": 16765,
+      "wall_seconds": 1.097,
+      "netlist_sha256": "ae9b5505d6b94d08b336dec6d760b8e90e80230a9c833e4377b62eafe0048347",
+      "checks": [
+        {
+          "check": "startup_no_drive",
+          "passed": true
+        },
+        {
+          "check": "drain_voltage_below_70V_model_design_limit",
+          "passed": true
+        },
+        {
+          "check": "watchdog_removes_current",
+          "passed": true
+        },
+        {
+          "check": "feedback_is_3V3_bounded",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "peak_drain_v": 5.881425701811e-05,
+        "min_bus_v": 2.999879816654e-09,
+        "peak_pump_a": 2.050458030653e-11,
+        "peak_valve_a": 2.351910908459e-11,
+        "peak_shunt_v": 1.132002960283e-12
+      },
+      "criteria_pass": true
+    },
+    {
+      "name": "r1_power_feedback_broken",
+      "family": "power",
+      "revision": "R1",
+      "params": {
+        "fault": "feedback_broken"
+      },
+      "diagnostic": false,
+      "process_exit": 0,
+      "samples": 29377,
+      "wall_seconds": 1.642,
+      "netlist_sha256": "ea034f578fb3b80739b5bf5aa586657893aec62af2ab73ce97fa4b88c66b6b2e",
+      "checks": [
+        {
+          "check": "startup_no_drive",
+          "passed": true
+        },
+        {
+          "check": "run_has_expected_load_response",
+          "passed": true
+        },
+        {
+          "check": "drain_voltage_below_70V_model_design_limit",
+          "passed": true
+        },
+        {
+          "check": "broken_feedback_stays_high",
+          "passed": true
+        },
+        {
+          "check": "feedback_is_3V3_bounded",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "peak_drain_v": 0.08726504424317,
+        "min_bus_v": -2.348372771606e-05,
+        "peak_pump_a": 0.5817669607401,
+        "peak_valve_a": 0.4810320651286,
+        "peak_shunt_v": 0.02908834808101
+      },
+      "criteria_pass": true
+    },
+    {
+      "name": "r1_mosfet_short",
+      "family": "power",
+      "revision": "R1",
+      "params": {
+        "mos_short": "pump"
+      },
+      "diagnostic": false,
+      "process_exit": 0,
+      "samples": 41166,
+      "wall_seconds": 2.905,
+      "netlist_sha256": "a9383ffbfc6cc0f2dfb77286453b1c0393c6f031f5f889a1fb7b1e11f814fb01",
+      "checks": [
+        {
+          "check": "startup_no_drive",
+          "passed": true
+        },
+        {
+          "check": "run_has_expected_load_response",
+          "passed": true
+        },
+        {
+          "check": "drain_voltage_below_70V_model_design_limit",
+          "passed": true
+        },
+        {
+          "check": "permit_off_removes_current",
+          "passed": true
+        },
+        {
+          "check": "feedback_is_3V3_bounded",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "peak_drain_v": 32.84587120425,
+        "min_bus_v": -1.88209067811,
+        "peak_pump_a": 0.58780111239,
+        "peak_valve_a": 0.4809909876489,
+        "peak_shunt_v": 0.02939005566433
+      },
+      "criteria_pass": true
+    },
+    {
+      "name": "r1_master_welded",
+      "family": "power",
+      "revision": "R1",
+      "params": {
+        "master_welded": true
+      },
+      "diagnostic": false,
+      "process_exit": 0,
+      "samples": 72501,
+      "wall_seconds": 5.142,
+      "netlist_sha256": "526b7c39f1961b7e08e422e61558a3d40717b625f6ec5763f7e69d20e07c5742",
+      "checks": [
+        {
+          "check": "startup_no_drive",
+          "passed": true
+        },
+        {
+          "check": "run_has_expected_load_response",
+          "passed": true
+        },
+        {
+          "check": "drain_voltage_below_70V_model_design_limit",
+          "passed": true
+        },
+        {
+          "check": "permit_off_removes_current",
+          "passed": true
+        },
+        {
+          "check": "feedback_is_3V3_bounded",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "peak_drain_v": 33.06167766165,
+        "min_bus_v": 5.999706537231e-09,
+        "peak_pump_a": 0.5830144762779,
+        "peak_valve_a": 0.4822736112071,
+        "peak_shunt_v": 0.1109341539751
+      },
+      "criteria_pass": true
+    },
+    {
+      "name": "r1_combined_master_mos_short",
+      "family": "power",
+      "revision": "R1",
+      "params": {
+        "master_welded": true,
+        "mos_short": "pump"
+      },
+      "diagnostic": true,
+      "process_exit": 0,
+      "samples": 54566,
+      "wall_seconds": 3.69,
+      "netlist_sha256": "7b41b5c2dd5c00307ad1e5f15bc9d392671065b9e3bba6fd07f8812db60189e3",
+      "checks": [
+        {
+          "check": "startup_no_drive",
+          "passed": true
+        },
+        {
+          "check": "run_has_expected_load_response",
+          "passed": true
+        },
+        {
+          "check": "drain_voltage_below_70V_model_design_limit",
+          "passed": true
+        },
+        {
+          "check": "permit_off_removes_current",
+          "passed": false
+        },
+        {
+          "check": "feedback_is_3V3_bounded",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "peak_drain_v": 32.86248530091,
+        "min_bus_v": -4.016279558204e-06,
+        "peak_pump_a": 0.5886476630263,
+        "peak_valve_a": 0.4822356508861,
+        "peak_shunt_v": 0.09913430177553
+      },
+      "criteria_pass": false
+    },
+    {
+      "name": "r1_open_pump",
+      "family": "power",
+      "revision": "R1",
+      "params": {
+        "open_load": "pump"
+      },
+      "diagnostic": false,
+      "process_exit": 0,
+      "samples": 36937,
+      "wall_seconds": 2.891,
+      "netlist_sha256": "5f1b4650be4cfb51a695f22b9d6a8934cf21ad2def4fb6946b9b38877c08f3bc",
+      "checks": [
+        {
+          "check": "startup_no_drive",
+          "passed": true
+        },
+        {
+          "check": "run_has_expected_load_response",
+          "passed": true
+        },
+        {
+          "check": "drain_voltage_below_70V_model_design_limit",
+          "passed": true
+        },
+        {
+          "check": "permit_off_removes_current",
+          "passed": true
+        },
+        {
+          "check": "open_load_current_is_missing",
+          "passed": true
+        },
+        {
+          "check": "feedback_is_3V3_bounded",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "peak_drain_v": 33.05808508042,
+        "min_bus_v": -4.357930761704e-05,
+        "peak_pump_a": 1.199934118271e-08,
+        "peak_valve_a": 0.4894980006334,
+        "peak_shunt_v": 0.02447490008411
+      },
+      "criteria_pass": true
+    },
+    {
+      "name": "r1_short_pump",
+      "family": "power",
+      "revision": "R1",
+      "params": {
+        "short_load": "pump"
+      },
+      "diagnostic": false,
+      "process_exit": 0,
+      "samples": 56954,
+      "wall_seconds": 4.172,
+      "netlist_sha256": "9b477bef1f3c6ba6176614da77f5338158d9d88be0964fc489e8e538fb042651",
+      "checks": [
+        {
+          "check": "startup_no_drive",
+          "passed": true
+        },
+        {
+          "check": "drain_voltage_below_70V_model_design_limit",
+          "passed": true
+        },
+        {
+          "check": "permit_off_removes_current",
+          "passed": true
+        },
+        {
+          "check": "overcurrent_latches_trip",
+          "passed": true
+        },
+        {
+          "check": "overcurrent_removes_current",
+          "passed": true
+        },
+        {
+          "check": "feedback_is_3V3_bounded",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "peak_drain_v": 31.10518118265,
+        "min_bus_v": -5.285416234625e-05,
+        "peak_pump_a": 4.797427754277,
+        "peak_valve_a": 0.003841001764395,
+        "peak_shunt_v": 0.2398713204638
+      },
+      "criteria_pass": true
+    },
+    {
+      "name": "r1_load_corner_high",
+      "family": "power",
+      "revision": "R1",
+      "params": {
+        "supply": 13.2,
+        "valve_r": 15,
+        "valve_l": 0.5,
+        "watchdog_s": 0.25
+      },
+      "diagnostic": false,
+      "process_exit": 0,
+      "samples": 51822,
+      "wall_seconds": 3.969,
+      "netlist_sha256": "bbe086808abf9dca1fc47e642c7323417a53670f7d8cbfd8f979796a58691596",
+      "checks": [
+        {
+          "check": "startup_no_drive",
+          "passed": true
+        },
+        {
+          "check": "run_has_expected_load_response",
+          "passed": true
+        },
+        {
+          "check": "drain_voltage_below_70V_model_design_limit",
+          "passed": true
+        },
+        {
+          "check": "permit_off_removes_current",
+          "passed": true
+        },
+        {
+          "check": "feedback_is_3V3_bounded",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "peak_drain_v": 34.3853602499,
+        "min_bus_v": -2.418188389238e-05,
+        "peak_pump_a": 0.6416733796969,
+        "peak_valve_a": 0.8363010609497,
+        "peak_shunt_v": 0.04181505309806
+      },
+      "criteria_pass": true
+    },
+    {
+      "name": "r1_load_corner_low",
+      "family": "power",
+      "revision": "R1",
+      "params": {
+        "supply": 10.8,
+        "valve_r": 40,
+        "valve_l": 0.05,
+        "watchdog_s": 0.15
+      },
+      "diagnostic": false,
+      "process_exit": 0,
+      "samples": 41640,
+      "wall_seconds": 2.984,
+      "netlist_sha256": "3ce0e7481b21831227629213db2eeacf205d5f2c2bb0243145e2d571cffc10ad",
+      "checks": [
+        {
+          "check": "startup_no_drive",
+          "passed": true
+        },
+        {
+          "check": "run_has_expected_load_response",
+          "passed": true
+        },
+        {
+          "check": "drain_voltage_below_70V_model_design_limit",
+          "passed": true
+        },
+        {
+          "check": "permit_off_removes_current",
+          "passed": true
+        },
+        {
+          "check": "feedback_is_3V3_bounded",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "peak_drain_v": 31.83816326936,
+        "min_bus_v": -2.374755230695e-05,
+        "peak_pump_a": 0.5219969740667,
+        "peak_valve_a": 0.2619113266967,
+        "peak_shunt_v": 0.02609984875322
+      },
+      "criteria_pass": true
+    },
+    {
+      "name": "r1_receiver_0mA",
+      "family": "receiver",
+      "revision": "R1",
+      "params": {
+        "current": 0
+      },
+      "diagnostic": false,
+      "process_exit": 0,
+      "samples": 20008,
+      "wall_seconds": 0.42,
+      "netlist_sha256": "f3e3f9798711557927bacd2c2999ffb8d2975f2785311e071463f4288d2605cc",
+      "checks": [
+        {
+          "check": "ADC_normal_range_margin",
+          "passed": true
+        },
+        {
+          "check": "ADC_below_supply_for_valid_observation",
+          "passed": true
+        },
+        {
+          "check": "transmitter_current_tracks_request",
+          "passed": true
+        },
+        {
+          "check": "sensor_compliance_nonnegative",
+          "passed": true
+        },
+        {
+          "check": "burden_below_0.5W",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "adc_pin_max_v": 0.000751222247399,
+        "adc_pin_min_v": 0.0007511977106355,
+        "sensor_headroom_min_v": 13.99999256114,
+        "burden_peak_w": 5.533669274492e-13,
+        "adc_steady_v": 0.000751222247399,
+        "loop_steady_a": 0.0,
+        "off_rail_injection_peak_a": null
+      },
+      "criteria_pass": true,
+      "reused_trace": true
+    },
+    {
+      "name": "r1_receiver_3.6mA",
+      "family": "receiver",
+      "revision": "R1",
+      "params": {
+        "current": 0.0036
+      },
+      "diagnostic": false,
+      "process_exit": 0,
+      "samples": 20008,
+      "wall_seconds": 0.402,
+      "netlist_sha256": "98b459b914deb906f388849e737db08157ed2d2a74fdaf1bf46a85ea371356c7",
+      "checks": [
+        {
+          "check": "ADC_normal_range_margin",
+          "passed": true
+        },
+        {
+          "check": "ADC_below_supply_for_valid_observation",
+          "passed": true
+        },
+        {
+          "check": "transmitter_current_tracks_request",
+          "passed": true
+        },
+        {
+          "check": "sensor_compliance_nonnegative",
+          "passed": true
+        },
+        {
+          "check": "burden_below_0.5W",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "adc_pin_max_v": 0.2752554208927,
+        "adc_pin_min_v": 0.2752551289944,
+        "sensor_headroom_min_v": 13.55083868156,
+        "burden_peak_w": 0.001289968526615,
+        "adc_steady_v": 0.2752554208926,
+        "loop_steady_a": 0.0036,
+        "off_rail_injection_peak_a": null
+      },
+      "criteria_pass": true,
+      "reused_trace": true
+    },
+    {
+      "name": "r1_receiver_4mA",
+      "family": "receiver",
+      "revision": "R1",
+      "params": {
+        "current": 0.004
+      },
+      "diagnostic": false,
+      "process_exit": 0,
+      "samples": 20008,
+      "wall_seconds": 0.398,
+      "netlist_sha256": "948503db313f49bbb64f84b0d5d2d60a028993c68564fd66b4c3a87e44280f28",
+      "checks": [
+        {
+          "check": "ADC_normal_range_margin",
+          "passed": true
+        },
+        {
+          "check": "ADC_below_supply_for_valid_observation",
+          "passed": true
+        },
+        {
+          "check": "transmitter_current_tracks_request",
+          "passed": true
+        },
+        {
+          "check": "sensor_compliance_nonnegative",
+          "passed": true
+        },
+        {
+          "check": "burden_below_0.5W",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "adc_pin_max_v": 0.3058389707694,
+        "adc_pin_min_v": 0.3058387359096,
+        "sensor_headroom_min_v": 13.50093187222,
+        "burden_peak_w": 0.001592553706072,
+        "adc_steady_v": 0.3058389707694,
+        "loop_steady_a": 0.004,
+        "off_rail_injection_peak_a": null
+      },
+      "criteria_pass": true,
+      "reused_trace": true
+    },
+    {
+      "name": "r1_receiver_12mA",
+      "family": "receiver",
+      "revision": "R1",
+      "params": {
+        "current": 0.012
+      },
+      "diagnostic": false,
+      "process_exit": 0,
+      "samples": 20008,
+      "wall_seconds": 0.392,
+      "netlist_sha256": "1406e01168f7f247030dfda38321f7b0886f06e05271c945cb3e86e33ab68ab1",
+      "checks": [
+        {
+          "check": "ADC_normal_range_margin",
+          "passed": true
+        },
+        {
+          "check": "ADC_below_supply_for_valid_observation",
+          "passed": true
+        },
+        {
+          "check": "transmitter_current_tracks_request",
+          "passed": true
+        },
+        {
+          "check": "sensor_compliance_nonnegative",
+          "passed": true
+        },
+        {
+          "check": "burden_below_0.5W",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "adc_pin_max_v": 0.917514669264,
+        "adc_pin_min_v": 0.9175144612127,
+        "sensor_headroom_min_v": 12.50279563888,
+        "burden_peak_w": 0.01433298282283,
+        "adc_steady_v": 0.9175146692639,
+        "loop_steady_a": 0.012,
+        "off_rail_injection_peak_a": null
+      },
+      "criteria_pass": true,
+      "reused_trace": true
+    },
+    {
+      "name": "r1_receiver_20mA",
+      "family": "receiver",
+      "revision": "R1",
+      "params": {
+        "current": 0.02
+      },
+      "diagnostic": false,
+      "process_exit": 0,
+      "samples": 20008,
+      "wall_seconds": 0.395,
+      "netlist_sha256": "a19adbce57792243ef27bdc1fda4e7e54b17fe1284184b27d6b485fc0586f54b",
+      "checks": [
+        {
+          "check": "ADC_normal_range_margin",
+          "passed": true
+        },
+        {
+          "check": "ADC_below_supply_for_valid_observation",
+          "passed": true
+        },
+        {
+          "check": "transmitter_current_tracks_request",
+          "passed": true
+        },
+        {
+          "check": "sensor_compliance_nonnegative",
+          "passed": true
+        },
+        {
+          "check": "burden_below_0.5W",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "adc_pin_max_v": 1.52919103605,
+        "adc_pin_min_v": 1.529191036047,
+        "sensor_headroom_min_v": 11.50465939892,
+        "burden_peak_w": 0.03981384114315,
+        "adc_steady_v": 1.529191036047,
+        "loop_steady_a": 0.02,
+        "off_rail_injection_peak_a": null
+      },
+      "criteria_pass": true,
+      "reused_trace": true
+    },
+    {
+      "name": "r1_receiver_24mA",
+      "family": "receiver",
+      "revision": "R1",
+      "params": {
+        "current": 0.024
+      },
+      "diagnostic": false,
+      "process_exit": 0,
+      "samples": 20008,
+      "wall_seconds": 0.398,
+      "netlist_sha256": "340ec25b60028422c5ec8e9894af322135adf4b667f316c3f7c70348342c7e5a",
+      "checks": [
+        {
+          "check": "ADC_normal_range_margin",
+          "passed": true
+        },
+        {
+          "check": "ADC_below_supply_for_valid_observation",
+          "passed": true
+        },
+        {
+          "check": "transmitter_current_tracks_request",
+          "passed": true
+        },
+        {
+          "check": "sensor_compliance_nonnegative",
+          "passed": true
+        },
+        {
+          "check": "burden_below_0.5W",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "adc_pin_max_v": 1.835029203092,
+        "adc_pin_min_v": 1.835029203087,
+        "sensor_headroom_min_v": 11.0055912791,
+        "burden_peak_w": 0.05733193122709,
+        "adc_steady_v": 1.835029203087,
+        "loop_steady_a": 0.024,
+        "off_rail_injection_peak_a": null
+      },
+      "criteria_pass": true,
+      "reused_trace": true
+    },
+    {
+      "name": "r1_receiver_33mA",
+      "family": "receiver",
+      "revision": "R1",
+      "params": {
+        "current": 0.033
+      },
+      "diagnostic": false,
+      "process_exit": 0,
+      "samples": 20008,
+      "wall_seconds": 0.397,
+      "netlist_sha256": "203a1a141a9b983a967cecb8ca1aa984156a19be33b4b9ee69520496198f7508",
+      "checks": [
+        {
+          "check": "ADC_normal_range_margin",
+          "passed": true
+        },
+        {
+          "check": "ADC_below_supply_for_valid_observation",
+          "passed": true
+        },
+        {
+          "check": "transmitter_current_tracks_request",
+          "passed": true
+        },
+        {
+          "check": "sensor_compliance_nonnegative",
+          "passed": true
+        },
+        {
+          "check": "burden_below_0.5W",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "adc_pin_max_v": 2.523098619923,
+        "adc_pin_min_v": 2.523098619788,
+        "sensor_headroom_min_v": 9.882688667612,
+        "burden_peak_w": 0.1083931390937,
+        "adc_steady_v": 2.523098619788,
+        "loop_steady_a": 0.033,
+        "off_rail_injection_peak_a": null
+      },
+      "criteria_pass": true,
+      "reused_trace": true
+    },
+    {
+      "name": "r1_receiver_50mA",
+      "family": "receiver",
+      "revision": "R1",
+      "params": {
+        "current": 0.05
+      },
+      "diagnostic": false,
+      "process_exit": 0,
+      "samples": 20008,
+      "wall_seconds": 0.394,
+      "netlist_sha256": "9660030ca7142cadaf5c1396fa8249128b437d049a5bbd7cc7a0b3ccf35cebc7",
+      "checks": [
+        {
+          "check": "ADC_normal_range_margin",
+          "passed": true
+        },
+        {
+          "check": "ADC_below_supply_for_valid_observation",
+          "passed": true
+        },
+        {
+          "check": "transmitter_current_tracks_request",
+          "passed": true
+        },
+        {
+          "check": "sensor_compliance_nonnegative",
+          "passed": true
+        },
+        {
+          "check": "burden_below_0.5W",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "adc_pin_max_v": 2.523098619923,
+        "adc_pin_min_v": 2.523098619788,
+        "sensor_headroom_min_v": 9.882688667612,
+        "burden_peak_w": 0.1083931390937,
+        "adc_steady_v": 2.523098619788,
+        "loop_steady_a": 0.033,
+        "off_rail_injection_peak_a": null
+      },
+      "criteria_pass": true,
+      "reused_trace": true
+    },
+    {
+      "name": "r1_receiver_adc_off",
+      "family": "receiver",
+      "revision": "R1",
+      "params": {
+        "fault": "adc_off"
+      },
+      "diagnostic": false,
+      "process_exit": 0,
+      "samples": 20089,
+      "wall_seconds": 0.431,
+      "netlist_sha256": "c215b35ceedddb99c718cafad8f4a0247cec8d9c3bf11f81fcd37bf90e78f7ea",
+      "checks": [
+        {
+          "check": "ADC_normal_range_margin",
+          "passed": true
+        },
+        {
+          "check": "off_pin_discharges_below_0.15V",
+          "passed": true
+        },
+        {
+          "check": "off_supply_injection_below_1uA",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "adc_pin_max_v": 1.52919103605,
+        "adc_pin_min_v": 0.06121438214731,
+        "sensor_headroom_min_v": 11.50000000161,
+        "burden_peak_w": 0.03999999993553,
+        "adc_steady_v": 0.06563881824776,
+        "loop_steady_a": 0.02,
+        "off_rail_injection_peak_a": 1.358809233037e-07
+      },
+      "criteria_pass": true,
+      "reused_trace": true
+    },
+    {
+      "name": "r1_receiver_instrument_off",
+      "family": "receiver",
+      "revision": "R1",
+      "params": {
+        "fault": "instrument_off"
+      },
+      "diagnostic": false,
+      "process_exit": 0,
+      "samples": 20099,
+      "wall_seconds": 0.389,
+      "netlist_sha256": "16a1a5207b89d714cff582f2324d92b44102f2b7a83219744a21f7f771ec5a48",
+      "checks": [
+        {
+          "check": "ADC_normal_range_margin",
+          "passed": true
+        },
+        {
+          "check": "loss_of_conditioner_disables_signal",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "adc_pin_max_v": 1.52919103605,
+        "adc_pin_min_v": 0.06563290436581,
+        "sensor_headroom_min_v": 11.50263263101,
+        "burden_peak_w": 0.03989476406725,
+        "adc_steady_v": 0.06563910398721,
+        "loop_steady_a": 0.02,
+        "off_rail_injection_peak_a": null
+      },
+      "criteria_pass": true,
+      "reused_trace": true
+    },
+    {
+      "name": "r1_receiver_short_transmitter",
+      "family": "receiver",
+      "revision": "R1",
+      "params": {
+        "fault": "short_transmitter"
+      },
+      "diagnostic": false,
+      "process_exit": 0,
+      "samples": 20008,
+      "wall_seconds": 0.389,
+      "netlist_sha256": "ed19e7cae48204dbcd45bdaaf1d425c6990c97b03f2a6cefdff5b08ca928a89e",
+      "checks": [
+        {
+          "check": "ADC_normal_range_margin",
+          "passed": true
+        },
+        {
+          "check": "input_fault_burden_survives_envelope",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "adc_pin_max_v": 2.523098619923,
+        "adc_pin_min_v": 2.523098619788,
+        "sensor_headroom_min_v": 9.882688667612,
+        "burden_peak_w": 0.1083931390937,
+        "adc_steady_v": 2.523098619788,
+        "loop_steady_a": 0.033,
+        "off_rail_injection_peak_a": null
+      },
+      "criteria_pass": true,
+      "reused_trace": true
+    },
+    {
+      "name": "r1_receiver_reverse_loop",
+      "family": "receiver",
+      "revision": "R1",
+      "params": {
+        "fault": "reverse_loop"
+      },
+      "diagnostic": false,
+      "process_exit": 0,
+      "samples": 20008,
+      "wall_seconds": 0.393,
+      "netlist_sha256": "fae212683943fc5aecf943493b11e44dd62de534a3cea4d721b8cc0450868943",
+      "checks": [
+        {
+          "check": "ADC_normal_range_margin",
+          "passed": true
+        },
+        {
+          "check": "bad_loop_not_normal_4mA_reading",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "adc_pin_max_v": 0.000751222247399,
+        "adc_pin_min_v": 0.0007511977106355,
+        "sensor_headroom_min_v": -34.00000743886,
+        "burden_peak_w": 5.533669274492e-13,
+        "adc_steady_v": 0.000751222247399,
+        "loop_steady_a": 0.0,
+        "off_rail_injection_peak_a": null
+      },
+      "criteria_pass": true,
+      "reused_trace": true
+    },
+    {
+      "name": "r1_receiver_open_loop",
+      "family": "receiver",
+      "revision": "R1",
+      "params": {
+        "fault": "open_loop"
+      },
+      "diagnostic": false,
+      "process_exit": 0,
+      "samples": 20008,
+      "wall_seconds": 0.401,
+      "netlist_sha256": "9818cc05848f53b7d38d36478d6efca6da6f69d83ca6ca42eaf6815c380cb114",
+      "checks": [
+        {
+          "check": "ADC_normal_range_margin",
+          "passed": true
+        },
+        {
+          "check": "bad_loop_not_normal_4mA_reading",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "adc_pin_max_v": 0.000751222247399,
+        "adc_pin_min_v": 0.0007511977106355,
+        "sensor_headroom_min_v": 13.99999256114,
+        "burden_peak_w": 5.533669274492e-13,
+        "adc_steady_v": 0.000751222247399,
+        "loop_steady_a": 0.0,
+        "off_rail_injection_peak_a": null
+      },
+      "criteria_pass": true,
+      "reused_trace": true
+    },
+    {
+      "name": "r1_receiver_short_burden",
+      "family": "receiver",
+      "revision": "R1",
+      "params": {
+        "fault": "short_burden"
+      },
+      "diagnostic": false,
+      "process_exit": 0,
+      "samples": 20008,
+      "wall_seconds": 0.403,
+      "netlist_sha256": "23670e3a60980232777627f75b258d110fb6421007ff9329e9876194548e6789",
+      "checks": [
+        {
+          "check": "ADC_normal_range_margin",
+          "passed": true
+        },
+        {
+          "check": "bad_loop_not_normal_4mA_reading",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "adc_pin_max_v": 0.0007605917419693,
+        "adc_pin_min_v": 0.0007605672580608,
+        "sensor_headroom_min_v": 13.49997999993,
+        "burden_peak_w": 4.000029627892e-07,
+        "adc_steady_v": 0.0007605917419693,
+        "loop_steady_a": 0.02,
+        "off_rail_injection_peak_a": null
+      },
+      "criteria_pass": true,
+      "reused_trace": true
+    },
+    {
+      "name": "r1_receiver_open_burden",
+      "family": "receiver",
+      "revision": "R1",
+      "params": {
+        "fault": "open_burden"
+      },
+      "diagnostic": false,
+      "process_exit": 0,
+      "samples": 20008,
+      "wall_seconds": 0.436,
+      "netlist_sha256": "631579327752356262a22009703d04511af2ab492ca91efb02f5c7bf7cb6ad16",
+      "checks": [
+        {
+          "check": "ADC_normal_range_margin",
+          "passed": true
+        },
+        {
+          "check": "missing_burden_outside_valid_20mA_range",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "adc_pin_max_v": 2.850846299159,
+        "adc_pin_min_v": 2.850846299159,
+        "sensor_headroom_min_v": -3.552713678801e-15,
+        "burden_peak_w": 1.95222296008e-07,
+        "adc_steady_v": 2.850846299159,
+        "loop_steady_a": 0.001112109978344,
+        "off_rail_injection_peak_a": null
+      },
+      "criteria_pass": true,
+      "reused_trace": true
+    },
+    {
+      "name": "r1_receiver_fast_adc_off",
+      "family": "receiver",
+      "revision": "R1",
+      "params": {
+        "fault": "adc_off",
+        "rail_fall_s": 1e-06
+      },
+      "diagnostic": false,
+      "process_exit": 0,
+      "samples": 20074,
+      "wall_seconds": 0.409,
+      "netlist_sha256": "4604294239eaa3eabf6b28113478a4c91978aba02b20cb7c511c34b58be94390",
+      "checks": [
+        {
+          "check": "ADC_normal_range_margin",
+          "passed": true
+        },
+        {
+          "check": "off_pin_discharges_below_0.15V",
+          "passed": true
+        },
+        {
+          "check": "off_supply_injection_below_1uA",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "adc_pin_max_v": 1.52919103605,
+        "adc_pin_min_v": 0.04871981566342,
+        "sensor_headroom_min_v": 11.50000000161,
+        "burden_peak_w": 0.03999999993553,
+        "adc_steady_v": 0.06563881824774,
+        "loop_steady_a": 0.02,
+        "off_rail_injection_peak_a": 1.056125804489e-05
+      },
+      "criteria_pass": true,
+      "reused_trace": true
+    },
+    {
+      "name": "r1_receiver_corner_21.6V_99.9R",
+      "family": "receiver",
+      "revision": "R1",
+      "params": {
+        "supply": 21.6,
+        "burden": 99.9,
+        "current": 0.02,
+        "rail": 3.135
+      },
+      "diagnostic": false,
+      "process_exit": 0,
+      "samples": 20008,
+      "wall_seconds": 0.391,
+      "netlist_sha256": "605e6ac2a549f59648c7a626900582fc3d252c50cb31d1f3949f60553d3e8488",
+      "checks": [
+        {
+          "check": "ADC_normal_range_margin",
+          "passed": true
+        },
+        {
+          "check": "ADC_below_supply_for_valid_observation",
+          "passed": true
+        },
+        {
+          "check": "transmitter_current_tracks_request",
+          "passed": true
+        },
+        {
+          "check": "sensor_compliance_nonnegative",
+          "passed": true
+        },
+        {
+          "check": "burden_below_0.5W",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "adc_pin_max_v": 1.527665402863,
+        "adc_pin_min_v": 1.527665402862,
+        "sensor_headroom_min_v": 9.106650095627,
+        "burden_peak_w": 0.03977421262526,
+        "adc_steady_v": 1.527665402862,
+        "loop_steady_a": 0.02,
+        "off_rail_injection_peak_a": null
+      },
+      "criteria_pass": true,
+      "reused_trace": true
+    },
+    {
+      "name": "r1_receiver_corner_21.6V_100.1R",
+      "family": "receiver",
+      "revision": "R1",
+      "params": {
+        "supply": 21.6,
+        "burden": 100.1,
+        "current": 0.02,
+        "rail": 3.135
+      },
+      "diagnostic": false,
+      "process_exit": 0,
+      "samples": 20008,
+      "wall_seconds": 0.393,
+      "netlist_sha256": "ca0a83936b328a27f3ad72bbd62497e4a24bac03e5c160d7f2ccb2736de0652e",
+      "checks": [
+        {
+          "check": "ADC_normal_range_margin",
+          "passed": true
+        },
+        {
+          "check": "ADC_below_supply_for_valid_observation",
+          "passed": true
+        },
+        {
+          "check": "transmitter_current_tracks_request",
+          "passed": true
+        },
+        {
+          "check": "sensor_compliance_nonnegative",
+          "passed": true
+        },
+        {
+          "check": "burden_below_0.5W",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "adc_pin_max_v": 1.530716659577,
+        "adc_pin_min_v": 1.530716659572,
+        "sensor_headroom_min_v": 9.102668711515,
+        "burden_peak_w": 0.03985346929031,
+        "adc_steady_v": 1.530716659572,
+        "loop_steady_a": 0.02,
+        "off_rail_injection_peak_a": null
+      },
+      "criteria_pass": true,
+      "reused_trace": true
+    },
+    {
+      "name": "r1_receiver_corner_26.4V_99.9R",
+      "family": "receiver",
+      "revision": "R1",
+      "params": {
+        "supply": 26.4,
+        "burden": 99.9,
+        "current": 0.02,
+        "rail": 3.135
+      },
+      "diagnostic": false,
+      "process_exit": 0,
+      "samples": 20008,
+      "wall_seconds": 0.39,
+      "netlist_sha256": "b8080e9e012ee94995ee0bb466614b5651245962c02d0fe71ca29ab23ab3a70b",
+      "checks": [
+        {
+          "check": "ADC_normal_range_margin",
+          "passed": true
+        },
+        {
+          "check": "ADC_below_supply_for_valid_observation",
+          "passed": true
+        },
+        {
+          "check": "transmitter_current_tracks_request",
+          "passed": true
+        },
+        {
+          "check": "sensor_compliance_nonnegative",
+          "passed": true
+        },
+        {
+          "check": "burden_below_0.5W",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "adc_pin_max_v": 1.527665402863,
+        "adc_pin_min_v": 1.527665402862,
+        "sensor_headroom_min_v": 13.90665009563,
+        "burden_peak_w": 0.03977421262526,
+        "adc_steady_v": 1.527665402862,
+        "loop_steady_a": 0.02,
+        "off_rail_injection_peak_a": null
+      },
+      "criteria_pass": true,
+      "reused_trace": true
+    },
+    {
+      "name": "r1_receiver_corner_26.4V_100.1R",
+      "family": "receiver",
+      "revision": "R1",
+      "params": {
+        "supply": 26.4,
+        "burden": 100.1,
+        "current": 0.02,
+        "rail": 3.135
+      },
+      "diagnostic": false,
+      "process_exit": 0,
+      "samples": 20008,
+      "wall_seconds": 0.409,
+      "netlist_sha256": "0e33b145555179f39b419262206adaa6012086228a8d79d4a06292942b1d7add",
+      "checks": [
+        {
+          "check": "ADC_normal_range_margin",
+          "passed": true
+        },
+        {
+          "check": "ADC_below_supply_for_valid_observation",
+          "passed": true
+        },
+        {
+          "check": "transmitter_current_tracks_request",
+          "passed": true
+        },
+        {
+          "check": "sensor_compliance_nonnegative",
+          "passed": true
+        },
+        {
+          "check": "burden_below_0.5W",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "adc_pin_max_v": 1.530716659577,
+        "adc_pin_min_v": 1.530716659572,
+        "sensor_headroom_min_v": 13.90266871152,
+        "burden_peak_w": 0.03985346929031,
+        "adc_steady_v": 1.530716659572,
+        "loop_steady_a": 0.02,
+        "off_rail_injection_peak_a": null
+      },
+      "criteria_pass": true,
+      "reused_trace": true
+    },
+    {
+      "name": "r1_flow_4.5V_CTR0.2",
+      "family": "flow",
+      "revision": "R1",
+      "params": {
+        "supply": 4.5,
+        "ctr": 0.2
+      },
+      "diagnostic": false,
+      "process_exit": 0,
+      "samples": 10368,
+      "wall_seconds": 0.199,
+      "netlist_sha256": "329c0e3c56949d46b1e58d3b086d9b3f75a2e8438a00ea140fc6d95091178554",
+      "checks": [
+        {
+          "check": "logic_voltage_safe",
+          "passed": true
+        },
+        {
+          "check": "LED_current_bounded",
+          "passed": true
+        },
+        {
+          "check": "pulse_high_recognizable",
+          "passed": true
+        },
+        {
+          "check": "pulse_low_recognizable",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "logic_max_v": 3.300000001072,
+        "logic_min_v": 0.01893626350519,
+        "led_max_a": 0.004613098099068
+      },
+      "criteria_pass": true,
+      "reused_trace": true
+    },
+    {
+      "name": "r1_flow_5.5V_CTR0.2",
+      "family": "flow",
+      "revision": "R1",
+      "params": {
+        "supply": 5.5,
+        "ctr": 0.2
+      },
+      "diagnostic": false,
+      "process_exit": 0,
+      "samples": 10407,
+      "wall_seconds": 0.211,
+      "netlist_sha256": "b3b10de7cd6e7d684cc7d1bf53ed55a9e9612bdddf72012664ede1405b6943aa",
+      "checks": [
+        {
+          "check": "logic_voltage_safe",
+          "passed": true
+        },
+        {
+          "check": "LED_current_bounded",
+          "passed": true
+        },
+        {
+          "check": "pulse_high_recognizable",
+          "passed": true
+        },
+        {
+          "check": "pulse_low_recognizable",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "logic_max_v": 3.300000006329,
+        "logic_min_v": 0.009578229406906,
+        "led_max_a": 0.00635659835828
+      },
+      "criteria_pass": true,
+      "reused_trace": true
+    },
+    {
+      "name": "r1_flow_4.5V_CTR0.5",
+      "family": "flow",
+      "revision": "R1",
+      "params": {
+        "supply": 4.5,
+        "ctr": 0.5
+      },
+      "diagnostic": false,
+      "process_exit": 0,
+      "samples": 10397,
+      "wall_seconds": 0.206,
+      "netlist_sha256": "cd5e72fd74f89e4a8c9fd38e4a200022383830de30c0417780a8dd18229a6aa3",
+      "checks": [
+        {
+          "check": "logic_voltage_safe",
+          "passed": true
+        },
+        {
+          "check": "LED_current_bounded",
+          "passed": true
+        },
+        {
+          "check": "pulse_high_recognizable",
+          "passed": true
+        },
+        {
+          "check": "pulse_low_recognizable",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "logic_max_v": 3.300000000975,
+        "logic_min_v": 0.007108087519294,
+        "led_max_a": 0.004613105794052
+      },
+      "criteria_pass": true,
+      "reused_trace": true
+    },
+    {
+      "name": "r1_flow_5.5V_CTR0.5",
+      "family": "flow",
+      "revision": "R1",
+      "params": {
+        "supply": 5.5,
+        "ctr": 0.5
+      },
+      "diagnostic": false,
+      "process_exit": 0,
+      "samples": 10370,
+      "wall_seconds": 0.208,
+      "netlist_sha256": "bbb2783646dd33af077eec6d1fc33b3130be3472185a0ed66fe6ecbb1239dcb8",
+      "checks": [
+        {
+          "check": "logic_voltage_safe",
+          "passed": true
+        },
+        {
+          "check": "LED_current_bounded",
+          "passed": true
+        },
+        {
+          "check": "pulse_high_recognizable",
+          "passed": true
+        },
+        {
+          "check": "pulse_low_recognizable",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "logic_max_v": 3.300000020702,
+        "logic_min_v": 0.0007880245350493,
+        "led_max_a": 0.006356598270795
+      },
+      "criteria_pass": true,
+      "reused_trace": true
+    },
+    {
+      "name": "r1_flow_4.5V_CTR2",
+      "family": "flow",
+      "revision": "R1",
+      "params": {
+        "supply": 4.5,
+        "ctr": 2
+      },
+      "diagnostic": false,
+      "process_exit": 0,
+      "samples": 10419,
+      "wall_seconds": 0.209,
+      "netlist_sha256": "4bee587be12c6239a4c695acb67e87e28e6eff9e54f107cf5dc849c8e3b8313a",
+      "checks": [
+        {
+          "check": "logic_voltage_safe",
+          "passed": true
+        },
+        {
+          "check": "LED_current_bounded",
+          "passed": true
+        },
+        {
+          "check": "pulse_high_recognizable",
+          "passed": true
+        },
+        {
+          "check": "pulse_low_recognizable",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "logic_max_v": 3.300000001263,
+        "logic_min_v": -0.0007591107427656,
+        "led_max_a": 0.004613107224389
+      },
+      "criteria_pass": true,
+      "reused_trace": true
+    },
+    {
+      "name": "r1_flow_5.5V_CTR2",
+      "family": "flow",
+      "revision": "R1",
+      "params": {
+        "supply": 5.5,
+        "ctr": 2
+      },
+      "diagnostic": false,
+      "process_exit": 0,
+      "samples": 10430,
+      "wall_seconds": 0.213,
+      "netlist_sha256": "29214c7c73e2110e366494286276b33e12a722cb6af33455f2595e8c2cf14afb",
+      "checks": [
+        {
+          "check": "logic_voltage_safe",
+          "passed": true
+        },
+        {
+          "check": "LED_current_bounded",
+          "passed": true
+        },
+        {
+          "check": "pulse_high_recognizable",
+          "passed": true
+        },
+        {
+          "check": "pulse_low_recognizable",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "logic_max_v": 3.300000038715,
+        "logic_min_v": 0.0001660455393764,
+        "led_max_a": 0.006356598195425
+      },
+      "criteria_pass": true,
+      "reused_trace": true
+    },
+    {
+      "name": "r1_flow_pi_off",
+      "family": "flow",
+      "revision": "R1",
+      "params": {
+        "fault": "pi_off"
+      },
+      "diagnostic": false,
+      "process_exit": 0,
+      "samples": 10287,
+      "wall_seconds": 0.172,
+      "netlist_sha256": "cbcb2fb7d0e43e02049c6653bd749b0f6a43d2f926f91e3716685f2c43dafa3e",
+      "checks": [
+        {
+          "check": "logic_voltage_safe",
+          "passed": true
+        },
+        {
+          "check": "LED_current_bounded",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "logic_max_v": 0.0,
+        "logic_min_v": 0.0,
+        "led_max_a": 0.005483808212369
+      },
+      "criteria_pass": true,
+      "reused_trace": true
+    },
+    {
+      "name": "r1_flow_wire_open",
+      "family": "flow",
+      "revision": "R1",
+      "params": {
+        "fault": "open_signal"
+      },
+      "diagnostic": false,
+      "process_exit": 0,
+      "samples": 10128,
+      "wall_seconds": 0.126,
+      "netlist_sha256": "0778fcabce530ed62748029554985875ba038acc8ef5875d403323f5fcf25851",
+      "checks": [
+        {
+          "check": "logic_voltage_safe",
+          "passed": true
+        },
+        {
+          "check": "LED_current_bounded",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "logic_max_v": 3.3,
+        "logic_min_v": 3.3,
+        "led_max_a": 3.71238946796e-26
+      },
+      "criteria_pass": true,
+      "reused_trace": true
+    },
+    {
+      "name": "r1_refined_estop",
+      "family": "power",
+      "revision": "R1",
+      "params": {
+        "fault": "estop",
+        "max_step_s": 2e-05
+      },
+      "diagnostic": false,
+      "process_exit": 0,
+      "samples": 99536,
+      "wall_seconds": 7.22,
+      "netlist_sha256": "905a4f3f5a230b86984f5030a67a443226f7406e514ec78492a87cd183a4d009",
+      "checks": [
+        {
+          "check": "startup_no_drive",
+          "passed": true
+        },
+        {
+          "check": "run_has_expected_load_response",
+          "passed": true
+        },
+        {
+          "check": "drain_voltage_below_70V_model_design_limit",
+          "passed": true
+        },
+        {
+          "check": "fault_removes_current",
+          "passed": true
+        },
+        {
+          "check": "release_does_not_restart",
+          "passed": true
+        },
+        {
+          "check": "feedback_is_3V3_bounded",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "peak_drain_v": 33.05937843095,
+        "min_bus_v": -2.29752138332e-05,
+        "peak_pump_a": 0.581741986342,
+        "peak_valve_a": 0.4810320651278,
+        "peak_shunt_v": 0.02908709936111
+      },
+      "criteria_pass": true
+    },
+    {
+      "name": "r1_refined_short",
+      "family": "power",
+      "revision": "R1",
+      "params": {
+        "short_load": "pump",
+        "max_step_s": 2e-05,
+        "integration_order": 1
+      },
+      "diagnostic": false,
+      "process_exit": 0,
+      "samples": 196452,
+      "wall_seconds": 15.863,
+      "netlist_sha256": "a972924bd338ee686bddbf16a425d7985f1aedd7ff77d04f4b217fcad1d89c36",
+      "checks": [
+        {
+          "check": "startup_no_drive",
+          "passed": true
+        },
+        {
+          "check": "drain_voltage_below_70V_model_design_limit",
+          "passed": true
+        },
+        {
+          "check": "permit_off_removes_current",
+          "passed": true
+        },
+        {
+          "check": "overcurrent_latches_trip",
+          "passed": true
+        },
+        {
+          "check": "overcurrent_removes_current",
+          "passed": true
+        },
+        {
+          "check": "feedback_is_3V3_bounded",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "peak_drain_v": 31.09707412568,
+        "min_bus_v": -5.05401741755e-05,
+        "peak_pump_a": 4.805787945913,
+        "peak_valve_a": 0.003850979809678,
+        "peak_shunt_v": 0.2402893245712
+      },
+      "criteria_pass": true
+    },
+    {
+      "name": "r1_combined_fault_estop",
+      "family": "power",
+      "revision": "R1",
+      "params": {
+        "fault": "estop",
+        "master_welded": true,
+        "mos_short": "pump"
+      },
+      "diagnostic": false,
+      "process_exit": 0,
+      "samples": 54035,
+      "wall_seconds": 3.957,
+      "netlist_sha256": "61aad0c82840b68c2f55fa1e155361b27e2ebcd1150041165b53ba66d2f02071",
+      "checks": [
+        {
+          "check": "startup_no_drive",
+          "passed": true
+        },
+        {
+          "check": "run_has_expected_load_response",
+          "passed": true
+        },
+        {
+          "check": "drain_voltage_below_70V_model_design_limit",
+          "passed": true
+        },
+        {
+          "check": "fault_removes_current",
+          "passed": true
+        },
+        {
+          "check": "release_does_not_restart",
+          "passed": true
+        },
+        {
+          "check": "feedback_is_3V3_bounded",
+          "passed": true
+        }
+      ],
+      "metrics": {
+        "peak_drain_v": 32.86300701703,
+        "min_bus_v": -9.609164507557,
+        "peak_pump_a": 0.5886476634468,
+        "peak_valve_a": 0.4822356508858,
+        "peak_shunt_v": 0.09913430177553
+      },
+      "criteria_pass": true
+    }
+  ],
+  "required_pass": true,
+  "diagnostics_detected": true
+}

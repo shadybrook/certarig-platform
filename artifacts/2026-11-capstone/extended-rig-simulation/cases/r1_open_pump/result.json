@@ -1,0 +1,47 @@
+{
+  "name": "r1_open_pump",
+  "family": "power",
+  "revision": "R1",
+  "params": {
+    "open_load": "pump"
+  },
+  "diagnostic": false,
+  "process_exit": 0,
+  "samples": 36937,
+  "wall_seconds": 2.891,
+  "netlist_sha256": "5f1b4650be4cfb51a695f22b9d6a8934cf21ad2def4fb6946b9b38877c08f3bc",
+  "checks": [
+    {
+      "check": "startup_no_drive",
+      "passed": true
+    },
+    {
+      "check": "run_has_expected_load_response",
+      "passed": true
+    },
+    {
+      "check": "drain_voltage_below_70V_model_design_limit",
+      "passed": true
+    },
+    {
+      "check": "permit_off_removes_current",
+      "passed": true
+    },
+    {
+      "check": "open_load_current_is_missing",
+      "passed": true
+    },
+    {
+      "check": "feedback_is_3V3_bounded",
+      "passed": true
+    }
+  ],
+  "metrics": {
+    "peak_drain_v": 33.05808508042,
+    "min_bus_v": -4.357930761704e-05,
+    "peak_pump_a": 1.199934118271e-08,
+    "peak_valve_a": 0.4894980006334,
+    "peak_shunt_v": 0.02447490008411
+  },
+  "criteria_pass": true
+}

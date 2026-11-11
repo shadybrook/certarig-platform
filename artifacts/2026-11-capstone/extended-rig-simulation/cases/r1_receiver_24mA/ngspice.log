@@ -1,0 +1,35 @@
+
+Note: No compatibility mode selected!
+
+
+Circuit: certarig r1_receiver_24ma: sensor loop / adc protection r1
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+loop                                        24
+raw                                    2.39441
+rail                                       3.3
+inst                                         5
+pre                                    1.83528
+ref                                    2.59001
+mux_enable                                   5
+pin                                    1.83503
+headroom                               11.0056
+power                                0.0573319
+bburden_power#branch                         0
+bheadroom#branch                             0
+vloop#branch                            -0.024
+bmux#branch                                  0
+vinst#branch                       -0.00240999
+vrail#branch                      -2.46495e-12
+
+
+No. of Data Rows : 20008
+ngspice-47 done

@@ -1,0 +1,40 @@
+{
+  "case": {
+    "name": "receiver_burden_open_refused",
+    "family": "loop",
+    "params": {
+      "burden": 1000000000.0
+    },
+    "original": "missing_burden_protected",
+    "outcome": "refuse"
+  },
+  "original_control": false,
+  "assessment": {
+    "checks": {
+      "ADC_or_120R_input_within_rail_plus_0.3V": true,
+      "burden_below_half_watt": true,
+      "invalid_observation_refuses_authority": true,
+      "recovery_requires_explicit_reset": true
+    },
+    "metrics": {
+      "raw_max_V": 12.94446582836,
+      "pin_max_V": 2.847082783609,
+      "final_current_mA": 1.009712211553,
+      "burden_max_W": 1.675591955817e-07,
+      "off_injection_A": null,
+      "inferred_current_A": 0.037236456290909846,
+      "observation_valid": false,
+      "reference_guard_sequence": [
+        true,
+        false,
+        false,
+        true
+      ]
+    },
+    "passed": true
+  },
+  "samples": 20008,
+  "horizon_s": 0.04,
+  "netlist_sha256": "1988f599b276819268eee33da4d0bc72cbdaa4c6fc6acfe74402faa81815f888",
+  "experiment_ok": true
+}

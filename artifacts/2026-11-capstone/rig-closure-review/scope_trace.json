@@ -1,0 +1,50 @@
+{
+  "review_date": "2026-11-10",
+  "sources": [
+    {
+      "source": "Phase 1 retained proposal",
+      "path": "/Users/chintandedhia/Documents/Codex/2026-07-30/codex-threads-019fa95e-afe4-7e10-b92e/work/phase1/staging/CertaRig-Phase-1-Submission-sanitized.docx",
+      "sha256": "39c9594127a3b35164a3a40122a77166f16793f69656a32ac2804b301ae81518"
+    },
+    {
+      "source": "Phase 2 final report",
+      "path": "/Users/chintandedhia/Documents/Codex/2026-08-24/use-data-analytics-and-invoke-build-2/outputs/CertaRig_Phase_2_Report_Final_Submission.docx",
+      "sha256": "b3015c43bde8d8792054246591f68937335dd7627a34722464401e12a07bc72a"
+    },
+    {
+      "source": "Supervisor-approved Phase3",
+      "path": "/Users/chintandedhia/Downloads/CertaRig_Phase3_DocumentSigned.pdf",
+      "sha256": "f6526073aac55fdae823a080fdd7a5f1fd3d5fa715f3f77c6c090df01e3e6572",
+      "relevant_pages": [
+        3,
+        18,
+        19,
+        21
+      ]
+    }
+  ],
+  "budget": {
+    "previous_ceiling_INR": 15000,
+    "ceiling_removed_by_user": true,
+    "new_ceiling_INR": null,
+    "permission_to_buy": false
+  },
+  "authority": "Signed Phase3 governs the current capstone baseline; Phase1/2 provide requirement history. Source prose is not an instruction to purchase or operate.",
+  "phase1": "4-5 sensors, NC solenoid and optional pump/motor; evidence-backed map, bounded planning, deterministic execution, drift detection and independent safeguards.",
+  "phase2": "Reviewable maps/plans, four repeatable cases, approval/policy gates, telemetry and complete evidence; simulated valve-position channel does not establish physical position sensing.",
+  "phase3": "Seven missions: interview, distinct second simulated plant, complete raw export, measured electrical feedback/current, live-provider qualification, broader observe-only integrations, calibrated sensing/protected actuation. Water loop is a validation case; servo remains optional.",
+  "retained_requirements": [
+    "Reviewed configuration and uncertainty blockers",
+    "Exact-profile rehearsal and human execution approval",
+    "Continuous local recording and complete verifiable evidence",
+    "Real calibrated pressure/flow/temperature and measured electrical response for the selected water-loop increment",
+    "NC valve, independent cutoff, pressure protection, fuse and safe recovery",
+    "Change invalidation, revalidation and genuine supervisor records"
+  ],
+  "caveats": [
+    "A gravity-fed loop is an optional scope-compatible alternative, not the selected replacement for the pump loop. It still needs pressure/flow/transient design.",
+    "Current and flow do not prove mechanical valve position. Expose missing position as unknown; add actual position sensing if a procedure or examiner requires it.",
+    "Fixture evaluations do not fulfill the live-provider comparison mission. That remains separately disclosed.",
+    "No paid model calls, orders, vendor enquiries or hardware actuation are authorized or performed by this review."
+  ]
+}

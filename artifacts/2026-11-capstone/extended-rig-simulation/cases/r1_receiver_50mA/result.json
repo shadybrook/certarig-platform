@@ -1,0 +1,46 @@
+{
+  "name": "r1_receiver_50mA",
+  "family": "receiver",
+  "revision": "R1",
+  "params": {
+    "current": 0.05
+  },
+  "diagnostic": false,
+  "process_exit": 0,
+  "samples": 20008,
+  "wall_seconds": 0.394,
+  "netlist_sha256": "9660030ca7142cadaf5c1396fa8249128b437d049a5bbd7cc7a0b3ccf35cebc7",
+  "checks": [
+    {
+      "check": "ADC_normal_range_margin",
+      "passed": true
+    },
+    {
+      "check": "ADC_below_supply_for_valid_observation",
+      "passed": true
+    },
+    {
+      "check": "transmitter_current_tracks_request",
+      "passed": true
+    },
+    {
+      "check": "sensor_compliance_nonnegative",
+      "passed": true
+    },
+    {
+      "check": "burden_below_0.5W",
+      "passed": true
+    }
+  ],
+  "metrics": {
+    "adc_pin_max_v": 2.523098619923,
+    "adc_pin_min_v": 2.523098619788,
+    "sensor_headroom_min_v": 9.882688667612,
+    "burden_peak_w": 0.1083931390937,
+    "adc_steady_v": 2.523098619788,
+    "loop_steady_a": 0.033,
+    "off_rail_injection_peak_a": null
+  },
+  "criteria_pass": true,
+  "reused_trace": true
+}

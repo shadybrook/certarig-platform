@@ -1,0 +1,30 @@
+{
+  "case": {
+    "name": "unidirectional_stage_hot_1.5A",
+    "family": "thermal_driver",
+    "params": {
+      "amps": 1.5,
+      "rdson": 0.154,
+      "theta": 20,
+      "ambient": 50
+    },
+    "original": "drv8871_1.5A_hot_board_bound",
+    "outcome": "normal"
+  },
+  "original_control": false,
+  "assessment": {
+    "checks": {
+      "junction_below_125C_conservative_design_limit": true,
+      "load_above_6V": true
+    },
+    "metrics": {
+      "junction_max_C": 56.93,
+      "load_min_V": 11.769
+    },
+    "passed": true
+  },
+  "samples": 1508,
+  "horizon_s": 15,
+  "netlist_sha256": "3bf602b984c9eb1fb77ecb310fa176837360a4968f7cd7215cdbdc101ebcef6c",
+  "experiment_ok": true
+}

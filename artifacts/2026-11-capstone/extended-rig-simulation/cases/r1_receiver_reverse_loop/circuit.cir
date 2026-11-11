@@ -1,0 +1,39 @@
+CertaRig r1_receiver_reverse_loop: sensor loop / ADC protection R1
+Vloop loop 0 -24
+Bsensor loop raw I=0
+Rburden raw 0 100
+Vrail rail 0 3.3
+Vinst inst 0 5
+* Bounded fault protection equivalent: 2.5V rail maintained by shunt
+* reference plus steering diode and power-good controlled power-off isolator.
+Rseries raw pre 10k
+Cfilter pre 0 10n
+Rbias inst ref 1k
+Dref 0 ref REFERENCE
+.model REFERENCE D(Is=1p N=1 Rs=.8 BV=2.5 IBV=80u)
+Dupper pre ref CLAMP
+Dlower 0 pre CLAMP
+Bmux mux_enable 0 V=(v(rail)>3.0 && v(inst)>4.5 ? 5 : 0)
+Smux pre pin mux_enable 0 MUX
+Rdischarge pin 0 33k
+* Worst-case off leakage, source-independent envelope +/-2uA.
+Boffleak 0 pin I=(v(mux_enable)<2.5 ? 2u : 0)
+Cpin pin 0 10p
+.model MUX SW(Ron=4.5 Roff=1e12 Vt=2.5 Vh=.05)
+.model CLAMP D(Is=1e-7 N=1.05 Rs=.5 Cjo=10p)
+Radc pin 0 6Meg
+Dadc_hi pin rail ESD
+Dadc_lo 0 pin ESD
+.model ESD D(Is=1p N=1.3 Rs=10 Cjo=4p)
+Bheadroom headroom 0 V=v(loop)-v(raw)-10-abs(i(Vloop))*25
+Bburden_power power 0 V=v(raw)*v(raw)/100
+.options method=gear reltol=1e-5
+.control
+set wr_singlescale
+set wr_vecnames
+set numdgt=12
+tran .000002 .04 0 .000002
+wrdata trace.dat v(raw) v(pin) v(rail) v(headroom) v(power) i(Vrail) i(Vloop)
+quit
+.endc
+.end

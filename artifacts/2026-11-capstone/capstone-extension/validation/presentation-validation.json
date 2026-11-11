@@ -1,0 +1,144 @@
+{
+  "schemaVersion": "presentation-finalization.v1",
+  "finalSha256": "6c0f1ff0f3cfd018e7164487b652d8205dcc21f7938b063c48513b3115a82dba",
+  "byteCount": 384083,
+  "packageIntegrity": {
+    "chart_count": 0,
+    "claim_boundary": "Structural package checks only; no slide text, notes, formulas, chart values, or native PowerPoint execution were inspected.",
+    "finding_count": 0,
+    "findings": [],
+    "notes_parts_skipped": 10,
+    "relationship_part_count": 35,
+    "slide_count": 10,
+    "status": "pass",
+    "exitCode": 0,
+    "findingCount": 0,
+    "warnings": []
+  },
+  "presentationLayout": {
+    "finding_count": 0,
+    "findings": [],
+    "font_policy": {
+      "checked_text_script_count": 71,
+      "native_font_rendering_verified": false,
+      "observed_font_families": [
+        "Aptos",
+        "Arial Narrow"
+      ],
+      "observed_font_use_counts": {
+        "Aptos": 61,
+        "Arial Narrow": 10
+      },
+      "passed": true,
+      "performed": true
+    },
+    "slide_count": 10,
+    "slide_size_in": [
+      10,
+      7.5
+    ],
+    "warning_count": 0,
+    "warnings": [],
+    "exitCode": 0,
+    "findingCount": 0,
+    "fontPolicy": {
+      "checked_text_script_count": 71,
+      "native_font_rendering_verified": false,
+      "observed_font_families": [
+        "Aptos",
+        "Arial Narrow"
+      ],
+      "observed_font_use_counts": {
+        "Aptos": 61,
+        "Arial Narrow": 10
+      },
+      "passed": true,
+      "performed": true
+    }
+  },
+  "fontSelection": {
+    "basis": "reference",
+    "approvedFamilies": [
+      "Arial Narrow",
+      "Aptos",
+      "Aptos SemiBold"
+    ],
+    "scriptFonts": {},
+    "referenceSha256": "da83d919457eba3a4bcc4b2342d40b1e424e3f4f273c59ac838215c92081d535",
+    "referenceFontsVerifiedInEncodedText": true,
+    "checked_text_script_count": 71,
+    "native_font_rendering_verified": false,
+    "observed_font_families": [
+      "Aptos",
+      "Arial Narrow"
+    ],
+    "observed_font_use_counts": {
+      "Aptos": 61,
+      "Arial Narrow": 10
+    },
+    "passed": true,
+    "performed": true
+  },
+  "firstPartyImport": {
+    "performed": true,
+    "passed": true,
+    "slideCount": 10,
+    "sha256": "6c0f1ff0f3cfd018e7164487b652d8205dcc21f7938b063c48513b3115a82dba",
+    "runtimeNodeModules": "/Users/chintandedhia/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules",
+    "nodeExecutable": "/Users/chintandedhia/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node"
+  },
+  "nativeTableArithmetic": {
+    "performed": true,
+    "checked_column_count": 0,
+    "checks": [],
+    "claim_boundary": "Displayed-value arithmetic with rounding tolerance; not source-data verification.",
+    "eligible_table_count": 0,
+    "finding_count": 0,
+    "findings": [],
+    "native_table_count": 0,
+    "passed": true,
+    "schema_version": "presentation-native-table-arithmetic.v1",
+    "skipped_tables": [],
+    "slide_count": 10,
+    "warning_count": 0,
+    "warnings": []
+  },
+  "nativeChartTitles": {
+    "performed": true,
+    "checks": [],
+    "finding_count": 0,
+    "findings": [],
+    "native_chart_count": 0,
+    "native_powerpoint_verified": false,
+    "passed": true,
+    "presentation_sha256": "6c0f1ff0f3cfd018e7164487b652d8205dcc21f7938b063c48513b3115a82dba",
+    "schema_version": "presentation-native-chart-titles.v1",
+    "slide_count": 10,
+    "source_text_emitted": false,
+    "unresolved_linked_title_count": 0
+  },
+  "sourceDerivedPolicyFlags": [
+    "--expected-slide-size-emu",
+    "9144000,6858000",
+    "--validate-bullet-geometry",
+    "--validate-heading-fit",
+    "--cover-role",
+    "none",
+    "--expected-slide-count",
+    "10",
+    "--approved-font-family",
+    "Arial Narrow",
+    "--approved-font-family",
+    "Aptos",
+    "--approved-font-family",
+    "Aptos SemiBold"
+  ],
+  "nativeChartValidation": {
+    "detectedOwnerSlides": [],
+    "detectedChartCount": 0,
+    "targetApplication": null,
+    "sourceChartOwnersExplicitlyDeclared": false,
+    "validatorRan": false,
+    "passed": true
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "name": "integrated_unknown_startup_trip",
+  "family": "integrated",
+  "params": {
+    "startup_A": 3,
+    "cap_u": 100
+  },
+  "expected": "reject",
+  "reason": "Assumed 2x startup/100uF trips the 2.5A latch before running; actual pump inrush is unknown",
+  "checks": {
+    "startup_no_drive": true,
+    "run_has_expected_load_response": false,
+    "drain_voltage_below_70V_model_design_limit": true,
+    "permit_off_removes_current": true,
+    "feedback_is_3V3_bounded": true,
+    "BLDC_reverse_above_assumed_minus1V": true
+  },
+  "metrics": {
+    "peak_drain_v": 37.22893048175,
+    "min_bus_v": -1.584190287898e-08,
+    "peak_pump_a": 2.024835237529,
+    "peak_valve_a": 0.003315025177675,
+    "peak_shunt_v": 0.292526710081,
+    "pump_terminal_min_V": -0.0001204388507599,
+    "pump_terminal_max_V": 2.076403204315,
+    "trip_latch_max_V": 4.99999995
+  },
+  "criteria_pass": false,
+  "samples": 38627,
+  "horizon_s": 1.4,
+  "netlist_sha256": "1a56a463cedbf5a96185c228616a08cbe3a56ed395027cd164de9fb9da8b5369",
+  "matched_expectation": true
+}

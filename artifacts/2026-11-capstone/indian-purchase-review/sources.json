@@ -1,0 +1,76 @@
+{
+  "checked": "9-10 November 2026",
+  "sources": [
+    {
+      "component": "pump",
+      "url": "https://robu-prod-media.s3.ap-south-1.amazonaws.com/products/attachments/OUBdxYrTqNAGFqLSPFl2NML0rXL4TCD8CWIFkZ2J.pdf",
+      "interpretation": "12V 1.38A 5m 9L/min; actual attached sheet conflicts with product listing; do not merge variants"
+    },
+    {
+      "component": "pump manufacturer",
+      "url": "https://www.topsflo.com/brushless-dc-pump/brushless-dc-pump.html",
+      "interpretation": "B/C12-0905 family endpoints; no startup/current-controller model"
+    },
+    {
+      "component": "pressure",
+      "url": "https://nishkainstruments.com/product/pressure-transmitter/",
+      "interpretation": "0-1bar selected in live UI; 11-28V intersection and 0.5%FS conservative assumptions"
+    },
+    {
+      "component": "receiver",
+      "url": "https://wiki.dfrobot.com/sen0262/",
+      "interpretation": "120ohm 0-25mA published domain; no input-fault immunity proof"
+    },
+    {
+      "component": "receiver schematic",
+      "url": "https://dfimg.dfrobot.com/wiki/17563/SEN0262_current-to-voltage_schematics_v1.pdf",
+      "interpretation": "TP5551 buffer; separate burden-input experiment is not whole-board simulation"
+    },
+    {
+      "component": "loop protector",
+      "url": "https://www.analog.com/media/en/technical-documentation/data-sheets/MAX14626.pdf",
+      "interpretation": "45ohm max, 27-33mA DC bound, 36V input; dynamic fault overshoot/thermal cycling omitted"
+    },
+    {
+      "component": "isolation",
+      "url": "https://www.ti.com/lit/ds/symlink/tmux1511.pdf",
+      "interpretation": "3.6V powered-off signal domain; ideal PG switch timing is an explicit model gap"
+    },
+    {
+      "component": "current",
+      "url": "https://www.ti.com/lit/ds/symlink/ina219.pdf",
+      "interpretation": "+/-320mV shunt and 26V common mode; 0.1ohm from actual DNA module listing"
+    },
+    {
+      "component": "driver",
+      "url": "https://www.ti.com/lit/ds/symlink/drv8871.pdf",
+      "interpretation": "3.6A peak, 0.565ohm typical combined bridge resistance at specified conditions, TI test-PCB thetaJA41.1C/W; thermal shutdown/recovery not modeled"
+    },
+    {
+      "component": "valve family",
+      "url": "https://www.uflowvalve.com/Assets/Product/Catalogue/solenoid-valve/uflow_das_series_2_way_direct_acting_valve.pdf",
+      "interpretation": "12V10W family option; exact seller coil/part unresolved, L assumed"
+    },
+    {
+      "component": "hydraulic bypass",
+      "url": "https://assets.rs-online.com/image/upload/v1720004472/Datasheets/ecdedbd5e5f64de5b3b30b97a04c022d.pdf",
+      "interpretation": "Automatic/differential bypass, not demonstrated safety relief; missing capacity/tolerance"
+    },
+    {
+      "component": "temperature",
+      "url": "https://www.analog.com/media/en/technical-documentation/data-sheets/DS18B20.pdf",
+      "interpretation": "3.0-5.5V, 1-Wire, max 750ms 12bit conversion, chip accuracy not assembly calibration"
+    }
+  ],
+  "assumed": {
+    "pump_startup": "1-3x current in standalone envelope; integrated 1uF/1.5A nominal versus 100uF/3A failed start, neither vendor internals",
+    "valve_L_H": [
+      0.2,
+      0.5
+    ],
+    "cutoff": "earlier R1 behavioral RC/manual reset/watchdog, not selected IC/PCB",
+    "thermal": "Cth0.02J/K; theta41.1 TI PCB or assumed65C/W; Rds hot bound0.96ohm; no shutdown/dual-channel heating",
+    "hydraulic": "straight-line endpoint envelope only; K6; 2m pipe; actual valve/meter/bypass curves missing"
+  },
+  "procurement_release": false
+}

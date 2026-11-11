@@ -1,0 +1,39 @@
+{
+  "case": {
+    "name": "softstart_high_supply_large_cap",
+    "family": "start_power",
+    "params": {
+      "supply": 13.2,
+      "cap_u": 1000,
+      "limit": 4.32
+    },
+    "original": "",
+    "outcome": "normal"
+  },
+  "original_control": false,
+  "assessment": {
+    "checks": {
+      "measured_pump_shunt_in_range": true,
+      "source_within_5A": true,
+      "actuator_voltage_below_18V": true,
+      "peak_current_limited": true,
+      "startup_above_6V": true,
+      "no_spurious_trip": true,
+      "steady_after_startup": true
+    },
+    "metrics": {
+      "supply_peak_A": 4.205173897301,
+      "pump_peak_A": 4.205177281418,
+      "pump_shunt_peak_V": 0.2102588640709,
+      "trip_peak_V": 2.955397779518e-19,
+      "start_output_min_V": 12.14574898785,
+      "efuse_energy_J": 0.29263823176417575,
+      "silicon_SOA_qualified": false
+    },
+    "passed": true
+  },
+  "samples": 30353,
+  "horizon_s": 0.3,
+  "netlist_sha256": "5d301cf0ebd18c326c3d104001adfb5c7db3754809f105291248237e06a8ba31",
+  "experiment_ok": true
+}

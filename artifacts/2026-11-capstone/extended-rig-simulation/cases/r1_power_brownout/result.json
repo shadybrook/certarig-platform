@@ -1,0 +1,47 @@
+{
+  "name": "r1_power_brownout",
+  "family": "power",
+  "revision": "R1",
+  "params": {
+    "fault": "brownout"
+  },
+  "diagnostic": false,
+  "process_exit": 0,
+  "samples": 49054,
+  "wall_seconds": 3.581,
+  "netlist_sha256": "e7e928790270ab792532370c2f5e5629d5b7381662b3dcc47fc211db9301ee07",
+  "checks": [
+    {
+      "check": "startup_no_drive",
+      "passed": true
+    },
+    {
+      "check": "run_has_expected_load_response",
+      "passed": true
+    },
+    {
+      "check": "drain_voltage_below_70V_model_design_limit",
+      "passed": true
+    },
+    {
+      "check": "fault_removes_current",
+      "passed": true
+    },
+    {
+      "check": "release_does_not_restart",
+      "passed": true
+    },
+    {
+      "check": "feedback_is_3V3_bounded",
+      "passed": true
+    }
+  ],
+  "metrics": {
+    "peak_drain_v": 33.06046656479,
+    "min_bus_v": -2.348373980581e-05,
+    "peak_pump_a": 0.5817667055978,
+    "peak_valve_a": 0.4810320651279,
+    "peak_shunt_v": 0.02908833532394
+  },
+  "criteria_pass": true
+}

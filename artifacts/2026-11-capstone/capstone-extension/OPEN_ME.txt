@@ -1,0 +1,1 @@
+Open index.html for an offline readable handover, report pages and all ten slides. While the local server runs: http://127.0.0.1:18091/capstone-extension/ . Studio: http://127.0.0.1:18090 . Start with Your exact next steps. Hardware procurement remains on hold; no physical commissioning claimed.

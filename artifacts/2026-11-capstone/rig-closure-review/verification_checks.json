@@ -1,0 +1,41 @@
+{
+  "complete_cases": 31,
+  "original_controls": 8,
+  "mitigation_cases": 23,
+  "samples": 778742,
+  "offline_replay": true,
+  "original_unsafe_netlists_unchanged": true,
+  "fault_injections": [
+    {
+      "case": "missing_required_trace",
+      "rejected": true,
+      "message": "Missing/corrupt evidence: cases/softstart_3A_100uF/trace.csv.gz"
+    },
+    {
+      "case": "corrupted_trace",
+      "rejected": true,
+      "message": "Missing/corrupt evidence: cases/softstart_3A_100uF/trace.csv.gz"
+    },
+    {
+      "case": "rehashed_partial_transient",
+      "rejected": true,
+      "message": "Incomplete/nonfinite trace"
+    }
+  ],
+  "refinement_relative_differences": {
+    "supply_peak_A": 7.172274432111179e-07,
+    "pump_shunt_peak_V": 7.172263649406845e-07,
+    "efuse_energy_J": 4.058795492012463e-06
+  },
+  "browser": {
+    "report_loaded": true,
+    "paired_cards": 8,
+    "embedded_plot_loaded": true,
+    "evidence_expansion_works": true,
+    "horizontal_overflow": false
+  },
+  "tooling": "Ruff lint/format, Python compile and skill validator passed. No application code changed; full application regression suite was not rerun.",
+  "physical_qualification": false,
+  "application_integration": false,
+  "procurement_release": false
+}

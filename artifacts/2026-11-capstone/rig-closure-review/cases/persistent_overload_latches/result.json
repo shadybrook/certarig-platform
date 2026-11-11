@@ -1,0 +1,36 @@
+{
+  "case": {
+    "name": "persistent_overload_latches",
+    "family": "start_power",
+    "params": {
+      "fault": "overload"
+    },
+    "original": "",
+    "outcome": "fault"
+  },
+  "original_control": false,
+  "assessment": {
+    "checks": {
+      "measured_pump_shunt_in_range": true,
+      "source_within_5A": true,
+      "actuator_voltage_below_18V": true,
+      "peak_current_limited": true,
+      "fault_latches": true,
+      "permit_retry_does_not_restart": true
+    },
+    "metrics": {
+      "supply_peak_A": 4.000122526134,
+      "pump_peak_A": 4.0,
+      "pump_shunt_peak_V": 0.2,
+      "trip_peak_V": 4.9999999995,
+      "start_output_min_V": 10.94616884091,
+      "efuse_energy_J": 0.21755232314172687,
+      "silicon_SOA_qualified": false
+    },
+    "passed": true
+  },
+  "samples": 30399,
+  "horizon_s": 0.3,
+  "netlist_sha256": "e06728d32d836437778e3a8f8aff561e74a9aace25416178ce2d29ba4d4d6341",
+  "experiment_ok": true
+}

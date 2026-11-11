@@ -1,0 +1,28 @@
+{
+  "case": {
+    "name": "afe_short_burden",
+    "family": "afe",
+    "params": {
+      "fault": "short_burden"
+    },
+    "unsafe": false
+  },
+  "assessment": {
+    "checks": {
+      "adc_pin_absolute_budget": true,
+      "burden_below_half_watt": true,
+      "host_poweroff_injection_bounded": true,
+      "fault_is_not_a_valid_observation": true
+    },
+    "metrics": {
+      "pin_max_V": 0.9050836699373,
+      "rail_min_V": 4.600176529451,
+      "host_off_pin_V": 0.033
+    },
+    "criteria_pass": true
+  },
+  "samples": 20100,
+  "horizon": 0.04,
+  "netlist_sha256": "f6de9bd9cd57515d4dea81b4bae844a8f209a53809605602449d013a3689912d",
+  "experiment_ok": true
+}

@@ -1,0 +1,18 @@
+{
+  "implementation_commit": "f6b0c3ad923f3bfe3a519c9bd346a7fa46859e6a",
+  "engine": "ngspice 47",
+  "scenarios": 54,
+  "required_pass": 48,
+  "unsafe_controls_detected": 6,
+  "samples": 1810979,
+  "offline_replay": "54 scenarios",
+  "integrity_controls": "missing and corrupt evidence rejected in an isolated copy",
+  "fresh_cli_smoke": "one 20 mA receiver case generated and verified from a fresh directory",
+  "targeted_ruff_format_and_lint": "pass",
+  "application_code_changed": false,
+  "application_regressions_rerun": false,
+  "pdf_visual_review": "all four sheets rendered and inspected; height defects corrected",
+  "physical_validation": false,
+  "construction_release": false,
+  "procurement_release": false
+}

@@ -1,0 +1,25 @@
+
+Note: No compatibility mode selected!
+
+
+Circuit: drv8871 steady conduction / thermal analogy: drv8871_1.5a_hot_board_bound
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+bus                                         12
+load                                     10.56
+trise                                    140.4
+tj                                       190.4
+bjunction#branch                             0
+vbus#branch                               -1.5
+
+
+No. of Data Rows : 1508
+ngspice-47 done

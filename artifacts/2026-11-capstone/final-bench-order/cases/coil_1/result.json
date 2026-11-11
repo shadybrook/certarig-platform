@@ -1,0 +1,26 @@
+{
+  "case": {
+    "name": "coil_1",
+    "family": "coil",
+    "params": {
+      "L": 1
+    },
+    "unsafe": false
+  },
+  "assessment": {
+    "checks": {
+      "drain_below_80V_design_limit": true,
+      "coil_current_removed_by_one_second": true,
+      "energy_within_5J_suppressor_requirement": true
+    },
+    "metrics": {
+      "drain_peak_V": 55.45076135779,
+      "stored_energy_J": 0.1787465842623248
+    },
+    "criteria_pass": true
+  },
+  "samples": 154290,
+  "horizon": 1,
+  "netlist_sha256": "2defff77ea071b180c9f89a2aa9b7bf21935b968ff43307f057019b201110f75",
+  "experiment_ok": true
+}

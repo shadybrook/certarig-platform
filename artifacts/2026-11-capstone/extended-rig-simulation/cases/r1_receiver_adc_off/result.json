@@ -1,0 +1,38 @@
+{
+  "name": "r1_receiver_adc_off",
+  "family": "receiver",
+  "revision": "R1",
+  "params": {
+    "fault": "adc_off"
+  },
+  "diagnostic": false,
+  "process_exit": 0,
+  "samples": 20089,
+  "wall_seconds": 0.431,
+  "netlist_sha256": "c215b35ceedddb99c718cafad8f4a0247cec8d9c3bf11f81fcd37bf90e78f7ea",
+  "checks": [
+    {
+      "check": "ADC_normal_range_margin",
+      "passed": true
+    },
+    {
+      "check": "off_pin_discharges_below_0.15V",
+      "passed": true
+    },
+    {
+      "check": "off_supply_injection_below_1uA",
+      "passed": true
+    }
+  ],
+  "metrics": {
+    "adc_pin_max_v": 1.52919103605,
+    "adc_pin_min_v": 0.06121438214731,
+    "sensor_headroom_min_v": 11.50000000161,
+    "burden_peak_w": 0.03999999993553,
+    "adc_steady_v": 0.06563881824776,
+    "loop_steady_a": 0.02,
+    "off_rail_injection_peak_a": 1.358809233037e-07
+  },
+  "criteria_pass": true,
+  "reused_trace": true
+}

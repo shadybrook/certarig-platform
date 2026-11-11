@@ -1,0 +1,9 @@
+{
+  "archive": "/Users/chintandedhia/Documents/Codex/2026-11-09/okay-we-should-start-working-on/outputs/CertaRig_Extended_Bench_Order_CR-EXT-R1.zip",
+  "sha256": "efbcd39a2becda72707c5472c95ff24a3b7d39c6c41b10aa708ae1a0a0d27d08",
+  "bytes": 35413010,
+  "zip_integrity_pass": true,
+  "extracted_offline_replay_pass": true,
+  "manifest_files": 226,
+  "no_hardware_qualification": true
+}

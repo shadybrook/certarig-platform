@@ -1,0 +1,36 @@
+{
+  "case": {
+    "name": "estop_no_automatic_restart",
+    "family": "start_power",
+    "params": {
+      "fault": "estop"
+    },
+    "original": "",
+    "outcome": "fault"
+  },
+  "original_control": false,
+  "assessment": {
+    "checks": {
+      "measured_pump_shunt_in_range": true,
+      "source_within_5A": true,
+      "actuator_voltage_below_18V": true,
+      "peak_current_limited": true,
+      "fault_latches": true,
+      "permit_retry_does_not_restart": true
+    },
+    "metrics": {
+      "supply_peak_A": 3.12149490472,
+      "pump_peak_A": 3.121498209509,
+      "pump_shunt_peak_V": 0.1560749104755,
+      "trip_peak_V": 4.9999999995,
+      "start_output_min_V": 10.94616884091,
+      "efuse_energy_J": 0.07310549058888248,
+      "silicon_SOA_qualified": false
+    },
+    "passed": true
+  },
+  "samples": 30414,
+  "horizon_s": 0.3,
+  "netlist_sha256": "ce9704a9a79dc59f00f9889301bac0a17058423767b7011128c16ac8863442b5",
+  "experiment_ok": true
+}

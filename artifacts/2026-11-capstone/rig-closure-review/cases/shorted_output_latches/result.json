@@ -1,0 +1,36 @@
+{
+  "case": {
+    "name": "shorted_output_latches",
+    "family": "start_power",
+    "params": {
+      "fault": "short"
+    },
+    "original": "",
+    "outcome": "fault"
+  },
+  "original_control": false,
+  "assessment": {
+    "checks": {
+      "measured_pump_shunt_in_range": true,
+      "source_within_5A": true,
+      "actuator_voltage_below_18V": true,
+      "peak_current_limited": true,
+      "fault_latches": true,
+      "permit_retry_does_not_restart": true
+    },
+    "metrics": {
+      "supply_peak_A": 4.000996235931,
+      "pump_peak_A": 4.0,
+      "pump_shunt_peak_V": 0.2,
+      "trip_peak_V": 4.9999999995,
+      "start_output_min_V": 0.0,
+      "efuse_energy_J": 0.4198179072034182,
+      "silicon_SOA_qualified": false
+    },
+    "passed": true
+  },
+  "samples": 30496,
+  "horizon_s": 0.3,
+  "netlist_sha256": "0a771fdda8591edad9e9411b3724db2ea5f108316d0d1764453461763743bea2",
+  "experiment_ok": true
+}

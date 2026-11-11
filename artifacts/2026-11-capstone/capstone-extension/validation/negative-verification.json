@@ -1,0 +1,30 @@
+{
+  "missing_raw": {
+    "ok": false,
+    "files": 19,
+    "missing": [
+      "procedure_runs/run_20261109T092836_b80741/20261109T092836686905Z_thermal_soak.csv"
+    ],
+    "mismatched": [],
+    "errors": [
+      "missing or corrupt manifest artifact: procedure_runs/run_20261109T092836_b80741/20261109T092836686905Z_thermal_soak.csv",
+      "missing or corrupt raw recording: procedure_runs/run_20261109T092836_b80741/20261109T092836686905Z_thermal_soak.csv"
+    ],
+    "unlisted": [],
+    "zip": "../extension-artifacts/missing_raw.zip"
+  },
+  "corrupt_raw": {
+    "ok": false,
+    "files": 19,
+    "missing": [],
+    "mismatched": [
+      "procedure_runs/run_20261109T092836_b80741/20261109T092836686905Z_thermal_soak.csv"
+    ],
+    "errors": [
+      "missing or corrupt manifest artifact: procedure_runs/run_20261109T092836_b80741/20261109T092836686905Z_thermal_soak.csv",
+      "missing or corrupt raw recording: procedure_runs/run_20261109T092836_b80741/20261109T092836686905Z_thermal_soak.csv"
+    ],
+    "unlisted": [],
+    "zip": "../extension-artifacts/corrupt_raw.zip"
+  }
+}

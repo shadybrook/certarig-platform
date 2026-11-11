@@ -1,0 +1,16 @@
+TOPSFLO B12 electrical INPUT envelope: pump_input_13.2V_start2x
+Vsource source 0 13.2
+Rwire source bus 0.3
+Cbus bus 0 100u IC=0
+Bload bus 0 I=(time<.005 ? 0 : (time<.055 ? 3.0 : 1.5))*max(0,v(bus))/(max(0,v(bus))+.01)
+
+.options method=gear reltol=1e-5
+.control
+set wr_singlescale
+set wr_vecnames
+set numdgt=12
+tran 1e-05 0.15 0 1e-05
+wrdata trace.dat v(bus) i(Vsource)
+quit
+.endc
+.end

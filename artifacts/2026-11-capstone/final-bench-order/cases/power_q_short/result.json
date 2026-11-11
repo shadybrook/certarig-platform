@@ -1,0 +1,31 @@
+{
+  "case": {
+    "name": "power_q_short",
+    "family": "power",
+    "params": {
+      "fault": "q_short"
+    },
+    "unsafe": false
+  },
+  "assessment": {
+    "checks": {
+      "fault_does_not_restart": true,
+      "pre_fault_actuation_was_observed": true,
+      "pass_current_bounded": true,
+      "pass_power_bounded": true,
+      "regulated_forward_SOA_rectangle": true
+    },
+    "metrics": {
+      "output_max_V": 12.81833492465,
+      "pass_peak_A": 1.796233668794,
+      "pass_peak_W": 10.93307760904,
+      "tail_voltage_max_V": 0.0005597671885739,
+      "pass_energy_J": 0.10514047203625466
+    },
+    "criteria_pass": true
+  },
+  "samples": 80532,
+  "horizon": 0.8,
+  "netlist_sha256": "ea2758833b7f0fec4035e35aebb26d9bee1eb3f8af6ae756274f2d091cabdc14",
+  "experiment_ok": true
+}

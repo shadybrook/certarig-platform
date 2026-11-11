@@ -1,0 +1,27 @@
+{
+  "case": {
+    "name": "afe_burden_100.1",
+    "family": "afe",
+    "params": {
+      "burden": 100.1
+    },
+    "unsafe": false
+  },
+  "assessment": {
+    "checks": {
+      "adc_pin_absolute_budget": true,
+      "burden_below_half_watt": true,
+      "host_poweroff_injection_bounded": true
+    },
+    "metrics": {
+      "pin_max_V": 1.530871347887,
+      "rail_min_V": 4.600176529498,
+      "host_off_pin_V": 0.033
+    },
+    "criteria_pass": true
+  },
+  "samples": 20063,
+  "horizon": 0.04,
+  "netlist_sha256": "e37a0644516aa38a6d23895e3d0c97ef0cef738cfb5a9b53dc2071c7b755b68e",
+  "experiment_ok": true
+}

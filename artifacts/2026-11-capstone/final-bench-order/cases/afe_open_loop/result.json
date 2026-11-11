@@ -1,0 +1,28 @@
+{
+  "case": {
+    "name": "afe_open_loop",
+    "family": "afe",
+    "params": {
+      "fault": "open_loop"
+    },
+    "unsafe": false
+  },
+  "assessment": {
+    "checks": {
+      "adc_pin_absolute_budget": true,
+      "burden_below_half_watt": true,
+      "host_poweroff_injection_bounded": true,
+      "fault_is_not_a_valid_observation": true
+    },
+    "metrics": {
+      "pin_max_V": 0.9050914514433,
+      "rail_min_V": 4.600176529451,
+      "host_off_pin_V": 0.033
+    },
+    "criteria_pass": true
+  },
+  "samples": 20136,
+  "horizon": 0.04,
+  "netlist_sha256": "49589818f7594c5bc8474e34055632733bb8bc3f82a89a27e23aeb8fe9111c47",
+  "experiment_ok": true
+}

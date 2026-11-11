@@ -1,0 +1,35 @@
+{
+  "name": "integrated_valve_L_corner",
+  "family": "integrated",
+  "params": {
+    "fault": "estop",
+    "valve_l": 0.5,
+    "supply": 13.2
+  },
+  "expected": "within_envelope",
+  "reason": "",
+  "checks": {
+    "startup_no_drive": true,
+    "run_has_expected_load_response": true,
+    "drain_voltage_below_70V_model_design_limit": true,
+    "fault_removes_current": true,
+    "release_does_not_restart": true,
+    "feedback_is_3V3_bounded": true,
+    "BLDC_reverse_above_assumed_minus1V": true
+  },
+  "metrics": {
+    "peak_drain_v": 42.88027790422,
+    "min_bus_v": -3.473321213929e-08,
+    "peak_pump_a": 1.38804024827,
+    "peak_valve_a": 0.8476988050025,
+    "peak_shunt_v": 0.1388041884767,
+    "pump_terminal_min_V": -0.01310088637299,
+    "pump_terminal_max_V": 12.39767172212,
+    "trip_latch_max_V": 0.0
+  },
+  "criteria_pass": true,
+  "samples": 40653,
+  "horizon_s": 1.4,
+  "netlist_sha256": "639c1b9eb388d4d7de7f562ce5afdd57aa884bb4d456981b30e187eb6d62b646",
+  "matched_expectation": true
+}

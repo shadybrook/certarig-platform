@@ -1,3 +1,12 @@
+> **Latest capstone update - 11 November 2026:**
+> [Progress and latest source milestones](docs/capstone/LATEST_PROGRESS.md) |
+> [Extended-bench circuit diagram](docs/hardware/extended-rig/CR-EXT-R1/CertaRig_Extended_Bench_Circuit_CR-EXT-R1.pdf) |
+> [All generated deliverables](artifacts/2026-11-capstone/README.md)
+>
+> Completed simulator/commissioning work is at repository root. Ongoing sandbox
+> work is a separately labelled development snapshot. New physical bench
+> commissioning and detailed supplier schematics remain pending.
+
 # CertaRig
 
 A user-deployable test-operations platform. The LLM interprets and asks; deterministic code compares numbers, enforces limits and drives the output. The agent reaches the rig only through the Edge API, filtered by a capability manifest.

@@ -1,0 +1,30 @@
+{
+  "case": {
+    "name": "unidirectional_stage_3.6A_thermal",
+    "family": "thermal_driver",
+    "params": {
+      "amps": 3.6,
+      "rdson": 0.154,
+      "theta": 20,
+      "ambient": 50
+    },
+    "original": "drv8871_3.6A_continuous_claim",
+    "outcome": "normal"
+  },
+  "original_control": false,
+  "assessment": {
+    "checks": {
+      "junction_below_125C_conservative_design_limit": true,
+      "load_above_6V": true
+    },
+    "metrics": {
+      "junction_max_C": 89.9168,
+      "load_min_V": 11.4456
+    },
+    "passed": true
+  },
+  "samples": 1508,
+  "horizon_s": 15,
+  "netlist_sha256": "b1d43750d7c0015d054554cbfe083513c9f780d27a395c2203a34d6a2f90504e",
+  "experiment_ok": true
+}

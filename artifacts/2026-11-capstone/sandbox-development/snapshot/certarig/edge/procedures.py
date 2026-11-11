@@ -1,0 +1,220 @@
+"""Procedure runtime API extension for the Edge node."""
+
+from __future__ import annotations
+
+from pathlib import Path
+from typing import Any
+
+from .capabilities import Principal
+from .runtime import ProcedureLibrary, ProcedureRunner, ProcedureValidationError, validate_procedure
+from .runtime.runner import RunnerError
+from .server import EdgeNode, HttpError, RequestContext
+
+DEFAULT_SKILLS_ROOT = Path(__file__).resolve().parents[2] / "skills"
+
+
+class ProcedureService:
+    def __init__(self, node: EdgeNode) -> None:
+        self.node = node
+        self.skills_root: Path | None = None
+        self.library = ProcedureLibrary(
+            node.config, drafts_dir=node.runtime.evidence_dir / "procedure_drafts"
+        )
+        self.runner = ProcedureRunner(
+            node.runtime,
+            node.config,
+            node.runtime.evidence_dir,
+            contract_hash=lambda: node.contract_hash,
+            bundle_context=lambda: {
+                "manifest_hash": node.manifest.manifest_hash,
+                "manifest_id": node.manifest.manifest_id,
+                "evidence_root": str(node.runtime.evidence_dir),
+                "hardware_identity": (
+                    f"{type(node.runtime.hardware).__name__}@{__import__('socket').gethostname()}"
+                    f" config={node.config.config_hash[:12]}"
+                ),
+            },
+            on_finish=self._on_run_finish,
+        )
+
+    def load_library(self, root: str | Path) -> list[str]:
+        self.skills_root = Path(root)
+        return [procedure.id for procedure in self.library.load_directory(root)]
+
+    def close(self) -> None:
+        self.runner.close()
+
+    # ------------------------------------------------------------ routes
+    def list_procedures(self, ctx: RequestContext) -> tuple[int, dict[str, Any]]:
+        return 200, {"procedures": self.library.list(), "skipped": self.library.skipped}
+
+    def get_procedure(self, ctx: RequestContext) -> tuple[int, dict[str, Any]]:
+        procedure = self.library.get(ctx.params["procedure_id"])
+        if procedure is None:
+            raise HttpError(404, "procedure not found")
+        return 200, {**procedure.summary(), "procedure": procedure.raw}
+
+    def validate(self, ctx: RequestContext) -> tuple[int, dict[str, Any]]:
+        raw = ctx.body.get("procedure")
+        errors = validate_procedure(raw, self.node.config)
+        payload: dict[str, Any] = {"valid": not errors, "errors": errors}
+        if not errors and isinstance(raw, dict):
+            from .config import canonical_hash
+
+            payload["procedure_hash"] = canonical_hash(raw)
+        return 200, payload
+
+    def create_draft(self, ctx: RequestContext) -> tuple[int, dict[str, Any]]:
+        raw = ctx.body.get("procedure")
+        if not isinstance(raw, dict):
+            raise HttpError(400, "procedure must be an object")
+        try:
+            draft = self.library.add_draft(raw, ctx.principal_name)
+        except ProcedureValidationError as exc:
+            raise HttpError(422, {"error": "procedure is invalid", "errors": exc.errors}) from exc
+        return 201, draft.summary()
+
+    def list_drafts(self, ctx: RequestContext) -> tuple[int, dict[str, Any]]:
+        if ctx.principal is Principal.ANONYMOUS:
+            raise HttpError(401, "authentication required")
+        return 200, {"drafts": self.library.drafts()}
+
+    def get_draft(self, ctx: RequestContext) -> tuple[int, dict[str, Any]]:
+        if ctx.principal is Principal.ANONYMOUS:
+            raise HttpError(401, "authentication required")
+        draft = self.library.draft(ctx.params["procedure_hash"])
+        if draft is None:
+            raise HttpError(404, "draft not found")
+        return 200, {**draft.summary(), "procedure": draft.raw}
+
+    def approve_draft(self, ctx: RequestContext) -> tuple[int, dict[str, Any]]:
+        if ctx.principal is not Principal.OPERATOR:
+            raise HttpError(403, "only an engineer (operator principal) can approve a procedure draft")
+        if "sandboxes" in self.node.extensions and (ctx.body.get("sandbox_id") or ctx.body.get("sandbox_proposal_id")):
+            draft = self.library.draft(ctx.params["procedure_hash"])
+            if draft is None:
+                raise HttpError(404, "draft not found")
+            self.node.extensions["sandboxes"].handoff(ctx, "procedure", draft.raw)
+        try:
+            procedure = self.library.approve_draft(ctx.params["procedure_hash"], ctx.principal_name)
+        except KeyError as exc:
+            raise HttpError(404, "draft not found") from exc
+        return 200, procedure.summary()
+
+    def reject_draft(self, ctx: RequestContext) -> tuple[int, dict[str, Any]]:
+        if ctx.principal is not Principal.OPERATOR:
+            raise HttpError(403, "only an engineer (operator principal) can reject a procedure draft")
+        try:
+            self.library.reject_draft(ctx.params["procedure_hash"])
+        except KeyError as exc:
+            raise HttpError(404, "draft not found") from exc
+        return 200, {"status": "rejected"}
+
+    def _on_run_finish(self, run: Any) -> None:
+        from .ledger import append_outcome
+        from .runtime.model import RunStatus
+        from .twin_gate import record_sim_pass
+
+        failed = next((step.step_id for step in run.steps if step.status not in {"passed", "skipped", "pending"}), None)
+        append_outcome(
+            self.node.runtime.evidence_dir,
+            {
+                "procedure_id": run.procedure_id,
+                "procedure_hash": run.procedure_hash,
+                "run_id": run.run_id,
+                "status": run.status.value,
+                "outcome_reason": run.outcome_reason,
+                "first_failing_step": failed,
+                "config_hash": self.node.config.config_hash,
+                "contract_hash": self.node.contract_hash,
+            },
+        )
+        if run.status is not RunStatus.PASSED:
+            return
+        if self.node.config.hardware.mode != "simulator":
+            return
+        record_sim_pass(self.node.runtime.evidence_dir, run.procedure_id, run.procedure_hash, run.run_id, self.node.config)
+
+    def start_run(self, ctx: RequestContext) -> tuple[int, dict[str, Any]]:
+        procedure_id = str(ctx.body.get("procedure_id", ""))
+        procedure = self.library.get(procedure_id)
+        if procedure is None:
+            raise HttpError(404, f"procedure {procedure_id!r} not found or not approved")
+        from certarig.edge.hardware.raspberry_pi import RaspberryPiHardware
+
+        from .twin_gate import check_gate
+
+        # The gate is about the physical adapter, not the config document. Tests inject a
+        # ControllableRig under rig.wave1.json (mode raspberry_pi) and must not be blocked.
+        mode = "raspberry_pi" if isinstance(self.node.runtime.hardware, RaspberryPiHardware) else "mock"
+        refusal = check_gate(self.node.runtime.evidence_dir, procedure.procedure_hash, mode, config=self.node.config if self.node.config.commissioning_required else None)
+        if refusal is not None:
+            raise HttpError(409, refusal)
+        label = str(ctx.body.get("label") or procedure_id)
+        approval = self.node.approvals.get(ctx.approval_id) if ctx.approval_id else None
+        import json
+
+        gate_path = self.node.runtime.evidence_dir / "twin_gate" / f"{procedure.procedure_hash}.json"
+        try:
+            run = self.runner.start(procedure, label, ctx.principal_name, evidence_context={
+                "config": self.node.rig_document()["document"] or self.node.config.public_dict(),
+                "commissioning": self.node.extensions["commissioning"].current() if "commissioning" in self.node.extensions else None,
+                "approval": approval.to_dict() if approval else None,
+                "provider": __import__("os").environ.get("CERTARIG_AGENT_PROVIDER", "fake"),
+                **(self.node.extensions["interviews"].evidence() if "interviews" in self.node.extensions else {}),
+                "rehearsal": json.loads(gate_path.read_text()) if gate_path.is_file() else {"kind": "no_previous_rehearsal", "hardware_mode": self.node.config.hardware.mode},
+            })
+        except RunnerError as exc:
+            raise HttpError(409, str(exc)) from exc
+        return 201, run.to_dict()
+
+    def list_runs(self, ctx: RequestContext) -> tuple[int, dict[str, Any]]:
+        return 200, {"runs": self.runner.list()}
+
+    def get_run(self, ctx: RequestContext) -> tuple[int, dict[str, Any]]:
+        run = self.runner.get(ctx.params["run_id"])
+        if run is None:
+            raise HttpError(404, "run not found")
+        return 200, run.to_dict()
+
+    def ack(self, ctx: RequestContext) -> tuple[int, dict[str, Any]]:
+        try:
+            run = self.runner.ack(ctx.params["run_id"], str(ctx.body.get("step_id", "")), ctx.principal_name)
+        except KeyError as exc:
+            raise HttpError(404, "run not found") from exc
+        except RunnerError as exc:
+            raise HttpError(409, str(exc)) from exc
+        return 200, run.to_dict()
+
+    def abort(self, ctx: RequestContext) -> tuple[int, dict[str, Any]]:
+        try:
+            run = self.runner.abort(
+                ctx.params["run_id"], str(ctx.body.get("reason") or "aborted via API"), ctx.principal_name
+            )
+        except KeyError as exc:
+            raise HttpError(404, "run not found") from exc
+        except RunnerError as exc:
+            raise HttpError(409, str(exc)) from exc
+        return 200, run.to_dict()
+
+
+def install_procedures(node: EdgeNode, skills_root: str | Path | None = None) -> ProcedureService:
+    service = ProcedureService(node)
+    if skills_root is not None:
+        service.load_library(skills_root)
+    node.extensions["procedures"] = service
+    add = node.add_route
+    add("GET", "/v1/procedures", service.list_procedures, "read_procedures")
+    add("GET", "/v1/procedures/drafts", service.list_drafts)
+    add("GET", "/v1/procedures/drafts/{procedure_hash}", service.get_draft)
+    add("GET", "/v1/procedures/{procedure_id}", service.get_procedure, "read_procedures")
+    add("POST", "/v1/procedures/validate", service.validate)
+    add("POST", "/v1/procedures/drafts", service.create_draft, "draft_procedure")
+    add("POST", "/v1/procedures/drafts/{procedure_hash}/approve", service.approve_draft)
+    add("POST", "/v1/procedures/drafts/{procedure_hash}/reject", service.reject_draft)
+    add("GET", "/v1/procedure_runs", service.list_runs, "read_procedure_run")
+    add("POST", "/v1/procedure_runs", service.start_run, "run_procedure")
+    add("GET", "/v1/procedure_runs/{run_id}", service.get_run, "read_procedure_run")
+    add("POST", "/v1/procedure_runs/{run_id}/ack", service.ack, "ack_operator_step")
+    add("POST", "/v1/procedure_runs/{run_id}/abort", service.abort, "abort_procedure")
+    return service

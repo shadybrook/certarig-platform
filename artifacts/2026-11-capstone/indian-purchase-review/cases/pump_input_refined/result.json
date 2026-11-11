@@ -1,0 +1,25 @@
+{
+  "name": "pump_input_refined",
+  "family": "pump_input",
+  "params": {
+    "supply": 10.8,
+    "startup": 3,
+    "step": 2e-06
+  },
+  "expected": "within_envelope",
+  "reason": "",
+  "checks": {
+    "input_6_to_18V": true,
+    "steady_startup_demand_below_5A": true
+  },
+  "metrics": {
+    "operating_input_min_V": 9.451426845373,
+    "operating_source_max_A": 4.495243848757,
+    "connection_inrush_peak_A": 4.495243848757
+  },
+  "criteria_pass": true,
+  "samples": 75012,
+  "horizon_s": 0.15,
+  "netlist_sha256": "36c8b89ecd3474314d9b02915d49bb6b291245f269d87f4b1e353570600ffa88",
+  "matched_expectation": true
+}

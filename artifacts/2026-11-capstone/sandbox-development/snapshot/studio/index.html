@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CertaRig Studio</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="top">
+      <a class="brand" href="#telemetry">
+        <span class="mark">CR</span>
+        <span>CertaRig Studio</span>
+      </a>
+      <nav id="nav" aria-label="Studio">
+        <a href="#telemetry" data-view="telemetry">Live</a>
+        <a href="#procedures" data-view="procedures">Procedures</a>
+        <a href="#approvals" data-view="approvals">Approvals <span id="approval-count" class="badge hidden">0</span></a>
+        <a href="#agent" data-view="agent">Agent</a>
+        <a href="#evidence" data-view="evidence">Evidence</a>
+        <a href="#capabilities" data-view="capabilities">Capabilities</a>
+        <a href="#author" data-view="author">Author</a>
+        <a href="#onboard" data-view="onboard">Onboard</a>
+        <a href="#sandbox" data-view="sandbox">Sandbox</a>
+      </nav>
+      <div class="session">
+        <span id="health-pill" class="pill" data-state="down">offline</span>
+        <button id="logout" class="ghost" type="button">Clear keys</button>
+      </div>
+    </header>
+
+    <aside id="gate" class="gate" hidden>
+      <form id="login-form" class="card">
+        <p class="eyebrow">Connect</p>
+        <h1>Authenticate to this Edge node</h1>
+        <p>Keys stay in this browser tab only. They are never written to the repository or GBrain.</p>
+        <label>Operator key <input id="operator-key" data-testid="operator-key" type="password" autocomplete="off" required minlength="12" /></label>
+        <label>Your name <input id="operator-name" type="text" value="studio-operator" /></label>
+        <label>Mint a 1-hour session
+          <input id="mint-session" type="checkbox" />
+        </label>
+        <label>Auditor key (read-only, optional)
+          <input id="auditor-key" type="password" autocomplete="off" />
+        </label>
+        <button class="primary" type="submit">Open Studio</button>
+        <p id="login-error" class="error" hidden></p>
+      </form>
+    </aside>
+
+    <main id="main">
+      <section id="view-telemetry" class="view" data-view="telemetry"></section>
+      <section id="view-procedures" class="view hidden" data-view="procedures"></section>
+      <section id="view-approvals" class="view hidden" data-view="approvals"></section>
+      <section id="view-agent" class="view hidden" data-view="agent"></section>
+      <section id="view-evidence" class="view hidden" data-view="evidence"></section>
+      <section id="view-capabilities" class="view hidden" data-view="capabilities"></section>
+      <section id="view-author" class="view hidden" data-view="author"></section>
+      <section id="view-onboard" class="view hidden" data-view="onboard"></section>
+      <section id="view-sandbox" class="view hidden" data-view="sandbox"></section>
+    </main>
+
+    <div id="toast" class="toast hidden" role="status"></div>
+    <script type="module" src="./src/app.mjs"></script>
+  </body>
+</html>

@@ -1,0 +1,31 @@
+{
+  "case": {
+    "name": "nishka_12V_insufficient_compliance",
+    "family": "loop",
+    "params": {
+      "supply": 12
+    },
+    "expected": "reject",
+    "reason": "11V transmitter minimum plus receiver/protector burden prevents 20mA"
+  },
+  "original_control": true,
+  "assessment": {
+    "checks": {
+      "ADC_or_120R_input_within_rail_plus_0.3V": true,
+      "burden_below_half_watt": true,
+      "transmitter_reaches_requested_current": false
+    },
+    "metrics": {
+      "raw_max_V": 0.6446271543469,
+      "pin_max_V": 0.4940301865698,
+      "final_current_mA": 6.461324467004999,
+      "burden_max_W": 0.004155441681214,
+      "off_injection_A": null
+    },
+    "criteria_pass": false
+  },
+  "samples": 20008,
+  "horizon_s": 0.04,
+  "netlist_sha256": "47a5d185ee852c01ca62f0504ff9338fa7da677ef43bb24eefe9ac62e109a1b1",
+  "experiment_ok": true
+}
