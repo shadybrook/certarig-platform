@@ -172,6 +172,14 @@ class ToolRegistry:
                     },
                     "review_location": "Onboard: review complete source document and diff",
                 }
+            if name in {"sandbox_experiment", "read_sandbox"} and not result.get("artifact_name"):
+                allowed = {"sandbox_id", "revision", "status", "snapshot_hash", "expires_at", "authority", "job_id", "kind", "qualification", "proposal_id", "error", "artifacts"}
+                brief = {k:v for k,v in result.items() if k in allowed}
+                if "jobs" in result:
+                    brief["jobs"] = [{k:v for k,v in j.items() if k in allowed} for j in result["jobs"]]
+                if result.get("receipt"):
+                    brief["verification"] = result["receipt"]["verification"]
+                result = brief
             return ToolResult(name, arguments, True, result, _ms(started))
         except EdgeApiError as exc:
             payload = dict(exc.payload)
@@ -198,6 +206,26 @@ class ToolRegistry:
     def _edge(self, name: str, args: dict[str, Any]) -> dict[str, Any]:
         client = self.client
         approval = args.get("approval_id")
+        if name == "read_sandbox":
+            base = "/v1/sandboxes/" + str(args["sandbox_id"])
+            if args.get("job_id"):
+                base += "/jobs/" + str(args["job_id"])
+                if args.get("artifact_name"):
+                    from urllib.parse import quote
+                    artifact = str(args["artifact_name"])
+                    data = client.request("GET", base + "/artifacts/" + quote(artifact, safe=""), raw=True)
+                    return {"artifact_name": artifact, "bytes": len(data), "preview": "PNG available in Studio" if artifact.endswith(".png") else data[:8000].decode(errors="replace"), "truncated": len(data)>8000, "evidence_kind": "untrusted_experiment_artifact_not_authority"}
+            return client.get(base)
+        if name == "sandbox_experiment":
+            action = args["action"]
+            sandbox_payload = {k:v for k,v in args.items() if k not in {"action", "sandbox_id"}}
+            if action == "create":
+                return client.post("/v1/sandboxes", sandbox_payload)
+            base = "/v1/sandboxes/" + str(args["sandbox_id"])
+            if action == "close":
+                return client.request("DELETE", base, {})
+            suffix = {"revise": "/revisions", "run": "/jobs", "propose": "/proposals"}[action]
+            return client.post(base + suffix, sandbox_payload)
         if name == "commissioning_interview":
             action = args["action"]
             base = "/v1/commissioning/interviews"

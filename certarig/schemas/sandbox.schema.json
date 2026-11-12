@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://certarig.local/schemas/sandbox.schema.json",
+  "title": "CertaRig disposable commissioning workspace v1",
+  "type": "object",
+  "required": ["sandbox_id", "owner", "status", "revision", "snapshot", "snapshot_hash", "revision_hashes", "jobs", "proposals", "events", "authority"],
+  "properties": {
+    "sandbox_id": {"type": "string", "pattern": "^sbx_[a-f0-9]{16}$"},
+    "owner": {"type": "string"},
+    "status": {"enum": ["active", "expired", "closed"]},
+    "revision": {"type": "integer", "minimum": 0, "maximum": 50},
+    "authority": {"const": "none"},
+    "snapshot": {"type": "object", "required": ["document", "procedure", "base_config_hash", "evidence_kind"]},
+    "snapshot_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "revision_hashes": {"type": "object", "additionalProperties": {"type": "string"}},
+    "jobs": {"type": "array", "maxItems": 10, "items": {"type": "object", "required": ["job_id", "kind", "status", "revision", "qualification", "artifacts"], "properties": {"job_id": {"type": "string", "pattern": "^job_[a-f0-9]{16}$"}, "kind": {"enum": ["python", "spice", "rehearsal"]}, "status": {"enum": ["queued", "running", "completed", "failed", "cancelled", "timed_out", "interrupted"]}, "qualification": {"type": "boolean"}, "artifacts": {"type": "object"}}}},
+    "proposals": {"type": "array", "items": {"type": "object", "properties": {"kind": {"enum": ["configuration", "procedure"]}, "status": {"const": "needs_operator_review"}}}},
+    "events": {"type": "array"}
+  }
+}

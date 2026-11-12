@@ -1,0 +1,74 @@
+{
+  "recorded_at": "2026-11-11 07:49:59 UTC",
+  "status": "implemented_software_runtime_and_final_regression_blocked",
+  "implementation_commits": [
+    "8a121a6",
+    "7942a03",
+    "20c8515"
+  ],
+  "last_complete_regression": {
+    "command": "make check",
+    "status": "passed_before_final_quota_collection_fix",
+    "passed": 343,
+    "skipped": 8,
+    "coverage_percent": 90.26,
+    "coverage_gate_percent": 90
+  },
+  "final_repeat": {
+    "command": "make check",
+    "status": "interrupted_after_disk_exhaustion",
+    "observed_error": "OSError: [Errno 28] No space left on device in simulator recording flush",
+    "completed_cases": 193,
+    "skipped": 8,
+    "failures": 0,
+    "errors": 0,
+    "sandbox_passed": 61,
+    "sandbox_skipped": 7,
+    "requires_clean_complete_rerun": true
+  },
+  "targeted_final_quota_test": "passed",
+  "lint": "passed_on_final_source",
+  "typing": {
+    "status": "passed",
+    "source_files": 89
+  },
+  "browser": {
+    "full_suite_passed": 10,
+    "sandbox_repeat_passed": 2,
+    "provider": "fake_fixture",
+    "screenshot": "studio-blocked.png"
+  },
+  "slow_scenario_soak": {
+    "passed": 1
+  },
+  "runtime_qualification": {
+    "status": "not_run",
+    "required_real_container_cases": 7,
+    "image_built": false,
+    "sandbox_vm_created": false,
+    "success_refusal_demo_executed": false
+  },
+  "preflight": {
+    "ready": false,
+    "free_bytes": 128917504,
+    "memory_pressure": 2,
+    "blockers": [
+      "At least 8 GiB free disk space is required; no existing files will be deleted",
+      "macOS memory pressure is elevated; close workloads manually",
+      "Pinned sandbox image has not been built"
+    ]
+  },
+  "preservation": {
+    "existing_docker_context": "colima",
+    "existing_colima_profiles": [
+      "default"
+    ],
+    "phase3_changed": false,
+    "preexisting_data_deleted": false,
+    "unrelated_workloads_stopped": false,
+    "paid_calls": false,
+    "hardware_writes": false,
+    "cleanup": "Only about 7 MiB of this task's completed temporary pytest artifacts"
+  },
+  "next_gate": "At least 8 GiB free disk and normal macOS memory pressure; clean full regression, image build, real-container qualification and real demo still required"
+}

@@ -59,6 +59,9 @@ def _params(properties: dict[str, Any] | None = None, required: list[str] | None
 TOOL_CATALOGUE: dict[str, ToolSpec] = {
     spec.name: spec
     for spec in (
+        ToolSpec("read_sandbox", "Read a disposable sandbox and its jobs; no execution authority.", False, _params({"sandbox_id": {"type": "string"}, "job_id": {"type": "string"}, "artifact_name": {"type": "string"}}, ["sandbox_id"])),
+        ToolSpec("sandbox_experiment", "Create/read/revise/run/close a local experiment or submit an inert configuration/procedure proposal. Code runs only in the isolated broker; never applies or approves equipment changes.", True,
+            _params({"action": {"enum": ["create", "revise", "run", "propose", "close"]}, "sandbox_id": {"type": "string"}, "source": {"type": "string"}, "procedure_id": {"type": "string"}, "interview_id": {"type": "string"}, "recording_id": {"enum": ["latest"]}, "seed": {"type": "integer"}, "expected_revision": {"type": "integer"}, "document": {"type": "object"}, "procedure": {"type": "object"}, "kind": {"enum": ["python", "spice", "rehearsal", "configuration", "procedure"]}, "job_id": {"type": "string"}}, ["action"])),
         ToolSpec("read_rig", "Read the public rig configuration, signals map and hashes.", False, _params()),
         ToolSpec(
             "read_capabilities", "Read this manifest: what the agent may do right now.", False, _params()

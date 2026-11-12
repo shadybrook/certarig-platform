@@ -23,6 +23,10 @@ Studio (browser)  ──►  Edge node  ──►  ProcessGuardrail  ──►  
 
 The Phase 3 PoC that this was imported from is frozen. This repo is the platform.
 
+## Local commissioning sandbox
+
+The [Sandbox setup and workflow](docs/sandbox/README.md) adds disposable Python/SPICE experiments, separate trusted simulator rehearsal, reviewed proposals and offline evidence replay. See the [implementation status](docs/sandbox/IMPLEMENTATION_STATUS.md) for verified software checks and outstanding runtime qualification. Container execution remains disabled until the dedicated runtime passes preflight and its real-container test suite.
+
 ## Experimental CNC and printer integration
 
 The [machine control feasibility study](docs/research/2026-11-07-machine-control-feasibility.md) maps supported integration routes for CNC, filament and resin machines. The [reproducible machine lab](docs/research/MACHINE_CONTROL_LAB.md) exercises the existing agent tool loop against real OctoPrint 1.11.8 and its bundled VIRTUAL printer. It verifies 12 controller integration checks, including job completion and approval refusals. The gateway remains restricted to the virtual printer; physical machines and live model inference are separate validation milestones.

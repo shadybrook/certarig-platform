@@ -139,6 +139,43 @@ class EdgeClient:
     def propose_interview(self, interview_id: str) -> dict[str, Any]:
         return self.post(f"/v1/commissioning/interviews/{interview_id}/propose", {})
 
+    def sandbox_preflight(self) -> dict[str, Any]:
+        return self.get("/v1/sandboxes/preflight")
+
+    def create_sandbox(self, source: str = "active", procedure_id: str | None = None, seed: int = 11, recording_id: str | None = None) -> dict[str, Any]:
+        body: dict[str, Any] = {"source": source, "seed": seed}
+        if procedure_id:
+            body["procedure_id"] = procedure_id
+        if recording_id is not None:
+            body["recording_id"] = recording_id
+        return self.post("/v1/sandboxes", body)
+
+    def sandbox(self, sandbox_id: str) -> dict[str, Any]:
+        return self.get(f"/v1/sandboxes/{sandbox_id}")
+
+    def run_sandbox(self, sandbox_id: str, kind: str, source: str = "") -> dict[str, Any]:
+        return self.post(f"/v1/sandboxes/{sandbox_id}/jobs", {"kind": kind, "source": source})
+
+    def revise_sandbox(self, sandbox_id: str, revision: int, document: dict[str, Any], procedure: dict[str, Any] | None = None) -> dict[str, Any]:
+        body: dict[str, Any] = {"expected_revision": revision, "document": document}
+        if procedure is not None:
+            body["procedure"] = procedure
+        return self.post(f"/v1/sandboxes/{sandbox_id}/revisions", body)
+
+    def sandbox_job(self, sandbox_id: str, job_id: str) -> dict[str, Any]:
+        return self.get(f"/v1/sandboxes/{sandbox_id}/jobs/{job_id}")
+
+    def propose_sandbox(self, sandbox_id: str, job_id: str, kind: str = "configuration") -> dict[str, Any]:
+        return self.post(f"/v1/sandboxes/{sandbox_id}/proposals", {"job_id": job_id, "kind": kind})
+
+    def export_sandbox(self, sandbox_id: str) -> bytes:
+        data: bytes = self.request("GET", f"/v1/sandboxes/{sandbox_id}/export", raw=True)
+        return data
+
+    def close_sandbox(self, sandbox_id: str) -> dict[str, Any]:
+        result: dict[str, Any] = self.request("DELETE", f"/v1/sandboxes/{sandbox_id}", {})
+        return result
+
     def signals(self) -> dict[str, Any]:
         return self.get("/v1/signals")
 

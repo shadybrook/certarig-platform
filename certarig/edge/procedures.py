@@ -90,6 +90,11 @@ class ProcedureService:
     def approve_draft(self, ctx: RequestContext) -> tuple[int, dict[str, Any]]:
         if ctx.principal is not Principal.OPERATOR:
             raise HttpError(403, "only an engineer (operator principal) can approve a procedure draft")
+        if "sandboxes" in self.node.extensions and (ctx.body.get("sandbox_id") or ctx.body.get("sandbox_proposal_id")):
+            draft = self.library.draft(ctx.params["procedure_hash"])
+            if draft is None:
+                raise HttpError(404, "draft not found")
+            self.node.extensions["sandboxes"].handoff(ctx, "procedure", draft.raw)
         try:
             procedure = self.library.approve_draft(ctx.params["procedure_hash"], ctx.principal_name)
         except KeyError as exc:

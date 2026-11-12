@@ -1,3 +1,17 @@
+components:
+  securitySchemes:
+    operatorKey:
+      type: apiKey
+      in: header
+      name: X-CertaRig-Operator-Key
+    agentKey:
+      type: apiKey
+      in: header
+      name: X-CertaRig-Agent-Key
+    session:
+      type: apiKey
+      in: header
+      name: X-CertaRig-Session
 openapi: 3.0.3
 info:
   title: CertaRig Edge API
@@ -499,3 +513,214 @@ paths:
       description: Validate sources, units, calibration and supported procedures.
         Returns needs_evidence with blockers or proposed with a configuration diff
         and revalidation checklist. Never applies configuration.
+  /v1/sandboxes/preflight:
+    get:
+      summary: GET /v1/sandboxes/preflight
+      responses:
+        '200':
+          description: Success
+      description: Authenticated local sandbox broker operation. No physical authority.
+        Disabled/unavailable isolation returns503; invalid or stale experiment returns409.
+        Generated code never runs on the host.
+      security:
+      - operatorKey: []
+      - agentKey: []
+      - session: []
+  /v1/sandboxes:
+    get:
+      summary: GET /v1/sandboxes
+      responses:
+        '200':
+          description: Success
+      description: Authenticated local sandbox broker operation. No physical authority.
+        Disabled/unavailable isolation returns503; invalid or stale experiment returns409.
+        Generated code never runs on the host.
+      security:
+      - operatorKey: []
+      - agentKey: []
+      - session: []
+    post:
+      summary: POST /v1/sandboxes
+      responses:
+        '200':
+          description: Success
+      description: Authenticated local sandbox broker operation. No physical authority.
+        Disabled/unavailable isolation returns503; invalid or stale experiment returns409.
+        Generated code never runs on the host.
+      security:
+      - operatorKey: []
+      - agentKey: []
+      - session: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                source:
+                  enum:
+                  - active
+                  - thermal
+                  - pressure_flow
+                  - interview
+                procedure_id:
+                  type: string
+                interview_id:
+                  type: string
+                recording_id:
+                  enum:
+                  - latest
+                seed:
+                  type: integer
+              additionalProperties: false
+  /v1/sandboxes/{sandbox_id}:
+    get:
+      summary: GET /v1/sandboxes/{sandbox_id}
+      responses:
+        '200':
+          description: Success
+      description: Authenticated local sandbox broker operation. No physical authority.
+        Disabled/unavailable isolation returns503; invalid or stale experiment returns409.
+        Generated code never runs on the host.
+      security:
+      - operatorKey: []
+      - agentKey: []
+      - session: []
+    delete:
+      summary: DELETE /v1/sandboxes/{sandbox_id}
+      responses:
+        '200':
+          description: Success
+      description: Authenticated local sandbox broker operation. No physical authority.
+        Disabled/unavailable isolation returns503; invalid or stale experiment returns409.
+        Generated code never runs on the host.
+      security:
+      - operatorKey: []
+      - agentKey: []
+      - session: []
+  /v1/sandboxes/{sandbox_id}/revisions:
+    post:
+      summary: POST /v1/sandboxes/{sandbox_id}/revisions
+      responses:
+        '200':
+          description: Success
+      description: Authenticated local sandbox broker operation. No physical authority.
+        Disabled/unavailable isolation returns503; invalid or stale experiment returns409.
+        Generated code never runs on the host.
+      security:
+      - operatorKey: []
+      - agentKey: []
+      - session: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                expected_revision:
+                  type: integer
+                document:
+                  type: object
+                procedure:
+                  type: object
+              additionalProperties: false
+  /v1/sandboxes/{sandbox_id}/jobs:
+    post:
+      summary: POST /v1/sandboxes/{sandbox_id}/jobs
+      responses:
+        '200':
+          description: Success
+      description: Authenticated local sandbox broker operation. No physical authority.
+        Disabled/unavailable isolation returns503; invalid or stale experiment returns409.
+        Generated code never runs on the host.
+      security:
+      - operatorKey: []
+      - agentKey: []
+      - session: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                kind:
+                  enum:
+                  - python
+                  - spice
+                  - rehearsal
+                source:
+                  type: string
+                  maxLength: 256000
+              additionalProperties: false
+  /v1/sandboxes/{sandbox_id}/jobs/{job_id}:
+    get:
+      summary: GET /v1/sandboxes/{sandbox_id}/jobs/{job_id}
+      responses:
+        '200':
+          description: Success
+      description: Authenticated local sandbox broker operation. No physical authority.
+        Disabled/unavailable isolation returns503; invalid or stale experiment returns409.
+        Generated code never runs on the host.
+      security:
+      - operatorKey: []
+      - agentKey: []
+      - session: []
+  /v1/sandboxes/{sandbox_id}/jobs/{job_id}/artifacts/{name}:
+    get:
+      summary: GET /v1/sandboxes/{sandbox_id}/jobs/{job_id}/artifacts/{name}
+      responses:
+        '200':
+          description: Success
+      description: Authenticated local sandbox broker operation. No physical authority.
+        Disabled/unavailable isolation returns503; invalid or stale experiment returns409.
+        Generated code never runs on the host.
+      security:
+      - operatorKey: []
+      - agentKey: []
+      - session: []
+  /v1/sandboxes/{sandbox_id}/proposals:
+    post:
+      summary: POST /v1/sandboxes/{sandbox_id}/proposals
+      responses:
+        '200':
+          description: Success
+      description: Authenticated local sandbox broker operation. No physical authority.
+        Disabled/unavailable isolation returns503; invalid or stale experiment returns409.
+        Generated code never runs on the host.
+      security:
+      - operatorKey: []
+      - agentKey: []
+      - session: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                job_id:
+                  type: string
+                kind:
+                  enum:
+                  - configuration
+                  - procedure
+              additionalProperties: false
+  /v1/sandboxes/{sandbox_id}/export:
+    get:
+      summary: GET /v1/sandboxes/{sandbox_id}/export
+      responses:
+        '200':
+          description: Checksummed sandbox ZIP; numerical replay does not authenticate
+            origin without local broker
+        '409':
+          description: Active job or missing/corrupt evidence
+      description: Authenticated local sandbox broker operation. No physical authority.
+        Disabled/unavailable isolation returns503; invalid or stale experiment returns409.
+        Generated code never runs on the host.
+      security:
+      - operatorKey: []
+      - agentKey: []
+      - session: []
