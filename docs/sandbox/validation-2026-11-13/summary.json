@@ -1,0 +1,46 @@
+{
+  "date": "2026-11-13",
+  "repository": "shadybrook/certarig-platform",
+  "branch": "capstone/sandbox-2026-11-13",
+  "tested_commit": "7d0931b7e2cd77f429739a0680c3f5021c526292",
+  "execution_location": "local_macos_not_codex_cloud",
+  "python": "3.14.3",
+  "make_check": {
+    "status": "passed",
+    "lint": "passed",
+    "typing_source_files": 89,
+    "coverage_percent": 90.33,
+    "coverage_gate_percent": 90
+  },
+  "slow_scenario_soak": {
+    "status": "passed",
+    "tests": 1
+  },
+  "studio_browser": {
+    "status": "passed",
+    "tests": 10,
+    "provider": "fake_fixture"
+  },
+  "real_container_qualification": {
+    "status": "not_run",
+    "cases_remaining": 7
+  },
+  "codex_cloud_task": {
+    "status": "not_started"
+  },
+  "hosted_ci": {
+    "status": "runners_not_started",
+    "workflow_run_id": 43308772376,
+    "test_steps_executed": false
+  },
+  "preservation": {
+    "published_base": "6c009303960ebd9441400d01a20f6da02f2b1a5a",
+    "existing_published_artifacts_deleted": false,
+    "phase3_installation_changed": false
+  },
+  "files": {
+    "make-check.txt": "1ce3c9d05ca9dfdeca72b8c43415942bf78dd833a335ac7273afbacdefe60766",
+    "soak.txt": "c67be4a13d6147186df520095af76f2df072816c2ba974f0c3fa964595c3f827",
+    "browser.txt": "adf5c672480608ef2dc92f8054be243e94621ee5e5829e1c1a91d2fea89fa937"
+  }
+}

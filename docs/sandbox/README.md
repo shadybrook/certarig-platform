@@ -4,6 +4,8 @@ Local commissioning experiments and trusted simulated rehearsal. **Not released 
 
 ## Current deployment gate
 
+The [13 November publication checks](validation-2026-11-13/summary.json) pass locally: lint, typing, 90.33% coverage, soak and ten browser tests. These replace the incomplete full regression recorded on 11 November. Worker execution is still unqualified; the seven real-container tests have not run.
+
 The implementation session initially found about 1.5 GiB free disk and elevated macOS memory pressure; storage subsequently exhausted completely during the final regression repeat. The exact final probe and outstanding checks are recorded in the [implementation status report](IMPLEMENTATION_STATUS.md). The approved requirements are 8 GiB free and normal memory pressure. No new Colima VM or worker image was built under those conditions. Only this task's disposable test artifacts were cleaned up; pre-existing data and unrelated workloads were preserved. No paid calls were made or hardware connected. Mocked engine tests and trusted host-side simulator tests are not container-isolation qualification.
 
 ## Prepare, qualify, then serve

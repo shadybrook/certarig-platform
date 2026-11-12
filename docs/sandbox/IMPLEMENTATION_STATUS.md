@@ -1,5 +1,7 @@
 # CertaRig Sandbox implementation checkpoint — 11 November 2026
 
+**Publication update — 13 November:** A fresh local `make check` now passes with 90.33% coverage. The soak check and all ten Studio browser tests also pass. See the [dated validation record](validation-2026-11-13/summary.json) and its hashed logs. Real-container qualification and a Codex Cloud run remain outstanding. The checkpoint account below preserves the historical 11 November results and storage failure.
+
 **Software implemented; runtime release blocked and unqualified.** No disposable worker has run in the dedicated VM during this implementation session. The frozen Phase 3 installation and physical hardware were not changed.
 
 ## Reviewable delivery
