@@ -8,6 +8,8 @@ The implementation session initially found about 1.5 GiB free disk and elevated 
 
 ## Prepare, qualify, then serve
 
+For Codex Cloud, read the [cloud feasibility review and bounded work order](CODEX_CLOUD_REVIEW.md). The current launcher is Colima-specific; cloud worker execution requires a native Linux backend and separate qualification.
+
 Run from this source checkout after `make install`. Use the existing development virtualenv. First inspect resource blockers:
 
     .venv/bin/python -m certarig sandbox preflight
