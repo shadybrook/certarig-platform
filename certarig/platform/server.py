@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Any, cast
 from urllib.parse import parse_qs, urlsplit
 
-from . import evaluation, evidence
+from . import evaluation, evidence, health, profiles
 from .auth import OIDC
 from .service import Platform
 
@@ -55,9 +55,24 @@ class API:
             return p.pair(actor, body["connector"])
         if parts == ["assets", "enroll"] and method == "POST":
             return p.enroll(actor, body["code"])
+        if (
+            len(parts) == 4
+            and parts[0] == "assets"
+            and parts[2:] == ["profile-review", "preview"]
+            and method == "POST"
+        ):
+            return profiles.preview(p, actor, parts[1])
         if len(parts) == 3 and parts[0] == "assets":
             if parts[2] == "grants" and method == "POST":
                 return p.grant(actor, parts[1], body["user_id"], body["enabled"])
+            if parts[2] == "tools" and method == "GET":
+                return {"tools": p.observation_tools(actor, parts[1])}
+            if parts[2] == "profiles" and method == "GET":
+                return {"profiles": profiles.history(p, actor, parts[1])}
+            if parts[2] == "profile-review":
+                if method == "POST" and set(body) == {"review_id"}:
+                    return profiles.accept(p, actor, parts[1], body["review_id"])
+                raise ValueError("Expected a reviewed profile preview identifier")
             if method == "GET":
                 return p.read_asset(actor, parts[1], parts[2])
         if parts == ["model-connections"]:
@@ -74,10 +89,13 @@ class API:
         if len(parts) == 3 and parts[0] == "model-connections" and method == "POST":
             c = p.owned_connection(actor, parts[1])
             if parts[2] == "disconnect":
+                disconnected = p.disconnect(actor, c["id"])
                 previous = self.connections.pop(c["id"], None)
                 if previous:
                     previous.close()
-                return p.disconnect(actor, c["id"])
+                return disconnected
+            if not c["enabled"]:
+                raise PermissionError("Model connection is disconnected; create a new connection")
             provider = (
                 self.connections.setdefault(c["id"], self.providers(c))
                 if c["id"] not in self.connections
@@ -87,8 +105,12 @@ class API:
                 return provider.login()
             if parts[2] == "status":
                 result = provider.account()
-                c["status"] = "connected" if result["connected"] else "not_connected"
-                p.store.put("connection", c)
+                with p.store.atomic():
+                    current = p.owned_connection(actor, c["id"])
+                    if not current["enabled"] or current["revision"] != c["revision"]:
+                        raise PermissionError("Model status response belongs to a disconnected connection")
+                    current["status"] = "connected" if result["connected"] else "not_connected"
+                    p.store.put("connection", current)
                 return result
         if parts == ["agents"]:
             if method == "GET":
@@ -110,19 +132,22 @@ class API:
                 return e
             if method == "POST":
                 return evaluation.qualify(p, actor, e["id"], self.broker)
-        if parts == ["deployments"] and method == "GET":
-            accessible = {a["id"] for a in p.assets(actor)}
+        if parts == ["deployments", "runtime"] and method == "GET":
             return {
-                "deployments": [
-                    d for d in p.store.listing("deployment", actor.org_id) if d["asset_id"] in accessible
-                ]
+                "runtime": health.status(p.store)
+                if p.assets(actor)
+                else {"state": "unavailable", "heartbeat_at": None}
+            }
+        if parts == ["deployments"] and method == "GET":
+            return {
+                "deployments": [{**d, "runtime_health": health.status(p.store)} for d in p.deployments(actor)]
             }
         if parts == ["deployments", "review"] and method == "POST":
             p.reviewer(actor)
             evaluation.validate(p, actor, body["evaluation_id"], self.broker)
             return p.review(actor, body["version_id"], body["evaluation_id"])
         if len(parts) == 2 and parts[0] == "deployments" and method == "GET":
-            return p.deployment(actor, parts[1])
+            return p.present_deployment(actor, parts[1])
         if len(parts) == 3 and parts[0] == "deployments":
             d = p.deployment(actor, parts[1])
             if parts[2] == "events" and method == "GET":

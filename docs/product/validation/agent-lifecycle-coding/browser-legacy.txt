@@ -1,0 +1,17 @@
+
+Running 10 tests using 1 worker
+
+(node:81296) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 studio/e2e/pressure_guardrail.spec.js:45:1 › pressure_guardrail trips from Studio and then passes after the operator lowers pressure (5.9s)
+  ✓   2 studio/e2e/pressure_guardrail.spec.js:75:1 › operator can grant an approval from the inbox (2.0s)
+  ✓   3 studio/e2e/sandbox.spec.js:11:1 › sandbox accurately reports disabled runtime without a host fallback (1.1s)
+  ✓   4 studio/e2e/sandbox.spec.js:19:1 › sandbox frontend fixture keeps blocked execution disabled and escapes artifact text (1.1s)
+  ✓   5 studio/e2e/studio_honesty.spec.js:23:1 › onboard briefing persists after reload (2.1s)
+  ✓   6 studio/e2e/studio_honesty.spec.js:40:1 › stale contract retries once after a hot apply (1.2s)
+  ✓   7 studio/e2e/studio_honesty.spec.js:54:1 › authoring wizard drafts and approves a soak (1.2s)
+  ✓   8 studio/e2e/studio_honesty.spec.js:68:1 › procedures reconnect to the stored run after reload (2.0s)
+  ✓   9 studio/e2e/zz_capstone_workflow.spec.js:5:1 › configure thermal rig, block, review, deny, approve, run and export (4.4s)
+  ✓  10 studio/e2e/zz_commissioning_interview.spec.js:3:1 › resume an incomplete interview, then onboard both fixture plants through reviewed proposals (2.6s)
+
+  10 passed (25.1s)

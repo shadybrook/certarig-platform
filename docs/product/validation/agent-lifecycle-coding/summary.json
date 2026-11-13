@@ -1,0 +1,47 @@
+{
+  "date": "2026-11-13",
+  "baseline": "dd63f8e",
+  "branch": "product/agent-lifecycle-2026-11-13",
+  "coding_items": {
+    "reviewed_profile_recovery": "implemented",
+    "registry_observation_selector": "implemented",
+    "runtime_and_provider_health": "implemented"
+  },
+  "regression": {
+    "passed": 412,
+    "skipped": 8,
+    "coverage_percent": 90.95,
+    "coverage_gate": 90,
+    "property_and_scenario_included": true
+  },
+  "platform_tests_passed": 68,
+  "browser": {
+    "existing_passed": 10,
+    "lifecycle_passed": 3,
+    "widths": [
+      1280,
+      390
+    ],
+    "dependencies": "Explicit test identities, model responses, simulator inputs and Sandbox engine doubles"
+  },
+  "soak_passed": 1,
+  "lint": "passed",
+  "typing": {
+    "passed": true,
+    "source_files": 105
+  },
+  "deferred_by_user": {
+    "genuine_dex_login": "not_run_in_coding_pass",
+    "genuine_codex_login_and_qualification": "not_run_in_coding_pass",
+    "sandbox_image_build": "not_run_in_coding_pass",
+    "real_container_tests": {
+      "run": 0,
+      "required": 7
+    },
+    "genuine_final_demonstration": "not_run_in_coding_pass"
+  },
+  "paid_model_calls": 0,
+  "public_deployment": false,
+  "physical_operation": false,
+  "hardware_purchases": false
+}

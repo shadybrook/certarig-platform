@@ -215,6 +215,22 @@ components:
           type: array
           items:
             type: object
+        provider_status:
+          enum:
+          - not_started
+          - idle
+          - connecting
+          - assessing
+          - using_tool
+          - completed
+          - stopped
+          - cancelled
+          - interrupted
+          - error
+        activity:
+          type: string
+        runtime_health:
+          $ref: '#/components/schemas/RuntimeHealth'
     AgentDefinition:
       type: object
       required:
@@ -282,6 +298,105 @@ components:
       - status
       - reason
       additionalProperties: false
+    RuntimeHealth:
+      type: object
+      required:
+      - state
+      - heartbeat_at
+      properties:
+        state:
+          enum:
+          - online
+          - offline
+          - unresponsive
+          - unavailable
+        runtime_id:
+          type:
+          - string
+          - 'null'
+        heartbeat_at:
+          type:
+          - number
+          - 'null'
+        timeout_s:
+          type: number
+          const: 5
+    ProfileRevision:
+      type: object
+      required:
+      - id
+      - org_id
+      - asset_id
+      - revision
+      - profile_hash
+      - profile
+      - reviewer_id
+      - reviewed_at
+      - record_hash
+      properties:
+        id: &id002
+          type: string
+          minLength: 1
+        org_id: *id002
+        asset_id: *id002
+        profile_hash: *id002
+        reviewer_id: *id002
+        record_hash: *id002
+        revision:
+          type: integer
+          minimum: 1
+        capabilities_hash:
+          type:
+          - string
+          - 'null'
+        profile:
+          type: object
+        reviewed_at:
+          type: number
+    ProfileReview:
+      type: object
+      required:
+      - id
+      - org_id
+      - asset_id
+      - reviewer_id
+      - base_revision
+      - base_hash
+      - profile_hash
+      - profile
+      - capabilities_hash
+      - status
+      - changed
+      - diff
+      - revalidation
+      - expires_at
+      properties:
+        id: *id002
+        org_id: *id002
+        asset_id: *id002
+        reviewer_id: *id002
+        base_hash: *id002
+        profile_hash: *id002
+        capabilities_hash: *id002
+        base_revision:
+          type: integer
+          minimum: 1
+        profile:
+          type: object
+        status:
+          enum:
+          - pending
+          - unchanged
+          - accepted
+        changed:
+          type: boolean
+        diff:
+          type: array
+          items: *id002
+        revalidation:
+          type: object
+        expires_at:
+          type: number
 paths:
   /v1/auth/login:
     get:
@@ -1089,3 +1204,122 @@ paths:
         name: asset_id
         required: true
         schema: *id001
+  /v1/assets/{asset_id}/tools:
+    get:
+      summary: "List this principal\u2019s connector-supported observation tools;\
+        \ excludes control and approval tools"
+      responses:
+        '200':
+          description: Success
+        '401':
+          description: No application session
+        '403':
+          description: Wrong role, scope or CSRF
+        '404':
+          description: Resource unavailable in this scope
+        '409':
+          description: Stale profile, consumed preview or unavailable runtime
+      parameters:
+      - in: path
+        name: asset_id
+        required: true
+        schema: *id002
+  /v1/assets/{asset_id}/profiles:
+    get:
+      summary: Read preserved reviewed profile revisions for a granted asset
+      responses:
+        '200':
+          description: Success
+        '401':
+          description: No application session
+        '403':
+          description: Wrong role, scope or CSRF
+        '404':
+          description: Resource unavailable in this scope
+        '409':
+          description: Stale profile, consumed preview or unavailable runtime
+      parameters:
+      - in: path
+        name: asset_id
+        required: true
+        schema: *id002
+  /v1/assets/{asset_id}/profile-review/preview:
+    post:
+      summary: Reviewer snapshots a changed simulator profile and policy, invalidates
+        outstanding grants and inspects the diff
+      responses:
+        '200':
+          description: Success
+        '401':
+          description: No application session
+        '403':
+          description: Wrong role, scope or CSRF
+        '404':
+          description: Resource unavailable in this scope
+        '409':
+          description: Stale profile, consumed preview or unavailable runtime
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      parameters:
+      - in: path
+        name: asset_id
+        required: true
+        schema: *id002
+      - in: header
+        name: X-CSRF-Token
+        required: true
+        schema: *id002
+  /v1/assets/{asset_id}/profile-review:
+    post:
+      summary: Reviewer accepts the exact unexpired preview once; requires fresh evaluation
+        and independent review
+      responses:
+        '200':
+          description: Success
+        '401':
+          description: No application session
+        '403':
+          description: Wrong role, scope or CSRF
+        '404':
+          description: Resource unavailable in this scope
+        '409':
+          description: Stale profile, consumed preview or unavailable runtime
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - review_id
+              additionalProperties: false
+              properties:
+                review_id: *id002
+      parameters:
+      - in: path
+        name: asset_id
+        required: true
+        schema: *id002
+      - in: header
+        name: X-CSRF-Token
+        required: true
+        schema: *id002
+  /v1/deployments/runtime:
+    get:
+      summary: Read scoped trusted runtime heartbeat; stale status cannot restore
+        authority
+      responses:
+        '200':
+          description: Success
+        '401':
+          description: No application session
+        '403':
+          description: Wrong role, scope or CSRF
+        '404':
+          description: Resource unavailable in this scope
+        '409':
+          description: Stale profile, consumed preview or unavailable runtime

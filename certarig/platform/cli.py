@@ -187,11 +187,6 @@ def run(args: argparse.Namespace) -> None:
         if args.action == "runtime":
             runtime = Runtime(platform, factory, lambda a, e: validate(platform, a, e, broker))
             try:
-                # A runtime process restart never adopts previously started work.
-                for row in store.db.execute("SELECT body FROM documents WHERE kind='deployment'").fetchall():
-                    d = json.loads(row[0])
-                    if d["status"] == "running":
-                        platform.pause(d, "Runtime restarted; independent review required")
                 print("Observation runtime ready; no deployments resumed.", flush=True)
                 runtime.serve()
             except KeyboardInterrupt:

@@ -156,3 +156,40 @@ def verify_trace(value: dict[str, Any]) -> dict[str, Any]:
         "verifier": VERIFIER,
         "trace_hash": fingerprint(value),
     }
+
+
+class ProfileRevision(TypedDict):
+    id: str
+    org_id: str
+    asset_id: str
+    revision: int
+    profile_hash: str
+    capabilities_hash: str | None
+    profile: dict[str, Any]
+    reviewer_id: str
+    reviewed_at: float
+    record_hash: str
+
+
+class ProfileReview(TypedDict):
+    id: str
+    org_id: str
+    asset_id: str
+    reviewer_id: str
+    base_revision: int
+    base_hash: str
+    profile_hash: str
+    profile: dict[str, Any]
+    capabilities_hash: str
+    status: Literal["pending", "unchanged", "accepted"]
+    expires_at: float
+    changed: bool
+    diff: list[str]
+    revalidation: dict[str, Any]
+
+
+class RuntimeHealth(TypedDict):
+    state: Literal["online", "offline", "unresponsive", "unavailable"]
+    runtime_id: str | None
+    heartbeat_at: float | None
+    timeout_s: float

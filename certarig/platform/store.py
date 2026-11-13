@@ -62,12 +62,17 @@ class Store:
     @contextmanager
     def atomic(self) -> Iterator[None]:
         with self.lock:
-            self.db.execute("BEGIN IMMEDIATE")
+            savepoint = uid("tx") if self.db.in_transaction else None
+            self.db.execute("SAVEPOINT " + savepoint if savepoint else "BEGIN IMMEDIATE")
             try:
                 yield
-                self.db.execute("COMMIT")
+                self.db.execute("RELEASE SAVEPOINT " + savepoint if savepoint else "COMMIT")
             except BaseException:
-                self.db.execute("ROLLBACK")
+                if savepoint:
+                    self.db.execute("ROLLBACK TO SAVEPOINT " + savepoint)
+                    self.db.execute("RELEASE SAVEPOINT " + savepoint)
+                else:
+                    self.db.execute("ROLLBACK")
                 raise
 
     def provision(self, issuer: str, subject: str, org: str, role: str) -> str:

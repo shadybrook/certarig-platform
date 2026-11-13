@@ -1,0 +1,10 @@
+
+Running 3 tests using 1 worker
+
+(node:81414) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 studio/tests-platform/lifecycle.spec.mjs:12:1 › separate identities, immutable authoring, fixture evaluation, review, monitor and revoke (1.7s)
+  ✓  2 studio/tests-platform/lifecycle.spec.mjs:56:1 › session gate and safe validation error (373ms)
+  ✓  3 studio/tests-platform/lifecycle.spec.mjs:68:1 › review profile recovery, all observation tools and offline runtime status (2.7s)
+
+  3 passed (6.3s)

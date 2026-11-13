@@ -8,6 +8,7 @@ from urllib.parse import urlsplit
 
 from certarig.edge.client import EdgeClient
 
+from . import health, profiles
 from .contracts import OUTPUT, READ_TOOLS, SUITE, VERIFIER, fingerprint
 from .store import Actor, Store, uid
 
@@ -44,7 +45,12 @@ class Platform:
 
             d = json.loads(row[0])
             if d["status"] in {"running", "approved"}:
-                d.update(status="interrupted", reason="Control plane restarted; new review required")
+                d.update(
+                    status="interrupted",
+                    reason="Control plane restarted; new review required",
+                    provider_status="interrupted",
+                    activity="stopped",
+                )
                 store.put("deployment", d)
                 store.audit(d["org_id"], "interrupted", "system", deployment_id=d["id"])
 
@@ -129,6 +135,7 @@ class Platform:
             raise PermissionError("Connector organization registration changed")
         client = self.client_factory(config["url"], auditor_key=config["auditor_key"])
         rig = client.rig()
+        caps = client.capabilities()
         if rig["rig"]["hardware"]["mode"] != "simulator":
             raise ValueError("Physical enrollment is not supported")
         with self.store.atomic():
@@ -145,8 +152,10 @@ class Platform:
                 "profile_hash": rig["config_hash"],
                 "mode": "simulator",
                 "profile": rig,
+                "capabilities_hash": fingerprint(caps),
             }
             self.store.secret(value["id"], {"url": config["url"], "auditor_key": config["auditor_key"]})
+            profiles.baseline(self, value, actor.user_id)
             self.store.put("asset", value)
             self.store.put(
                 "grant",
@@ -164,6 +173,26 @@ class Platform:
     def client(self, asset: dict[str, Any]) -> Any:
         secret = self.store.secret(asset["id"])
         return self.client_factory(secret["url"], auditor_key=secret["auditor_key"])
+
+    def observation_tools(self, actor: Actor, asset_id: str) -> list[dict[str, Any]]:
+        asset = self.asset(actor, asset_id)
+        return [
+            row
+            for row in self.client(asset).capabilities()["agent_tools"]
+            if row["name"] in READ_TOOLS and row.get("policy") == "allowed"
+        ]
+
+    def deployments(self, actor: Actor) -> list[dict[str, Any]]:
+        allowed = {asset["id"] for asset in self.assets(actor)}
+        return [
+            self.deployment(actor, d["id"])
+            for d in self.store.listing("deployment", actor.org_id)
+            if d["asset_id"] in allowed
+        ]
+
+    def present_deployment(self, actor: Actor, identifier: str) -> dict[str, Any]:
+        d = self.deployment(actor, identifier)
+        return {**d, "runtime_health": health.status(self.store)}
 
     def read_asset(self, actor: Actor, asset_id: str, resource: str) -> dict[str, Any]:
         if resource not in {"rig", "signals", "state", "capabilities"}:
@@ -249,8 +278,7 @@ class Platform:
             or len(set(tools)) != len(tools)
         ):
             raise ValueError("Only distinct observation tools are allowed")
-        caps = self.client(asset).capabilities()
-        if not set(tools) <= {t["name"] for t in caps["agent_tools"]}:
+        if not set(tools) <= {t["name"] for t in self.observation_tools(actor, asset["id"])}:
             raise ValueError("Tool is not supported by this connector")
         with self.store.atomic():
             previous = (
@@ -287,8 +315,12 @@ class Platform:
         if rig["config_hash"] != asset["profile_hash"] or rig["rig"]["hardware"]["mode"] != "simulator":
             raise ValueError("Asset profile changed; enroll/revalidate before review")
         caps = self.client(asset).capabilities()
-        if not set(version["tools"]) <= {t["name"] for t in caps["agent_tools"]}:
+        if not set(version["tools"]) <= {
+            t["name"] for t in caps["agent_tools"] if t.get("policy") == "allowed"
+        }:
             raise PermissionError("Connector capabilities changed")
+        if asset.get("capabilities_hash") is not None and fingerprint(caps) != asset["capabilities_hash"]:
+            raise ValueError("Connector capabilities changed; review the profile before a new evaluation")
         return {
             "version_hash": version["hash"],
             "connection_id": c["id"],
@@ -297,6 +329,7 @@ class Platform:
             "model": c["model"],
             "asset_id": asset["id"],
             "profile_hash": asset["profile_hash"],
+            "profile_revision": asset.get("profile_revision", 1),
             "tools": sorted(version["tools"]),
             "capabilities_hash": fingerprint(caps),
             "suite": SUITE,
@@ -339,6 +372,8 @@ class Platform:
                 "reviewed_at": self.store.clock(),
                 "assessments": 0,
                 "observations": [],
+                "provider_status": "not_started",
+                "activity": "idle",
             }
             self.store.put("deployment", d)
             self.store.audit(
@@ -353,11 +388,17 @@ class Platform:
     def deployment(self, actor: Actor, identifier: str) -> dict[str, Any]:
         d = self.store.get("deployment", identifier, actor.org_id)
         self.asset(actor, d["asset_id"])
-        return d
+        return health.reconcile(self, d)
 
     def start(self, actor: Actor, identifier: str) -> dict[str, Any]:
         self.reviewer(actor)
+        candidate = self.deployment(actor, identifier)
+        version = self.version(actor, candidate["version_id"])
+        observed_binding = self.binding(
+            actor, version
+        )  # Connector I/O never holds the heartbeat/revocation lock.
         with self.store.atomic():
+            self.reviewer(actor)
             d = self.deployment(actor, identifier)
             if (
                 d["reviewer_id"] != actor.user_id
@@ -366,20 +407,45 @@ class Platform:
             ):
                 raise ValueError("Fresh approval by this reviewer required")
             v = self.version(actor, d["version_id"])
-            if self.binding(actor, v) != d["binding"]:
+            asset = self.asset(Actor(d["author_id"], actor.org_id, ""), d["asset_id"])
+            connection = self.store.get("connection", d["connection_id"], actor.org_id)
+            if (
+                observed_binding != d["binding"]
+                or v["hash"] != observed_binding["version_hash"]
+                or asset["profile_hash"] != observed_binding["profile_hash"]
+                or asset.get("profile_revision", 1) != observed_binding["profile_revision"]
+                or (
+                    asset.get("capabilities_hash") is not None
+                    and asset["capabilities_hash"] != observed_binding["capabilities_hash"]
+                )
+                or not connection["enabled"]
+                or not connection["consent"]
+                or connection["revision"] != observed_binding["connection_revision"]
+            ):
                 raise ValueError("Review binding changed")
             if self.store.db.execute(
                 "SELECT 1 FROM documents WHERE kind='deployment' AND json_extract(body,'$.status')='running'"
             ).fetchone():
                 raise ValueError("Only one observation deployment may run")
+            runtime = health.status(self.store)
+            if runtime["state"] != "online":
+                raise ValueError("Start the observation runtime before starting a deployment")
             now = self.store.clock()
-            d.update(status="running", started_at=now, expires_at=now + 900, next_at=now, runtime_id=None)
+            d.update(
+                status="running",
+                started_at=now,
+                expires_at=now + 900,
+                next_at=now,
+                runtime_id=runtime["runtime_id"],
+                provider_status="idle",
+                activity="waiting_for_assessment",
+            )
             self.store.put("deployment", d)
             self.store.audit(actor.org_id, "started", actor.user_id, deployment_id=d["id"])
             return d
 
     def pause(self, d: dict[str, Any], reason: str) -> None:
-        d.update(status="paused", reason=reason)
+        d.update(status="paused", reason=reason, provider_status="stopped", activity="stopped")
         self.store.put("deployment", d)
         self.store.audit(d["org_id"], "paused", "system", deployment_id=d["id"], reason=reason)
 
@@ -388,7 +454,12 @@ class Platform:
             d = self.deployment(actor, identifier)
             if actor.user_id != d["author_id"]:
                 self.reviewer(actor)
-            d.update(status="revoked", reason="Access revoked by operator")
+            d.update(
+                status="revoked",
+                reason="Access revoked by operator",
+                provider_status="cancelled",
+                activity="stopped",
+            )
             self.store.put("deployment", d)
             self.store.audit(actor.org_id, "revoked", actor.user_id, deployment_id=d["id"])
             return d

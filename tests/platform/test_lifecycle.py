@@ -9,7 +9,7 @@ from types import SimpleNamespace
 import pytest
 
 from certarig.agent.providers.base import ProviderResponse
-from certarig.platform import evaluation, evidence
+from certarig.platform import evaluation, evidence, health
 from certarig.platform.contracts import READ_TOOLS, verify_trace
 from certarig.platform.evaluation import FixtureProvider
 from certarig.platform.registry import FixtureRegistry, ScopedRegistry
@@ -118,7 +118,11 @@ def lab(tmp_path):
     version = platform.create_version(author, definition)
     engine = Engine()
     broker = Broker(tmp_path / "broker", engine, clock=lambda: now[0])
+    runtime = Runtime(
+        platform, lambda c: FixtureProvider(), lambda a, e: evaluation.validate(platform, a, e, broker)
+    )
     context = SimpleNamespace(
+        runtime=runtime,
         store=store,
         p=platform,
         author=author,
@@ -134,6 +138,7 @@ def lab(tmp_path):
         now=now,
     )
     yield context
+    runtime.close()
     broker.close()
     store.close()
 
@@ -283,9 +288,7 @@ def test_fixture_evaluation_is_bound_and_never_codex_qualification(lab):
 
 def test_runtime_observes_without_write_authority_and_exports(lab):
     d = deployed(lab)
-    runtime = Runtime(
-        lab.p, lambda c: FixtureProvider(), lambda a, e: evaluation.validate(lab.p, a, e, lab.broker)
-    )
+    runtime = lab.runtime
     runtime.tick(d["id"])
     current = lab.p.deployment(lab.author, d["id"])
     assert current["assessments"] == 1
@@ -329,7 +332,8 @@ def test_runtime_refusal_failure_and_restart_restore_no_authority(lab, monkeypat
     def factory(c):
         return FixtureProvider()
 
-    runtime = Runtime(lab.p, factory, lambda a, e: evaluation.validate(lab.p, a, e, lab.broker))
+    runtime = lab.runtime
+    runtime.factory = factory
     if failure == "permission":
         lab.p.grant(lab.reviewer, lab.a["id"], lab.author.user_id, False)
     if failure == "model":
@@ -360,7 +364,8 @@ def test_late_revoked_inference_is_discarded(lab):
             lab.p.revoke(lab.author, d["id"])
             return ProviderResponse('{"status":"ready","reason":"late"}')
 
-    runtime = Runtime(lab.p, lambda c: Late(), lambda a, e: None)
+    runtime = lab.runtime
+    runtime.factory = lambda c: Late()
     runtime.tick(d["id"])
     current = lab.p.deployment(lab.author, d["id"])
     assert current["status"] == "revoked" and current["observations"] == []
@@ -491,7 +496,10 @@ def test_real_edge_recording_continues_when_agent_provider_fails(lab):
         def failing(c):
             raise RuntimeError("Provider disconnected")
 
-        runtime = Runtime(p, failing, lambda a, e: None)
+        runtime = lab.runtime
+        runtime.platform = p
+        runtime.factory = failing
+        runtime.validate_receipt = lambda a, e: None
         runtime.tick(d["id"])
         assert p.deployment(lab.author, d["id"])["status"] == "paused"
         deadline = time.monotonic() + 2
@@ -509,7 +517,7 @@ def test_scheduler_limit_cancellation_and_runtime_restart(lab):
     import time
 
     d = deployed(lab)
-    runtime = Runtime(lab.p, lambda c: FixtureProvider(), lambda a, e: None)
+    runtime = lab.runtime
     entered, cancelled = threading.Event(), threading.Event()
 
     class Pending(FixtureProvider):
@@ -532,20 +540,25 @@ def test_scheduler_limit_cancellation_and_runtime_restart(lab):
     runtime.close()
     # A new reviewed lease completes after ten spaced assessments, never a catch-up burst.
     e = lab.store.get("evaluation", d["evaluation_id"], "org")
+    runtime = Runtime(lab.p, lambda c: FixtureProvider(), lambda a, e: None)
+    lab.runtime = runtime
     new = lab.p.review(lab.reviewer, lab.v["id"], e["id"])
     new = lab.p.start(lab.reviewer, new["id"])
-    runtime = Runtime(lab.p, lambda c: FixtureProvider(), lambda a, e: None)
     for _ in range(10):
         runtime.tick(new["id"])
-        lab.now[0] += 30
+        for _heartbeat in range(30):
+            lab.now[0] += 1
+            health.pulse(lab.p, runtime.id)
     assert lab.p.deployment(lab.author, new["id"])["status"] == "completed"
     runtime.close()
+    runtime = Runtime(lab.p, lambda c: FixtureProvider(), lambda a, e: None)
+    lab.runtime = runtime
     new = lab.p.review(lab.reviewer, lab.v["id"], e["id"])
     new = lab.p.start(lab.reviewer, new["id"])
     row = lab.p.deployment(lab.author, new["id"])
     row["runtime_id"] = "previous-runtime"
     lab.store.put("deployment", row)
-    runtime = Runtime(lab.p, lambda c: FixtureProvider(), lambda a, e: None)
+    runtime = lab.runtime
     task = threading.Thread(target=runtime.serve)
     task.start()
     deadline = time.monotonic() + 2
@@ -555,7 +568,7 @@ def test_scheduler_limit_cancellation_and_runtime_restart(lab):
         time.sleep(0.02)
     runtime.close()
     task.join(2)
-    assert lab.p.deployment(lab.author, row["id"])["status"] == "paused"
+    assert lab.p.deployment(lab.author, row["id"])["status"] == "interrupted"
 
 
 @pytest.mark.parametrize(
@@ -565,7 +578,7 @@ def test_offline_consistency_rejects_rehashed_forged_or_incomplete_evidence(lab,
     import hashlib
 
     d = deployed(lab)
-    runtime = Runtime(lab.p, lambda c: FixtureProvider(), lambda a, e: None)
+    runtime = lab.runtime
     runtime.tick(d["id"])
     runtime.close()
     payload = evidence.export(lab.p, lab.author, d["id"])

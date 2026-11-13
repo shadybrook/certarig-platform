@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 const root = fileURLToPath(new URL('../', import.meta.url));
-const runtime = mkdtempSync(path.join(tmpdir(), 'certarig-customer-browser-'));
+const runtime = process.env.CERTARIG_BROWSER_FIXTURE_ROOT ||= mkdtempSync(path.join(tmpdir(), 'certarig-customer-browser-'));
 const quote = (value) => `'${String(value).replaceAll("'", "'\\''")}'`;
 export default defineConfig({
   testDir: './tests-platform', timeout: 40000, workers: 1,

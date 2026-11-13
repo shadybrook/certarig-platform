@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import fs from 'node:fs';
+import path from 'node:path';
 const origin = 'http://127.0.0.1:18095';
 async function signin(context, role) {
   await context.addCookies([{name:'certarig_login', value:'test-browser', url:origin}]);
@@ -62,4 +63,49 @@ test('session gate and safe validation error', async ({browser}) => {
   await expect(author.locator('#notice')).toContainText('Only distinct observation tools');
   await expect(author.locator('#notice')).toHaveAttribute('data-error','true');
   await context.close();
+});
+
+test('review profile recovery, all observation tools and offline runtime status', async ({browser}, testInfo) => {
+  const authorContext = await browser.newContext(), reviewerContext = await browser.newContext();
+  const author = await signin(authorContext,'author'), reviewer = await signin(reviewerContext,'reviewer');
+  await expect(author.locator('#tool-options input[name=tools]')).toHaveCount(7);
+  await expect(author.locator('#profile-review-panel')).toBeHidden();
+  await expect(reviewer.locator('#profile-review-panel')).toBeVisible();
+  const control = path.join(process.env.CERTARIG_BROWSER_FIXTURE_ROOT,'ui-controls.json');
+  fs.writeFileSync(control, JSON.stringify({profile:'profile-ui-2'}));
+  await reviewer.getByRole('button',{name:'Inspect current profile',exact:true}).click();
+  await expect(reviewer.locator('#profile-review-summary')).toContainText('has changed');
+  await reviewer.getByRole('button',{name:'Accept baseline for new evaluation',exact:true}).click();
+  await expect(reviewer.locator('#profile-review-summary')).toContainText('revision 2 saved');
+  await author.getByRole('button',{name:'Refresh status',exact:true}).click();
+  await expect(author.locator('#notice')).toContainText('Status refreshed');
+  await author.locator('#versions button').last().click();
+  await expect(author.locator('#qualification')).toContainText('stale profile');
+  await author.getByLabel('Read evidence',{exact:true}).check();
+  await author.getByLabel('Read procedures',{exact:true}).check();
+  await author.getByLabel('Read procedure run',{exact:true}).check();
+  await author.getByLabel('Read capabilities',{exact:true}).check();
+  await author.getByRole('button',{name:'Save new version',exact:true}).click();
+  await expect(author.locator('#notice')).toContainText('Saved immutable version 3');
+  await author.locator('#versions button').last().click();
+  await expect(author.getByLabel('Read evidence',{exact:true})).toBeChecked();
+  await author.getByRole('button',{name:'Collect evaluation traces'}).click();
+  await expect(author.locator('#qualification')).toContainText('awaiting_sandbox');
+  await author.getByRole('button',{name:'Verify in Sandbox'}).click();
+  await expect(author.locator('#qualification')).toContainText('passed');
+  await reviewer.getByRole('button',{name:'Refresh status',exact:true}).click();
+  await expect(reviewer.locator('#notice')).toContainText('Status refreshed');
+  await reviewer.locator('#versions button').last().click();
+  await reviewer.getByRole('button',{name:'Approve observation deployment'}).click();
+  await expect(reviewer.locator('#notice')).toContainText('Exact version approved');
+  fs.writeFileSync(control,JSON.stringify({profile:'profile-ui-2',runtime_offline:true}));
+  await expect(reviewer.locator('#runtime-health')).toContainText('Offline');
+  await expect(reviewer.getByRole('button',{name:'Start observation',exact:true})).toBeDisabled();
+  const dir=testInfo.outputPath('screens');fs.mkdirSync(dir,{recursive:true});
+  await reviewer.evaluate(() => window.scrollTo(0,0));
+  await reviewer.screenshot({path:path.join(dir,'profile-review-desktop.png'),fullPage:true});
+  await reviewer.setViewportSize({width:390,height:844});
+  expect(await reviewer.evaluate(() => document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
+  await reviewer.screenshot({path:path.join(dir,'profile-review-mobile.png'),fullPage:true});
+  await authorContext.close();await reviewerContext.close();
 });

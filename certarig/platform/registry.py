@@ -18,7 +18,22 @@ class ScopedRegistry:
         self.registry, self.allowed, self.guard = registry, set(allowed) & READ_TOOLS, guard
 
     def specs(self) -> list[ToolSpec]:
-        return [s for s in self.registry.specs() if s.name in self.allowed]
+        specs = []
+        for spec in self.registry.specs():
+            if spec.name not in self.allowed:
+                continue
+            if spec.name == "read_procedure_run":
+                params = {
+                    **spec.parameters,
+                    "properties": {
+                        **spec.parameters.get("properties", {}),
+                        "run_id": {"type": "string", "pattern": "^[A-Za-z0-9_-]{1,128}$"},
+                    },
+                    "required": ["run_id"],
+                }
+                spec = ToolSpec(spec.name, spec.description, params)
+            specs.append(spec)
+        return specs
 
     def execute(self, name: str, arguments: dict[str, Any]) -> ToolResult:
         try:

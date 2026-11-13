@@ -55,3 +55,8 @@ button.primary, .mark, #login .button { background: #1d4ed8; color: #fff; }
 
 .field-label { display: block; margin: 8px 0; color: var(--muted); }
 @media (max-width: 760px) { button, a.button { min-height: 44px; } }
+
+.tool-option { padding: 4px 0; }
+.tool-help { font-size: 12px; margin: 2px 0 8px 22px; }
+#profile-review-summary { margin: 12px 0; line-height: 1.5; overflow-wrap: anywhere; }
+#runtime-health { margin-bottom: 8px; }

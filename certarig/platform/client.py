@@ -52,3 +52,17 @@ class PlatformClient:
 
     def revoke(self, deployment_id: str) -> dict[str, Any]:
         return dict(self.request("POST", "/v1/deployments/" + deployment_id + "/revoke"))
+
+    def observation_tools(self, asset_id: str) -> list[dict[str, Any]]:
+        return list(self.request("GET", "/v1/assets/" + asset_id + "/tools")["tools"])
+
+    def preview_profile(self, asset_id: str) -> dict[str, Any]:
+        return dict(self.request("POST", "/v1/assets/" + asset_id + "/profile-review/preview", {}))
+
+    def accept_profile(self, asset_id: str, review_id: str) -> dict[str, Any]:
+        return dict(
+            self.request("POST", "/v1/assets/" + asset_id + "/profile-review", {"review_id": review_id})
+        )
+
+    def runtime_health(self) -> dict[str, Any]:
+        return dict(self.request("GET", "/v1/deployments/runtime")["runtime"])

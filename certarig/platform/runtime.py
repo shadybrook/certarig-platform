@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import threading
+import time
 from typing import Any
 
 import jsonschema
@@ -11,6 +12,7 @@ import jsonschema
 from certarig.agent.orchestrator import AgentSession
 from certarig.agent.transcript import Transcript
 
+from . import health
 from .contracts import OUTPUT
 from .evaluation import system_prompt
 from .registry import ScopedRegistry
@@ -25,6 +27,9 @@ class Runtime:
         self.active: dict[str, Any] = {}
         self.closed = threading.Event()
         self.slot = threading.Lock()
+        self.heartbeat_thread: threading.Thread | None = None
+        self.workers: list[threading.Thread] = []
+        health.claim(platform, self.id)
 
     def guard(self, identifier: str) -> dict[str, Any]:
         s = self.platform.store
@@ -32,7 +37,7 @@ class Runtime:
             row = s.one("SELECT org FROM documents WHERE kind='deployment' AND id=?", (identifier,))
             if not row:
                 raise PermissionError("Deployment not found")
-            d = s.get("deployment", identifier, row[0])
+            d = health.reconcile(self.platform, s.get("deployment", identifier, row[0]))
         actor = Actor(d["reviewer_id"], d["org_id"], "")
         try:
             self.platform.reviewer(actor)
@@ -62,6 +67,8 @@ class Runtime:
             self.closed.is_set()
             or d["status"] != "running"
             or d["runtime_id"] not in {None, self.id}
+            or health.status(self.platform.store)["state"] != "online"
+            or health.status(self.platform.store)["runtime_id"] != self.id
             or self.platform.store.clock() >= d["expires_at"]
             or d["assessments"] >= 10
         ):
@@ -85,7 +92,9 @@ class Runtime:
                 s.put("deployment", d)
             v = s.get("version", d["version_id"], d["org_id"])
             c = s.get("connection", d["connection_id"], d["org_id"])
+            self.activity(identifier, "connecting", "connecting_model")
             provider = self.factory(c)
+            self.activity(identifier, "assessing", "model")
             self.active[identifier] = provider
             asset = s.get("asset", d["asset_id"], d["org_id"])
             registry = ScopedRegistry.connected(
@@ -95,7 +104,12 @@ class Runtime:
                 s.root / "transcripts" / (identifier + "-" + str(d["assessments"]) + ".jsonl")
             )
             session = AgentSession(
-                provider, registry, transcript, max_model_calls_per_turn=8, system_prompt=system_prompt(v)
+                provider,
+                registry,
+                transcript,
+                max_model_calls_per_turn=8,
+                system_prompt=system_prompt(v),
+                on_event=lambda event: self.trace_activity(identifier, event),
             )
             result = session.send(
                 "Assess this enrolled bench in observation mode. Read fresh signals; return the configured JSON output."
@@ -112,8 +126,16 @@ class Runtime:
                     {"at": s.clock(), "output": output, "transcript": Transcript.read(transcript.path)}
                 )
                 current["assessments"] += 1
+                current.update(
+                    provider_status="idle", activity="waiting_for_assessment", last_assessment_at=s.clock()
+                )
                 if current["assessments"] >= 10:
-                    current.update(status="completed", reason="Assessment limit reached")
+                    current.update(
+                        status="completed",
+                        reason="Assessment limit reached",
+                        provider_status="completed",
+                        activity="stopped",
+                    )
                 s.put("deployment", current)
                 s.audit(
                     d["org_id"],
@@ -131,22 +153,81 @@ class Runtime:
                     current = self.platform.store.get("deployment", identifier, row[0])
                     if current["status"] == "running":
                         self.platform.pause(current, type(exc).__name__ + ": " + str(exc)[:300])
+                        current.update(provider_status="error", last_provider_error=type(exc).__name__)
+                        self.platform.store.put("deployment", current)
         finally:
             self.active.pop(identifier, None)
             try:
                 if provider:
                     provider.close()
+            except Exception as exc:
+                s = self.platform.store
+                with s.atomic():
+                    current = s.get("deployment", identifier, d["org_id"])
+                    if current["status"] == "running":
+                        self.platform.pause(current, "Provider cleanup failed; independent review required")
+                        current.update(provider_status="error", last_provider_error=type(exc).__name__)
+                        s.put("deployment", current)
             finally:
                 self.slot.release()
 
+    def activity(self, identifier: str, provider_status: str, activity: str) -> None:
+        s = self.platform.store
+        with s.atomic():
+            row = s.one("SELECT org FROM documents WHERE kind='deployment' AND id=?", (identifier,))
+            if not row:
+                raise PermissionError("Deployment not found")
+            d = s.get("deployment", identifier, row[0])
+            self._live(d)
+            d.update(provider_status=provider_status, activity=activity, activity_at=s.clock())
+            s.put("deployment", d)
+
+    def trace_activity(self, identifier: str, event: dict[str, Any]) -> None:
+        if event["kind"] == "tool_call":
+            self.activity(identifier, "using_tool", event["name"])
+        elif event["kind"] in {"tool_result", "model_response"}:
+            self.activity(identifier, "assessing", "model")
+
     def sweep(self) -> None:
+        # Cancellation does not wait for connector I/O or the Sandbox verifier.
+        s = self.platform.store
         for identifier, provider in list(self.active.items()):
             try:
-                self.guard(identifier)
+                row = s.one("SELECT org FROM documents WHERE kind='deployment' AND id=?", (identifier,))
+                if not row:
+                    raise PermissionError("Deployment not found")
+                d = health.reconcile(self.platform, s.get("deployment", identifier, row[0]))
+                self._live(d)
+                actor = Actor(d["reviewer_id"], d["org_id"], "")
+                self.platform.reviewer(actor)
+                self.platform.asset(actor, d["asset_id"])
+                self.platform.asset(Actor(d["author_id"], d["org_id"], ""), d["asset_id"])
+                c = s.get("connection", d["connection_id"], d["org_id"])
+                if (
+                    not c["enabled"]
+                    or not c["consent"]
+                    or c["revision"] != d["binding"]["connection_revision"]
+                ):
+                    raise PermissionError("Model connection authorization changed")
+            except (PermissionError, KeyError, ValueError):
+                try:
+                    provider.cancel()
+                except Exception:
+                    pass  # Tool guards and late-result checks still deny authority.
+
+    def _heartbeat_loop(self) -> None:
+        while not self.closed.wait(health.HEARTBEAT_S):
+            try:
+                health.pulse(self.platform, self.id)
+                self.sweep()
             except (PermissionError, OSError):
-                provider.cancel()
+                self.closed.set()
+                self.sweep()
+                return
 
     def serve(self) -> None:
+        self.heartbeat_thread = threading.Thread(target=self._heartbeat_loop, daemon=True)
+        self.heartbeat_thread.start()
         while not self.closed.wait(0.2):
             self.sweep()
             rows = self.platform.store.rows(
@@ -154,12 +235,24 @@ class Runtime:
             )
             for row in rows:
                 d = json.loads(row[0])
-                if d["runtime_id"] not in {None, self.id}:
-                    self.platform.pause(d, "Runtime restarted; new review required")
+                if d["runtime_id"] != self.id:
+                    health.reconcile(self.platform, d)
                 elif d["next_at"] <= self.platform.store.clock() and not self.slot.locked():
-                    threading.Thread(target=self.tick, args=(d["id"],), daemon=True).start()
+                    self.workers = [worker for worker in self.workers if worker.is_alive()]
+                    worker = threading.Thread(target=self.tick, args=(d["id"],), daemon=True)
+                    self.workers.append(worker)
+                    worker.start()
 
     def close(self) -> None:
         self.closed.set()
+        health.stop(self.platform, self.id)
         for provider in list(self.active.values()):
-            provider.cancel()
+            try:
+                provider.cancel()
+            except Exception:
+                pass
+        if self.heartbeat_thread:
+            self.heartbeat_thread.join(timeout=2)
+        deadline = time.monotonic() + 2
+        for worker in self.workers:
+            worker.join(timeout=max(0, deadline - time.monotonic()))

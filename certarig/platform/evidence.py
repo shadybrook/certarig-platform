@@ -10,6 +10,7 @@ from typing import Any
 
 import jsonschema
 
+from . import profiles
 from .contracts import OUTPUT, encoded, fingerprint, verify_trace
 from .service import Platform
 from .store import Actor
@@ -26,7 +27,7 @@ def export(platform: Platform, actor: Actor, identifier: str) -> bytes:
         "deployment.json": d,
         "version.json": platform.version(actor, d["version_id"]),
         "evaluation.json": e,
-        "asset.json": platform.asset(actor, d["asset_id"]),
+        "asset.json": profiles.evidence_asset(platform, actor, d),
         "events.json": platform.store.events(actor.org_id, identifier),
     }
     files = {name: encoded(value) for name, value in values.items()}
@@ -82,6 +83,20 @@ def verify(data: bytes) -> dict[str, Any]:
         or d["asset_id"] != a["id"]
     ):
         raise ValueError("Organization or asset binding mismatch")
+    if "profile_revision" in e["binding"]:
+        profile = a.get("reviewed_profile")
+        if (
+            not isinstance(profile, dict)
+            or profile["revision"] != e["binding"]["profile_revision"]
+            or profile["asset_id"] != a["id"]
+            or profile["org_id"] != a["org_id"]
+            or profile["profile_hash"] != a["profile_hash"]
+            or profile.get("capabilities_hash") != e["binding"]["capabilities_hash"]
+            or profile["profile"] != a["profile"]
+            or profile["profile"]["config_hash"] != a["profile_hash"]
+            or profile["record_hash"] != fingerprint({k: v for k, v in profile.items() if k != "record_hash"})
+        ):
+            raise ValueError("Missing, corrupt or mismatched historical profile review")
     check = verify_trace(e["trace"])
     if (
         not check["passed"]

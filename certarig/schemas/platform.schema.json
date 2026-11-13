@@ -265,6 +265,26 @@
           "items": {
             "type": "object"
           }
+        },
+        "provider_status": {
+          "enum": [
+            "not_started",
+            "idle",
+            "connecting",
+            "assessing",
+            "using_tool",
+            "completed",
+            "stopped",
+            "cancelled",
+            "interrupted",
+            "error"
+          ]
+        },
+        "activity": {
+          "type": "string"
+        },
+        "runtime_health": {
+          "$ref": "#/$defs/RuntimeHealth"
         }
       }
     },
@@ -359,6 +379,174 @@
         "reason"
       ],
       "additionalProperties": false
+    },
+    "RuntimeHealth": {
+      "type": "object",
+      "required": [
+        "state",
+        "heartbeat_at"
+      ],
+      "properties": {
+        "state": {
+          "enum": [
+            "online",
+            "offline",
+            "unresponsive",
+            "unavailable"
+          ]
+        },
+        "runtime_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "heartbeat_at": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "timeout_s": {
+          "type": "number",
+          "const": 5
+        }
+      }
+    },
+    "ProfileRevision": {
+      "type": "object",
+      "required": [
+        "id",
+        "org_id",
+        "asset_id",
+        "revision",
+        "profile_hash",
+        "profile",
+        "reviewer_id",
+        "reviewed_at",
+        "record_hash"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "org_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "asset_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "profile_hash": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reviewer_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "record_hash": {
+          "type": "string",
+          "minLength": 1
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "capabilities_hash": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "profile": {
+          "type": "object"
+        },
+        "reviewed_at": {
+          "type": "number"
+        }
+      }
+    },
+    "ProfileReview": {
+      "type": "object",
+      "required": [
+        "id",
+        "org_id",
+        "asset_id",
+        "reviewer_id",
+        "base_revision",
+        "base_hash",
+        "profile_hash",
+        "profile",
+        "capabilities_hash",
+        "status",
+        "changed",
+        "diff",
+        "revalidation",
+        "expires_at"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "org_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "asset_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reviewer_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "base_hash": {
+          "type": "string",
+          "minLength": 1
+        },
+        "profile_hash": {
+          "type": "string",
+          "minLength": 1
+        },
+        "capabilities_hash": {
+          "type": "string",
+          "minLength": 1
+        },
+        "base_revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "profile": {
+          "type": "object"
+        },
+        "status": {
+          "enum": [
+            "pending",
+            "unchanged",
+            "accepted"
+          ]
+        },
+        "changed": {
+          "type": "boolean"
+        },
+        "diff": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "revalidation": {
+          "type": "object"
+        },
+        "expires_at": {
+          "type": "number"
+        }
+      }
     }
   }
 }
