@@ -1,0 +1,364 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CertaRig local customer lifecycle records",
+  "$defs": {
+    "Organization": {
+      "type": "object",
+      "required": [
+        "id",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "Membership": {
+      "type": "object",
+      "required": [
+        "user_id",
+        "org_id",
+        "role",
+        "enabled"
+      ],
+      "properties": {
+        "user_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "org_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "role": {
+          "enum": [
+            "author",
+            "reviewer"
+          ]
+        },
+        "enabled": {
+          "type": "boolean"
+        }
+      }
+    },
+    "AssetGrant": {
+      "type": "object",
+      "required": [
+        "id",
+        "org_id",
+        "asset_id",
+        "user_id",
+        "enabled"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "org_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "asset_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "user_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "enabled": {
+          "type": "boolean"
+        }
+      }
+    },
+    "AgentVersion": {
+      "type": "object",
+      "required": [
+        "id",
+        "org_id",
+        "asset_id",
+        "author_id",
+        "agent_id",
+        "revision",
+        "name",
+        "instructions",
+        "connection_id",
+        "tools",
+        "output_contract",
+        "limits",
+        "hash"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "org_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "asset_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "author_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "agent_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "instructions": {
+          "type": "string",
+          "minLength": 1
+        },
+        "connection_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tools": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "output_contract": {
+          "type": "object"
+        },
+        "limits": {
+          "type": "object"
+        },
+        "hash": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "Evaluation": {
+      "type": "object",
+      "required": [
+        "id",
+        "org_id",
+        "asset_id",
+        "version_id",
+        "binding",
+        "status",
+        "trusted"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "org_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "asset_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "binding": {
+          "type": "object"
+        },
+        "status": {
+          "enum": [
+            "collecting",
+            "awaiting_sandbox",
+            "passed",
+            "failed",
+            "interrupted"
+          ]
+        },
+        "trusted": {
+          "type": "boolean"
+        }
+      }
+    },
+    "Deployment": {
+      "type": "object",
+      "required": [
+        "id",
+        "org_id",
+        "asset_id",
+        "version_id",
+        "evaluation_id",
+        "author_id",
+        "reviewer_id",
+        "binding",
+        "mode",
+        "status",
+        "assessments",
+        "observations"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "org_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "asset_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evaluation_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "author_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reviewer_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "binding": {
+          "type": "object"
+        },
+        "mode": {
+          "const": "observation"
+        },
+        "status": {
+          "enum": [
+            "approved",
+            "running",
+            "paused",
+            "revoked",
+            "interrupted",
+            "completed"
+          ]
+        },
+        "assessments": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "observations": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "AgentDefinition": {
+      "type": "object",
+      "required": [
+        "name",
+        "instructions",
+        "asset_id",
+        "connection_id",
+        "tools"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "instructions": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8000
+        },
+        "asset_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "connection_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tools": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "read_capabilities",
+              "read_evidence",
+              "read_procedure_run",
+              "read_procedures",
+              "read_rig",
+              "read_signals",
+              "read_state"
+            ]
+          }
+        }
+      }
+    },
+    "ModelConnectionInput": {
+      "type": "object",
+      "required": [
+        "backend",
+        "model"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "backend": {
+          "enum": [
+            "codex",
+            "fixture"
+          ]
+        },
+        "model": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "consent": {
+          "type": "boolean"
+        }
+      }
+    },
+    "ObservationOutput": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "ready",
+            "blocked"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        }
+      },
+      "required": [
+        "status",
+        "reason"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

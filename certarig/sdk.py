@@ -17,6 +17,7 @@ from pathlib import Path
 from typing import Any
 
 from certarig.edge.client import EdgeClient
+from certarig.platform.client import PlatformClient as PlatformClient
 
 
 class CertaRig:

@@ -116,6 +116,7 @@ class EdgeNode:
         audit_size: int = 2000,
         config_path: str | Path | None = None,
         capabilities_path: str | Path | None = None,
+        private_reads: bool = False,
     ) -> None:
         if len(operator_key) < 12:
             raise ValueError("operator key must be at least 12 characters")
@@ -124,6 +125,7 @@ class EdgeNode:
         if agent_key is not None and secrets.compare_digest(agent_key, operator_key):
             raise ValueError("agent key must differ from the operator key")
         self.runtime = runtime
+        self.private_reads = private_reads
         self.config = runtime.config
         self.manifest = manifest
         self.operator_key = operator_key
@@ -238,6 +240,8 @@ class EdgeNode:
 
     # --------------------------------------------------------------- enforcement
     def enforce(self, ctx: RequestContext, route: Route, headers: Any) -> None:
+        if self.private_reads and ctx.principal is Principal.ANONYMOUS and route.path != "/health":
+            raise HttpError(401, "registered connector authentication required")
         if route.tool is None:
             if route.mutating and ctx.principal is Principal.ANONYMOUS and route.path != "/v1/auth/session":
                 raise HttpError(401, "authentication required")

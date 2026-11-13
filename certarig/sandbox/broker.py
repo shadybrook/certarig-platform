@@ -51,6 +51,12 @@ class Broker:
         self.key = key.read_bytes()
         if len(self.key) != 32:
             raise ValueError("corrupt receipt signing key")
+        for path in (root / "agent-evaluations").glob("*.json"):
+            value = json.loads(path.read_text())
+            if value["status"] == "running":
+                self.engine.cleanup("crsb-" + value["job_id"])
+                value["status"] = "interrupted"
+                write_json_atomic(path, value)
         for p in root.glob("sbx_*/workspace.json"):
             workspace = json.loads(p.read_text())
             for job in workspace["jobs"]:
@@ -168,6 +174,11 @@ class Broker:
     def call(self, method: str, owner: str, role: str, body: dict[str, Any]) -> dict[str, Any]:
         if role not in {"operator", "agent", "auditor"}:
             raise PermissionError("authentication required")
+        if method in {"agent_evaluation", "agent_evaluation_validate"}:
+            if role == "auditor" and method == "agent_evaluation":
+                raise PermissionError("auditor is read-only")
+            from .agent_evaluation import call
+            return call(self, method, owner, body)
         with self.lock:
             if method == "preflight":
                 return self.engine.preflight()

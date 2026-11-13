@@ -175,6 +175,11 @@ def main() -> None:
         elif kind == "rehearsal":
             rehearse(json.loads(paths["snapshot.json"].read_text()), output, scratch)
             code = 0
+        elif kind == "agent_evaluation":
+            from certarig.platform.contracts import verify_trace
+            result = verify_trace(json.loads(paths["trace.json"].read_text()))
+            (output / "evaluation.json").write_bytes(encoded(result))
+            code = 0
         else:
             raise ValueError("unknown job kind")
     except Exception as exc:

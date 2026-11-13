@@ -163,3 +163,7 @@ Adapters are untested live in this tree; every CI path uses FakeProvider.
 ## Provenance
 
 Imported from the frozen PoC at commit `23988a3`. See `docs/PROVENANCE.md`.
+
+## Local customer-agent lifecycle
+
+The isolated customer control plane adds organization sessions, simulator enrollment, immutable agent versions, trusted evaluation and reviewed observation deployments. See [setup and qualification status](docs/product/AGENT_LIFECYCLE.md). Existing Edge role-key APIs are unchanged.

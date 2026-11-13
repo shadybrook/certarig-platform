@@ -1,0 +1,59 @@
+{
+  "date": "2026-11-13",
+  "branch": "product/agent-lifecycle-2026-11-13",
+  "baseline": "f877d82",
+  "regression": {
+    "passed": 398,
+    "skipped": 8,
+    "deselected": 3,
+    "coverage_percent": 90.75,
+    "gate_percent": 90,
+    "property_scenario_included": true
+  },
+  "new_platform_tests": 54,
+  "browser": {
+    "existing": 10,
+    "customer_lifecycle": 2,
+    "dependencies": "Explicit fixtures; no live Codex or container qualification",
+    "widths": [
+      1280,
+      390
+    ]
+  },
+  "soak": {
+    "passed": 1,
+    "hardware": false
+  },
+  "lint": "passed",
+  "typing": {
+    "passed": true,
+    "source_files": 103
+  },
+  "oidc": {
+    "signed_test_issuer": "passed",
+    "genuine_dex": "not_run"
+  },
+  "codex": {
+    "cli": "0.146.1",
+    "real_protocol_probe": "passed",
+    "dedicated_account": "not_signed_in",
+    "inference_calls": 0,
+    "live_qualification": "not_run"
+  },
+  "sandbox": {
+    "real_cases_run": 0,
+    "real_cases_required": 7,
+    "preflight": {
+      "ready": false,
+      "free_bytes": 27506728960,
+      "memory_pressure": 2,
+      "blockers": [
+        "macOS memory pressure is elevated; close workloads manually",
+        "Pinned sandbox image has not been built"
+      ]
+    }
+  },
+  "physical_operations": false,
+  "public_deployment": false,
+  "paid_api_calls": false
+}

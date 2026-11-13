@@ -47,7 +47,7 @@ class BrokerClient:
 
     def call(self, method: str, owner: str, role: str, body: dict[str, Any]) -> dict[str, Any]:
         with socket.socket(socket.AF_UNIX) as stream:
-            stream.settimeout(10)
+            stream.settimeout(150 if method == "agent_evaluation" else 10)
             stream.connect(str(self.path))
             send(stream, {"method": method, "owner": owner, "role": role, "body": body})
             result = receive(stream)

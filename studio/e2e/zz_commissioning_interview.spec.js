@@ -19,10 +19,14 @@ test('resume an incomplete interview, then onboard both fixture plants through r
     await page.locator('#iv-source').fill('Browser qualification fixture specification; not physical calibration');
     await page.locator('#iv-template').selectOption(template);
     await page.locator('#iv-template-load').click();
+    await expect.poll(async () => JSON.parse(await page.locator('#iv-document').inputValue()).channels?.length || 0).toBeGreaterThan(0);
     const document = JSON.parse(await page.locator('#iv-document').inputValue());
     document.rig_id = `interview-${template.replaceAll('_','-')}`;
     await page.locator('#iv-document').fill(JSON.stringify(document,null,2));
-    await page.locator('#iv-save').click();
+    await Promise.all([
+      page.waitForResponse(response => response.url().endsWith('/answers') && response.request().method() === 'POST' && response.ok()),
+      page.locator('#iv-save').click(),
+    ]);
     await page.locator('#iv-propose').click();
     await expect(page.locator('#iv-apply')).toBeEnabled();
     await expect(page.locator('#iv-preview')).toContainText('qualification');
