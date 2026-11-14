@@ -76,7 +76,7 @@ class MqttHardware(HardwareAdapter):
             self.config.rig_id,
             self.config.config_hash,
             self.estop,
-            not self.output,
+            False if self.network else not self.output,
             tuple(samples),
             datetime.now(UTC).isoformat(),
         )
@@ -94,7 +94,7 @@ class MqttHardware(HardwareAdapter):
             self.bus.publish("command/valve", False)
 
     def output_is_safe(self) -> bool:
-        return not self.output
+        return False if self.network else not self.output
 
     def close(self) -> None:
         self.force_safe_state()

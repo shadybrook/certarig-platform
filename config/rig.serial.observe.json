@@ -1,0 +1,41 @@
+{
+  "rig_id": "certarig-serial-jsonl-observer",
+  "revision": "operator-review-required",
+  "sample_interval_ms": 20,
+  "abort_limits": {
+    "temperature": 85.0
+  },
+  "hardware": {
+    "mode": "serial_jsonl",
+    "observe_only": true,
+    "relay_feedback_gpio": null,
+    "serial": {
+      "port": "/dev/REVIEWED_SERIAL_DEVICE",
+      "baudrate": 115200,
+      "timeout_s": 0.1,
+      "max_age_s": 1
+    }
+  },
+  "channels": [
+    {
+      "channel_id": "jacket_c",
+      "kind": "analog",
+      "concept": "temperature",
+      "unit": "degC",
+      "valid_min": 0.0,
+      "valid_max": 120.0,
+      "safe_min": 10.0,
+      "safe_max": 85.0,
+      "warning_max": 75.0,
+      "calibration_id": "REPLACE_WITH_REVIEWED_CALIBRATION",
+      "required": true,
+      "stuck_samples": 50,
+      "stuck_epsilon": 0.01,
+      "source": {
+        "kind": "serial_jsonl",
+        "address": "jacket_c"
+      }
+    }
+  ],
+  "description": "Observation profile template only; identify hardware, calibrate and review before use."
+}

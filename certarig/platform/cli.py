@@ -185,7 +185,7 @@ def run(args: argparse.Namespace) -> None:
         broker = BrokerClient(Path(settings["sandbox_socket"]))
         factory = providers(root)
         if args.action == "runtime":
-            runtime = Runtime(platform, factory, lambda a, e: validate(platform, a, e, broker))
+            runtime = Runtime(platform, factory, lambda a, e: validate(platform, a, e, broker), broker=broker)
             try:
                 print("Observation runtime ready; no deployments resumed.", flush=True)
                 runtime.serve()

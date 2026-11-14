@@ -77,6 +77,7 @@ class HardwareConfig:
     simulator: dict[str, Any] | None = None
     mqtt: dict[str, Any] | None = None
     modbus: dict[str, Any] | None = None
+    serial: dict[str, Any] | None = None
     feedback_required: bool = False
     feedback_settle_ms: int = 250
     feedback_active_high: bool = True
@@ -100,6 +101,8 @@ class RigConfig:
 
     def public_dict(self) -> dict[str, Any]:
         value = asdict(self)
+        if self.hardware.serial is None:
+            value["hardware"].pop("serial", None)
         value["channels"] = [asdict(channel) for channel in self.channels]
         return value
 

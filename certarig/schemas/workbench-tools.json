@@ -1,0 +1,217 @@
+{
+  "revision": "workbench-authoring/1",
+  "authority": "draft_and_analysis_only",
+  "tools": [
+    {
+      "name": "create_agent_draft",
+      "description": "Create an inert commissioning draft.",
+      "method": "POST",
+      "path": [
+        "drafts"
+      ],
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "asset_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "goal": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "template": {
+            "enum": [
+              "commissioning",
+              "analysis",
+              "revalidation",
+              "evidence",
+              "reporting"
+            ]
+          }
+        },
+        "required": [
+          "asset_id",
+          "goal"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "read_agent_draft",
+      "description": "Inspect a scoped draft and blockers.",
+      "method": "GET",
+      "path": [
+        "drafts",
+        ":draft_id"
+      ],
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "draft_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "draft_id"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "add_draft_requirement",
+      "description": "Append a requirement with revision checking.",
+      "method": "POST",
+      "path": [
+        "drafts",
+        ":draft_id"
+      ],
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "draft_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "draft_id",
+          "expected_revision",
+          "message"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "submit_agent_evaluation",
+      "description": "Queue an authored version for evaluation.",
+      "method": "POST",
+      "path": [
+        "tasks"
+      ],
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "enum": [
+              "evaluate",
+              "team_evaluate"
+            ]
+          },
+          "target_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "kind",
+          "target_id"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "read_task",
+      "description": "Read scoped task progress.",
+      "method": "GET",
+      "path": [
+        "tasks",
+        ":task_id"
+      ],
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "task_id"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "read_evidence_index",
+      "description": "List permitted evidence.",
+      "method": "GET",
+      "path": [
+        "evidence"
+      ],
+      "parameters": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "run_reviewed_analysis",
+      "description": "Run a reviewed Sandbox analysis tool.",
+      "method": "POST",
+      "path": [
+        "tools",
+        ":tool_id",
+        "run"
+      ],
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "tool_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "inputs": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "tool_id",
+          "inputs"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "read_analysis",
+      "description": "Inspect scoped analysis status.",
+      "method": "GET",
+      "path": [
+        "analyses",
+        ":analysis_id"
+      ],
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "analysis_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "analysis_id"
+        ],
+        "additionalProperties": false
+      }
+    }
+  ]
+}

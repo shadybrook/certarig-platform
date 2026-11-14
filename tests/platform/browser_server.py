@@ -12,11 +12,17 @@ from tests.platform.test_lifecycle import Client, FixtureProvider, lab
 if __name__ == "__main__":
     context = lab.__wrapped__(Path(sys.argv[1]))
     value = next(context)
+    from tests.platform.test_workbench import AnalysisEngine
+
+    value.broker.engine = AnalysisEngine()
     control = Path(sys.argv[1]) / "ui-controls.json"
 
     class BrowserClient(Client):
         def rig(self):
             result = super().rig()
+            result["rig"] = json.loads(
+                (Path(__file__).resolve().parents[2] / "config" / "rig.thermal.sim.json").read_text()
+            )
             controls = json.loads(control.read_text()) if control.exists() else {}
             if self.url.endswith(":18091"):
                 result["config_hash"] = controls.get("profile", self.profile)

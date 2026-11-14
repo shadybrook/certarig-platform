@@ -30,3 +30,5 @@ evidence/sim-library/
 evidence/agent_transcripts/
 evidence/lab-pulled/
 .coverage
+
+studio/test-results-platform/

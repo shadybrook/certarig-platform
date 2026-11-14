@@ -1,0 +1,47 @@
+{
+  "rig_id": "certarig-modbus-tcp-observer",
+  "revision": "operator-review-required",
+  "sample_interval_ms": 20,
+  "abort_limits": {
+    "temperature": 85.0
+  },
+  "hardware": {
+    "mode": "modbus_tcp",
+    "observe_only": true,
+    "relay_feedback_gpio": null,
+    "modbus": {
+      "host": "127.0.0.1",
+      "port": 1502,
+      "timeout_s": 0.25
+    }
+  },
+  "channels": [
+    {
+      "channel_id": "jacket_c",
+      "kind": "analog",
+      "concept": "temperature",
+      "unit": "degC",
+      "valid_min": 0.0,
+      "valid_max": 120.0,
+      "safe_min": 10.0,
+      "safe_max": 85.0,
+      "warning_max": 75.0,
+      "calibration_id": "REPLACE_WITH_REVIEWED_CALIBRATION",
+      "required": true,
+      "stuck_samples": 50,
+      "stuck_epsilon": 0.01,
+      "source": {
+        "kind": "modbus_tcp",
+        "register": 0,
+        "function": 4,
+        "device_id": 1,
+        "data_type": "uint16",
+        "gain": 0.1,
+        "offset": 0,
+        "byte_order": "big",
+        "word_order": "big"
+      }
+    }
+  ],
+  "description": "Observation profile template only; identify hardware, calibrate and review before use."
+}

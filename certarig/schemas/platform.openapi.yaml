@@ -1,9 +1,9 @@
 openapi: 3.1.0
 info:
   title: CertaRig local customer-agent control plane
-  version: 0.5.0
-  description: Loopback simulator proof. Separate from Edge role keys; no physical
-    or hosted authority.
+  version: 0.6.0
+  description: 'Local Innovator Workbench: scoped observation agents, reviewed teams
+    and isolated analysis. No physical actuation or hosted authority.'
 servers:
 - url: http://127.0.0.1:18090
 security:
@@ -230,7 +230,7 @@ components:
         activity:
           type: string
         runtime_health:
-          $ref: '#/components/schemas/RuntimeHealth'
+          $ref: '#/$defs/RuntimeHealth'
     AgentDefinition:
       type: object
       required:
@@ -249,10 +249,12 @@ components:
           type: string
           minLength: 1
           maxLength: 8000
-        asset_id: &id001
+        asset_id:
           type: string
           minLength: 1
-        connection_id: *id001
+        connection_id:
+          type: string
+          minLength: 1
         tools:
           type: array
           minItems: 1
@@ -334,14 +336,24 @@ components:
       - reviewed_at
       - record_hash
       properties:
-        id: &id002
+        id:
           type: string
           minLength: 1
-        org_id: *id002
-        asset_id: *id002
-        profile_hash: *id002
-        reviewer_id: *id002
-        record_hash: *id002
+        org_id:
+          type: string
+          minLength: 1
+        asset_id:
+          type: string
+          minLength: 1
+        profile_hash:
+          type: string
+          minLength: 1
+        reviewer_id:
+          type: string
+          minLength: 1
+        record_hash:
+          type: string
+          minLength: 1
         revision:
           type: integer
           minimum: 1
@@ -371,13 +383,27 @@ components:
       - revalidation
       - expires_at
       properties:
-        id: *id002
-        org_id: *id002
-        asset_id: *id002
-        reviewer_id: *id002
-        base_hash: *id002
-        profile_hash: *id002
-        capabilities_hash: *id002
+        id:
+          type: string
+          minLength: 1
+        org_id:
+          type: string
+          minLength: 1
+        asset_id:
+          type: string
+          minLength: 1
+        reviewer_id:
+          type: string
+          minLength: 1
+        base_hash:
+          type: string
+          minLength: 1
+        profile_hash:
+          type: string
+          minLength: 1
+        capabilities_hash:
+          type: string
+          minLength: 1
         base_revision:
           type: integer
           minimum: 1
@@ -392,11 +418,248 @@ components:
           type: boolean
         diff:
           type: array
-          items: *id002
+          items:
+            type: string
+            minLength: 1
         revalidation:
           type: object
         expires_at:
           type: number
+    Project:
+      type: object
+      required:
+      - id
+      - org_id
+      - name
+      - owner_id
+      - asset_ids
+      properties:
+        id:
+          type: string
+        org_id:
+          type: string
+        name:
+          type: string
+        owner_id:
+          type: string
+        asset_ids:
+          type: array
+          items:
+            type: string
+    CommissioningDraft:
+      type: object
+      required:
+      - id
+      - org_id
+      - owner_id
+      - asset_id
+      - revision
+      - status
+      - definition
+      - messages
+      properties:
+        id:
+          type: string
+        org_id:
+          type: string
+        owner_id:
+          type: string
+        asset_id:
+          type: string
+        revision:
+          type: integer
+          minimum: 1
+        status:
+          enum:
+          - draft
+          - committed
+        definition:
+          type: object
+        messages:
+          type: array
+          items:
+            type: object
+    Task:
+      type: object
+      required:
+      - id
+      - org_id
+      - asset_id
+      - owner_id
+      - kind
+      - target_id
+      - status
+      properties:
+        id:
+          type: string
+        org_id:
+          type: string
+        asset_id:
+          type: string
+        owner_id:
+          type: string
+        kind:
+          enum:
+          - evaluate
+          - qualify
+          - team_evaluate
+        target_id:
+          type: string
+        status:
+          enum:
+          - queued
+          - running
+          - completed
+          - failed
+          - cancelled
+          - interrupted
+    TeamVersion:
+      type: object
+      required:
+      - id
+      - org_id
+      - team_members
+      - member_evaluations
+      - hash
+      properties:
+        id:
+          type: string
+        org_id:
+          type: string
+        team_members:
+          type: array
+          minItems: 2
+          maxItems: 4
+          uniqueItems: true
+          items:
+            type: string
+        member_evaluations:
+          type: array
+          items:
+            type: string
+        hash:
+          type: string
+    AnalysisTool:
+      type: object
+      required:
+      - id
+      - org_id
+      - asset_id
+      - source
+      - kind
+      - hash
+      - status
+      - input_schema
+      - output_schema
+      - tests
+      properties:
+        id:
+          type: string
+        org_id:
+          type: string
+        asset_id:
+          type: string
+        source:
+          type: string
+          maxLength: 128000
+        kind:
+          enum:
+          - python
+          - spice
+        hash:
+          type: string
+        status:
+          enum:
+          - unreviewed
+          - reviewed
+        input_schema:
+          type: object
+        output_schema:
+          type: object
+        tests:
+          type: array
+          minItems: 1
+          maxItems: 3
+    Analysis:
+      type: object
+      required:
+      - id
+      - org_id
+      - asset_id
+      - owner_id
+      - tool_id
+      - tool_hash
+      - status
+      properties:
+        id:
+          type: string
+        org_id:
+          type: string
+        asset_id:
+          type: string
+        owner_id:
+          type: string
+        tool_id:
+          type: string
+        tool_hash:
+          type: string
+        status:
+          type: string
+    ConnectorProfile:
+      type: object
+      required:
+      - id
+      - org_id
+      - asset_id
+      - owner_id
+      - transport
+      - channels
+      - status
+      properties:
+        id:
+          type: string
+        org_id:
+          type: string
+        asset_id:
+          type: string
+        owner_id:
+          type: string
+        transport:
+          enum:
+          - mqtt
+          - serial_jsonl
+          - modbus_tcp
+        channels:
+          type: array
+          minItems: 1
+          maxItems: 16
+        status:
+          enum:
+          - proposed
+          - reviewed_for_operator_installation
+    Replay:
+      type: object
+      required:
+      - id
+      - org_id
+      - asset_id
+      - csv
+      - sha256
+      - kind
+      properties:
+        id:
+          type: string
+        org_id:
+          type: string
+        asset_id:
+          type: string
+        csv:
+          type: string
+          maxLength: 512000
+        sha256:
+          type: string
+        kind:
+          const: imported_recording_unverified_origin
 paths:
   /v1/auth/login:
     get:
@@ -421,7 +684,9 @@ paths:
       - in: query
         name: state
         required: true
-        schema: *id001
+        schema: &id001
+          type: string
+          minLength: 1
       - in: query
         name: code
         required: true
@@ -1223,7 +1488,9 @@ paths:
       - in: path
         name: asset_id
         required: true
-        schema: *id002
+        schema: &id002
+          type: string
+          minLength: 1
   /v1/assets/{asset_id}/profiles:
     get:
       summary: Read preserved reviewed profile revisions for a granted asset
@@ -1323,3 +1590,812 @@ paths:
           description: Resource unavailable in this scope
         '409':
           description: Stale profile, consumed preview or unavailable runtime
+  /v1/templates:
+    get:
+      summary: GET templates
+      description: Application session and current asset grants required. Authoring
+        confers no execution authority.
+      responses:
+        '200':
+          description: Scoped result
+        '403':
+          description: Permission denied
+        '409':
+          description: Invalid, stale or conflicting request
+      parameters: []
+  /v1/projects:
+    get:
+      summary: GET projects
+      description: Application session and current asset grants required. Authoring
+        confers no execution authority.
+      responses:
+        '200':
+          description: Scoped result
+        '403':
+          description: Permission denied
+        '409':
+          description: Invalid, stale or conflicting request
+      parameters: []
+    post:
+      summary: POST projects
+      description: Application session and current asset grants required. Authoring
+        confers no execution authority.
+      responses:
+        '200':
+          description: Scoped result
+        '403':
+          description: Permission denied
+        '409':
+          description: Invalid, stale or conflicting request
+      parameters:
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  maxLength: 120
+                asset_ids:
+                  type: array
+                  minItems: 1
+                  maxItems: 16
+                  items:
+                    type: string
+  /v1/drafts:
+    get:
+      summary: GET drafts
+      description: Application session and current asset grants required. Authoring
+        confers no execution authority.
+      responses:
+        '200':
+          description: Scoped result
+        '403':
+          description: Permission denied
+        '409':
+          description: Invalid, stale or conflicting request
+      parameters: []
+    post:
+      summary: POST drafts
+      description: Application session and current asset grants required. Authoring
+        confers no execution authority.
+      responses:
+        '200':
+          description: Scoped result
+        '403':
+          description: Permission denied
+        '409':
+          description: Invalid, stale or conflicting request
+      parameters:
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                asset_id:
+                  type: string
+                project_id:
+                  type:
+                  - string
+                  - 'null'
+                goal:
+                  type: string
+                template:
+                  enum:
+                  - commissioning
+                  - analysis
+                  - revalidation
+                  - evidence
+                  - reporting
+  /v1/drafts/{draft_id}:
+    get:
+      summary: GET drafts/{draft_id}
+      description: Application session and current asset grants required. Authoring
+        confers no execution authority.
+      responses:
+        '200':
+          description: Scoped result
+        '403':
+          description: Permission denied
+        '409':
+          description: Invalid, stale or conflicting request
+      parameters:
+      - name: draft_id
+        in: path
+        required: true
+        schema:
+          type: string
+    post:
+      summary: POST drafts/{draft_id}
+      description: Application session and current asset grants required. Authoring
+        confers no execution authority.
+      responses:
+        '200':
+          description: Scoped result
+        '403':
+          description: Permission denied
+        '409':
+          description: Invalid, stale or conflicting request
+      parameters:
+      - name: draft_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                expected_revision:
+                  type: integer
+                definition:
+                  type: object
+                message:
+                  type: string
+  /v1/drafts/{draft_id}/commit:
+    post:
+      summary: POST drafts/{draft_id}/commit
+      description: Application session and current asset grants required. Authoring
+        confers no execution authority.
+      responses:
+        '200':
+          description: Scoped result
+        '403':
+          description: Permission denied
+        '409':
+          description: Invalid, stale or conflicting request
+      parameters:
+      - name: draft_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                expected_revision:
+                  type: integer
+  /v1/tasks:
+    get:
+      summary: GET tasks
+      description: Application session and current asset grants required. Authoring
+        confers no execution authority.
+      responses:
+        '200':
+          description: Scoped result
+        '403':
+          description: Permission denied
+        '409':
+          description: Invalid, stale or conflicting request
+      parameters: []
+    post:
+      summary: POST tasks
+      description: Application session and current asset grants required. Authoring
+        confers no execution authority.
+      responses:
+        '200':
+          description: Scoped result
+        '403':
+          description: Permission denied
+        '409':
+          description: Invalid, stale or conflicting request
+      parameters:
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                kind:
+                  enum:
+                  - evaluate
+                  - qualify
+                  - team_evaluate
+                target_id:
+                  type: string
+  /v1/tasks/{task_id}:
+    get:
+      summary: GET tasks/{task_id}
+      description: Application session and current asset grants required. Authoring
+        confers no execution authority.
+      responses:
+        '200':
+          description: Scoped result
+        '403':
+          description: Permission denied
+        '409':
+          description: Invalid, stale or conflicting request
+      parameters:
+      - name: task_id
+        in: path
+        required: true
+        schema:
+          type: string
+  /v1/tasks/{task_id}/events:
+    post:
+      summary: POST tasks/{task_id}/events
+      description: Application session and current asset grants required. Authoring
+        confers no execution authority.
+      responses:
+        '200':
+          description: Scoped result
+        '403':
+          description: Permission denied
+        '409':
+          description: Invalid, stale or conflicting request
+      parameters:
+      - name: task_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                after:
+                  type: integer
+                  minimum: 0
+  /v1/tasks/{task_id}/cancel:
+    post:
+      summary: POST tasks/{task_id}/cancel
+      description: Application session and current asset grants required. Authoring
+        confers no execution authority.
+      responses:
+        '200':
+          description: Scoped result
+        '403':
+          description: Permission denied
+        '409':
+          description: Invalid, stale or conflicting request
+      parameters:
+      - name: task_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+  /v1/teams:
+    get:
+      summary: GET teams
+      description: Application session and current asset grants required. Authoring
+        confers no execution authority.
+      responses:
+        '200':
+          description: Scoped result
+        '403':
+          description: Permission denied
+        '409':
+          description: Invalid, stale or conflicting request
+      parameters: []
+    post:
+      summary: POST teams
+      description: Application session and current asset grants required. Authoring
+        confers no execution authority.
+      responses:
+        '200':
+          description: Scoped result
+        '403':
+          description: Permission denied
+        '409':
+          description: Invalid, stale or conflicting request
+      parameters:
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                supervisor_id:
+                  type: string
+                specialist_ids:
+                  type: array
+                  minItems: 1
+                  maxItems: 3
+                  items:
+                    type: string
+  /v1/tools:
+    get:
+      summary: GET tools
+      description: Application session and current asset grants required. Authoring
+        confers no execution authority.
+      responses:
+        '200':
+          description: Scoped result
+        '403':
+          description: Permission denied
+        '409':
+          description: Invalid, stale or conflicting request
+      parameters: []
+    post:
+      summary: POST tools
+      description: Application session and current asset grants required. Authoring
+        confers no execution authority.
+      responses:
+        '200':
+          description: Scoped result
+        '403':
+          description: Permission denied
+        '409':
+          description: Invalid, stale or conflicting request
+      parameters:
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+  /v1/tools/{tool_id}:
+    get:
+      summary: GET tools/{tool_id}
+      description: Application session and current asset grants required. Authoring
+        confers no execution authority.
+      responses:
+        '200':
+          description: Scoped result
+        '403':
+          description: Permission denied
+        '409':
+          description: Invalid, stale or conflicting request
+      parameters:
+      - name: tool_id
+        in: path
+        required: true
+        schema:
+          type: string
+  /v1/tools/{tool_id}/tests:
+    get:
+      summary: GET tools/{tool_id}/tests
+      description: Application session and current asset grants required. Authoring
+        confers no execution authority.
+      responses:
+        '200':
+          description: Scoped result
+        '403':
+          description: Permission denied
+        '409':
+          description: Invalid, stale or conflicting request
+      parameters:
+      - name: tool_id
+        in: path
+        required: true
+        schema:
+          type: string
+  /v1/tools/{tool_id}/test:
+    post:
+      summary: POST tools/{tool_id}/test
+      description: Application session and current asset grants required. Authoring
+        confers no execution authority.
+      responses:
+        '200':
+          description: Scoped result
+        '403':
+          description: Permission denied
+        '409':
+          description: Invalid, stale or conflicting request
+      parameters:
+      - name: tool_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+  /v1/tools/{tool_id}/review:
+    post:
+      summary: POST tools/{tool_id}/review
+      description: Application session and current asset grants required. Authoring
+        confers no execution authority.
+      responses:
+        '200':
+          description: Scoped result
+        '403':
+          description: Permission denied
+        '409':
+          description: Invalid, stale or conflicting request
+      parameters:
+      - name: tool_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                test_id:
+                  type: string
+  /v1/tools/{tool_id}/run:
+    post:
+      summary: POST tools/{tool_id}/run
+      description: Application session and current asset grants required. Authoring
+        confers no execution authority.
+      responses:
+        '200':
+          description: Scoped result
+        '403':
+          description: Permission denied
+        '409':
+          description: Invalid, stale or conflicting request
+      parameters:
+      - name: tool_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                inputs: {}
+                replay_id:
+                  type:
+                  - string
+                  - 'null'
+  /v1/analyses:
+    get:
+      summary: GET analyses
+      description: Application session and current asset grants required. Authoring
+        confers no execution authority.
+      responses:
+        '200':
+          description: Scoped result
+        '403':
+          description: Permission denied
+        '409':
+          description: Invalid, stale or conflicting request
+      parameters: []
+  /v1/analyses/{analysis_id}:
+    get:
+      summary: GET analyses/{analysis_id}
+      description: Application session and current asset grants required. Authoring
+        confers no execution authority.
+      responses:
+        '200':
+          description: Scoped result
+        '403':
+          description: Permission denied
+        '409':
+          description: Invalid, stale or conflicting request
+      parameters:
+      - name: analysis_id
+        in: path
+        required: true
+        schema:
+          type: string
+  /v1/analyses/{analysis_id}/artifact:
+    post:
+      summary: POST analyses/{analysis_id}/artifact
+      description: Application session and current asset grants required. Authoring
+        confers no execution authority.
+      responses:
+        '200':
+          description: Scoped result
+        '403':
+          description: Permission denied
+        '409':
+          description: Invalid, stale or conflicting request
+      parameters:
+      - name: analysis_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+  /v1/analyses/{analysis_id}/cancel:
+    post:
+      summary: POST analyses/{analysis_id}/cancel
+      description: Application session and current asset grants required. Authoring
+        confers no execution authority.
+      responses:
+        '200':
+          description: Scoped result
+        '403':
+          description: Permission denied
+        '409':
+          description: Invalid, stale or conflicting request
+      parameters:
+      - name: analysis_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+  /v1/replays:
+    get:
+      summary: GET replays
+      description: Application session and current asset grants required. Authoring
+        confers no execution authority.
+      responses:
+        '200':
+          description: Scoped result
+        '403':
+          description: Permission denied
+        '409':
+          description: Invalid, stale or conflicting request
+      parameters: []
+    post:
+      summary: POST replays
+      description: Application session and current asset grants required. Authoring
+        confers no execution authority.
+      responses:
+        '200':
+          description: Scoped result
+        '403':
+          description: Permission denied
+        '409':
+          description: Invalid, stale or conflicting request
+      parameters:
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+  /v1/connector-profiles:
+    get:
+      summary: GET connector-profiles
+      description: Application session and current asset grants required. Authoring
+        confers no execution authority.
+      responses:
+        '200':
+          description: Scoped result
+        '403':
+          description: Permission denied
+        '409':
+          description: Invalid, stale or conflicting request
+      parameters: []
+    post:
+      summary: POST connector-profiles
+      description: Application session and current asset grants required. Authoring
+        confers no execution authority.
+      responses:
+        '200':
+          description: Scoped result
+        '403':
+          description: Permission denied
+        '409':
+          description: Invalid, stale or conflicting request
+      parameters:
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+  /v1/connector-profiles/{profile_id}:
+    get:
+      summary: GET connector-profiles/{profile_id}
+      description: Application session and current asset grants required. Authoring
+        confers no execution authority.
+      responses:
+        '200':
+          description: Scoped result
+        '403':
+          description: Permission denied
+        '409':
+          description: Invalid, stale or conflicting request
+      parameters:
+      - name: profile_id
+        in: path
+        required: true
+        schema:
+          type: string
+  /v1/connector-profiles/{profile_id}/review:
+    post:
+      summary: POST connector-profiles/{profile_id}/review
+      description: Application session and current asset grants required. Authoring
+        confers no execution authority.
+      responses:
+        '200':
+          description: Scoped result
+        '403':
+          description: Permission denied
+        '409':
+          description: Invalid, stale or conflicting request
+      parameters:
+      - name: profile_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+  /v1/evidence:
+    get:
+      summary: GET evidence
+      description: Application session and current asset grants required. Authoring
+        confers no execution authority.
+      responses:
+        '200':
+          description: Scoped result
+        '403':
+          description: Permission denied
+        '409':
+          description: Invalid, stale or conflicting request
+      parameters: []
+  /v1/evidence/{deployment_id}/verify:
+    post:
+      summary: POST evidence/{deployment_id}/verify
+      description: Application session and current asset grants required. Authoring
+        confers no execution authority.
+      responses:
+        '200':
+          description: Scoped result
+        '403':
+          description: Permission denied
+        '409':
+          description: Invalid, stale or conflicting request
+      parameters:
+      - name: deployment_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+  /v1/workbench-tools:
+    get:
+      summary: GET workbench-tools
+      description: Application session and current asset grants required. Authoring
+        confers no execution authority.
+      responses:
+        '200':
+          description: Scoped result
+        '403':
+          description: Permission denied
+        '409':
+          description: Invalid, stale or conflicting request
+      parameters: []

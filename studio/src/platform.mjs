@@ -13,6 +13,10 @@ function options(select, rows, label) {
   select.replaceChildren(...rows.map((row) => { const option = node('option', label(row)); option.value = row.id; return option; }));
   if ([...select.options].some((o) => o.value === previous)) select.value = previous;
 }
+function extraDefinition() {
+  return {analysis_tools:[...document.querySelectorAll('input[name="analysis-tools"]:checked')].map(b=>b.value),
+    limits:{model_calls:Number($('limit-calls').value),max_assessments:Number($('limit-assessments').value),interval_s:Number($('limit-interval').value),lease_s:Number($('limit-lease').value)}};
+}
 function selected() { return state.versions.find((v) => v.id === state.selected); }
 function currentEvaluation() { return state.evaluations.filter((e) => e.version_id === state.selected).at(-1); }
 const providerLabels = {not_started:'Not started', idle:'Idle', connecting:'Connecting', assessing:'Assessing', using_tool:'Reading bench data', completed:'Complete', stopped:'Stopped', cancelled:'Cancelled', interrupted:'Interrupted', error:'Error'};
@@ -60,7 +64,7 @@ function renderVersions() {
   $('versions').replaceChildren(...versions.map((version) => {
     const button = node('button', `${version.name} · v${version.revision}`);
     button.setAttribute('aria-pressed', String(version.id === state.selected));
-    button.onclick = () => { state.selected = version.id; fillEditor(); renderVersions(); renderEvaluation(); };
+    button.onclick = () => { state.selected = version.id; fillEditor(); renderVersions(); renderEvaluation(); document.dispatchEvent(new CustomEvent("versionselected",{detail:{versionId:version.id}})); };
     return button;
   }));
   if (!versions.length) $('versions').append(node('p', 'No saved versions for this bench.', 'muted'));
@@ -76,6 +80,8 @@ function fillEditor() {
     }
     $('connection').value = version.connection_id;
     renderTools(version.tools);
+    for (const [id,key] of [['limit-calls','model_calls'],['limit-assessments','max_assessments'],['limit-interval','interval_s'],['limit-lease','lease_s']]) $(id).value=version.limits[key];
+    document.querySelectorAll('input[name="analysis-tools"]').forEach(b=>b.checked=(version.analysis_tools||[]).includes(b.value));
   }
   $('version-label').textContent = version ? `Version ${version.revision} · ${version.id}` : 'Unsaved draft';
   const readonly = version && version.author_id !== state.me.user_id;
@@ -132,18 +138,18 @@ async function load() {
   const health = await api('deployments/runtime'); state.runtime = health.runtime; renderRuntime();
   await loadTools(selected()?.tools);
   if (selected() && selected().author_id !== state.me.user_id) fillEditor();
-  renderVersions(); renderEvaluation(); renderDeployments();
+  renderVersions(); renderEvaluation(); renderDeployments(); document.dispatchEvent(new Event("platformloaded"));
 }
 async function action(fn) {
   if (state.busy) return;
   state.busy = true; renderEvaluation(); notice('Working…');
   try { await fn(); await load(); } catch (error) { notice(error.message, true); }
-  finally { state.busy = false; renderEvaluation(); }
+  finally { state.busy = false; renderEvaluation(); if ($('notice').textContent === 'Working…') notice('Status updated.'); }
 }
 $('agent-form').onsubmit = (event) => { event.preventDefault(); action(async () => {
   if (state.toolsLoading || state.toolAsset !== $('asset').value) throw new Error('Wait for this bench’s permitted tools to load.');
   if (!$('asset').value || !$('connection').value) throw new Error('Select an enrolled bench and create a model connection first.');
-  const v = selected(); const body = { name: $('agent-name').value.trim(), instructions: $('instructions').value, asset_id: $('asset').value, connection_id: $('connection').value, tools: checkedTools() };
+  const v = selected(); const body = { name: $('agent-name').value.trim(), instructions: $('instructions').value, asset_id: $('asset').value, connection_id: $('connection').value, tools: checkedTools(), ...extraDefinition() };
   const result = await api(v ? `agents/${v.agent_id}/versions` : 'agents', body); state.selected = result.id; notice(`Saved immutable version ${result.revision}. Evaluate this version before review.`);
 }); };
 $('model-form').onsubmit = (event) => { event.preventDefault(); action(async () => { await api('model-connections', { backend: $('backend').value, model: $('model').value, consent: $('consent').checked }); notice('Model connection created. Codex requires separate managed sign-in.'); }); };
@@ -180,3 +186,5 @@ try {
 } catch (error) { if (state.me) notice(error.message, true); }
 
 setInterval(async () => { if (state.me && !state.busy && !document.hidden) { try { const [data, runtime, assets] = await Promise.all([api('deployments'), api('deployments/runtime'), api('assets')]); state.deployments = data.deployments; state.runtime = runtime.runtime; state.assets = assets.assets; renderRuntime(); renderEvaluation(); renderDeployments(); } catch (error) { state.runtime = {state:'unknown'}; renderRuntime(); notice(`Monitoring paused: ${error.message}`, true); } } }, 2000);
+
+if (state.me) { const {init} = await import("./workbench.mjs"); init({api,state,load,action,notice,checkedTools,renderTools,extraDefinition}); }

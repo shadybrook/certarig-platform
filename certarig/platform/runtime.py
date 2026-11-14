@@ -21,8 +21,9 @@ from .store import Actor, uid
 
 
 class Runtime:
-    def __init__(self, platform: Platform, provider_factory: Any, validate_receipt: Any):
+    def __init__(self, platform: Platform, provider_factory: Any, validate_receipt: Any, broker: Any = None):
         self.platform, self.factory, self.validate_receipt = platform, provider_factory, validate_receipt
+        self.broker = broker
         self.id = uid("run")
         self.active: dict[str, Any] = {}
         self.closed = threading.Event()
@@ -88,7 +89,9 @@ class Runtime:
                 self._live(d)
                 d["runtime_id"] = self.id
                 # In-flight lease is persisted before inference. Restart cannot resume it.
-                d["next_at"] = s.clock() + 30
+                d["next_at"] = (
+                    s.clock() + s.get("version", d["version_id"], d["org_id"])["limits"]["interval_s"]
+                )
                 s.put("deployment", d)
             v = s.get("version", d["version_id"], d["org_id"])
             c = s.get("connection", d["connection_id"], d["org_id"])
@@ -97,39 +100,65 @@ class Runtime:
             self.activity(identifier, "assessing", "model")
             self.active[identifier] = provider
             asset = s.get("asset", d["asset_id"], d["org_id"])
-            registry = ScopedRegistry.connected(
-                self.platform.client(asset), v["tools"], lambda: self.guard(identifier)
-            )
-            transcript = Transcript(
-                s.root / "transcripts" / (identifier + "-" + str(d["assessments"]) + ".jsonl")
-            )
-            session = AgentSession(
-                provider,
-                registry,
-                transcript,
-                max_model_calls_per_turn=8,
-                system_prompt=system_prompt(v),
-                on_event=lambda event: self.trace_activity(identifier, event),
-            )
-            result = session.send(
-                "Assess this enrolled bench in observation mode. Read fresh signals; return the configured JSON output."
-            )
-            output = json.loads(result.text)
+            if v.get("team_members"):
+                provider.close()
+                provider = None
+                from . import teams
+
+                def activate(member_provider: Any) -> None:
+                    self.active[identifier] = member_provider
+
+                team_result = teams.run(
+                    self.platform,
+                    Actor(d["author_id"], d["org_id"], ""),
+                    v,
+                    self.factory,
+                    lambda member: self.registry(d, member, asset),
+                    s.root / "transcripts" / (identifier + "-" + str(d["assessments"]) + ".jsonl"),
+                    "Assess this enrolled bench in observation mode. Read fresh signals and delegate within the reviewed team.",
+                    lambda: self.guard(identifier),
+                    activate,
+                )
+                output = team_result["output"]
+                transcript_rows = team_result["transcript"]
+            else:
+                registry = self.registry(d, v, asset)
+                transcript = Transcript(
+                    s.root / "transcripts" / (identifier + "-" + str(d["assessments"]) + ".jsonl")
+                )
+                session = AgentSession(
+                    provider,
+                    registry,
+                    transcript,
+                    max_model_calls_per_turn=v["limits"]["model_calls"],
+                    system_prompt=system_prompt(v),
+                    on_event=lambda event: self.trace_activity(identifier, event),
+                )
+                result = session.send(
+                    "Assess this enrolled bench in observation mode. Read fresh signals; return the configured JSON output."
+                )
+                output = json.loads(result.text)
+                transcript_rows = Transcript.read(transcript.path)
+                if result.stopped_reason != "end_turn":
+                    raise ValueError("Incomplete assessment")
             jsonschema.validate(output, OUTPUT)
-            if result.stopped_reason != "end_turn":
-                raise ValueError("Incomplete assessment")
             self.guard(identifier)
             with s.atomic():
                 current = s.get("deployment", identifier, d["org_id"])
                 self._live(current)  # Never publish a late revoked result.
                 current["observations"].append(
-                    {"at": s.clock(), "output": output, "transcript": Transcript.read(transcript.path)}
+                    {
+                        "at": s.clock(),
+                        "output": output,
+                        "transcript": transcript_rows,
+                        **({"team": team_result} if v.get("team_members") else {}),
+                    }
                 )
                 current["assessments"] += 1
                 current.update(
                     provider_status="idle", activity="waiting_for_assessment", last_assessment_at=s.clock()
                 )
-                if current["assessments"] >= 10:
+                if current["assessments"] >= v["limits"]["max_assessments"]:
                     current.update(
                         status="completed",
                         reason="Assessment limit reached",
@@ -171,6 +200,26 @@ class Runtime:
             finally:
                 self.slot.release()
 
+    def registry(self, deployment: dict[str, Any], version: dict[str, Any], asset: dict[str, Any]) -> Any:
+        def guard() -> dict[str, Any]:
+            return self.guard(deployment["id"])
+
+        base = ScopedRegistry.connected(self.platform.client(asset), version["tools"], guard)
+        if not version.get("analysis_tools"):
+            return base
+        if self.broker is None:
+            raise PermissionError("Isolated analysis broker unavailable")
+        from .analysis import Analysis, AnalysisRegistry
+
+        return AnalysisRegistry(
+            base,
+            Analysis(self.platform, self.broker),
+            Actor(version["author_id"], version["org_id"], ""),
+            version,
+            guard,
+            deployment["id"],
+        )
+
     def activity(self, identifier: str, provider_status: str, activity: str) -> None:
         s = self.platform.store
         with s.atomic():
@@ -203,6 +252,14 @@ class Runtime:
                 self.platform.asset(actor, d["asset_id"])
                 self.platform.asset(Actor(d["author_id"], d["org_id"], ""), d["asset_id"])
                 c = s.get("connection", d["connection_id"], d["org_id"])
+                for member in d["binding"].get("team_members", []):
+                    mc = s.get("connection", member["connection_id"], d["org_id"])
+                    if (
+                        not mc["enabled"]
+                        or not mc["consent"]
+                        or mc["revision"] != member["connection_revision"]
+                    ):
+                        raise PermissionError("Specialist consent removed")
                 if (
                     not c["enabled"]
                     or not c["consent"]

@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json
 import zipfile
-from pathlib import Path
 from typing import Any
 
 from certarig.edge.config import canonical_hash
@@ -12,7 +11,7 @@ from certarig.edge.config import canonical_hash
 from .contracts import LIMITS, TERMINAL, binding, digest, safe_name, verify_rehearsal
 
 
-def verify(path: Path) -> dict[str, Any]:
+def verify(path: Any) -> dict[str, Any]:
     errors = []
     try:
         with zipfile.ZipFile(path) as archive:

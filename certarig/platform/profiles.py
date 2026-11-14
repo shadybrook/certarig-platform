@@ -42,8 +42,7 @@ def preview(platform: Any, actor: Actor, asset_id: str) -> dict[str, Any]:
     asset = platform.asset(actor, asset_id)
     client = platform.client(asset)
     rig, caps = client.rig(), client.capabilities()
-    if rig["rig"]["hardware"]["mode"] != "simulator":
-        raise ValueError("Only simulator profiles may be reviewed here")
+    platform.observation_mode(asset["connector"], rig)
     if not isinstance(rig.get("config_hash"), str) or not rig["config_hash"]:
         raise ValueError("Connector did not supply an exact profile hash")
     with platform.store.atomic():
@@ -113,7 +112,7 @@ def accept(platform: Any, actor: Actor, asset_id: str, review_id: str) -> dict[s
             or current["base_hash"] != asset["profile_hash"]
             or rig != current["profile"]
             or fingerprint(caps) != current["capabilities_hash"]
-            or rig["rig"]["hardware"]["mode"] != "simulator"
+            or platform.observation_mode(asset["connector"], rig) != asset["mode"]
         ):
             raise ValueError("Profile review is stale, changed, expired or already consumed; preview again")
         baseline(platform, asset, actor.user_id)

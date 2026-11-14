@@ -298,6 +298,11 @@ class Broker:
                 inputs = {"snapshot.json": encoded({**w["snapshot"], "seed": w["seed"]})}
                 if kind != "rehearsal":
                     inputs[filename] = source.encode()
+                if "parameters" in body:
+                    if kind == "rehearsal" or len(encoded(body["parameters"])) > 128000:
+                        raise ValueError("Only bounded analysis parameters are supported")
+                    inputs["parameters.json"] = encoded(body["parameters"])
+
                 if w.get("recording"):
                     data = (self.root / sid / "recording.csv").read_bytes()
                     if digest(data) != w["recording"]["sha256"]:

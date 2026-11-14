@@ -12,6 +12,14 @@ from .bus import TagBus
 
 class ModbusHardware(HardwareAdapter):
     def __init__(self, config: RigConfig, bus: TagBus | None = None) -> None:
+        self.remote: Any = None
+        if (config.hardware.modbus or {}).get("host", "in-process") != "in-process":
+            from dataclasses import asdict
+
+            from certarig.connectors.modbus import ModbusSource
+
+            from .observation import ObservationHardware
+            self.remote = ObservationHardware(config, ModbusSource(config.hardware.modbus or {}, [asdict(c) for c in config.channels]))
         self.config = config
         self.bus = bus or TagBus()
         self.observe_only = bool(config.hardware.observe_only)
@@ -23,6 +31,8 @@ class ModbusHardware(HardwareAdapter):
             self.bus.set(_address(channel), rest)
 
     def snapshot(self) -> RigSnapshot:
+        if self.remote:
+            return self.remote.snapshot()
         captured = datetime.now(UTC).isoformat()
         samples = []
         for channel in self.config.channels:
@@ -41,19 +51,29 @@ class ModbusHardware(HardwareAdapter):
         )
 
     def set_valve(self, open_state: bool) -> None:
+        if self.remote:
+            self.remote.set_valve(open_state)
+            return
         if open_state and self.observe_only:
             raise HardwareError("observe_only")
         self.output = bool(open_state)
         self.bus.publish("coil/valve", int(self.output))
 
     def force_safe_state(self) -> None:
+        if self.remote:
+            return
         self.output = False
         self.bus.publish("coil/valve", 0)
 
     def output_is_safe(self) -> bool:
-        return not self.output
+        return self.remote.output_is_safe() if self.remote else not self.output
+
+    def status(self) -> dict[str, Any]:
+        return self.remote.status() if self.remote else {"transport": "in_process_fixture", "connected": True, "observe_only": self.observe_only}
 
     def close(self) -> None:
+        if self.remote:
+            self.remote.close()
         self.force_safe_state()
         self.closed = True
 

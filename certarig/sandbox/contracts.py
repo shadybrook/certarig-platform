@@ -96,7 +96,7 @@ def snapshot(
     if public.get("pressure_abort_bar") == 0:
         public.pop("pressure_abort_bar")
     hw = public["hardware"]
-    public["hardware"] = {k: v for k, v in hw.items() if k not in {"mqtt", "modbus"}}
+    public["hardware"] = {k: v for k, v in hw.items() if k not in {"mqtt", "modbus", "serial"}}
     for channel in public["channels"]:
         if not isinstance(channel, dict):
             raise ValueError("draft channels must be objects")

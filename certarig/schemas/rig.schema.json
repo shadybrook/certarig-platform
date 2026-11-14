@@ -59,7 +59,8 @@
             "simulator",
             "raspberry_pi",
             "mqtt",
-            "modbus_tcp"
+            "modbus_tcp",
+            "serial_jsonl"
           ]
         },
         "observe_only": {
@@ -184,6 +185,10 @@
           "type": "integer",
           "minimum": 0,
           "maximum": 5000
+        },
+        "serial": {
+          "type": "object",
+          "additionalProperties": true
         }
       }
     },

@@ -141,6 +141,7 @@ def load_config_dict(raw: Any) -> RigConfig:
         feedback_settle_ms=int(hardware_raw.get("feedback_settle_ms", 250)),
         feedback_active_high=bool(hardware_raw.get("feedback_active_high", True)),
         mqtt=dict(hardware_raw["mqtt"]) if isinstance(hardware_raw.get("mqtt"), dict) else None,
+        serial=dict(hardware_raw["serial"]) if isinstance(hardware_raw.get("serial"), dict) else None,
         modbus=dict(hardware_raw["modbus"]) if isinstance(hardware_raw.get("modbus"), dict) else None,
     )
     sample_interval_ms = int(raw.get("sample_interval_ms", 100))

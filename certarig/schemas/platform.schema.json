@@ -547,6 +547,331 @@
           "type": "number"
         }
       }
+    },
+    "Project": {
+      "type": "object",
+      "required": [
+        "id",
+        "org_id",
+        "name",
+        "owner_id",
+        "asset_ids"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "org_id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "owner_id": {
+          "type": "string"
+        },
+        "asset_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "CommissioningDraft": {
+      "type": "object",
+      "required": [
+        "id",
+        "org_id",
+        "owner_id",
+        "asset_id",
+        "revision",
+        "status",
+        "definition",
+        "messages"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "org_id": {
+          "type": "string"
+        },
+        "owner_id": {
+          "type": "string"
+        },
+        "asset_id": {
+          "type": "string"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "status": {
+          "enum": [
+            "draft",
+            "committed"
+          ]
+        },
+        "definition": {
+          "type": "object"
+        },
+        "messages": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "Task": {
+      "type": "object",
+      "required": [
+        "id",
+        "org_id",
+        "asset_id",
+        "owner_id",
+        "kind",
+        "target_id",
+        "status"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "org_id": {
+          "type": "string"
+        },
+        "asset_id": {
+          "type": "string"
+        },
+        "owner_id": {
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "evaluate",
+            "qualify",
+            "team_evaluate"
+          ]
+        },
+        "target_id": {
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "queued",
+            "running",
+            "completed",
+            "failed",
+            "cancelled",
+            "interrupted"
+          ]
+        }
+      }
+    },
+    "TeamVersion": {
+      "type": "object",
+      "required": [
+        "id",
+        "org_id",
+        "team_members",
+        "member_evaluations",
+        "hash"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "org_id": {
+          "type": "string"
+        },
+        "team_members": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 4,
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "member_evaluations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "hash": {
+          "type": "string"
+        }
+      }
+    },
+    "AnalysisTool": {
+      "type": "object",
+      "required": [
+        "id",
+        "org_id",
+        "asset_id",
+        "source",
+        "kind",
+        "hash",
+        "status",
+        "input_schema",
+        "output_schema",
+        "tests"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "org_id": {
+          "type": "string"
+        },
+        "asset_id": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string",
+          "maxLength": 128000
+        },
+        "kind": {
+          "enum": [
+            "python",
+            "spice"
+          ]
+        },
+        "hash": {
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "unreviewed",
+            "reviewed"
+          ]
+        },
+        "input_schema": {
+          "type": "object"
+        },
+        "output_schema": {
+          "type": "object"
+        },
+        "tests": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 3
+        }
+      }
+    },
+    "Analysis": {
+      "type": "object",
+      "required": [
+        "id",
+        "org_id",
+        "asset_id",
+        "owner_id",
+        "tool_id",
+        "tool_hash",
+        "status"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "org_id": {
+          "type": "string"
+        },
+        "asset_id": {
+          "type": "string"
+        },
+        "owner_id": {
+          "type": "string"
+        },
+        "tool_id": {
+          "type": "string"
+        },
+        "tool_hash": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "ConnectorProfile": {
+      "type": "object",
+      "required": [
+        "id",
+        "org_id",
+        "asset_id",
+        "owner_id",
+        "transport",
+        "channels",
+        "status"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "org_id": {
+          "type": "string"
+        },
+        "asset_id": {
+          "type": "string"
+        },
+        "owner_id": {
+          "type": "string"
+        },
+        "transport": {
+          "enum": [
+            "mqtt",
+            "serial_jsonl",
+            "modbus_tcp"
+          ]
+        },
+        "channels": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16
+        },
+        "status": {
+          "enum": [
+            "proposed",
+            "reviewed_for_operator_installation"
+          ]
+        }
+      }
+    },
+    "Replay": {
+      "type": "object",
+      "required": [
+        "id",
+        "org_id",
+        "asset_id",
+        "csv",
+        "sha256",
+        "kind"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "org_id": {
+          "type": "string"
+        },
+        "asset_id": {
+          "type": "string"
+        },
+        "csv": {
+          "type": "string",
+          "maxLength": 512000
+        },
+        "sha256": {
+          "type": "string"
+        },
+        "kind": {
+          "const": "imported_recording_unverified_origin"
+        }
+      }
     }
   }
 }

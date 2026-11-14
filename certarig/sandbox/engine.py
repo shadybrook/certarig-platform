@@ -101,6 +101,7 @@ class DockerEngine:
 
     def preflight(self) -> dict[str, Any]:
         result = resource_preflight(self.root)
+        result["runner_image"] = self.image
         try:
             if self.current_image != self.image:
                 result["blockers"].append("Image lock changed; restart and requalify the broker")

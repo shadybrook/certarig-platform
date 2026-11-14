@@ -31,6 +31,18 @@ def export(platform: Platform, actor: Actor, identifier: str) -> bytes:
         "events.json": platform.store.events(actor.org_id, identifier),
     }
     files = {name: encoded(value) for name, value in values.items()}
+    from . import evidence_v2
+
+    extra = evidence_v2.context(platform, actor, d)
+    if (
+        extra["workspace.json"]["drafts"]
+        or extra["members.json"]
+        or extra["analysis.json"]["runs"]
+        or extra["analysis.json"]["tools"]
+    ):
+        data = evidence_v2.package(files, extra)
+        verify(data)
+        return data
     files["manifest.json"] = encoded(
         {
             "format": "certarig-agent-evidence/1",
@@ -50,6 +62,15 @@ def export(platform: Platform, actor: Actor, identifier: str) -> bytes:
 def verify(data: bytes) -> dict[str, Any]:
     if len(data) > 32 * 1024**2:
         raise ValueError("Evidence archive exceeds limit")
+    with zipfile.ZipFile(io.BytesIO(data)) as probe:
+        if "manifest.json" in probe.namelist():
+            entry = probe.getinfo("manifest.json")
+            if entry.file_size > 64000:
+                raise ValueError("Oversized manifest")
+            if json.loads(probe.read(entry)).get("format") == "certarig-agent-evidence/2":
+                from .evidence_v2 import verify as verify_v2
+
+                return verify_v2(data)
     with zipfile.ZipFile(io.BytesIO(data)) as archive:
         entries = archive.infolist()
         if (

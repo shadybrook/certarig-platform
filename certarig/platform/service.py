@@ -125,6 +125,22 @@ class Platform:
         self.store.transaction("pair", token, {"org_id": actor.org_id, "connector": connector})
         return {"code": token, "expires_in": 300, "connector": connector}
 
+    def observation_mode(self, connector: str, rig: dict[str, Any]) -> str:
+        mode = rig["rig"]["hardware"]["mode"]
+        config = self.connectors[connector]
+        if mode == "simulator":
+            return mode
+        if (
+            mode not in {"mqtt", "serial_jsonl", "modbus_tcp"}
+            or config.get("observation_only") is not True
+            or config.get("mode") != mode
+            or rig["rig"]["hardware"].get("observe_only") is not True
+        ):
+            raise ValueError(
+                "Physical enrollment is not supported without an operator-registered observation connector"
+            )
+        return mode
+
     def enroll(self, actor: Actor, code: str) -> dict[str, Any]:
         self.reviewer(actor)
         tx = self.store.consume("pair", code)
@@ -136,8 +152,7 @@ class Platform:
         client = self.client_factory(config["url"], auditor_key=config["auditor_key"])
         rig = client.rig()
         caps = client.capabilities()
-        if rig["rig"]["hardware"]["mode"] != "simulator":
-            raise ValueError("Physical enrollment is not supported")
+        mode = self.observation_mode(tx["connector"], rig)
         with self.store.atomic():
             if self.store.one(
                 "SELECT 1 FROM documents WHERE kind='asset' AND json_extract(body,'$.connector')=?",
@@ -150,7 +165,7 @@ class Platform:
                 "connector": tx["connector"],
                 "name": config["name"],
                 "profile_hash": rig["config_hash"],
-                "mode": "simulator",
+                "mode": mode,
                 "profile": rig,
                 "capabilities_hash": fingerprint(caps),
             }
@@ -236,7 +251,10 @@ class Platform:
             c.update(enabled=False, consent=False, revision=c["revision"] + 1, status="disconnected")
             self.store.put("connection", c)
             for d in self.store.listing("deployment", actor.org_id):
-                if d["connection_id"] == identifier and d["status"] in {"approved", "running"}:
+                if (
+                    d["connection_id"] == identifier
+                    or any(b["connection_id"] == identifier for b in d["binding"].get("team_members", []))
+                ) and d["status"] in {"approved", "running"}:
                     self.pause(d, "Model connection consent removed")
             return c
 
@@ -259,7 +277,12 @@ class Platform:
         self, actor: Actor, body: dict[str, Any], agent_id: str | None = None
     ) -> dict[str, Any]:
         self.actor(actor)
-        if set(body) != {"name", "instructions", "asset_id", "connection_id", "tools"}:
+        required = {"name", "instructions", "asset_id", "connection_id", "tools"}
+        if not required <= set(body) or set(body) - required - {
+            "analysis_tools",
+            "limits",
+            "output_contract",
+        }:
             raise ValueError("An agent requires name, instructions, asset, model connection and tools")
         if not all(
             isinstance(body[k], str) and 0 < len(body[k]) <= n
@@ -280,6 +303,35 @@ class Platform:
             raise ValueError("Only distinct observation tools are allowed")
         if not set(tools) <= {t["name"] for t in self.observation_tools(actor, asset["id"])}:
             raise ValueError("Tool is not supported by this connector")
+        limits = body.get(
+            "limits", {"interval_s": 30, "max_assessments": 10, "lease_s": 900, "model_calls": 8}
+        )
+        if (
+            set(limits) != {"interval_s", "max_assessments", "lease_s", "model_calls"}
+            or any(type(v) is not int for v in limits.values())
+            or not 30 <= limits["interval_s"] <= 900
+            or not 1 <= limits["max_assessments"] <= 10
+            or not 30 <= limits["lease_s"] <= 900
+            or not 1 <= limits["model_calls"] <= 8
+        ):
+            raise ValueError("Operating limits must remain inside the local runtime bounds")
+        if body.get("output_contract", OUTPUT) != OUTPUT:
+            raise ValueError("This release requires the readiness output contract")
+        analysis_tools = body.get("analysis_tools", [])
+        if (
+            not isinstance(analysis_tools, list)
+            or len(analysis_tools) > 3
+            or len(set(analysis_tools)) != len(analysis_tools)
+        ):
+            raise ValueError("Select up to three distinct reviewed analysis tools")
+        for identifier in analysis_tools:
+            tool = self.store.get("analysis_tool", identifier, actor.org_id)
+            if (
+                tool["asset_id"] != asset["id"]
+                or tool["owner_id"] != actor.user_id
+                or tool["status"] != "reviewed"
+            ):
+                raise PermissionError("Select your reviewed analysis tools on this bench")
         with self.store.atomic():
             previous = (
                 [v for v in self.store.listing("version", actor.org_id) if v["agent_id"] == agent_id]
@@ -297,7 +349,7 @@ class Platform:
                 "revision": len(previous) + 1,
                 **body,
                 "output_contract": OUTPUT,
-                "limits": {"interval_s": 30, "max_assessments": 10, "lease_s": 900, "model_calls": 8},
+                "limits": limits,
             }
             value["hash"] = fingerprint(value)
             self.store.put("version", value)
@@ -312,7 +364,10 @@ class Platform:
         if not c["enabled"] or c["owner_id"] != version["author_id"]:
             raise PermissionError("Model connection is no longer authorized")
         rig = self.client(asset).rig()
-        if rig["config_hash"] != asset["profile_hash"] or rig["rig"]["hardware"]["mode"] != "simulator":
+        if (
+            rig["config_hash"] != asset["profile_hash"]
+            or self.observation_mode(asset["connector"], rig) != asset["mode"]
+        ):
             raise ValueError("Asset profile changed; enroll/revalidate before review")
         caps = self.client(asset).capabilities()
         if not set(version["tools"]) <= {
@@ -321,8 +376,9 @@ class Platform:
             raise PermissionError("Connector capabilities changed")
         if asset.get("capabilities_hash") is not None and fingerprint(caps) != asset["capabilities_hash"]:
             raise ValueError("Connector capabilities changed; review the profile before a new evaluation")
-        return {
+        result: dict[str, Any] = {
             "version_hash": version["hash"],
+            "limits": version["limits"],
             "connection_id": c["id"],
             "connection_revision": c["revision"],
             "backend": c["backend"],
@@ -335,6 +391,31 @@ class Platform:
             "suite": SUITE,
             "verifier": VERIFIER,
         }
+        if version.get("analysis_tools"):
+            result["analysis_tools"] = []
+            for identifier in version["analysis_tools"]:
+                tool = self.store.get("analysis_tool", identifier, actor.org_id)
+                if tool["status"] != "reviewed" or tool["asset_id"] != asset["id"]:
+                    raise PermissionError("Analysis tool review is unavailable")
+                result["analysis_tools"].append(
+                    {
+                        "id": identifier,
+                        "hash": tool["hash"],
+                        "runner_image": tool["reviewed_image"],
+                        "reviewer_id": tool["reviewer_id"],
+                    }
+                )
+        if version.get("team_members"):
+            result["team_members"] = [
+                self.binding(actor, self.version(actor, identifier)) for identifier in version["team_members"]
+            ]
+            for binding in result["team_members"]:
+                connection = self.store.get("connection", binding["connection_id"], actor.org_id)
+                if not connection["consent"]:
+                    raise PermissionError("Every team model owner must consent")
+            result["member_evaluations"] = version["member_evaluations"]
+            result["team_version_ids"] = version["team_members"]
+        return result
 
     def review(self, actor: Actor, version_id: str, evaluation_id: str) -> dict[str, Any]:
         self.reviewer(actor)
@@ -434,7 +515,7 @@ class Platform:
             d.update(
                 status="running",
                 started_at=now,
-                expires_at=now + 900,
+                expires_at=now + v["limits"]["lease_s"],
                 next_at=now,
                 runtime_id=runtime["runtime_id"],
                 provider_status="idle",

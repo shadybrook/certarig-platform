@@ -65,7 +65,8 @@ def test_local_control_plane_and_runtime_cleanup_without_execution(tmp_path, mon
     assert "server_closed" in seen
 
     class Managed:
-        def __init__(self, *args):
+        def __init__(self, *args, **kwargs):
+            assert kwargs.get("broker") is not None
             seen.append("runtime_created")
 
         def serve(self):

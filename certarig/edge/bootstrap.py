@@ -38,6 +38,11 @@ def build_hardware(config: RigConfig) -> HardwareAdapter:
         from .hardware.mqtt import MqttHardware
 
         return MqttHardware(config)
+    if mode == "serial_jsonl":
+        from certarig.connectors.serial import SerialSource
+
+        from .hardware.observation import ObservationHardware
+        return ObservationHardware(config, SerialSource(config.hardware.serial or {}, {c.channel_id: c.unit for c in config.channels}))
     if mode == "modbus_tcp":
         from .hardware.modbus import ModbusHardware
 

@@ -60,3 +60,64 @@ button.primary, .mark, #login .button { background: #1d4ed8; color: #fff; }
 .tool-help { font-size: 12px; margin: 2px 0 8px 22px; }
 #profile-review-summary { margin: 12px 0; line-height: 1.5; overflow-wrap: anywhere; }
 #runtime-health { margin-bottom: 8px; }
+
+/* Innovator Workbench: navigation, active task, contextual review. */
+main { max-width: 1800px; }
+.workspace-grid { grid-template-columns: 240px minmax(360px,1fr) minmax(320px,390px); gap: 28px; align-items: start; }
+.workspace-heading { margin-bottom: 20px; }
+.workspace-grid > * { min-width: 0; }
+.inspector { border-left: 1px solid var(--line); padding-left: 24px; }
+.inspector h2 { font-size: 17px; }
+.inspector section + section { margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--line); }
+#commissioning-chat { min-height: 420px; }
+#conversation { margin-top: 24px; }
+.conversation-message { padding: 14px 0; border-bottom: 1px solid var(--line); }
+.conversation-message p { margin: 5px 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.conversation-message strong { font-size: 12px; color: var(--muted); font-weight: 500; }
+.fixture-note { font-size: 12px; color: var(--warn); margin-top: 16px; }
+#draft-status { font-size: 12px; }
+.pane-tabs { display: none; }
+#task-list article, #evidence-list article, #analysis-tools article, #connector-profiles article, #analysis-runs article { padding: 14px 0; border-bottom: 1px solid var(--line); overflow-wrap: anywhere; }
+#task-list h3, #evidence-list h3, #analysis-tools h3, #connector-profiles h3, #analysis-runs h3 { font-size: 14px; margin: 0 0 8px; }
+#task-list p, #evidence-list p { margin: 6px 0; }
+#specialists { min-height: 100px; }
+#deployment-panel { position: relative; }
+.danger { background: #81232e; color: #fff; }
+#revoke-strip:not(:empty) { position: sticky; top: 60px; z-index: 4; padding: 10px 16px; border: 1px solid var(--line); background: var(--panel); display: flex; align-items: center; gap: 12px; justify-content: space-between; }
+#revoke-strip p { margin: 0; }
+@media (max-width: 1150px) and (min-width: 761px) {
+ .workspace-grid { grid-template-columns: 200px minmax(0,1fr); }
+ .inspector { grid-column: 2; border: 0; padding-left: 0; }
+}
+@media (max-width: 760px) {
+ .workspace-grid { display: block; }
+ .pane-tabs { display: flex; gap: 6px; position: sticky; top: 110px; z-index: 3; padding: 8px 0; background: var(--bg); }
+ .pane-tabs button { flex: 1; font-size: 12px; padding: 8px; }
+ .pane-tabs button[aria-pressed="true"] { border-color: var(--accent); color: var(--text); background: #183558; }
+ .workspace-grid[data-pane="commission"] > #library-panel, .workspace-grid[data-pane="commission"] > #inspect-panel,
+ .workspace-grid[data-pane="library"] > #commission-panel, .workspace-grid[data-pane="library"] > #inspect-panel,
+ .workspace-grid[data-pane="inspect"] > #commission-panel, .workspace-grid[data-pane="inspect"] > #library-panel { display: none; }
+ .inspector { border: 0; padding-left: 0; }
+ #revoke-strip:not(:empty) { top: 0; position: sticky; flex-wrap: wrap; }
+}
+.inspector-nav { display: flex; flex-wrap: wrap; gap: 6px; padding-bottom: 18px; margin-bottom: 20px; border-bottom: 1px solid var(--line); }
+.inspector-nav button { font-size: 12px; padding: 7px 9px; }
+.inspector-nav button[aria-pressed="true"] { background: #183558; border-color: var(--accent); }
+.inspector[data-view="review"] > :is(#team-section,#sandbox-section,#connector-section,#evidence-section),
+.inspector[data-view="teams"] > section:not(#team-section),
+.inspector[data-view="sandbox"] > section:not(#sandbox-section),
+.inspector[data-view="connectors"] > section:not(#connector-section),
+.inspector[data-view="evidence"] > section:not(#evidence-section) { display: none; }
+.inspector > section { margin-top: 0; }
+#evidence-list a { display: inline-block; margin: 12px 8px; }
+@media (min-width: 1151px) {
+ .workspace-grid > aside, .workspace-grid > .work-area, .workspace-grid > .inspector { max-height: calc(100dvh - 230px); overflow-y: auto; padding-bottom: 28px; scrollbar-gutter: stable; }
+ .work-area { padding-right: 12px; }
+}
+@media (max-width: 760px) { .pane-tabs { top: var(--header-height,130px); } }
+.workspace-heading p { margin: 4px 0 0; }
+#notice:not(:empty) { padding: 8px 12px; margin: 8px 0; }
+.workspace-heading { margin: 14px 0 20px; }
+@media (min-width: 1151px) {
+ .workspace-grid > aside, .workspace-grid > .work-area, .workspace-grid > .inspector { max-height: var(--workspace-height,calc(100dvh - 230px)); }
+}

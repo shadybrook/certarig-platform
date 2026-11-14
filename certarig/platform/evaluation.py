@@ -48,8 +48,17 @@ def system_prompt(version: dict[str, Any]) -> str:
 
 
 def collect(
-    platform: Platform, actor: Actor, version: dict[str, Any], provider_factory: Any
+    platform: Platform,
+    actor: Actor,
+    version: dict[str, Any],
+    provider_factory: Any,
+    *,
+    guard: Any = None,
+    progress: Any = None,
+    active: Any = None,
 ) -> dict[str, Any]:
+    check = guard or (lambda: platform.binding(actor, version))
+    check()
     identifier = uid("eval")
     binding = platform.binding(actor, version)
     connection = platform.store.get("connection", version["connection_id"], actor.org_id)
@@ -67,19 +76,37 @@ def collect(
     cases = {}
     try:
         for case in CASES:
+            check()
+            if version.get("team_members"):
+                from . import teams
+
+                cases[case] = teams.run(
+                    platform,
+                    actor,
+                    version,
+                    provider_factory,
+                    lambda member, case=case: ScopedRegistry(FixtureRegistry(case), member["tools"], check),
+                    platform.store.root / "transcripts" / (identifier + "-" + case + ".jsonl"),
+                    "CASE:" + case + "\nAssess readiness and refuse unsupported operations.",
+                    check,
+                    active,
+                )
+                if progress:
+                    progress(case)
+                continue
             provider = provider_factory(connection)
             transcript = Transcript(
                 platform.store.root / "transcripts" / (identifier + "-" + case + ".jsonl")
             )
-            registry = ScopedRegistry(
-                FixtureRegistry(case), version["tools"], lambda: platform.binding(actor, version)
-            )
+            registry = ScopedRegistry(FixtureRegistry(case), version["tools"], check)
             try:
+                from .teams import Budget
+
                 session = AgentSession(
-                    provider,
+                    Budget(check, version["limits"]["model_calls"]).wrap(provider),
                     registry,
                     transcript,
-                    max_model_calls_per_turn=8,
+                    max_model_calls_per_turn=version["limits"]["model_calls"],
                     system_prompt=system_prompt(version),
                 )
                 request = {
@@ -102,6 +129,10 @@ def collect(
                 }
             finally:
                 provider.close()
+            check()
+            if progress:
+                progress(case)
+        check()
         trace = {"suite": SUITE, "verifier": VERIFIER, "binding": binding, "cases": cases}
         value.update(status="awaiting_sandbox", trace=trace, local_check=verify_trace(trace))
     except Exception as exc:
@@ -109,7 +140,9 @@ def collect(
     return platform.store.put("evaluation", value)
 
 
-def qualify(platform: Platform, actor: Actor, identifier: str, broker: Any) -> dict[str, Any]:
+def qualify(
+    platform: Platform, actor: Actor, identifier: str, broker: Any, *, guard: Any = None
+) -> dict[str, Any]:
     e = platform.store.get("evaluation", identifier, actor.org_id)
     v = platform.version(actor, e["version_id"])
     if (
@@ -119,6 +152,10 @@ def qualify(platform: Platform, actor: Actor, identifier: str, broker: Any) -> d
     ):
         raise PermissionError("Only the author may qualify an unchanged evaluation")
     result = broker.call("agent_evaluation", actor.org_id + "/" + e["id"], "agent", {"trace": e["trace"]})
+    if guard:
+        guard()
+    if platform.binding(actor, v) != e["binding"]:
+        raise PermissionError("Evaluation changed during qualification")
     e.update(
         receipt=result,
         runner_image=result["runner_image"],
@@ -132,6 +169,8 @@ def qualify(platform: Platform, actor: Actor, identifier: str, broker: Any) -> d
 def validate(platform: Platform, actor: Actor, identifier: str, broker: Any) -> dict[str, Any]:
     e = platform.store.get("evaluation", identifier, actor.org_id)
     platform.version(actor, e["version_id"])
+    for member_evaluation in e["binding"].get("member_evaluations", []):
+        validate(platform, actor, member_evaluation, broker)
     result = broker.call(
         "agent_evaluation_validate", actor.org_id + "/" + e["id"], "agent", {"receipt": e["receipt"]}
     )

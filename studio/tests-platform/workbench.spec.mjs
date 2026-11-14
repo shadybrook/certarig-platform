@@ -1,0 +1,52 @@
+import {test,expect} from '@playwright/test';
+import fs from 'node:fs';
+
+test('resumable commissioning conversation, task progress and mobile panels',async({browser},testInfo)=>{
+ const context=await browser.newContext();await context.addCookies([{name:'certarig_login',value:'test-browser',url:'http://127.0.0.1:18095'}]);
+ const page=await context.newPage();await page.goto('/v1/auth/callback?state=test&code=author');await expect(page.locator('#product')).toBeVisible();
+ await page.getByLabel('What should this agent help you check?').fill('Check temperature freshness and explain blocked commissioning.');
+ await page.getByRole('button',{name:'Create agent draft',exact:true}).click();
+ await expect(page.locator('#draft-status')).toContainText('Saved');
+ await expect(page.locator('#conversation')).toContainText('Deterministic drafting assistant');
+ await page.reload();await page.locator('#draft-list button').last().click();
+ await page.getByLabel('Model connection',{exact:true}).selectOption({index:0});
+ await page.getByLabel('Add a requirement or answer').fill('Never accept an unknown calibration record.');
+ await page.getByRole('button',{name:'Add to proposal',exact:true}).click();
+ await expect(page.locator('#conversation')).toContainText('Never accept an unknown calibration record.');
+ await expect(page.getByLabel('Instructions',{exact:true})).toHaveValue(/unknown calibration/);
+ await page.getByRole('button',{name:'Save reviewed draft as version',exact:true}).click();
+ await expect(page.locator('#notice')).toContainText('immutable version');
+ await page.reload();await page.locator('#versions button').last().click();
+ await expect(page.getByLabel('Instructions',{exact:true})).toHaveValue(/unknown calibration/);
+ await expect(page.locator('#conversation')).toContainText('Never accept an unknown calibration record.');
+ await page.getByRole('button',{name:'Collect evaluation traces',exact:true}).click();
+ await expect(page.locator('#task-list')).toContainText('completed');
+ await expect(page.locator('#qualification')).toContainText('awaiting_sandbox');
+ await page.getByRole('button',{name:'Inspect activity',exact:true}).last().click();
+ await expect(page.locator('#task-list')).toContainText('case_completed');
+ await expect(page.locator('#notice')).not.toContainText('Working…');await page.evaluate(()=>{window.scrollTo(0,0);for(const id of ['commission-panel','inspect-panel','library-panel'])document.getElementById(id).scrollTop=0;});
+ const dir=testInfo.outputPath('screens');fs.mkdirSync(dir,{recursive:true});
+ await page.screenshot({path:`${dir}/workbench-desktop.png`,fullPage:false});
+ await page.setViewportSize({width:390,height:844});await page.getByRole('button',{name:'Benches',exact:true}).click();
+ await expect(page.locator('#library-panel')).toBeVisible();await expect(page.locator('#commission-panel')).toBeHidden();
+ await page.getByRole('button',{name:'Commission',exact:true}).click();await expect(page.locator('#commission-panel')).toBeVisible();
+ await page.getByRole('button',{name:'Review & evidence',exact:true}).click();await expect(page.locator('#inspect-panel')).toBeVisible();
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
+ await page.screenshot({path:`${dir}/workbench-mobile.png`,fullPage:false});
+ await page.keyboard.press('Tab');expect(await page.evaluate(()=>document.activeElement.tagName!=='BODY')).toBeTruthy();
+ await context.close();
+});
+
+test('Sandbox tool progress updates without opening its result inspector',async({browser})=>{
+ const context=await browser.newContext();await context.addCookies([{name:'certarig_login',value:'test-browser',url:'http://127.0.0.1:18095'}]);
+ const page=await context.newPage();await page.goto('/v1/auth/callback?state=test&code=author');await expect(page.locator('#product')).toBeVisible();
+ await page.getByRole('button',{name:'Sandbox',exact:true}).click();
+ await page.getByText('Author an analysis tool',{exact:true}).click();
+ await page.getByLabel('Tool name',{exact:true}).fill('Fixture analysis progress');
+ await page.getByRole('button',{name:'Save tool version',exact:true}).click();
+ await expect(page.locator('#analysis-tools')).toContainText('Fixture analysis progress');
+ await page.getByRole('button',{name:'Run declared tests',exact:true}).last().click();
+ await expect(page.locator('#analysis-runs')).toContainText('completed',{timeout:10000});
+ await expect(page.locator('#analysis-runs pre')).toHaveCount(0);
+ await context.close();
+});

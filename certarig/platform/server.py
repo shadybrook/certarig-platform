@@ -21,9 +21,23 @@ class API:
     def __init__(self, platform: Platform, oidc: OIDC, broker: Any, providers: Any):
         self.platform, self.oidc, self.broker, self.providers = platform, oidc, broker, providers
         self.connections: dict[str, Any] = {}
+        from .analysis import Analysis
+        from .connectors import ConnectorProfiles
+        from .tasks import Tasks
+        from .workbench import Workbench
+
+        self.workbench = Workbench(platform)
+        self.tasks = Tasks(platform, providers, broker)
+        self.analysis = Analysis(platform, broker)
+        self.connector_profiles = ConnectorProfiles(platform)
 
     def route(self, actor: Any, method: str, parts: list[str], body: dict[str, Any]) -> Any:
         p = self.platform
+        from . import workbench_api
+
+        handled, response = workbench_api.route(self, actor, method, parts, body)
+        if handled:
+            return response
         if parts == ["openapi.json"] and method == "GET":
             import yaml
 
@@ -162,6 +176,7 @@ class API:
         raise KeyError("Endpoint not found")
 
     def close(self) -> None:
+        self.tasks.close()
         for provider in self.connections.values():
             provider.close()
 
@@ -249,7 +264,13 @@ def server(api: API, port: int = 18090, studio: Path | None = None) -> Threading
                 if not parsed.path.startswith("/v1/") and method == "GET" and studio:
                     relative = "platform.html" if parsed.path == "/" else parsed.path.lstrip("/")
                     # Only the new product shell and its static dependencies, never arbitrary repository paths.
-                    if relative not in {"platform.html", "styles.css", "platform.css", "src/platform.mjs"}:
+                    if relative not in {
+                        "platform.html",
+                        "styles.css",
+                        "platform.css",
+                        "src/platform.mjs",
+                        "src/workbench.mjs",
+                    }:
                         raise KeyError("Static file not found")
                     path = studio / relative
                     self.reply(
