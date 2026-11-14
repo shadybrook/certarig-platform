@@ -3,7 +3,7 @@ import fs from 'node:fs';
 
 test('resumable commissioning conversation, task progress and mobile panels',async({browser},testInfo)=>{
  const context=await browser.newContext();await context.addCookies([{name:'certarig_login',value:'test-browser',url:'http://127.0.0.1:18095'}]);
- const page=await context.newPage();await page.goto('/v1/auth/callback?state=test&code=author');await expect(page.locator('#product')).toBeVisible();
+ const page=await context.newPage();await page.goto('/v1/auth/callback?state=test&code=author');await page.goto('/classic');await expect(page.locator('#product')).toBeVisible();
  await page.getByLabel('What should this agent help you check?').fill('Check temperature freshness and explain blocked commissioning.');
  await page.getByRole('button',{name:'Create agent draft',exact:true}).click();
  await expect(page.locator('#draft-status')).toContainText('Saved');
@@ -39,7 +39,7 @@ test('resumable commissioning conversation, task progress and mobile panels',asy
 
 test('Sandbox tool progress updates without opening its result inspector',async({browser})=>{
  const context=await browser.newContext();await context.addCookies([{name:'certarig_login',value:'test-browser',url:'http://127.0.0.1:18095'}]);
- const page=await context.newPage();await page.goto('/v1/auth/callback?state=test&code=author');await expect(page.locator('#product')).toBeVisible();
+ const page=await context.newPage();await page.goto('/v1/auth/callback?state=test&code=author');await page.goto('/classic');await expect(page.locator('#product')).toBeVisible();
  await page.getByRole('button',{name:'Sandbox',exact:true}).click();
  await page.getByText('Author an analysis tool',{exact:true}).click();
  await page.getByLabel('Tool name',{exact:true}).fill('Fixture analysis progress');

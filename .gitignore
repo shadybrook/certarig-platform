@@ -32,3 +32,7 @@ evidence/lab-pulled/
 .coverage
 
 studio/test-results-platform/
+
+# Also ignore development environments supplied as local symlinks.
+.venv
+studio/node_modules

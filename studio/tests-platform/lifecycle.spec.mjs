@@ -6,7 +6,7 @@ async function signin(context, role) {
   await context.addCookies([{name:'certarig_login', value:'test-browser', url:origin}]);
   const page = await context.newPage();
   await page.goto(`/v1/auth/callback?state=test&code=${role}`);
-  await expect(page.locator('#product')).toBeVisible();
+  await page.goto('/classic');await expect(page.locator('#product')).toBeVisible();
   return page;
 }
 test('separate identities, immutable authoring, fixture evaluation, review, monitor and revoke', async ({ browser }, testInfo) => {
@@ -47,7 +47,7 @@ test('separate identities, immutable authoring, fixture evaluation, review, moni
   await expect(reviewer.locator('#deployments')).toContainText('revoked');
   await reviewer.evaluate(() => window.scrollTo(0, 0));
   await reviewer.screenshot({path:`${evidenceDir}/reviewer-desktop.png`,fullPage:true});
-  const download = reviewer.waitForEvent('download'); await reviewer.getByRole('link',{name:'Export evidence'}).click();
+  const download = reviewer.waitForEvent('download'); await reviewer.getByRole('link',{name:'Export evidence'}).last().click();
   expect((await download).suggestedFilename()).toBe('certarig-agent-evidence.zip');
   await reviewer.getByRole('button',{name:'Sign out',exact:true}).click();
   await expect(reviewer.getByRole('link',{name:'Sign in to your organization'})).toBeVisible();

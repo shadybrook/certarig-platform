@@ -4,7 +4,7 @@ const notice = (text, error = false) => { $('notice').textContent = text; $('not
 async function api(path, body) {
   const response = await fetch(`/v1/${path}`, { method: body === undefined ? 'GET' : 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': state.me?.csrf || '' }, ...(body === undefined ? {} : { body: JSON.stringify(body) }) });
   const result = await response.json();
-  if (!response.ok) throw new Error(result.error || `Request failed (${response.status})`);
+  if (!response.ok) { const error=new Error(result.error || `Request failed (${response.status})`);error.status=response.status;document.dispatchEvent(new CustomEvent('platformerror',{detail:{path,status:response.status,message:error.message}}));throw error; }
   return result;
 }
 const node = (tag, text, className) => { const el = document.createElement(tag); if (text !== undefined) el.textContent = text; if (className) el.className = className; return el; };
@@ -27,7 +27,7 @@ function renderTools(chosen) {
   const selectedNames = new Set(chosen);
   const rows = [...state.tools];
   for (const name of selectedNames) if (!rows.some((row) => row.name === name)) rows.push({name, unavailable:true, description:'No longer allowed by this connector. Remove it before saving a new version.'});
-  const readonly = selected()?.author_id && selected().author_id !== state.me.user_id;
+  const readonly = selected()?.team_members || (selected()?.author_id && selected().author_id !== state.me.user_id);
   $('tool-options').replaceChildren(...rows.map((spec) => {
     const group = node('div', undefined, 'tool-option'); const label = node('label'); const box = document.createElement('input');
     box.type = 'checkbox'; box.name = 'tools'; box.value = spec.name; box.checked = selectedNames.has(spec.name); box.disabled = Boolean(readonly);
@@ -48,7 +48,7 @@ async function loadTools(chosen) {
     if (request !== toolRequest) return;
     state.tools = result.tools; state.toolAsset = id; renderTools(defaults);
   } catch (error) { if (request === toolRequest) { state.tools = []; state.toolAsset = null; $('tool-options').replaceChildren(node('p',`Tools unavailable: ${error.message}`,'warn')); } throw error; }
-  finally { if (request === toolRequest) { state.toolsLoading = false; $('save-agent').disabled = !state.toolAsset || !state.tools.length || Boolean(selected() && selected().author_id !== state.me.user_id); } }
+  finally { if (request === toolRequest) { state.toolsLoading = false; $('save-agent').disabled = !state.toolAsset || !state.tools.length || Boolean(selected() && (selected().author_id !== state.me.user_id || selected().team_members)); } }
 }
 function renderRuntime() {
   const runtime = state.runtime;
@@ -63,7 +63,7 @@ function renderVersions() {
   const versions = state.versions.filter((v) => v.asset_id === $('asset').value);
   $('versions').replaceChildren(...versions.map((version) => {
     const button = node('button', `${version.name} · v${version.revision}`);
-    button.setAttribute('aria-pressed', String(version.id === state.selected));
+    button.dataset.versionId=version.id;button.setAttribute('aria-pressed', String(version.id === state.selected));
     button.onclick = () => { state.selected = version.id; fillEditor(); renderVersions(); renderEvaluation(); document.dispatchEvent(new CustomEvent("versionselected",{detail:{versionId:version.id}})); };
     return button;
   }));
@@ -84,7 +84,7 @@ function fillEditor() {
     document.querySelectorAll('input[name="analysis-tools"]').forEach(b=>b.checked=(version.analysis_tools||[]).includes(b.value));
   }
   $('version-label').textContent = version ? `Version ${version.revision} · ${version.id}` : 'Unsaved draft';
-  const readonly = version && version.author_id !== state.me.user_id;
+  const readonly = version && (version.author_id !== state.me.user_id || version.team_members);
   $('agent-form').querySelectorAll('input, textarea, select, button').forEach((el) => { el.disabled = Boolean(readonly); });
   $('save-agent').disabled = Boolean(readonly) || state.toolsLoading || !state.toolAsset;
 }
@@ -100,6 +100,7 @@ function renderEvaluation() {
   $('cases').replaceChildren(...Object.entries(e?.local_check?.cases || {}).map(([name, result]) => {
     const row = node('div', undefined, 'case-row'); row.append(node('span', name.replaceAll('_', ' ')), node('span', `${result.passed ? 'Matched' : 'Failed'} · expected ${result.expected}`, result.passed ? 'ok' : 'bad')); return row;
   }));
+  const nominal=e?.trace?.cases?.nominal?.output;if(nominal){const result=node('p',`Nominal evaluation answer: ${nominal.status} · ${nominal.reason}`,'evaluation-answer');$('cases').prepend(result);}
   $('definition').textContent = JSON.stringify({ version: v || null, evaluation: e || null }, null, 2);
 }
 function renderDeployments() {
@@ -126,7 +127,8 @@ function renderDeployments() {
 async function load() {
   const [a, c, v, e, d] = await Promise.all([api('assets'), api('model-connections'), api('agents'), api('agents/evaluations'), api('deployments')]);
   Object.assign(state, { assets: a.assets, connections: c.connections, versions: v.versions, evaluations: e.evaluations, deployments: d.deployments });
-  options($('asset'), state.assets, (asset) => asset.name);
+  const previousAsset=$('asset').value;options($('asset'), state.assets, (asset) => asset.name);
+  if(previousAsset&&!state.assets.some(a=>a.id===previousAsset)){state.selected=null;$('agent-name').value='Commissioning observer';$('instructions').value='';resetProfileReview();document.dispatchEvent(new Event('assetpermissionlost'));}
   options($('connection'), state.connections, (connection) => `${connection.backend === 'fixture' ? 'Fixture' : 'Codex'} · ${connection.model} · ${connection.status}`);
   $('scope').textContent = `${state.me.org_id} · ${state.me.role === 'reviewer' ? 'Reviewer' : 'Author'} · ${state.assets.length} permitted bench${state.assets.length === 1 ? '' : 'es'}`;
   $('asset-state').textContent = state.assets.length ? 'Simulator · observation access' : 'A Reviewer must enroll a simulator and grant you access.';
@@ -137,6 +139,7 @@ async function load() {
   $('profile-review-panel').hidden = state.me.role !== 'reviewer' || !state.assets.length;
   const health = await api('deployments/runtime'); state.runtime = health.runtime; renderRuntime();
   await loadTools(selected()?.tools);
+  if (state.selected && !state.versions.some(v=>v.id===state.selected)) state.selected=null;
   if (selected() && selected().author_id !== state.me.user_id) fillEditor();
   renderVersions(); renderEvaluation(); renderDeployments(); document.dispatchEvent(new Event("platformloaded"));
 }
@@ -150,7 +153,7 @@ $('agent-form').onsubmit = (event) => { event.preventDefault(); action(async () 
   if (state.toolsLoading || state.toolAsset !== $('asset').value) throw new Error('Wait for this bench’s permitted tools to load.');
   if (!$('asset').value || !$('connection').value) throw new Error('Select an enrolled bench and create a model connection first.');
   const v = selected(); const body = { name: $('agent-name').value.trim(), instructions: $('instructions').value, asset_id: $('asset').value, connection_id: $('connection').value, tools: checkedTools(), ...extraDefinition() };
-  const result = await api(v ? `agents/${v.agent_id}/versions` : 'agents', body); state.selected = result.id; notice(`Saved immutable version ${result.revision}. Evaluate this version before review.`);
+  const result = await api(v ? `agents/${v.agent_id}/versions` : 'agents', body); state.selected = result.id; state.versions.push(result);fillEditor();$('agent-builder')?.close();document.dispatchEvent(new CustomEvent('versionselected',{detail:{versionId:result.id}}));notice(`Saved immutable version ${result.revision}. Evaluate this version before review.`);
 }); };
 $('model-form').onsubmit = (event) => { event.preventDefault(); action(async () => { await api('model-connections', { backend: $('backend').value, model: $('model').value, consent: $('consent').checked }); notice('Model connection created. Codex requires separate managed sign-in.'); }); };
 $('connection').onchange = () => { $('model-login').disabled = state.connections.find((c) => c.id === $('connection').value)?.backend !== 'codex' || !state.connections.find((c) => c.id === $('connection').value)?.enabled; $('model-status').disabled = $('model-login').disabled; };
@@ -185,6 +188,8 @@ try {
   state.me = await api('auth/me'); $('identity').textContent = `${state.me.org_id} · ${state.me.role} · ${state.me.user_id}`; $('login').hidden = true; $('product').hidden = false; await load();
 } catch (error) { if (state.me) notice(error.message, true); }
 
-setInterval(async () => { if (state.me && !state.busy && !document.hidden) { try { const [data, runtime, assets] = await Promise.all([api('deployments'), api('deployments/runtime'), api('assets')]); state.deployments = data.deployments; state.runtime = runtime.runtime; state.assets = assets.assets; renderRuntime(); renderEvaluation(); renderDeployments(); } catch (error) { state.runtime = {state:'unknown'}; renderRuntime(); notice(`Monitoring paused: ${error.message}`, true); } } }, 2000);
+setInterval(async () => { if (state.me && !state.busy && !document.hidden) { try { const [data, runtime, assets] = await Promise.all([api('deployments'), api('deployments/runtime'), api('assets')]); state.deployments = data.deployments; state.runtime = runtime.runtime; const changed=JSON.stringify(state.assets.map(a=>[a.id,a.profile_hash,a.profile_revision]))!==JSON.stringify(assets.assets.map(a=>[a.id,a.profile_hash,a.profile_revision]));state.assets = assets.assets;if(changed)await load(); renderRuntime(); renderEvaluation(); renderDeployments(); } catch (error) { state.runtime = {state:'unknown'}; renderRuntime(); notice(`Monitoring paused: ${error.message}`, true); } } }, 2000);
 
-if (state.me) { const {init} = await import("./workbench.mjs"); init({api,state,load,action,notice,checkedTools,renderTools,extraDefinition}); }
+if (state.me) { const {init} = await import("./workbench.mjs"); init({api,state,load,action,notice,checkedTools,renderTools,extraDefinition,fillEditor}); }
+
+export {state, api, load, action, notice};

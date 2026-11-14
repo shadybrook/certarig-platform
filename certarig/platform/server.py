@@ -264,10 +264,20 @@ def server(api: API, port: int = 18090, studio: Path | None = None) -> Threading
                     )
                     return
                 if not parsed.path.startswith("/v1/") and method == "GET" and studio:
-                    relative = "platform.html" if parsed.path == "/" else parsed.path.lstrip("/")
+                    relative = {"/": "journal.html", "/classic": "classic.html"}.get(
+                        parsed.path, parsed.path.lstrip("/")
+                    )
                     # Only the new product shell and its static dependencies, never arbitrary repository paths.
                     if relative not in {
                         "platform.html",
+                        "classic.html",
+                        "journal.html",
+                        "journal.css",
+                        "src/journal-entry.mjs",
+                        "src/journal.mjs",
+                        "src/journal-data.mjs",
+                        "src/bench-specs.mjs",
+                        *{f"assets/font-{i}.ttf" for i in range(6)},
                         "styles.css",
                         "platform.css",
                         "src/platform.mjs",
