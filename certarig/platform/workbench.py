@@ -77,7 +77,7 @@ class Workbench:
         )
 
     def draft(self, actor: Actor, body: dict[str, Any]) -> dict[str, Any]:
-        if set(body) - {"asset_id", "project_id", "template", "goal"}:
+        if set(body) - {"asset_id", "project_id", "template", "goal", "base_version_id"}:
             raise ValueError("Unsupported draft fields")
         asset = self.p.asset(actor, body["asset_id"])
         project_id = body.get("project_id")
@@ -116,6 +116,30 @@ class Workbench:
                 "text": "Deterministic drafting assistant: inspect the proposed instructions and tools, then select your model connection. This draft has no execution authority.",
             },
         ]
+        if body.get("base_version_id"):
+            base = self.p.version(actor, body["base_version_id"])
+            if (
+                base["author_id"] != actor.user_id
+                or base["asset_id"] != asset["id"]
+                or base.get("team_members")
+            ):
+                raise PermissionError("Revise your own individual version on its original bench")
+            value["base_version_id"] = base["id"]
+            value["definition"] = {
+                k: base[k]
+                for k in (
+                    "name",
+                    "instructions",
+                    "asset_id",
+                    "connection_id",
+                    "tools",
+                    "analysis_tools",
+                    "limits",
+                    "output_contract",
+                )
+                if k in base
+            }
+            value["base_definition"] = json.loads(json.dumps(value["definition"]))
         return self.s.put("draft", value)
 
     def update(self, actor: Actor, identifier: str, body: dict[str, Any]) -> dict[str, Any]:
@@ -190,7 +214,7 @@ class Workbench:
             blockers.append("Select an enabled model connection owned by the author")
         if not d["tools"]:
             blockers.append("Select at least one observation tool")
-        before = value["history"][-1]["definition"] if value["history"] else {}
+        before = value.get("base_definition", value["history"][-1]["definition"] if value["history"] else {})
         return {
             **value,
             "blockers": blockers,
@@ -208,7 +232,8 @@ class Workbench:
                 raise ValueError("Draft changed or was already committed")
             if self.inspect(actor, identifier)["blockers"]:
                 raise ValueError("Resolve draft blockers before saving a version")
-            version = self.p.create_version(actor, draft["definition"])
+            base = self.p.version(actor, draft["base_version_id"]) if draft.get("base_version_id") else None
+            version = self.p.create_version(actor, draft["definition"], base["agent_id"] if base else None)
             draft.update(status="committed", version_id=version["id"])
             self.s.put("draft", draft)
             self.s.audit(

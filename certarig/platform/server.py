@@ -22,6 +22,7 @@ class API:
         self.platform, self.oidc, self.broker, self.providers = platform, oidc, broker, providers
         self.connections: dict[str, Any] = {}
         from .analysis import Analysis
+        from .bench_specs import BenchSpecs
         from .connectors import ConnectorProfiles
         from .tasks import Tasks
         from .workbench import Workbench
@@ -30,6 +31,7 @@ class API:
         self.tasks = Tasks(platform, providers, broker)
         self.analysis = Analysis(platform, broker)
         self.connector_profiles = ConnectorProfiles(platform)
+        self.bench_specs = BenchSpecs(platform)
 
     def route(self, actor: Any, method: str, parts: list[str], body: dict[str, Any]) -> Any:
         p = self.platform

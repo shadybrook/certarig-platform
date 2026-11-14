@@ -11,6 +11,26 @@ from .workbench import TEMPLATES
 
 def route(api: Any, actor: Actor, method: str, parts: list[str], body: dict[str, Any]) -> tuple[bool, Any]:
     p, w = api.platform, api.workbench
+    if parts == ["bench-specs"]:
+        return True, {"specs": api.bench_specs.listing(actor)} if method == "GET" else api.bench_specs.create(
+            actor, body
+        )
+    if len(parts) >= 2 and parts[0] == "bench-specs":
+        if len(parts) == 2 and method == "GET":
+            return True, api.bench_specs.get(actor, parts[1])
+        if method == "POST" and len(parts) == 3:
+            if parts[2] == "revise":
+                return True, api.bench_specs.revise(actor, parts[1], body)
+            if parts[2] == "assess" and not body:
+                return True, api.bench_specs.assess(actor, parts[1])
+            if parts[2] == "propose":
+                return True, api.bench_specs.propose(actor, parts[1], body)
+            if parts[2] == "review":
+                return True, api.bench_specs.review(actor, parts[1], body)
+    if parts == ["connectors", "registered"] and method == "GET":
+        from .connectors import registered
+
+        return True, {"connectors": registered(p, actor)}
     if parts == ["workbench-tools"] and method == "GET":
         from .workbench_tools import WorkbenchRegistry
 

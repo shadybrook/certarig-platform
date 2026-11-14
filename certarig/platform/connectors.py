@@ -9,6 +9,23 @@ from .store import Actor, uid
 from .workbench import text
 
 
+def registered(platform: Any, actor: Actor) -> list[dict[str, Any]]:
+    """Public enrollment metadata only; never expose endpoint or credential fields."""
+    platform.reviewer(actor)
+    enrolled = {a["connector"] for a in platform.store.listing("asset", actor.org_id)}
+    return [
+        {
+            "id": identifier,
+            "name": str(config.get("name", identifier)),
+            "mode": config.get("mode", "operator-registered"),
+            "enrolled": identifier in enrolled,
+            "observation_only": True,
+        }
+        for identifier, config in platform.connectors.items()
+        if config.get("org_id") == actor.org_id
+    ]
+
+
 class ConnectorProfiles:
     def __init__(self, platform: Any):
         self.p, self.s = platform, platform.store

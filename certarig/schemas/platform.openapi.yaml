@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: CertaRig local customer-agent control plane
-  version: 0.6.0
+  version: 0.7.0
   description: 'Local Innovator Workbench: scoped observation agents, reviewed teams
     and isolated analysis. No physical actuation or hosted authority.'
 servers:
@@ -660,6 +660,163 @@ components:
           type: string
         kind:
           const: imported_recording_unverified_origin
+    BenchDescriptionFacts:
+      title: Operator-declared bench description, never an execution grant
+      type: object
+      additionalProperties: false
+      required:
+      - title
+      - channels
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 120
+        description:
+          type: string
+          maxLength: 8000
+        equipment:
+          type: array
+          maxItems: 16
+          items:
+            type: string
+            minLength: 1
+            maxLength: 1000
+        transport:
+          anyOf:
+          - type: string
+            minLength: 1
+            maxLength: 64
+          - type: 'null'
+        procedure:
+          anyOf:
+          - type: string
+            minLength: 1
+            maxLength: 128
+          - type: 'null'
+        channels:
+          type: array
+          maxItems: 16
+          items:
+            type: object
+            additionalProperties: false
+            required:
+            - channel_id
+            - quantity
+            - unit
+            properties:
+              channel_id:
+                anyOf:
+                - type: string
+                  minLength: 1
+                  maxLength: 128
+                - type: 'null'
+              quantity:
+                anyOf:
+                - type: string
+                  minLength: 1
+                  maxLength: 128
+                - type: 'null'
+              unit:
+                anyOf:
+                - type: string
+                  minLength: 1
+                  maxLength: 64
+                - type: 'null'
+              calibration_id:
+                anyOf:
+                - type: string
+                  minLength: 1
+                  maxLength: 1000
+                - type: 'null'
+              source:
+                anyOf:
+                - type: string
+                  minLength: 1
+                  maxLength: 1000
+                - type: 'null'
+              scaling:
+                anyOf:
+                - type: object
+                  additionalProperties: false
+                  required:
+                  - gain
+                  - offset
+                  properties:
+                    gain:
+                      type: number
+                    offset:
+                      type: number
+                - type: 'null'
+              limits:
+                anyOf:
+                - type: object
+                  additionalProperties: false
+                  required:
+                  - min
+                  - max
+                  properties:
+                    min:
+                      type: number
+                    max:
+                      type: number
+                - type: 'null'
+              max_age_s:
+                anyOf:
+                - type: number
+                  exclusiveMinimum: 0
+                  maximum: 3600
+                - type: 'null'
+              reference:
+                anyOf:
+                - enum:
+                  - gauge
+                  - absolute
+                  - differential
+                  - unknown
+                - type: 'null'
+        source_refs:
+          type: array
+          maxItems: 32
+          items:
+            type: string
+            minLength: 1
+            maxLength: 1000
+        unknowns:
+          type: array
+          maxItems: 32
+          items:
+            type: string
+            minLength: 1
+            maxLength: 1000
+        replay_id:
+          type: string
+          minLength: 1
+          maxLength: 128
+    BenchDescriptionCreate:
+      type: object
+      additionalProperties: false
+      required:
+      - facts
+      properties:
+        asset_id: &id001
+          type:
+          - string
+          - 'null'
+        facts: &id002
+          $ref: '#/components/schemas/BenchDescriptionFacts'
+    BenchDescriptionRevise:
+      type: object
+      additionalProperties: false
+      required:
+      - facts
+      - expected_revision
+      properties:
+        asset_id: *id001
+        facts: *id002
+        expected_revision:
+          type: integer
+          minimum: 1
 paths:
   /v1/auth/login:
     get:
@@ -684,13 +841,13 @@ paths:
       - in: query
         name: state
         required: true
-        schema: &id001
+        schema: &id003
           type: string
           minLength: 1
       - in: query
         name: code
         required: true
-        schema: *id001
+        schema: *id003
   /v1/auth/me:
     get:
       summary: Current server-derived membership and CSRF token
@@ -733,7 +890,7 @@ paths:
       - in: header
         name: X-CSRF-Token
         required: true
-        schema: *id001
+        schema: *id003
   /v1/auth/members:
     get:
       summary: Reviewer-only member identifiers
@@ -791,12 +948,12 @@ paths:
               required:
               - connector
               properties:
-                connector: *id001
+                connector: *id003
       parameters:
       - in: header
         name: X-CSRF-Token
         required: true
-        schema: *id001
+        schema: *id003
   /v1/assets/enroll:
     post:
       summary: Reviewer enrolls registered local simulator only
@@ -822,12 +979,12 @@ paths:
               required:
               - code
               properties:
-                code: *id001
+                code: *id003
       parameters:
       - in: header
         name: X-CSRF-Token
         required: true
-        schema: *id001
+        schema: *id003
   /v1/assets/{asset_id}/grants:
     post:
       summary: Reviewer changes user_id and enabled grant; removal pauses deployment
@@ -854,18 +1011,18 @@ paths:
               - user_id
               - enabled
               properties:
-                user_id: *id001
+                user_id: *id003
                 enabled:
                   type: boolean
       parameters:
       - in: path
         name: asset_id
         required: true
-        schema: *id001
+        schema: *id003
       - in: header
         name: X-CSRF-Token
         required: true
-        schema: *id001
+        schema: *id003
   /v1/model-connections:
     get:
       summary: List this user's private connection metadata
@@ -907,7 +1064,7 @@ paths:
       - in: header
         name: X-CSRF-Token
         required: true
-        schema: *id001
+        schema: *id003
   /v1/model-connections/{connection_id}/login:
     post:
       summary: Begin dedicated managed ChatGPT device sign-in
@@ -934,11 +1091,11 @@ paths:
       - in: path
         name: connection_id
         required: true
-        schema: *id001
+        schema: *id003
       - in: header
         name: X-CSRF-Token
         required: true
-        schema: *id001
+        schema: *id003
   /v1/model-connections/{connection_id}/status:
     post:
       summary: Read redacted account connection state
@@ -965,11 +1122,11 @@ paths:
       - in: path
         name: connection_id
         required: true
-        schema: *id001
+        schema: *id003
       - in: header
         name: X-CSRF-Token
         required: true
-        schema: *id001
+        schema: *id003
   /v1/model-connections/{connection_id}/disconnect:
     post:
       summary: Remove consent and pause affected deployments
@@ -996,11 +1153,11 @@ paths:
       - in: path
         name: connection_id
         required: true
-        schema: *id001
+        schema: *id003
       - in: header
         name: X-CSRF-Token
         required: true
-        schema: *id001
+        schema: *id003
   /v1/agents:
     get:
       summary: List versions accessible through asset grants
@@ -1042,7 +1199,7 @@ paths:
       - in: header
         name: X-CSRF-Token
         required: true
-        schema: *id001
+        schema: *id003
   /v1/agents/{agent_id}/versions:
     post:
       summary: Author creates new immutable version
@@ -1069,11 +1226,11 @@ paths:
       - in: path
         name: agent_id
         required: true
-        schema: *id001
+        schema: *id003
       - in: header
         name: X-CSRF-Token
         required: true
-        schema: *id001
+        schema: *id003
   /v1/agents/{version_id}/evaluate:
     post:
       summary: Collect five cases outside Edge with synthetic tool data; not qualification
@@ -1100,11 +1257,11 @@ paths:
       - in: path
         name: version_id
         required: true
-        schema: *id001
+        schema: *id003
       - in: header
         name: X-CSRF-Token
         required: true
-        schema: *id001
+        schema: *id003
   /v1/agents/evaluations:
     get:
       summary: List scoped evaluation records
@@ -1141,7 +1298,7 @@ paths:
       - in: path
         name: evaluation_id
         required: true
-        schema: *id001
+        schema: *id003
     post:
       summary: Author verifies stored traces in qualified Sandbox; submitted pass
         reports are ignored
@@ -1168,11 +1325,11 @@ paths:
       - in: path
         name: evaluation_id
         required: true
-        schema: *id001
+        schema: *id003
       - in: header
         name: X-CSRF-Token
         required: true
-        schema: *id001
+        schema: *id003
   /v1/agents/preflight:
     get:
       summary: Report Sandbox resource and qualification blockers
@@ -1232,13 +1389,13 @@ paths:
               - version_id
               - evaluation_id
               properties:
-                version_id: *id001
-                evaluation_id: *id001
+                version_id: *id003
+                evaluation_id: *id003
       parameters:
       - in: header
         name: X-CSRF-Token
         required: true
-        schema: *id001
+        schema: *id003
   /v1/deployments/{deployment_id}:
     get:
       summary: Read scoped observations and lease
@@ -1259,7 +1416,7 @@ paths:
       - in: path
         name: deployment_id
         required: true
-        schema: *id001
+        schema: *id003
   /v1/deployments/{deployment_id}/start:
     post:
       summary: Reviewer starts bounded observation lease; separate runtime required
@@ -1286,11 +1443,11 @@ paths:
       - in: path
         name: deployment_id
         required: true
-        schema: *id001
+        schema: *id003
       - in: header
         name: X-CSRF-Token
         required: true
-        schema: *id001
+        schema: *id003
   /v1/deployments/{deployment_id}/revoke:
     post:
       summary: Author or Reviewer revokes tools and discards late results
@@ -1317,11 +1474,11 @@ paths:
       - in: path
         name: deployment_id
         required: true
-        schema: *id001
+        schema: *id003
       - in: header
         name: X-CSRF-Token
         required: true
-        schema: *id001
+        schema: *id003
   /v1/deployments/{deployment_id}/events:
     get:
       summary: Read lifecycle audit events
@@ -1342,7 +1499,7 @@ paths:
       - in: path
         name: deployment_id
         required: true
-        schema: *id001
+        schema: *id003
   /v1/deployments/{deployment_id}/export:
     get:
       summary: Download complete offline-verifiable lifecycle ZIP
@@ -1368,7 +1525,7 @@ paths:
       - in: path
         name: deployment_id
         required: true
-        schema: *id001
+        schema: *id003
   /v1/openapi.json:
     get:
       summary: Read the customer control-plane API contract
@@ -1405,7 +1562,7 @@ paths:
       - in: path
         name: asset_id
         required: true
-        schema: *id001
+        schema: *id003
   /v1/assets/{asset_id}/signals:
     get:
       summary: Scoped connector observation; credentials remain server-side
@@ -1426,7 +1583,7 @@ paths:
       - in: path
         name: asset_id
         required: true
-        schema: *id001
+        schema: *id003
   /v1/assets/{asset_id}/state:
     get:
       summary: Scoped connector observation; credentials remain server-side
@@ -1447,7 +1604,7 @@ paths:
       - in: path
         name: asset_id
         required: true
-        schema: *id001
+        schema: *id003
   /v1/assets/{asset_id}/capabilities:
     get:
       summary: Scoped connector observation; credentials remain server-side
@@ -1468,11 +1625,11 @@ paths:
       - in: path
         name: asset_id
         required: true
-        schema: *id001
+        schema: *id003
   /v1/assets/{asset_id}/tools:
     get:
-      summary: "List this principal\u2019s connector-supported observation tools;\
-        \ excludes control and approval tools"
+      summary: List this principal’s connector-supported observation tools; excludes
+        control and approval tools
       responses:
         '200':
           description: Success
@@ -1488,7 +1645,7 @@ paths:
       - in: path
         name: asset_id
         required: true
-        schema: &id002
+        schema: &id004
           type: string
           minLength: 1
   /v1/assets/{asset_id}/profiles:
@@ -1509,7 +1666,7 @@ paths:
       - in: path
         name: asset_id
         required: true
-        schema: *id002
+        schema: *id004
   /v1/assets/{asset_id}/profile-review/preview:
     post:
       summary: Reviewer snapshots a changed simulator profile and policy, invalidates
@@ -1535,11 +1692,11 @@ paths:
       - in: path
         name: asset_id
         required: true
-        schema: *id002
+        schema: *id004
       - in: header
         name: X-CSRF-Token
         required: true
-        schema: *id002
+        schema: *id004
   /v1/assets/{asset_id}/profile-review:
     post:
       summary: Reviewer accepts the exact unexpired preview once; requires fresh evaluation
@@ -1565,16 +1722,16 @@ paths:
               - review_id
               additionalProperties: false
               properties:
-                review_id: *id002
+                review_id: *id004
       parameters:
       - in: path
         name: asset_id
         required: true
-        schema: *id002
+        schema: *id004
       - in: header
         name: X-CSRF-Token
         required: true
-        schema: *id002
+        schema: *id004
   /v1/deployments/runtime:
     get:
       summary: Read scoped trusted runtime heartbeat; stale status cannot restore
@@ -1701,6 +1858,10 @@ paths:
                   - revalidation
                   - evidence
                   - reporting
+                base_version_id:
+                  type: string
+                  description: Optional owned individual version on the same bench;
+                    preserves immutable agent lineage and the base-definition diff.
   /v1/drafts/{draft_id}:
     get:
       summary: GET drafts/{draft_id}
@@ -2399,3 +2560,234 @@ paths:
         '409':
           description: Invalid, stale or conflicting request
       parameters: []
+  /v1/bench-specs:
+    get:
+      summary: List accessible bench descriptions
+      description: Application identity, current organization and linked-asset access
+        are checked server-side. Description review is not equipment or execution
+        qualification.
+      responses:
+        '200':
+          description: Scoped description or deterministic support report; no execution
+            authority
+        '403':
+          description: Role, ownership or asset permission denied
+        '404':
+          description: Resource unavailable
+        '409':
+          description: Invalid or stale description revision
+    post:
+      summary: Create an inert bench description
+      description: Application identity, current organization and linked-asset access
+        are checked server-side. Description review is not equipment or execution
+        qualification.
+      responses:
+        '200':
+          description: Scoped description or deterministic support report; no execution
+            authority
+        '403':
+          description: Role, ownership or asset permission denied
+        '404':
+          description: Resource unavailable
+        '409':
+          description: Invalid or stale description revision
+      parameters:
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BenchDescriptionCreate'
+  /v1/bench-specs/{spec_id}:
+    get:
+      summary: Read an accessible bench description
+      description: Application identity, current organization and linked-asset access
+        are checked server-side. Description review is not equipment or execution
+        qualification.
+      responses:
+        '200':
+          description: Scoped description or deterministic support report; no execution
+            authority
+        '403':
+          description: Role, ownership or asset permission denied
+        '404':
+          description: Resource unavailable
+        '409':
+          description: Invalid or stale description revision
+      parameters:
+      - name: spec_id
+        in: path
+        required: true
+        schema:
+          type: string
+  /v1/bench-specs/{spec_id}/revise:
+    post:
+      summary: 'Bench description: revise'
+      description: Application identity, current organization and linked-asset access
+        are checked server-side. Description review is not equipment or execution
+        qualification.
+      responses:
+        '200':
+          description: Scoped description or deterministic support report; no execution
+            authority
+        '403':
+          description: Role, ownership or asset permission denied
+        '404':
+          description: Resource unavailable
+        '409':
+          description: Invalid or stale description revision
+      parameters:
+      - name: spec_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BenchDescriptionRevise'
+  /v1/bench-specs/{spec_id}/assess:
+    post:
+      summary: 'Bench description: assess'
+      description: Application identity, current organization and linked-asset access
+        are checked server-side. Description review is not equipment or execution
+        qualification.
+      responses:
+        '200':
+          description: Scoped description or deterministic support report; no execution
+            authority
+        '403':
+          description: Role, ownership or asset permission denied
+        '404':
+          description: Resource unavailable
+        '409':
+          description: Invalid or stale description revision
+      parameters:
+      - name: spec_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+  /v1/bench-specs/{spec_id}/propose:
+    post:
+      summary: 'Bench description: propose'
+      description: Application identity, current organization and linked-asset access
+        are checked server-side. Description review is not equipment or execution
+        qualification.
+      responses:
+        '200':
+          description: Scoped description or deterministic support report; no execution
+            authority
+        '403':
+          description: Role, ownership or asset permission denied
+        '404':
+          description: Resource unavailable
+        '409':
+          description: Invalid or stale description revision
+      parameters:
+      - name: spec_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - expected_revision
+              additionalProperties: false
+              properties:
+                expected_revision: &id005
+                  type: integer
+                  minimum: 1
+  /v1/bench-specs/{spec_id}/review:
+    post:
+      summary: 'Bench description: review'
+      description: Application identity, current organization and linked-asset access
+        are checked server-side. Description review is not equipment or execution
+        qualification.
+      responses:
+        '200':
+          description: Scoped description or deterministic support report; no execution
+            authority
+        '403':
+          description: Role, ownership or asset permission denied
+        '404':
+          description: Resource unavailable
+        '409':
+          description: Invalid or stale description revision
+      parameters:
+      - name: spec_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - expected_revision
+              - content_hash
+              additionalProperties: false
+              properties:
+                expected_revision: *id005
+                content_hash:
+                  type: string
+                  pattern: ^[a-f0-9]{64}$
+  /v1/connectors/registered:
+    get:
+      summary: Reviewer-only registered connector public metadata; no endpoints, device
+        paths or credentials
+      description: Application identity, current organization and linked-asset access
+        are checked server-side. Description review is not equipment or execution
+        qualification.
+      responses:
+        '200':
+          description: Scoped description or deterministic support report; no execution
+            authority
+        '403':
+          description: Role, ownership or asset permission denied
+        '404':
+          description: Resource unavailable
+        '409':
+          description: Invalid or stale description revision

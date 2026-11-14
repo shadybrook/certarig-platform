@@ -121,3 +121,31 @@ class PlatformClient:
 
     def verify_evidence(self, deployment_id: str) -> dict[str, Any]:
         return dict(self.request("POST", "/v1/evidence/" + deployment_id + "/verify", {}))
+
+    def bench_specs(self) -> list[dict[str, Any]]:
+        return list(self.request("GET", "/v1/bench-specs")["specs"])
+
+    def create_bench_spec(self, facts: dict[str, Any], asset_id: str | None = None) -> dict[str, Any]:
+        return dict(self.request("POST", "/v1/bench-specs", {"facts": facts, "asset_id": asset_id}))
+
+    def revise_bench_spec(self, spec_id: str, expected_revision: int, **changes: Any) -> dict[str, Any]:
+        return dict(
+            self.request(
+                "POST",
+                f"/v1/bench-specs/{spec_id}/revise",
+                {"expected_revision": expected_revision, **changes},
+            )
+        )
+
+    def assess_bench_spec(self, spec_id: str) -> dict[str, Any]:
+        return dict(self.request("POST", f"/v1/bench-specs/{spec_id}/assess", {}))
+
+    def propose_bench_spec(self, spec_id: str, expected_revision: int) -> dict[str, Any]:
+        return dict(
+            self.request(
+                "POST", f"/v1/bench-specs/{spec_id}/propose", {"expected_revision": expected_revision}
+            )
+        )
+
+    def registered_connectors(self) -> list[dict[str, Any]]:
+        return list(self.request("GET", "/v1/connectors/registered")["connectors"])
