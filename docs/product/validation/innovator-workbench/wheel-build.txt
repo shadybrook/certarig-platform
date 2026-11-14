@@ -1,0 +1,339 @@
+Building wheel...
+/Users/chintandedhia/.cache/uv/builds-v0/.tmp6p1JjM/lib/python3.14/site-packages/setuptools/config/_apply_pyprojecttoml.py:82: SetuptoolsDeprecationWarning: `project.license` as a TOML table is deprecated
+!!
+
+        ********************************************************************************
+        Please use a simple string containing a SPDX expression for `project.license`. You can also use `project.license-files`. (Both options available on setuptools>=77.0.0).
+
+        By 2027-Feb-18, you need to update your project and remove deprecated calls
+        or your builds will no longer be supported.
+
+        See https://packaging.python.org/en/latest/guides/writing-pyproject-toml/#license for details.
+        ********************************************************************************
+
+!!
+  corresp(dist, value, root_dir)
+running egg_info
+writing certarig.egg-info/PKG-INFO
+writing dependency_links to certarig.egg-info/dependency_links.txt
+writing entry points to certarig.egg-info/entry_points.txt
+writing requirements to certarig.egg-info/requires.txt
+writing top-level names to certarig.egg-info/top_level.txt
+reading manifest file 'certarig.egg-info/SOURCES.txt'
+writing manifest file 'certarig.egg-info/SOURCES.txt'
+/Users/chintandedhia/.cache/uv/builds-v0/.tmp6p1JjM/lib/python3.14/site-packages/setuptools/config/_apply_pyprojecttoml.py:82: SetuptoolsDeprecationWarning: `project.license` as a TOML table is deprecated
+!!
+
+        ********************************************************************************
+        Please use a simple string containing a SPDX expression for `project.license`. You can also use `project.license-files`. (Both options available on setuptools>=77.0.0).
+
+        By 2027-Feb-18, you need to update your project and remove deprecated calls
+        or your builds will no longer be supported.
+
+        See https://packaging.python.org/en/latest/guides/writing-pyproject-toml/#license for details.
+        ********************************************************************************
+
+!!
+  corresp(dist, value, root_dir)
+running bdist_wheel
+running build
+running build_py
+copying certarig/platform/analysis.py -> build/lib/certarig/platform
+running egg_info
+writing certarig.egg-info/PKG-INFO
+writing dependency_links to certarig.egg-info/dependency_links.txt
+writing entry points to certarig.egg-info/entry_points.txt
+writing requirements to certarig.egg-info/requires.txt
+writing top-level names to certarig.egg-info/top_level.txt
+reading manifest file 'certarig.egg-info/SOURCES.txt'
+writing manifest file 'certarig.egg-info/SOURCES.txt'
+installing to build/bdist.macosx-15.0-arm64/wheel
+running install
+running install_lib
+creating build/bdist.macosx-15.0-arm64/wheel
+creating build/bdist.macosx-15.0-arm64/wheel/certarig
+creating build/bdist.macosx-15.0-arm64/wheel/certarig/connectors
+copying build/lib/certarig/connectors/observation.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/connectors
+copying build/lib/certarig/connectors/__init__.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/connectors
+copying build/lib/certarig/connectors/mqtt.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/connectors
+copying build/lib/certarig/connectors/serial.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/connectors
+copying build/lib/certarig/connectors/modbus.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/connectors
+copying build/lib/certarig/sdk.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig
+creating build/bdist.macosx-15.0-arm64/wheel/certarig/platform
+copying build/lib/certarig/platform/workbench_api.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/platform
+copying build/lib/certarig/platform/auth.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/platform
+copying build/lib/certarig/platform/store.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/platform
+copying build/lib/certarig/platform/service.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/platform
+copying build/lib/certarig/platform/server.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/platform
+copying build/lib/certarig/platform/connectors.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/platform
+copying build/lib/certarig/platform/tasks.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/platform
+copying build/lib/certarig/platform/analysis.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/platform
+copying build/lib/certarig/platform/codex.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/platform
+copying build/lib/certarig/platform/registry.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/platform
+copying build/lib/certarig/platform/health.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/platform
+copying build/lib/certarig/platform/evidence_v2.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/platform
+copying build/lib/certarig/platform/client.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/platform
+copying build/lib/certarig/platform/evaluation.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/platform
+copying build/lib/certarig/platform/teams.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/platform
+copying build/lib/certarig/platform/__init__.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/platform
+copying build/lib/certarig/platform/workbench_tools.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/platform
+copying build/lib/certarig/platform/runtime.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/platform
+copying build/lib/certarig/platform/workbench.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/platform
+copying build/lib/certarig/platform/cli.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/platform
+copying build/lib/certarig/platform/contracts.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/platform
+copying build/lib/certarig/platform/evidence.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/platform
+copying build/lib/certarig/platform/profiles.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/platform
+copying build/lib/certarig/__init__.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig
+creating build/bdist.macosx-15.0-arm64/wheel/certarig/agent
+copying build/lib/certarig/agent/skills.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/agent
+copying build/lib/certarig/agent/transcript.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/agent
+creating build/bdist.macosx-15.0-arm64/wheel/certarig/agent/providers
+copying build/lib/certarig/agent/providers/fake.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/agent/providers
+copying build/lib/certarig/agent/providers/__init__.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/agent/providers
+copying build/lib/certarig/agent/providers/openai_provider.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/agent/providers
+copying build/lib/certarig/agent/providers/anthropic_provider.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/agent/providers
+copying build/lib/certarig/agent/providers/base.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/agent/providers
+copying build/lib/certarig/agent/tools.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/agent
+copying build/lib/certarig/agent/policy.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/agent
+copying build/lib/certarig/agent/__init__.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/agent
+copying build/lib/certarig/agent/cli.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/agent
+copying build/lib/certarig/agent/authoring.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/agent
+copying build/lib/certarig/agent/orchestrator.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/agent
+creating build/bdist.macosx-15.0-arm64/wheel/certarig/edge
+copying build/lib/certarig/edge/bootstrap.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge
+copying build/lib/certarig/edge/bundle.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge
+copying build/lib/certarig/edge/sessions.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge
+copying build/lib/certarig/edge/server.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge
+creating build/bdist.macosx-15.0-arm64/wheel/certarig/edge/hardware
+copying build/lib/certarig/edge/hardware/observation.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge/hardware
+copying build/lib/certarig/edge/hardware/__init__.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge/hardware
+copying build/lib/certarig/edge/hardware/mqtt.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge/hardware
+copying build/lib/certarig/edge/hardware/raspberry_pi.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge/hardware
+copying build/lib/certarig/edge/hardware/mixed.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge/hardware
+copying build/lib/certarig/edge/hardware/bus.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge/hardware
+copying build/lib/certarig/edge/hardware/modbus.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge/hardware
+copying build/lib/certarig/edge/hardware/base.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge/hardware
+copying build/lib/certarig/edge/hardware/mock.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge/hardware
+copying build/lib/certarig/edge/config.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge
+copying build/lib/certarig/edge/models.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge
+copying build/lib/certarig/edge/watchdog.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge
+copying build/lib/certarig/edge/approvals.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge
+copying build/lib/certarig/edge/authoring_templates.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge
+copying build/lib/certarig/edge/openapi.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge
+copying build/lib/certarig/edge/client.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge
+copying build/lib/certarig/edge/bootflag.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge
+creating build/bdist.macosx-15.0-arm64/wheel/certarig/edge/runtime
+copying build/lib/certarig/edge/runtime/facts.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge/runtime
+copying build/lib/certarig/edge/runtime/runner.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge/runtime
+copying build/lib/certarig/edge/runtime/predicates.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge/runtime
+copying build/lib/certarig/edge/runtime/library.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge/runtime
+copying build/lib/certarig/edge/runtime/__init__.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge/runtime
+copying build/lib/certarig/edge/runtime/model.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge/runtime
+copying build/lib/certarig/edge/ledger.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge
+copying build/lib/certarig/edge/revalidation.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge
+copying build/lib/certarig/edge/__init__.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge
+copying build/lib/certarig/edge/commissioning_records.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge
+copying build/lib/certarig/edge/commissioning.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge
+copying build/lib/certarig/edge/ops.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge
+copying build/lib/certarig/edge/schemas.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge
+copying build/lib/certarig/edge/cli.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge
+copying build/lib/certarig/edge/capabilities.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge
+copying build/lib/certarig/edge/agent_api.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge
+copying build/lib/certarig/edge/recording_analysis.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge
+copying build/lib/certarig/edge/twin_gate.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge
+copying build/lib/certarig/edge/live.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge
+copying build/lib/certarig/edge/app.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge
+copying build/lib/certarig/edge/errors.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge
+copying build/lib/certarig/edge/interviews.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge
+copying build/lib/certarig/edge/procedures.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge
+copying build/lib/certarig/edge/evidence_cli.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge
+copying build/lib/certarig/edge/safety.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge
+copying build/lib/certarig/edge/briefing.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge
+copying build/lib/certarig/edge/configurator.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge
+copying build/lib/certarig/edge/atomic.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge
+copying build/lib/certarig/edge/evidence.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge
+copying build/lib/certarig/edge/physical_review.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge
+copying build/lib/certarig/edge/executor.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/edge
+creating build/bdist.macosx-15.0-arm64/wheel/certarig/schemas
+copying build/lib/certarig/schemas/sandbox.schema.json -> build/bdist.macosx-15.0-arm64/wheel/./certarig/schemas
+copying build/lib/certarig/schemas/rig.schema.json -> build/bdist.macosx-15.0-arm64/wheel/./certarig/schemas
+copying build/lib/certarig/schemas/evidence_manifest.schema.json -> build/bdist.macosx-15.0-arm64/wheel/./certarig/schemas
+copying build/lib/certarig/schemas/workbench-tools.json -> build/bdist.macosx-15.0-arm64/wheel/./certarig/schemas
+copying build/lib/certarig/schemas/scenario.schema.json -> build/bdist.macosx-15.0-arm64/wheel/./certarig/schemas
+copying build/lib/certarig/schemas/platform.schema.json -> build/bdist.macosx-15.0-arm64/wheel/./certarig/schemas
+copying build/lib/certarig/schemas/procedure.schema.json -> build/bdist.macosx-15.0-arm64/wheel/./certarig/schemas
+copying build/lib/certarig/schemas/platform.openapi.yaml -> build/bdist.macosx-15.0-arm64/wheel/./certarig/schemas
+copying build/lib/certarig/schemas/openapi.yaml -> build/bdist.macosx-15.0-arm64/wheel/./certarig/schemas
+copying build/lib/certarig/schemas/capabilities.schema.json -> build/bdist.macosx-15.0-arm64/wheel/./certarig/schemas
+copying build/lib/certarig/schemas/commissioning.schema.json -> build/bdist.macosx-15.0-arm64/wheel/./certarig/schemas
+copying build/lib/certarig/cli.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig
+creating build/bdist.macosx-15.0-arm64/wheel/certarig/machines
+copying build/lib/certarig/machines/gateway.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/machines
+copying build/lib/certarig/machines/protocols.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/machines
+copying build/lib/certarig/machines/__init__.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/machines
+copying build/lib/certarig/machines/agent_tools.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/machines
+creating build/bdist.macosx-15.0-arm64/wheel/certarig/sandbox
+copying build/lib/certarig/sandbox/worker.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/sandbox
+copying build/lib/certarig/sandbox/transport.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/sandbox
+copying build/lib/certarig/sandbox/agent_evaluation.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/sandbox
+copying build/lib/certarig/sandbox/__init__.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/sandbox
+copying build/lib/certarig/sandbox/api.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/sandbox
+copying build/lib/certarig/sandbox/engine.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/sandbox
+copying build/lib/certarig/sandbox/cli.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/sandbox
+copying build/lib/certarig/sandbox/contracts.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/sandbox
+copying build/lib/certarig/sandbox/broker.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/sandbox
+copying build/lib/certarig/sandbox/evidence.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/sandbox
+copying build/lib/certarig/py.typed -> build/bdist.macosx-15.0-arm64/wheel/./certarig
+creating build/bdist.macosx-15.0-arm64/wheel/certarig/sim
+copying build/lib/certarig/sim/stamp_gate.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/sim
+copying build/lib/certarig/sim/bus_twin.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/sim
+copying build/lib/certarig/sim/plant.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/sim
+copying build/lib/certarig/sim/__init__.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/sim
+copying build/lib/certarig/sim/api.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/sim
+copying build/lib/certarig/sim/cli.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/sim
+copying build/lib/certarig/sim/scenario.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/sim
+copying build/lib/certarig/sim/invariants.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig/sim
+copying build/lib/certarig/__main__.py -> build/bdist.macosx-15.0-arm64/wheel/./certarig
+running install_egg_info
+Copying certarig.egg-info to build/bdist.macosx-15.0-arm64/wheel/./certarig-0.4.0-py3.14.egg-info
+running install_scripts
+creating build/bdist.macosx-15.0-arm64/wheel/certarig-0.4.0.dist-info/WHEEL
+creating '/tmp/certarig-workbench-wheel/.tmpec5met/.tmp-txmvoofp/certarig-0.4.0-py3-none-any.whl' and adding 'build/bdist.macosx-15.0-arm64/wheel' to it
+adding 'certarig/__init__.py'
+adding 'certarig/__main__.py'
+adding 'certarig/cli.py'
+adding 'certarig/py.typed'
+adding 'certarig/sdk.py'
+adding 'certarig/agent/__init__.py'
+adding 'certarig/agent/authoring.py'
+adding 'certarig/agent/cli.py'
+adding 'certarig/agent/orchestrator.py'
+adding 'certarig/agent/policy.py'
+adding 'certarig/agent/skills.py'
+adding 'certarig/agent/tools.py'
+adding 'certarig/agent/transcript.py'
+adding 'certarig/agent/providers/__init__.py'
+adding 'certarig/agent/providers/anthropic_provider.py'
+adding 'certarig/agent/providers/base.py'
+adding 'certarig/agent/providers/fake.py'
+adding 'certarig/agent/providers/openai_provider.py'
+adding 'certarig/connectors/__init__.py'
+adding 'certarig/connectors/modbus.py'
+adding 'certarig/connectors/mqtt.py'
+adding 'certarig/connectors/observation.py'
+adding 'certarig/connectors/serial.py'
+adding 'certarig/edge/__init__.py'
+adding 'certarig/edge/agent_api.py'
+adding 'certarig/edge/app.py'
+adding 'certarig/edge/approvals.py'
+adding 'certarig/edge/atomic.py'
+adding 'certarig/edge/authoring_templates.py'
+adding 'certarig/edge/bootflag.py'
+adding 'certarig/edge/bootstrap.py'
+adding 'certarig/edge/briefing.py'
+adding 'certarig/edge/bundle.py'
+adding 'certarig/edge/capabilities.py'
+adding 'certarig/edge/cli.py'
+adding 'certarig/edge/client.py'
+adding 'certarig/edge/commissioning.py'
+adding 'certarig/edge/commissioning_records.py'
+adding 'certarig/edge/config.py'
+adding 'certarig/edge/configurator.py'
+adding 'certarig/edge/errors.py'
+adding 'certarig/edge/evidence.py'
+adding 'certarig/edge/evidence_cli.py'
+adding 'certarig/edge/executor.py'
+adding 'certarig/edge/interviews.py'
+adding 'certarig/edge/ledger.py'
+adding 'certarig/edge/live.py'
+adding 'certarig/edge/models.py'
+adding 'certarig/edge/openapi.py'
+adding 'certarig/edge/ops.py'
+adding 'certarig/edge/physical_review.py'
+adding 'certarig/edge/procedures.py'
+adding 'certarig/edge/recording_analysis.py'
+adding 'certarig/edge/revalidation.py'
+adding 'certarig/edge/safety.py'
+adding 'certarig/edge/schemas.py'
+adding 'certarig/edge/server.py'
+adding 'certarig/edge/sessions.py'
+adding 'certarig/edge/twin_gate.py'
+adding 'certarig/edge/watchdog.py'
+adding 'certarig/edge/hardware/__init__.py'
+adding 'certarig/edge/hardware/base.py'
+adding 'certarig/edge/hardware/bus.py'
+adding 'certarig/edge/hardware/mixed.py'
+adding 'certarig/edge/hardware/mock.py'
+adding 'certarig/edge/hardware/modbus.py'
+adding 'certarig/edge/hardware/mqtt.py'
+adding 'certarig/edge/hardware/observation.py'
+adding 'certarig/edge/hardware/raspberry_pi.py'
+adding 'certarig/edge/runtime/__init__.py'
+adding 'certarig/edge/runtime/facts.py'
+adding 'certarig/edge/runtime/library.py'
+adding 'certarig/edge/runtime/model.py'
+adding 'certarig/edge/runtime/predicates.py'
+adding 'certarig/edge/runtime/runner.py'
+adding 'certarig/machines/__init__.py'
+adding 'certarig/machines/agent_tools.py'
+adding 'certarig/machines/gateway.py'
+adding 'certarig/machines/protocols.py'
+adding 'certarig/platform/__init__.py'
+adding 'certarig/platform/analysis.py'
+adding 'certarig/platform/auth.py'
+adding 'certarig/platform/cli.py'
+adding 'certarig/platform/client.py'
+adding 'certarig/platform/codex.py'
+adding 'certarig/platform/connectors.py'
+adding 'certarig/platform/contracts.py'
+adding 'certarig/platform/evaluation.py'
+adding 'certarig/platform/evidence.py'
+adding 'certarig/platform/evidence_v2.py'
+adding 'certarig/platform/health.py'
+adding 'certarig/platform/profiles.py'
+adding 'certarig/platform/registry.py'
+adding 'certarig/platform/runtime.py'
+adding 'certarig/platform/server.py'
+adding 'certarig/platform/service.py'
+adding 'certarig/platform/store.py'
+adding 'certarig/platform/tasks.py'
+adding 'certarig/platform/teams.py'
+adding 'certarig/platform/workbench.py'
+adding 'certarig/platform/workbench_api.py'
+adding 'certarig/platform/workbench_tools.py'
+adding 'certarig/sandbox/__init__.py'
+adding 'certarig/sandbox/agent_evaluation.py'
+adding 'certarig/sandbox/api.py'
+adding 'certarig/sandbox/broker.py'
+adding 'certarig/sandbox/cli.py'
+adding 'certarig/sandbox/contracts.py'
+adding 'certarig/sandbox/engine.py'
+adding 'certarig/sandbox/evidence.py'
+adding 'certarig/sandbox/transport.py'
+adding 'certarig/sandbox/worker.py'
+adding 'certarig/schemas/capabilities.schema.json'
+adding 'certarig/schemas/commissioning.schema.json'
+adding 'certarig/schemas/evidence_manifest.schema.json'
+adding 'certarig/schemas/openapi.yaml'
+adding 'certarig/schemas/platform.openapi.yaml'
+adding 'certarig/schemas/platform.schema.json'
+adding 'certarig/schemas/procedure.schema.json'
+adding 'certarig/schemas/rig.schema.json'
+adding 'certarig/schemas/sandbox.schema.json'
+adding 'certarig/schemas/scenario.schema.json'
+adding 'certarig/schemas/workbench-tools.json'
+adding 'certarig/sim/__init__.py'
+adding 'certarig/sim/api.py'
+adding 'certarig/sim/bus_twin.py'
+adding 'certarig/sim/cli.py'
+adding 'certarig/sim/invariants.py'
+adding 'certarig/sim/plant.py'
+adding 'certarig/sim/scenario.py'
+adding 'certarig/sim/stamp_gate.py'
+adding 'certarig-0.4.0.dist-info/METADATA'
+adding 'certarig-0.4.0.dist-info/WHEEL'
+adding 'certarig-0.4.0.dist-info/entry_points.txt'
+adding 'certarig-0.4.0.dist-info/top_level.txt'
+adding 'certarig-0.4.0.dist-info/RECORD'
+removing build/bdist.macosx-15.0-arm64/wheel
+Successfully built /tmp/certarig-workbench-wheel/certarig-0.4.0-py3-none-any.whl
