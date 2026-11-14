@@ -25,3 +25,13 @@ The first implementation was completed early in the working schedule. Remaining 
 The signed Phase 3 baseline was approved on 19 September 2026. Current capstone reviewer assignment, deadline and submission process still require confirmation. Preserve genuine emailed feedback and meeting minutes when received; never infer attendance or remarks from code activity.
 
 9 November extension: persisted source-bound commissioning interviews, separate thermal RC plant, semantic revalidation/profile-bound rehearsal, observe-only broker MQTT, mixed-sensing/feedback foundations and staged physical review implemented. Local software checks accompany the release. Hardware procurement is on hold pending corrected specifications, matched delivered quote and current wiring review; no parts ordered or physical tests claimed.
+
+## Recorded implementation on 14 November 2026
+
+| Date | Work planned | Actual work recorded | Supervisor remark |
+|---|---|---|---|
+| 14 November 2026 | Execute selected Session Journal A plan | Isolated branch; interactive prototype and independent design/UX reviews; connected product shell; draft recovery/conflict handling; guided bench descriptions, support reports, API/client/schema/tools; local regression, browser and soak checks; report/deck drafts prepared | |
+
+This is a coding/design work record, not evidence of a supervisor interaction. Genuine identity/provider/container qualification, real connector/device checks, physical evidence or scope approval and an attended presentation rehearsal remain open. Current qualification is recorded under `docs/product/validation/session-journal/`.
+
+15 November 2026 continuation: completed advanced resumable-draft lineage and the exact-member team interface, corrected shared browser-fixture assumptions, and reran local checks. Genuine login/container/physical qualification and supervisor remarks remain open.

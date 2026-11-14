@@ -1,3 +1,7 @@
+# Current product checkpoint dated 15 November 2026
+
+The current software entry is the [Session Journal](../product/SESSION_JOURNAL.md). Its [qualification ledger](../product/validation/session-journal/README.md) separates passed software checks from unrun genuine identity, provider, container and physical checks. Earlier simulator/procurement notes below remain historical.
+
 # CertaRig capstone checkpoint
 
 The current extension is documented in [EXTENSION.md](EXTENSION.md), with [signed mission/rubric mapping](REQUIREMENTS.md) and [hardware design/procurement holds](HARDWARE_REVIEW.md). Start there. The older workflow notes below describe the initial baseline; current results are in the release validation receipt.

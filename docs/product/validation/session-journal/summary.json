@@ -1,0 +1,85 @@
+{
+  "date": "2026-11-15",
+  "branch": "product/session-journal-2026-11-14",
+  "base_commit": "13bd409a1ec045df986b1fc1aa8e129562a3ddee",
+  "implementation_commits": [
+    "60a110b",
+    "4b5ea18"
+  ],
+  "scope": "local observation; fixture-backed coding qualification",
+  "checks": {
+    "lint": "passed",
+    "mypy": {
+      "status": "passed",
+      "source_files": 120
+    },
+    "coverage": {
+      "status": "passed",
+      "gate_percent": 90,
+      "reported_total_percent": 90.63,
+      "line_rate": 0.9294,
+      "branch_rate": 0.8368
+    },
+    "new_description_and_lineage_tests": {
+      "passed": 40
+    },
+    "platform_browser": {
+      "passed": 11,
+      "identity": "test issuer",
+      "provider": "deterministic fixture",
+      "sandbox_engine": "test double"
+    },
+    "legacy_edge_browser": {
+      "passed": 10
+    },
+    "simulated_hour_soak": "passed",
+    "clean_wheel_import_and_schema": "passed",
+    "standalone_wheel_ui": "not claimed; source checkout required",
+    "prototype": {
+      "status": "passed",
+      "consoleErrors": [],
+      "platformRequests": 0,
+      "checks": [
+        "fixture success, independent review, observation and revocation",
+        "stale-source refusal and recovery",
+        "draft refresh recovery",
+        "all eight destinations",
+        "command palette and modal Escape",
+        "four viewport widths and no horizontal overflow",
+        "task cancellation and late-result suppression",
+        "200 percent reflow equivalent at 720 CSS pixels and 2x device scale",
+        "mobile navigation and builder"
+      ],
+      "nativeKeyboard": "unverified"
+    }
+  },
+  "qualification": {
+    "dex_two_real_accounts": "unverified",
+    "live_codex": "unverified",
+    "sandbox_image": "not built",
+    "real_container_cases": {
+      "passed": 0,
+      "unrun": 7
+    },
+    "sandbox_preflight": {
+      "ready": false,
+      "free_bytes": 17140027392,
+      "memory_pressure": 2,
+      "blockers": [
+        "macOS memory pressure is elevated; close workloads manually",
+        "Pinned sandbox image has not been built"
+      ]
+    },
+    "real_mqtt_broker": "unrun in this checkpoint",
+    "physical_serial_modbus": "unverified",
+    "native_mobile_keyboard": "unverified",
+    "physical_capstone_missions": "actual evidence or genuine approved scope amendment required",
+    "final_university_deadline": "unconfirmed"
+  },
+  "boundaries": {
+    "physical_actuation": false,
+    "paid_model_calls": false,
+    "public_hosting": false,
+    "automatic_merge": false
+  }
+}

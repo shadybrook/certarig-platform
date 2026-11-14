@@ -1,5 +1,7 @@
 # CertaRig Innovator Workbench
 
+**14 November update:** `/` now opens [Session Journal A](SESSION_JOURNAL.md), including versioned bench descriptions and support reports. `/classic` retains the three-panel interface described below. Current results and outstanding qualification are in [Session Journal validation](validation/session-journal/README.md).
+
 The product is a local software workspace for engineering bench owners. A project groups benches; it grants no equipment permissions. A task selects one permitted bench. Independent agents and reviewed supervisor teams share the existing customer lifecycle.
 
 ## Open the product

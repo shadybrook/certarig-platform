@@ -1,0 +1,17 @@
+{
+  "status": "passed",
+  "consoleErrors": [],
+  "platformRequests": 0,
+  "checks": [
+    "fixture success, independent review, observation and revocation",
+    "stale-source refusal and recovery",
+    "draft refresh recovery",
+    "all eight destinations",
+    "command palette and modal Escape",
+    "four viewport widths and no horizontal overflow",
+    "task cancellation and late-result suppression",
+    "200 percent reflow equivalent at 720 CSS pixels and 2x device scale",
+    "mobile navigation and builder"
+  ],
+  "nativeKeyboard": "unverified"
+}

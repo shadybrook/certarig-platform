@@ -1,0 +1,17 @@
+{
+  "seconds": [
+    30,
+    60,
+    60,
+    45,
+    75,
+    45,
+    300,
+    120,
+    105,
+    60
+  ],
+  "total_seconds": 900,
+  "live_demo_seconds": 300,
+  "status": "planned timing; not an attended rehearsal"
+}

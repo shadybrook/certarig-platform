@@ -36,3 +36,6 @@ studio/test-results-platform/
 # Also ignore development environments supplied as local symlinks.
 .venv
 studio/node_modules
+
+# Keep generated prototype renders separate from selected evidence screenshots.
+docs/product/validation/session-journal/prototype/*.png

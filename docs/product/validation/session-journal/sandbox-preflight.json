@@ -1,0 +1,9 @@
+{
+  "ready": false,
+  "free_bytes": 17140027392,
+  "memory_pressure": 2,
+  "blockers": [
+    "macOS memory pressure is elevated; close workloads manually",
+    "Pinned sandbox image has not been built"
+  ]
+}

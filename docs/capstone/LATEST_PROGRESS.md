@@ -1,3 +1,9 @@
+# Current software update dated 15 November 2026
+
+The selected Session Journal A is implemented on `product/session-journal-2026-11-14`. See [product workflow](../product/SESSION_JOURNAL.md) and [current validation and qualification ledger](../product/validation/session-journal/README.md). The new bench-description layer records provenance and unresolved facts without granting execution authority. Current hardware direction is a reference accessory below ₹3,000; the older water-loop proposals below are historical, not a current order instruction or a physical result. Signed physical missions still need actual evidence or genuine supervisor-approved amendment.
+
+---
+
 # CertaRig capstone progress - 11 November 2026
 
 Start with the [extended-bench electrical connection diagram](../hardware/extended-rig/CR-EXT-R1/CertaRig_Extended_Bench_Circuit_CR-EXT-R1.pdf),
